@@ -26,9 +26,11 @@ import org.alfresco.opencmis.dictionary.CMISDictionaryService;
 import org.alfresco.opencmis.search.CMISQueryService;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.forms.FormService;
+import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.imap.ImapService;
 import org.alfresco.repo.lock.JobLockService;
 import org.alfresco.repo.nodelocator.NodeLocatorService;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper;
 import org.alfresco.repo.search.impl.solr.facet.handler.FacetLabelDisplayHandlerRegistry;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -47,12 +49,13 @@ import org.alfresco.service.cmr.ml.ContentFilterLanguagesService;
 import org.alfresco.service.cmr.ml.EditionService;
 import org.alfresco.service.cmr.ml.MultilingualContentService;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.notification.NotificationService;
 import org.alfresco.service.cmr.rating.RatingService;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
-import org.alfresco.service.cmr.repository.CrossRepositoryCopyService;
+import org.alfresco.service.cmr.repository.DocumentLinkService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.ScriptService;
@@ -473,6 +476,35 @@ public class MockedTestServiceRegistry implements ServiceRegistry
 
     @Override
     public FacetLabelDisplayHandlerRegistry getFacetLabelDisplayHandlerRegistry()
+    {
+        // A mock response
+        return null;
+    }
+
+
+    @Override
+    public ModuleService getModuleService()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MessageService getMessageService()
+    {
+        // A mock response
+        return null;
+    }
+
+    @Override
+    public DocumentLinkService getDocumentLinkService() 
+    {
+        // A mock response
+        return null;
+    }
+    
+    @Override
+    public PolicyComponent getPolicyComponent()
     {
         // A mock response
         return null;

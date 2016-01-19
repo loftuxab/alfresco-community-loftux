@@ -202,7 +202,7 @@ public abstract class FilteredFormProcessor<ItemType, PersistType> extends Abstr
     /**
      * Generates a list of default fields to add if no field names are specified.
      * @param data Used for field creation.
-     * @param ignoredFields TODO
+     * @param fieldsToIgnore TODO
      * @return a {@link List} of {@link Field Fields} which may be empty.
      */
     protected List<Field> generateDefaultFields(FormCreationData data, List<String> fieldsToIgnore)
@@ -246,7 +246,7 @@ public abstract class FilteredFormProcessor<ItemType, PersistType> extends Abstr
 
     /**
      * Creates a data object used by the {@link FormProcessor} and {@link FieldProcessor FieldProcessors} to create {@link Field Fields}
-     * @return
+     * @return Object
      */
     protected abstract Object makeItemData(ItemType item);
 
@@ -271,15 +271,15 @@ public abstract class FilteredFormProcessor<ItemType, PersistType> extends Abstr
 
     /**
      * Returns a {@link String} describing the type fo the specified item.
-     * @param item
-     * @return
+     * @param item ItemType
+     * @return String
      */
     protected abstract String getItemType(ItemType item);
 
     /**
      * Returns the URI location of the specified item.
-     * @param item
-     * @return
+     * @param item ItemType
+     * @return String
      */
     protected abstract String getItemURI(ItemType item);
     

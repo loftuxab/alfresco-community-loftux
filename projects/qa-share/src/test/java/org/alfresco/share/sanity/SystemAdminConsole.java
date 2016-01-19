@@ -83,7 +83,6 @@ public class SystemAdminConsole extends AbstractUtils
         // Transformation Services section
         assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.transformationServices.OpenOfficeDirect.get()), "Radio button isn't present");
         assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.transformationServices.JODConverter.get()), "Radio button isn't present");
-        assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.transformationServices.SWFTools.get()), "Radio button isn't present");
         assertTrue(sysSummaryPage.isRadioButtonPresent(SystemSummaryPage.transformationServices.ImageMagic.get()), "Radio button isn't present");
         String ffValue = sysSummaryPage.getValue(SystemSummaryPage.transformationServices.FFMpeg.get());
         assertTrue(ffValue.contains("nstalled"), "");

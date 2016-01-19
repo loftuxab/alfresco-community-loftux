@@ -95,7 +95,7 @@ public class AssociationRef implements EntityRef, Serializable
     }
     
     /**
-     * @param childAssocRefStr a string of the form <b>id|sourceNodeRef|targetNodeRef|assocTypeQName</b>.
+     * @param assocRefStr a string of the form <b>id|sourceNodeRef|targetNodeRef|assocTypeQName</b>.
      */
     public AssociationRef(String assocRefStr)
     {

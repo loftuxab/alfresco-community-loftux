@@ -110,7 +110,7 @@ public class PublicApiClient
 		this.rc.set(rc);
 	}
 
-	private RequestContext getRequestContext()
+	public RequestContext getRequestContext()
 	{
 		RequestContext context = rc.get();
 		if(context == null)
@@ -240,7 +240,7 @@ public class PublicApiClient
 	/**
 	 * Get CMIS repositories (Enterprise AtomPub CMIS binding)
 	 * 
-	 * @return
+	 * @return List<Repository>
 	 */
 	public List<Repository> getCMISRepositories()
 	{
@@ -276,10 +276,10 @@ public class PublicApiClient
 	/**
 	 * Create a CMIS session using Enterprise AtomPub binding.
 	 * 
-	 * @param repositoryId
-	 * @param username
-	 * @param password
-	 * @return
+	 * @param repositoryId String
+	 * @param username String
+	 * @param password String
+	 * @return CmisSession
 	 */
 	public CmisSession createCMISSession(String repositoryId, String username, String password)
 	{
@@ -439,6 +439,17 @@ public class PublicApiClient
 
 		return response;
 	}
+
+    public HttpResponse post(String scope, String entityCollectionName, Object entityId, String relationCollectionName, Object relationshipEntityId,
+                String body, String contentType) throws IOException
+    {
+        HttpResponse response = client.post(getRequestContext(), scope, entityCollectionName, entityId, relationCollectionName,
+                    relationshipEntityId != null ? relationshipEntityId.toString() : null, body, contentType);
+
+        logger.debug(response.toString());
+
+        return response;
+    }
 
 	public HttpResponse post(String urlSuffix, String body) throws IOException
 	{

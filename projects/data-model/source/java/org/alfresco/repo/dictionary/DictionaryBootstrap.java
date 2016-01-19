@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Properties;
 
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryException;
@@ -52,6 +53,8 @@ public class DictionaryBootstrap implements DictionaryListener
     // Tenant Service
     private TenantService tenantService;
 
+    private Properties globalProperties;
+
     // Logger
     private static Log logger = LogFactory.getLog(DictionaryBootstrap.class);
     
@@ -59,7 +62,7 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the Dictionary DAO
      * 
-     * @param dictionaryDAO
+     * @param dictionaryDAO DictionaryDAO
      */
     public void setDictionaryDAO(DictionaryDAO dictionaryDAO)
     {
@@ -69,11 +72,21 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the Tenant Service
      * 
-     * @param tenantService
+     * @param tenantService TenantService
      */
     public void setTenantService(TenantService tenantService)
     {
         this.tenantService = tenantService;
+    }
+    
+    /**
+     * Sets the global properties
+     * 
+     * @param globalProperties
+     */
+    public void setGlobalProperties(Properties globalProperties)
+    {
+        this.globalProperties = globalProperties;
     }
     
     /**
@@ -89,7 +102,7 @@ public class DictionaryBootstrap implements DictionaryListener
     /**
      * Sets the initial list of models to bootstrap with
      * 
-     * @param modelResources the model names
+     * @param labels the labels
      */
     public void setLabels(List<String> labels)
     {
@@ -141,12 +154,13 @@ public class DictionaryBootstrap implements DictionaryListener
                 InputStream modelStream = getClass().getClassLoader().getResourceAsStream(bootstrapModel);
                 if (modelStream == null)
                 {
-                    throw new DictionaryException("Could not find bootstrap model " + bootstrapModel);
+                    throw new DictionaryException("d_dictionary.bootstrap.model_not_found", bootstrapModel);
                 }
                 try
                 {
                     M2Model model = M2Model.createModel(modelStream);
-
+                    model.setConfigProperties(globalProperties);
+                    
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Loading model: "+model.getName()+" (from "+bootstrapModel+")");
@@ -156,7 +170,7 @@ public class DictionaryBootstrap implements DictionaryListener
                 }
                 catch(DictionaryException e)
                 {
-                    throw new DictionaryException("Could not import bootstrap model " + bootstrapModel, e);
+                    throw new DictionaryException("d_dictionary.bootstrap.model_not_imported", e, bootstrapModel);
                 }
                 finally
                 {

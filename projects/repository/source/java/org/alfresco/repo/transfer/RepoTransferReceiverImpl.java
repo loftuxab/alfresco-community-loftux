@@ -499,7 +499,7 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
     }
 
     /**
-     * @return
+     * @return NodeRef
      */
     private NodeRef createTransferRecord()
     {
@@ -558,7 +558,7 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
      *
      * This is the last chance to clean up.
      *
-     * @param transferId
+     * @param transferId String
      */
     private void timeout(final String transferId)
     {
@@ -722,7 +722,7 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
     }
 
     /**
-     * @param stagingFolder
+     * @param file File
      */
     private void deleteFile(File file)
     {
@@ -897,6 +897,8 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
                     List<TransferManifestProcessor> commitProcessors = manifestProcessorFactory.getCommitProcessors(
                             RepoTransferReceiverImpl.this, transferId);
 
+                    Set<TransferSummaryReport> summaryReports = new HashSet<TransferSummaryReport>();
+
                     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
                     SAXParser parser = saxParserFactory.newSAXParser();
                     File snapshotFile = getSnapshotFile(transferId);
@@ -914,7 +916,10 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
 
                             //behaviourFilter.disableBehaviour(ContentModel.ASPECT_AUDITABLE);
                             behaviourFilter.disableBehaviour();
-
+                            if (processor instanceof TransferSummaryAware)
+                            {
+                                summaryReports.add(((TransferSummaryAware) processor).getTransferSummaryReport());
+                            }
                             try
                             {
                                 parser.parse(snapshotFile, reader);
@@ -924,6 +929,14 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
                                 behaviourFilter.enableBehaviour();
                             }
                             parser.reset();
+                        }
+
+                        for (TransferSummaryReport transferSummaryReport : summaryReports)
+                        {
+                            if (transferSummaryReport != null)
+                            {
+                                transferSummaryReport.finishSummaryReport();
+                            }
                         }
                     }
                     else
@@ -1498,7 +1511,7 @@ public class RepoTransferReceiverImpl implements TransferReceiver,
         /**
          * Make the lock - called on main thread
          *
-         * @throws LockAquisitionException
+         * @throws org.alfresco.repo.lock.LockAcquisitionException
          */
         public synchronized void makeLock()
         {

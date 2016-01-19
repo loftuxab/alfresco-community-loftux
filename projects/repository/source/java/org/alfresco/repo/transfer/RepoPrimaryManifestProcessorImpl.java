@@ -123,7 +123,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     private Map<NodeRef, NodeRef> categoryMap = new HashMap<NodeRef, NodeRef>();
 
     /**
-     * @param transferId
+     * @param receiver TransferReceiver
+     * @param transferId String
      */
     public RepoPrimaryManifestProcessorImpl(TransferReceiver receiver, String transferId)
     {
@@ -174,7 +175,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
                         + "  - deleting");
             }
             
-            logDeleted(node.getNodeRef(), exNode, nodeService.getPath(exNode).toString());    
+            logDeleted(node.getNodeRef(), exNode, nodeService.getPath(exNode).toString()); 
+            logSummaryDeleted(node.getNodeRef(), exNode, nodeService.getPath(exNode).toString()); 
             
             delete(node, exNode);
         }
@@ -215,6 +217,12 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
         // Does a corresponding node exist in this repo?
         if (resolvedNodes.resolvedChild != null)
         {
+            if (log.isTraceEnabled())
+            {
+                log.trace("REPO_PRIMARY_MANIFEST_PROCESSOR - node DOES exist!");
+                logInvasionHierarchy(resolvedNodes.resolvedParent, resolvedNodes.resolvedChild, nodeService, log);
+            }
+
             // Yes, the corresponding node does exist. Update it.
             if (log.isDebugEnabled())
             {
@@ -222,6 +230,11 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
                         + resolvedNodes.resolvedChild);
             }
             update(node, resolvedNodes, primaryParentAssoc);
+
+            if (log.isTraceEnabled())
+            {
+                log.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            }
         }
         else
         {
@@ -245,16 +258,28 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
             {
                 log.debug("Incoming noderef has no corresponding local noderef: " + node.getNodeRef());
             }
+
+            if (log.isTraceEnabled())
+            {
+                log.trace("REPO_PRIMARY_MANIFEST_PROCESSOR - node DOES NOT esist yet! Name: '" + node.getProperties().get(ContentModel.PROP_NAME) + "', parentPath: '"
+                        + node.getParentPath() + "'");
+            }
+
             create(node, resolvedNodes, primaryParentAssoc);
+
+            if (log.isTraceEnabled())
+            {
+                log.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+            }
         }
     }
 
     /**
      * Create new node.
      * 
-     * @param node
-     * @param resolvedNodes
-     * @param primaryParentAssoc
+     * @param node TransferManifestNormalNode
+     * @param resolvedNodes ResolvedParentChildPair
+     * @param primaryParentAssoc ChildAssociationRef
      */
     private void create(TransferManifestNormalNode node, ResolvedParentChildPair resolvedNodes,
             ChildAssociationRef primaryParentAssoc)
@@ -324,6 +349,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
         }
         
         logCreated(node.getNodeRef(), newNode.getChildRef(), newNode.getParentRef(), nodeService.getPath(newNode.getChildRef()).toString(), false);
+        logSummaryCreated(node.getNodeRef(), newNode.getChildRef(), newNode.getParentRef(), nodeService.getPath(newNode.getChildRef()).toString(), false);
         
         // Deal with the content properties
         writeContent(newNode.getChildRef(), contentProps);
@@ -374,7 +400,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     
     /**
      * Delete this node
-     * @param exNode
+     * @param node TransferManifestDeletedNode
+     * @param nodeToDelete NodeRef
      */
     protected void delete(TransferManifestDeletedNode node, NodeRef nodeToDelete)
     {
@@ -409,6 +436,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
             
             // Not alien or from another repo - delete it.
             logDeleted(node.getNodeRef(), nodeToDelete, nodeService.getPath(nodeToDelete).toString());
+            logSummaryDeleted(node.getNodeRef(), nodeToDelete, nodeService.getPath(nodeToDelete).toString());
             
             nodeService.deleteNode(nodeToDelete);
             if (log.isDebugEnabled())
@@ -446,9 +474,9 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
 
     /**
      * 
-     * @param node
-     * @param resolvedNodes
-     * @param primaryParentAssoc
+     * @param node TransferManifestNormalNode
+     * @param resolvedNodes ResolvedParentChildPair
+     * @param primaryParentAssoc ChildAssociationRef
      */
     private void update(TransferManifestNormalNode node, ResolvedParentChildPair resolvedNodes,
             ChildAssociationRef primaryParentAssoc)
@@ -517,6 +545,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
             ChildAssociationRef newNode = nodeService.moveNode(nodeToUpdate, parentNodeRef, parentAssocType, parentAssocName);
             logMoved(node.getNodeRef(), nodeToUpdate, node.getParentPath().toString(), newNode.getParentRef(), 
                     nodeService.getPath(newNode.getChildRef()).toString());
+            logSummaryMoved(node.getNodeRef(), nodeToUpdate, node.getParentPath().toString(), newNode.getParentRef(), 
+                    nodeService.getPath(newNode.getChildRef()).toString());
             
             /**
              * are we adding an alien node here? The transfer service has policies disabled 
@@ -582,8 +612,11 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
             nodeService.setProperties(nodeToUpdate, props);
 
             // Deal with the content properties
-            writeContent(nodeToUpdate, contentProps);
-
+           boolean contentUpdated = writeContent(nodeToUpdate, contentProps);
+            if (contentUpdated)
+            {
+                logSummaryUpdated(node.getNodeRef(), nodeToUpdate, nodeService.getPath(nodeToUpdate).toString());
+            }
             // Change the type of the content
             if(!nodeService.getType(nodeToUpdate).equals(node.getType()))
             {
@@ -735,7 +768,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
      *            The noderef of the existing node in the local repo that is to be updated with these properties. May be
      *            null, indicating that these properties are destined for a brand new local node.
      * @param props the new properties
-     * @param the existing properties, null if this is a create
+     * @param existingProps the existing properties, null if this is a create
      * @return A map containing the content properties which are going to be replaced from the supplied "props" map
      */
     private Map<QName, Serializable> processProperties(NodeRef nodeToUpdate, Map<QName, Serializable> props,
@@ -824,12 +857,13 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     }
 
     /**
-     * @param node
-     * @param nodeToUpdate
-     * @param contentProps
+     * @param nodeToUpdate NodeRef
+     * @param contentProps Map<QName, Serializable>
+     * @return true if any content property has been updated for the needToUpdate node
      */
-    private void writeContent(NodeRef nodeToUpdate, Map<QName, Serializable> contentProps)
+    private boolean writeContent(NodeRef nodeToUpdate, Map<QName, Serializable> contentProps)
     {
+        boolean contentUpdated = false;
         File stagingDir = getStagingFolder();
         for (Map.Entry<QName, Serializable> contentEntry : contentProps.entrySet())
         {
@@ -840,6 +874,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
                 log.debug("content data is null or empty:" + nodeToUpdate);
                 ContentData cd = new ContentData(null, null, 0, null);
                 nodeService.setProperty(nodeToUpdate, contentEntry.getKey(), cd);
+                contentUpdated = true;
             }
             else
             {
@@ -854,8 +889,10 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
                 writer.setMimetype(contentData.getMimetype());
                 writer.setLocale(contentData.getLocale());
                 writer.putContent(stagedFile);
+                contentUpdated = true;
             }
         }
+        return contentUpdated;
     }
 
     protected boolean updateNeeded(TransferManifestNormalNode node, NodeRef nodeToUpdate)
@@ -885,7 +922,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     }
 
     /**
-     * @return
+     * @return Set<QName>
      */
     protected Set<QName> getLocalProperties()
     {
@@ -893,7 +930,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     }
 
     /**
-     * @param primaryParentAssoc
+     * @param primaryParentAssoc ChildAssociationRef
      */
     private void storeOrphanNode(ChildAssociationRef primaryParentAssoc)
     {
@@ -907,8 +944,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     }
 
     /**
-     * @param node
-     * @param msgId
+     * @param node TransferManifestNode
+     * @param msgId String
      */
     private void error(TransferManifestNode node, String msgId)
     {
@@ -918,7 +955,7 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
     }
 
     /**
-     * @param msgId
+     * @param msgId String
      */
     private void error(String msgId)
     {
@@ -994,8 +1031,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
      * CRUD of Categories and Tags - also maps noderefs of type d:content from source to target
      * 
      * 
-     * @param properties
-     * @param manifestCategories
+     * @param properties Map<QName, Serializable>
+     * @param manifestCategories Map<NodeRef, ManifestCategory>
      */
     private void processCategories(Map<QName, Serializable> properties, Map<NodeRef, ManifestCategory> manifestCategories)
     {   
@@ -1058,8 +1095,8 @@ public class RepoPrimaryManifestProcessorImpl extends AbstractManifestProcessorB
      * 
      * It will lazily create any missing categories and tags as it executes.
      * 
-     * @param sourceCategoryNodeRef
-     * @param manifestCategories
+     * @param sourceCategoryNodeRef NodeRef
+     * @param manifestCategories Map<NodeRef, ManifestCategory>
      * @return targetNodeRef
      */
     private NodeRef processCategory(final NodeRef sourceCategoryNodeRef, final Map<NodeRef, ManifestCategory> manifestCategories)

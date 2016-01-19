@@ -13,6 +13,16 @@
 		<#if node.properties.modified??>${indent}"modified": "${xmldate(node.properties.modified)}",</#if>
 		<#if node.properties.modifier??>${indent}"modifier": "${node.properties.modifier}",</#if>
 		${indent}"displayPath": "${node.displayPath!""}",
+		<#if node.aspects??>
+        ${indent}"aspects": 
+        ${indent}[
+           <#list node.aspects as aspect>
+                 "${shortQName(aspect)}"
+              <#if aspect_has_next>,</#if>
+           </#list>
+        
+           ${indent}],
+       </#if>
 		${indent}"nodeRef": "${node.nodeRef}"
 	${indent}},
 	</#escape>
@@ -32,10 +42,17 @@
 			{
 				"type": "${row.item.typeShort}",
 				"parentType": "${row.item.parentTypeShort!""}",
-				<#if row.item.parent??>"parentName": "${row.item.parent.name!""}",</#if>
 				"isContainer": ${row.item.isContainer?string},
 				<#if row.container??>"container": "${row.container!""}",</#if>
 				"name": "${row.item.properties.name!""}",
+				<#if row.item.aspects??>
+                 "aspects": [
+                   <#list row.item.aspects as aspect>
+                     "${shortQName(aspect)}"
+                      <#if aspect_has_next>,</#if>
+                   </#list>
+                   ],
+                 </#if>
 				"title":<#if row.item.properties["lnk:title"]??>"${row.item.properties["lnk:title"]}",
 						<#elseif row.item.properties["ia:whatEvent"]??>"${row.item.properties["ia:whatEvent"]}",
 						<#else>"${row.item.properties.title!""}",</#if>

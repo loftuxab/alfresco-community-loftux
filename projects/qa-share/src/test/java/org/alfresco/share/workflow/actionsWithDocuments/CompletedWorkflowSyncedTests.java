@@ -79,25 +79,20 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         signInToAlfrescoInTheCloud(drone, cloudUser, DEFAULT_PASSWORD);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15690() throws Exception
-    {
-        createCompletedWorkflow("15690" + "A4");
-    }
-
     /**
      * AONE-15690: Modify properties (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15690() throws Exception
     {
-        String prefix = "15690" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
         String modifiedTitle = testName + "modifiedBy 1";
         String modifiedDescription = simpleTaskFile + " modified by 1";
 
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // OP Modify the synced document's properties, e.g. change title and description.
@@ -129,25 +124,21 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
                 "Document Description modified by OP User is not present for Cloud.");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15691() throws Exception
-    {
-        createCompletedWorkflow("15691" + "A43");
-    }
-
     /**
      * AONE-15691: Modify properties (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15691() throws Exception
     {
-        String prefix = "15691" + "A43";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
         String modifiedTitle = testName + "modifiedBy 5";
         String modifiedDescription = simpleTaskFile + " modified by 5";
 
+
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // Cloud Modify the synced document's properties, e.g. change title and description.
@@ -183,24 +174,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
                 "Document Description modified by CLoud User is not present for OP.");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15692() throws Exception
-    {
-        createCompletedWorkflow("15692" + "A4");
-    }
-
-    /**
+     /**
      * AONE-15692: Modify content (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15692() throws Exception
     {
-        String prefix = "15692" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
         String modifiedContent = testName + "modified content";
 
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // OP Modify the synced document's content
@@ -209,7 +195,7 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The content is changed successfully.
         ShareUser.login(drone, user1, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContent);
         contentDetails.setName(simpleTaskFile);
@@ -231,28 +217,25 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         DocumentDetailsPage documentDetailsPageCL;
         EditTextDocumentPage inlineEditPageCL = new EditTextDocumentPage(hybridDrone);
         documentLibraryPageCL = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite).render();
-        documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile);
+        documentDetailsPageCL = documentLibraryPageCL.selectFile(simpleTaskFile).render();
         inlineEditPageCL = documentDetailsPageCL.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPageCL.getDetails().getContent().contains(modifiedContent), "Changes are not displayed on Cloud");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15693() throws Exception
-    {
-        createCompletedWorkflow("15693" + "A4");
-    }
 
     /**
      * AONE-15683:Incomplete workflow - modify content (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15693() throws Exception
     {
-        String prefix = "15693" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
         String modifiedContentOnCloud = testName + "modified content in CLOUD";
+
+        createCompletedWorkflow(testName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -261,14 +244,14 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         // The content is changed successfully.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);
         DocumentLibraryPage documentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(modifiedContentOnCloud);
         contentDetails.setName(simpleTaskFile);
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         documentDetailsPage = inlineEditPage.save(contentDetails).render();
         ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite);
-        documentLibraryPage.selectFile(simpleTaskFile);
+        documentLibraryPage.selectFile(simpleTaskFile).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Content is not modified");
         ShareUser.logout(hybridDrone);
@@ -285,29 +268,24 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         docLib.getFileDirectoryInfo(simpleTaskFile).selectRequestSync().render();
         waitForSync(drone, simpleTaskFile, opSiteName);
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
-        documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile);
+        documentDetailsPage = documentLibraryPage.selectFile(simpleTaskFile).render();
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         Assert.assertTrue(inlineEditPage.getDetails().getContent().contains(modifiedContentOnCloud), "Changes are not displayed on OP");
-    }
-
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15694() throws Exception
-    {
-        createCompletedWorkflow("15694" + "A4");
     }
 
     /**
      * AONE-15694: Move (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15694() throws Exception
     {
-        String prefix = "15694" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
-        String folderName = getFolderName(prefix + testName);
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
+        String folderName = getFolderName(testName);
 
+        createCompletedWorkflow(testName);
         // ---- Step 1, 2 ----
         // ---- Step action ---
         // OP Move the synced document to another location.
@@ -330,24 +308,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15695() throws Exception
-    {
-        createCompletedWorkflow("15695" + "A4");
-    }
-
     /**
      * AONE-15695:Move (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15695() throws Exception
     {
-        String prefix = "15695" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
-        String folderName = getFolderName(prefix + testName);
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
+        String folderName = getFolderName(testName);
 
+        createCompletedWorkflow(testName);
         // ---- Step 1, 2 ----
         // ---- Step action ---
         // Cloud Move the synced document to another location
@@ -373,23 +346,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15696() throws Exception
-    {
-        createCompletedWorkflow("15696" + "A4");
-    }
 
     /**
      * AONE-15696: Remove (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15696() throws Exception
     {
-        String prefix = "15696" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
 
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // OP Remove the synced document.
@@ -412,23 +381,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15697() throws Exception
-    {
-        createCompletedWorkflow("15697" + "A4");
-    }
 
     /**
      * AONE-15697:Remove (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15697() throws Exception
     {
-        String prefix = "15697" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
 
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // Cloud Remove the synced document.
@@ -451,22 +416,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         Assert.assertFalse(documentLibraryPage.isFileVisible(simpleTaskFile), "File is still displayed on OP");
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15698() throws Exception
-    {
-        createCompletedWorkflow("15698" + "A4");
-    }
 
     /**
      * AONE-15698:UnSync (OP)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15698() throws Exception
     {
-        String prefix = "15698" + "A4";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
+
+        createCompletedWorkflow(testName);
 
         // ---- Step 1 ----
         // ---- Step action ---
@@ -490,23 +452,19 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         ShareUser.logout(hybridDrone);
     }
 
-    @Test(groups = "DataPrepHybrid", timeOut = 600000)
-    public void dataPrep_AONE_15699() throws Exception
-    {
-        createCompletedWorkflow("15699" + "A6");
-    }
 
     /**
      * AONE-15699:UnSync (Cloud)
      */
-    @Test(groups = "Hybrid", enabled = true, timeOut = 300000)
+    @Test(groups = "Hybrid", enabled = true)
     public void AONE_15699() throws Exception
     {
-        String prefix = "15699" + "A6";
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSite = getSiteName(prefix + testName) + "-CL";
-        String simpleTaskFile = getFileName(prefix + testName) + ".txt";
+        String testName = getTestName() + System.currentTimeMillis();
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSite = getSiteName(testName) + "-CL";
+        String simpleTaskFile = getFileName(testName) + ".txt";
 
+        createCompletedWorkflow(testName);
         // ---- Step 1 ----
         // ---- Step action ---
         // Cloud UnSync the synced document i.e as network admin click 'Force UnSync' option
@@ -529,16 +487,15 @@ public class CompletedWorkflowSyncedTests extends AbstractWorkflow
         Assert.assertTrue(opDocumentLibraryPage.getFileDirectoryInfo(simpleTaskFile).isCloudSynced(), "File is not synced");
     }
 
-    private void createCompletedWorkflow(String prefix) throws Exception
+    private void createCompletedWorkflow(String testName) throws Exception
     {
-        testName = this.getClass().getSimpleName();
         List<String> userNames = new ArrayList<String>();
         userNames.add(cloudUser);
-        String opSiteName = getSiteName(prefix + testName) + "-OP";
-        String cloudSiteName = getSiteName(prefix + testName) + "-CL";
-        String fileName = getFileName(prefix + testName) + ".txt";
-        String folderName = getFolderName(prefix + testName);
-        String workFlowName = prefix + testName + "-WF";
+        String opSiteName = getSiteName(testName) + "-OP";
+        String cloudSiteName = getSiteName(testName) + "-CL";
+        String fileName = getFileName(testName) + ".txt";
+        String folderName = getFolderName(testName);
+        String workFlowName = testName + "-WF";
 
         // Cloud user logins and create site.
         ShareUser.login(hybridDrone, cloudUser, DEFAULT_PASSWORD);

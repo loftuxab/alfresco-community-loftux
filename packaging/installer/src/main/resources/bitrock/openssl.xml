@@ -31,20 +31,20 @@ Copyrighted by BitRock
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="OPENSSL_COMMON_FILE_LIST">
-            <value>				${common_root_directory}/bin/openssl
+            <value>             ${common_root_directory}/bin/openssl
                                                 ${common_root_directory}/openssl/openssl.cnf
-			</value>
+            </value>
         </setInstallerVariable>
         <setInstallerVariable name="CURL_COMMON_FILE_LIST">
-            <value>				${common_root_directory}/lib/libcurl.la
-						${common_root_directory}/lib/pkgconfig/libcurl.pc
-						${common_root_directory}/bin/curl-config
-             		</value>
+            <value>             ${common_root_directory}/lib/libcurl.la
+                        ${common_root_directory}/lib/pkgconfig/libcurl.pc
+                        ${common_root_directory}/bin/curl-config
+                    </value>
         </setInstallerVariable>  
         <setInstallerVariable name="CURL_COMMON_FILE_LIST">
-            <value>${CURL_COMMON_FILE_LIST}				
-						${common_root_directory}/bin/curl
-             		</value>
+            <value>${CURL_COMMON_FILE_LIST}             
+                        ${common_root_directory}/bin/curl
+                    </value>
             <ruleList>
                 <isTrue value="${curl_environment_wrapped}" />
             </ruleList>
@@ -73,6 +73,8 @@ SSL_CERT_FILE=${common_root_directory}/openssl/certs/curl-ca-bundle.crt
 export SSL_CERT_FILE
 OPENSSL_CONF=${common_root_directory}/openssl/openssl.cnf
 export OPENSSL_CONF
+OPENSSL_ENGINES=${common_root_directory}/lib/engines
+export OPENSSL_ENGINES
 </value>
                 </setInstallerVariable>
                 <setInstallerVariable name="ENV_VAR" value="${ENV_VAR}${SSL_ENV_VAR}"/>
@@ -97,18 +99,18 @@ set OPENSSL_CONF=${apache_configuration_directory.dos}\openssl.cnf
         </actionGroup>
     </readyToInstallActionList>
     <postInstallationActionList>
-	<addTextToFile>
-	    <file>${php_configuration_directory}/php.ini</file>
-	    <text>
+    <addTextToFile>
+        <file>${php_configuration_directory}/php.ini</file>
+        <text>
 ;Curl ca bundle certificate
 curl.cainfo="${common_root_directory}/openssl/certs/curl-ca-bundle.crt"
 </text>
-	    <ruleList>
-		<componentTest name="php" logic="exists" />
-		<platformTest type="unix" />
-		<fileExists path="${php_configuration_directory}/php.ini" />
-	    </ruleList>
-	</addTextToFile>
+        <ruleList>
+        <componentTest name="php" logic="exists" />
+        <platformTest type="unix" />
+        <fileExists path="${php_configuration_directory}/php.ini" />
+        </ruleList>
+    </addTextToFile>
     <addTextToFile>
         <file>${apache_configuration_directory.dos}\httpd.conf</file>
         <text>SetEnv OPENSSL_CONF "${apache_configuration_directory}/openssl.cnf"

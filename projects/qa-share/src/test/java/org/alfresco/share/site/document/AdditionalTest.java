@@ -88,7 +88,7 @@ public class AdditionalTest extends AbstractUtils {
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
             //Open document details page;
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             double currentVersion = Double.parseDouble(detailsPage.getDocumentVersion());
             //Upload new version for the document;
             File file = new File(DATA_FOLDER + fileName);

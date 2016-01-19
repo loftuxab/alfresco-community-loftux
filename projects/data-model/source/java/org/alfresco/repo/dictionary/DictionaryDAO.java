@@ -53,6 +53,11 @@ public interface DictionaryDAO extends ModelQuery
     /**
      * @return the models known by the dictionary
      */
+    /**
+     * @return the models known by the dictionary
+     */
+    Collection<QName> getModels();
+
     Collection<QName> getModels(boolean includeInherited);
 
     Collection<QName> getTypes(boolean includeInherited);
@@ -83,11 +88,11 @@ public interface DictionaryDAO extends ModelQuery
     Collection<TypeDefinition> getTypes(QName model);
 
     /**
-     * @param superType
+     * @param superType QName
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub types only
-     * @return
+     * @return Collection<QName>
      */
     Collection<QName> getSubTypes(QName superType, boolean follow);
 
@@ -106,11 +111,11 @@ public interface DictionaryDAO extends ModelQuery
     Collection<AssociationDefinition> getAssociations(QName model);
 
     /**
-     * @param superAspect
+     * @param superAspect QName
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub aspects only
-     * @return
+     * @return Collection<QName>
      */
     Collection<QName> getSubAspects(QName superAspect, boolean follow);
 
@@ -183,14 +188,13 @@ public interface DictionaryDAO extends ModelQuery
     /**
      * Get all properties for all models of the given data type.
      * 
-     * @param modelName
-     * @param dataType
-     * @return
+     * @param dataType QName
+     * @return Collection<PropertyDefinition>
      */
     Collection<PropertyDefinition> getPropertiesOfDataType(QName dataType);
 
     /**
-     * @param model
+     * @param modelName
      *            the model to retrieve namespaces for
      * @return the namespaces of the model
      */
@@ -219,7 +223,7 @@ public interface DictionaryDAO extends ModelQuery
      * If the input model does not exist in the Dictionary then no diffs will be
      * returned.
      * 
-     * @param model
+     * @param model M2Model
      * @return model diffs (if any)
      */
     List<M2ModelDiff> diffModel(M2Model model);
@@ -227,25 +231,45 @@ public interface DictionaryDAO extends ModelQuery
     List<M2ModelDiff> diffModelIgnoringConstraints(M2Model model);
 
     /**
+     * Register listener with the Dictionary
+     * <p>
+     *     This method is <b>deprecated</b>, use {@link #registerListener(DictionaryListener dictionaryListener)} instead.
+     * </p>
+     * @param dictionaryListener
+     */
+    @Deprecated
+    void register(DictionaryListener dictionaryListener);
+
+    /**
      * 
      * Register listener with the Dictionary
      * 
-     * @param dictionaryListener
+     * @param dictionaryListener DictionaryListener
      */
     void registerListener(DictionaryListener dictionaryListener);
 
     /**
-     * Reset the Dictionary - destroy & re-initialise
+     * Reset the Dictionary for the current tenant.
+     * The current dictionary will be discarded <b>and reloaded</b> before the method returns
+     * i.e. upon return the dictionary will be current.
      */
     void reset();
 
     /**
-     * Initialise the Dictionary
+     * Initialise a reload of the dictionary for the current tenant.  The current version of
+     * the dictionary will be accessible during this call, however it will only return once
+     * the dictionary has undergone a reload for the current tenant.
      */
     void init();
 
     /**
-     * Destroy the Dictionary
+     * Destroy the Dictionary.  After this call, there will be no dictionary available for the current
+     * tenant; reloading will be done lazily as required.
+     * <p>
+     * <strong>WARNING: </strong>This method can cause 'stutter' on user threads as they wait for
+     * the dictionary to reload.  It is safer to call {@link #init()}, which will also rebuild the
+     * dictionary but will not destroy the old one, thereby allowing other threads to continue
+     * operating.
      */
     void destroy();
 
@@ -253,17 +277,17 @@ public interface DictionaryDAO extends ModelQuery
     boolean isModelInherited(QName name);
 
     /**
-     * @return
+     * @return String
      */
     String getDefaultAnalyserResourceBundleName();
 
     /**
-     * @return
+     * @return ClassLoader
      */
     ClassLoader getResourceClassLoader();
 
     /**
-     * @param resourceClassLoader
+     * @param resourceClassLoader ClassLoader
      */
     void setResourceClassLoader(ClassLoader resourceClassLoader);
 }

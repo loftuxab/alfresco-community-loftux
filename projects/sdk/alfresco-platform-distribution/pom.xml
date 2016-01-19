@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+<!--  
     | This Alfresco Platform distribution POM defines the main Maven accessible artifacts
-    | of a specific Alfresco version / edition (Community / Enterprise)
+    | of a specific Alfresco version / edition (Community / Enterprise) 
     | By importing this POM you can have Alfresco version and artifacts scope pre-defined
-    | (using Maven dependencyManagement) and only take care of declaring groupId:artifactId
-    | in your client POMs.
-    -->
+    | (using Maven dependencyManagement) and only take care of declaring groupId:artifactId 
+    | in your client POMs. 
+    --> 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>alfresco-platform-distribution</artifactId>
   <name>Alfresco Community Platform Distribution descriptor</name>
   <description>This POM describes the Alfresco artifacts usable in the Maven SDK, in terms of artifacts groupId, artifactId, version</description>
   <packaging>pom</packaging>
-
+  
   <parent>
     <artifactId>alfresco-parent</artifactId>
-    <groupId>se.loftux.alfresco</groupId>
-    <version>LX81</version>
+    <groupId>org.alfresco</groupId>
+    <version>5.1-SNAPSHOT</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
-
+  
   <url>https://artifacts.alfresco.com/nexus/content/repositories/alfresco-docs/alfresco-platform-distribution/latest</url>
 
   <properties>
@@ -29,14 +29,14 @@
     <!-- Filtered in site so no dots allowed in property name -->
     <alfrescoEdition>Community</alfrescoEdition>
   </properties>
-
-  <!--
-      | Defines Alfresco platform delivered artifacts dependencyManagement
+  
+  <!--  
+      | Defines Alfresco platform delivered artifacts dependencyManagement 
       | (only commonly used artifacts are mentioned here.
-      | NOTE: You still need to add them to your child POM as <dependency>  in order to
-      | have them in the classpath. You can omit version and scope to use the
+      | NOTE: You still need to add them to your child POM as <dependency>  in order to 
+      | have them in the classpath. You can omit version and scope to use the 
       | standard SDK ones.
-      -->
+      --> 
   <dependencyManagement>
     <dependencies>
       <!-- == Repository JARs / WAR == -->
@@ -50,7 +50,7 @@
       <dependency>
         <groupId>${alfresco.groupId}</groupId>
         <artifactId>alfresco-core</artifactId>
-        <version>${project.version}</version>
+        <version>${dependency.alfresco-core.version}</version>
         <scope>provided</scope>
       </dependency>
       <!-- Data model -->
@@ -64,7 +64,7 @@
       <dependency>
         <groupId>${alfresco.groupId}</groupId>
         <artifactId>alfresco-jlan-embed</artifactId>
-        <version>${project.version}</version>
+        <version>${dependency.alfresco-jlan.version}</version>
         <scope>provided</scope>
       </dependency>
       <!-- MBeans -->
@@ -199,17 +199,16 @@
 
   <repositories>
     <repository>
-        <id>loftux</id>
-        <url>http://artifacts.loftux.net/nexus/content/repositories/releases</url>
+        <id>alfresco-maven-repo</id>
+        <url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
     </repository>
     <repository>
-        <id>loftux-snapshots</id>
-        <url>http://artifacts.loftux.net/nexus/content/repositories/snapshots/</url>
+        <id>alfresco-maven-repo-snapshots</id>
+        <url>https://artifacts.alfresco.com/nexus/content/groups/public-snapshots</url>
         <snapshots>
             <enabled>true</enabled>
             <updatePolicy>daily</updatePolicy>
         </snapshots>
     </repository>
   </repositories>
-
 </project>

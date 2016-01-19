@@ -119,7 +119,7 @@ public class TypeConverter
      * type. Wrapper around the Collection version for arrays.
      * 
      * @param propertyType - the target property type
-     * @param value - the value to be converted
+     * @param values - the value to be converted
      * @return - the converted value as the correct type
      * @throws DictionaryException if the property type's registered java class is invalid
      * @throws TypeConversionException if the conversion cannot be performed
@@ -145,7 +145,7 @@ public class TypeConverter
      * type.
      * 
      * @param propertyType - the target property type
-     * @param value - the value to be converted
+     * @param values - the value to be converted
      * @return - the converted value as the correct type
      * @throws DictionaryException if the property type's registered java class is invalid
      * @throws TypeConversionException if the conversion cannot be performed
@@ -175,7 +175,7 @@ public class TypeConverter
      * 
      * @param <T> The target type for the result of the conversion
      * @param c - a class for the target type
-     * @param value - the collection to be converted
+     * @param values - the collection to be converted
      * @return - the converted collection
      * @throws TypeConversionException if the conversion cannot be performed
      */
@@ -199,8 +199,8 @@ public class TypeConverter
      * Get the boolean value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return boolean
      */
     public final boolean booleanValue(Object value)
     {
@@ -211,8 +211,8 @@ public class TypeConverter
      * Get the char value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return char
      */
     public final char charValue(Object value)
     {
@@ -223,8 +223,8 @@ public class TypeConverter
      * Get the byte value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return byte
      */
     public final byte byteValue(Object value)
     {
@@ -239,8 +239,8 @@ public class TypeConverter
      * Get the short value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return short
      */
     public final short shortValue(Object value)
     {
@@ -255,8 +255,8 @@ public class TypeConverter
      * Get the int value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return int
      */
     public final int intValue(Object value)
     {
@@ -271,8 +271,8 @@ public class TypeConverter
      * Get the long value for the value object
      * May have conversion failure
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return long
      */
     public final long longValue(Object value)
     {
@@ -287,8 +287,8 @@ public class TypeConverter
      * Get the bollean value for the value object
      * May have conversion failure
      * 
-     * @param float
-     * @return
+     * @param value Object
+     * @return float
      */
     public final float floatValue(Object value)
     {
@@ -303,8 +303,8 @@ public class TypeConverter
      * Get the bollean value for the value object
      * May have conversion failure
      * 
-     * @param double
-     * @return
+     * @param value Object
+     * @return double
      */
     public final double doubleValue(Object value)
     {
@@ -318,7 +318,7 @@ public class TypeConverter
     /**
      * Is the value multi valued
      * 
-     * @param value
+     * @param value Object
      * @return true - if the underlyinf is a collection of values and not a singole value
      */
     public final boolean isMultiValued(Object value)
@@ -329,7 +329,7 @@ public class TypeConverter
     /**
      * Get the number of values represented
      * 
-     * @param value
+     * @param value Object
      * @return 1 for normal values and the size of the collection for MVPs
      */
     public final int size(Object value)
@@ -347,8 +347,8 @@ public class TypeConverter
     /**
      * Get a collection for the passed value
      * 
-     * @param value
-     * @return
+     * @param value Object
+     * @return Collection
      */
     private final Collection<?> createCollection(Object value)
     {
@@ -369,9 +369,9 @@ public class TypeConverter
     /**
      * Get a collection for the passed value converted to the specified type
      * 
-     * @param c
-     * @param value
-     * @return
+     * @param c Class<T>
+     * @param value Object
+     * @return Collection
      */
     public final <T> Collection<T> getCollection(Class<T> c, Object value)
     {
@@ -382,11 +382,11 @@ public class TypeConverter
     /**
      * Add a converter to the list of those available
      * 
-     * @param <F>       
-     * @param <T>
-     * @param source
-     * @param destination
-     * @param converter
+     * @param <F> from
+     * @param <T> to
+     * @param source Class<F>
+     * @param destination Class<T>
+     * @param converter Converter<F, T>
      */
     public final <F, T> void addConverter(Class<F> source, Class<T> destination, Converter<F, T> converter)
     {
@@ -404,9 +404,9 @@ public class TypeConverter
      * @param <F>  from
      * @param <I>  intermediate
      * @param <T>  to
-     * @param source
-     * @param intermediate
-     * @param destination
+     * @param source Class<F>
+     * @param intermediate Class<I>
+     * @param destination Class<T>
      */
     public final <F, I, T> Converter<F, T> addDynamicTwoStageConverter(Class<F> source, Class<I> intermediate, Class<T> destination)
     {
@@ -421,11 +421,10 @@ public class TypeConverter
      * Note: Takes into account the class of the object and any interfaces it may
      *       also support.
      * 
-     * @param <F>
-     * @param <T>
-     * @param source
-     * @param dest
-     * @return
+     * @param <T> to
+     * @param value Object
+     * @param dest Class<T>
+     * @return T
      */
     @SuppressWarnings("unchecked")
     public final <T> Converter<Object, T> getConverter(Object value, Class<T> dest)
@@ -471,11 +470,11 @@ public class TypeConverter
     /**
      * Find a conversion for a specific Class 
      * 
-     * @param <F>
-     * @param <T>
-     * @param source
-     * @param dest
-     * @return
+     * @param <F> from
+     * @param <T> to
+     * @param source Class<F>
+     * @param dest Class<T>
+     * @return conversion
      */
     @SuppressWarnings("unchecked")
     public <F, T> Converter<F, T> getConverter(Class<F> source, Class<T> dest)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -183,6 +183,10 @@ public class PatchServiceImpl implements PatchService
                 // go through all the patches and apply them where necessary        
                 for (Patch patch : sortedPatches)
                 {
+                    if(patch.isDeferred())
+                    {
+                        continue;
+                    }
                     // apply the patch
                     success = applyPatchAndDependencies(patch, appliedPatchesById);
                     if (!success)
@@ -260,8 +264,6 @@ public class PatchServiceImpl implements PatchService
      * Reentrant method that ensures that a patch and all its dependencies get applied.
      * The process terminates on the first failure.
      * 
-     * @param patchInfos all the executed patch data.  If there was a failure, then this
-     *      is the list of successful executions only.
      * @param patch the patch (containing dependencies) to apply
      * @param appliedPatchesById already applied patches keyed by their ID
      * @return Returns true if the patch and all its dependencies were successfully applied.
@@ -286,9 +288,9 @@ public class PatchServiceImpl implements PatchService
         AppliedPatch appliedPatch = appliedPatchesById.get(id); 
         if (appliedPatch != null && appliedPatch.getSucceeded())
         {
-            if (appliedPatch.getWasExecuted() && appliedPatch.getSucceeded())
+            if (appliedPatch.getWasExecuted())
             {
-                // It was sucessfully executed
+                // It was successfully executed
                 return true;
             }
             // We give the patch another chance
@@ -471,8 +473,6 @@ public class PatchServiceImpl implements PatchService
         
         /**
          * Perform some setup before applying the patch e.g. check whether the patch needs to be applied.
-         * 
-         * @return true: continue, false: do not apply patch
          */
     	private void setup()
     	{
@@ -553,6 +553,7 @@ public class PatchServiceImpl implements PatchService
                         patch.getId(),
                         I18NUtil.getMessage(patch.getDescription()));
                 logger.info(msg);
+                // the patch is executed regardless of the deferred flag value
                 report = (patch.isDeferred()) ? patch.applyAsync() : patch.apply();
                 state = STATE.APPLIED;
             }
@@ -580,6 +581,12 @@ public class PatchServiceImpl implements PatchService
     		        Descriptor serverDescriptor = descriptorService.getServerDescriptor();
     		        String server = (serverDescriptor.getVersion() + " - " + serverDescriptor.getEdition());
 
+    		        if (server.length() > 64)
+    		        {
+    		            logger.error("Server version '" + server + "' is too long for the 'applied_to_server' column therefore patch '" + 
+    		                        patch.getId() + "' will not be registered.");
+    		        }
+    		        
     		        // create or update the record of execution
     		        boolean create = true;
     		        if (appliedPatch == null)

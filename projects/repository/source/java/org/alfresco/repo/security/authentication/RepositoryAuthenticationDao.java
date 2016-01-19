@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -19,6 +19,7 @@
 package org.alfresco.repo.security.authentication;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +28,7 @@ import java.util.Map;
 import net.sf.acegisecurity.GrantedAuthority;
 import net.sf.acegisecurity.GrantedAuthorityImpl;
 import net.sf.acegisecurity.UserDetails;
-import net.sf.acegisecurity.providers.dao.User;
 import net.sf.acegisecurity.providers.dao.UsernameNotFoundException;
-import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -39,7 +38,9 @@ import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.tenant.TenantDisabledException;
 import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidStoreRefException;
@@ -54,6 +55,7 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.GUID;
+import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -74,13 +76,12 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     protected NodeService nodeService;
     protected TenantService tenantService;
     protected NamespacePrefixResolver namespacePrefixResolver;
-    protected PasswordEncoder passwordEncoder;
-    protected PasswordEncoder sha256PasswordEncoder;
     protected PolicyComponent policyComponent;
     
     private TransactionService transactionService;
+    protected CompositePasswordEncoder compositePasswordEncoder;
 
-    // note: cache is tenant-aware (if using TransctionalCache impl)
+// note: cache is tenant-aware (if using TransctionalCache impl)
     
     private SimpleCache<String, NodeRef> singletonCache; // eg. for user folder nodeRef
     private final String KEY_USERFOLDER_NODEREF = "key.userfolder.noderef";
@@ -116,16 +117,6 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     {
         this.singletonCache = singletonCache;
     }
-    
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder)
-    {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    public void setSha256PasswordEncoder(PasswordEncoder passwordEncoder)
-    {
-        this.sha256PasswordEncoder = passwordEncoder;
-    }
 
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
@@ -140,6 +131,11 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
+    }
+
+    public void setCompositePasswordEncoder(CompositePasswordEncoder compositePasswordEncoder)
+    {
+        this.compositePasswordEncoder = compositePasswordEncoder;
     }
 
     public void afterPropertiesSet() throws Exception
@@ -171,10 +167,16 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
         {
             return userDetails;
         }
-        // If the credentials have expired, we must return a copy with the flag set
-        return new User(userDetails.getUsername(), userDetails.getPassword(), userDetails.isEnabled(),
-                userDetails.isAccountNonExpired(), false,
-                userDetails.isAccountNonLocked(), userDetails.getAuthorities());
+
+        if (userDetails instanceof RepositoryAuthenticatedUser)
+        {
+            RepositoryAuthenticatedUser repoUser = (RepositoryAuthenticatedUser) userDetails;
+            return new RepositoryAuthenticatedUser(userDetails.getUsername(), userDetails.getPassword(), userDetails.isEnabled(),
+                    userDetails.isAccountNonExpired(), false,
+                    userDetails.isAccountNonLocked(), userDetails.getAuthorities(), repoUser.getHashIndicator(), repoUser.getSalt());
+        }
+
+        throw new AlfrescoRuntimeException("Unable to retrieve a compatible UserDetails object (requires RepositoryAuthenticatedUser)");
     }
     
     /**
@@ -245,12 +247,12 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
                     // Extract values from the query results
                     NodeRef userRef = tenantService.getName(results.get(0).getChildRef());
                     Map<QName, Serializable> properties = nodeService.getProperties(userRef);
-                    String password = DefaultTypeConverter.INSTANCE.convert(String.class,
-                            properties.get(ContentModel.PROP_PASSWORD));
+                    Pair<List<String>, String> hashPassword = determinePasswordHash(properties);
 
                     // Report back the user name as stored on the user
                     String userName = DefaultTypeConverter.INSTANCE.convert(String.class,
                             properties.get(ContentModel.PROP_USER_USERNAME));
+                    Serializable salt = properties.get(ContentModel.PROP_SALT);
 
                     GrantedAuthority[] gas = new GrantedAuthority[1];
                     gas[0] = new GrantedAuthorityImpl("ROLE_AUTHENTICATED");
@@ -260,14 +262,16 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
                     Date credentialsExpiryDate = getCredentialsExpiryDate(userName, properties, isAdminAuthority);
                     boolean credentialsHaveNotExpired = (credentialsExpiryDate == null || credentialsExpiryDate.getTime() >= System.currentTimeMillis());
                     
-                    UserDetails ud = new User(
+                    UserDetails ud = new RepositoryAuthenticatedUser(
                             userName,
-                            password,
+                            hashPassword.getSecond(),
                             getEnabled(userName, properties, isAdminAuthority),
                             !getHasExpired(userName, properties, isAdminAuthority),
                             credentialsHaveNotExpired,
                             !getLocked(userName, properties, isAdminAuthority),
-                            gas);
+                            gas,
+                            hashPassword.getFirst(),
+                            salt);
                     
                     cacheEntry = new CacheEntry(userRef, ud, credentialsExpiryDate);
                     // Only cache positive results
@@ -280,9 +284,55 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
         // Always use a transaction
         return transactionService.getRetryingTransactionHelper().doInTransaction(new SearchUserNameCallback(), true);
     }
+    
+    /**
+     * Retrieves the password hash for the given user properties.
+     * 
+     * @param properties The properties of the user.
+     * @return A Pair object containing the hash indicator and the hashed password.
+     */
+    public static Pair<List<String>, String> determinePasswordHash(Map<QName, Serializable> properties)
+    {
+        @SuppressWarnings("unchecked")
+        List<String> hashIndicator = (List<String>) properties.get(ContentModel.PROP_HASH_INDICATOR);
+        if (hashIndicator != null && hashIndicator.size()>0)
+        {
+            //We have hashed the value so get it.
+            return new Pair<>(hashIndicator,DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD_HASH)));
+        }
+        else
+        {
+            String passHash = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD_SHA256));
+            if (passHash != null)
+            {
+                //We have a SHA256 so use it
+                return new Pair<>(CompositePasswordEncoder.SHA256,passHash);
+            }
+            else
+            {
+                passHash = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD));
+                if (passHash != null)
+                {
+                    //Use MD4
+                    return new Pair<>(CompositePasswordEncoder.MD4,passHash);
+                }
+            }
+        }
+        
+        // throw execption if we failed to find a password for the user
+        throw new AlfrescoRuntimeException("Unable to find a password for user '" +
+                    properties.get(ContentModel.PROP_USER_USERNAME) + 
+                    "', please check your repository authentication settings.");
+    }
 
     @Override
     public void createUser(String caseSensitiveUserName, char[] rawPassword) throws AuthenticationException
+    {
+        createUser(caseSensitiveUserName, null, rawPassword);
+    }
+
+    @Override
+    public void createUser(String caseSensitiveUserName, String hashedPassword, char[] rawPassword) throws AuthenticationException
     {
         tenantService.checkDomainUser(caseSensitiveUserName);
 
@@ -296,8 +346,25 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
         properties.put(ContentModel.PROP_USER_USERNAME, caseSensitiveUserName);
         String salt = GUID.generate();
         properties.put(ContentModel.PROP_SALT, salt);
-        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), null));
-        properties.put(ContentModel.PROP_PASSWORD_SHA256, sha256PasswordEncoder.encodePassword(new String(rawPassword), salt));
+
+        if (hashedPassword == null)
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Hashing raw password to "+compositePasswordEncoder.getPreferredEncoding()
+                +" for "+caseSensitiveUserName);
+            }
+            hashedPassword = compositePasswordEncoder.encodePreferred(new String(rawPassword), salt);
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Using hashed password for  "+caseSensitiveUserName);
+            }
+        }
+        properties.put(ContentModel.PROP_PASSWORD_HASH, hashedPassword);
+        properties.put(ContentModel.PROP_HASH_INDICATOR, (Serializable) Arrays.asList(compositePasswordEncoder.getPreferredEncoding()));
         properties.put(ContentModel.PROP_ACCOUNT_EXPIRES, Boolean.valueOf(false));
         properties.put(ContentModel.PROP_CREDENTIALS_EXPIRE, Boolean.valueOf(false));
         properties.put(ContentModel.PROP_ENABLED, Boolean.valueOf(true));
@@ -308,15 +375,37 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     
     private NodeRef getUserFolderLocation(String caseSensitiveUserName)
     {
-        NodeRef userNodeRef = singletonCache.get(KEY_USERFOLDER_NODEREF);
+        String userDomain = null;
+        try
+        {
+            userDomain = tenantService.getUserDomain(caseSensitiveUserName);
+        }
+        catch (TenantDisabledException tde)
+        {
+            // see ACE-4909
+            // it is normal at this part if the tenant is disabled
+        }
+        if (userDomain == null)
+        {
+            // try to use default domain
+            userDomain = TenantService.DEFAULT_DOMAIN;
+        }
+        NodeRef userNodeRef = singletonCache.get(userDomain + KEY_USERFOLDER_NODEREF);
         if (userNodeRef == null)
         {
             QName qnameAssocSystem = QName.createQName("sys", "system", namespacePrefixResolver);
             QName qnameAssocUsers = QName.createQName("sys", "people", namespacePrefixResolver);
-            
-            //StoreRef userStoreRef = tenantService.getName(caseSensitiveUserName, new StoreRef(STOREREF_USERS.getProtocol(), STOREREF_USERS.getIdentifier()));
-            StoreRef userStoreRef = new StoreRef(STOREREF_USERS.getProtocol(), STOREREF_USERS.getIdentifier());
-            
+
+            StoreRef userStoreRef = null;
+            if(TenantUtil.isCurrentDomainDefault())
+            {
+                userStoreRef = tenantService.getName(caseSensitiveUserName, new StoreRef(STOREREF_USERS.getProtocol(), STOREREF_USERS.getIdentifier()));
+            }
+            else
+            {
+                userStoreRef = new StoreRef(STOREREF_USERS.getProtocol(), STOREREF_USERS.getIdentifier());
+            }
+
             // AR-527
             NodeRef rootNode = nodeService.getRootNode(userStoreRef);
             List<ChildAssociationRef> results = nodeService.getChildAssocs(rootNode, RegexQNamePattern.MATCH_ALL, qnameAssocSystem);
@@ -338,7 +427,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
             {
                 userNodeRef = tenantService.getName(results.get(0).getChildRef());
             }
-            singletonCache.put(KEY_USERFOLDER_NODEREF, userNodeRef);
+            singletonCache.put((tenantService.getUserDomain(caseSensitiveUserName) + KEY_USERFOLDER_NODEREF), userNodeRef);
         }
         return userNodeRef;
     }
@@ -355,10 +444,10 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
         String salt = GUID.generate();
         properties.remove(ContentModel.PROP_SALT);
         properties.put(ContentModel.PROP_SALT, salt);
+        properties.put(ContentModel.PROP_PASSWORD_HASH,  compositePasswordEncoder.encodePreferred(new String(rawPassword), salt));
+        properties.put(ContentModel.PROP_HASH_INDICATOR, compositePasswordEncoder.getPreferredEncoding());
         properties.remove(ContentModel.PROP_PASSWORD);
-        properties.put(ContentModel.PROP_PASSWORD, passwordEncoder.encodePassword(new String(rawPassword), null));
         properties.remove(ContentModel.PROP_PASSWORD_SHA256);
-        properties.put(ContentModel.PROP_PASSWORD_SHA256, sha256PasswordEncoder.encodePassword(new String(rawPassword), salt));
         nodeService.setProperties(userRef, properties);
     }
 
@@ -384,7 +473,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     {
         return (getUserOrNull(userName) != null);
     }
-    
+
     /**
      * @return                  Returns the user properties or <tt>null</tt> if there are none
      */
@@ -751,9 +840,26 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
         }
         else
         {
-            String password = DefaultTypeConverter.INSTANCE.convert(String.class, nodeService.getProperty(userNode, ContentModel.PROP_PASSWORD));
-            return password;
+            Map<QName, Serializable> properties = nodeService.getProperties(userNode);
+            List<String> hashIndicator = (List<String>) properties.get(ContentModel.PROP_HASH_INDICATOR);
+            if (hashIndicator != null && hashIndicator.size() == 1 && CompositePasswordEncoder.MD4.equals(hashIndicator))
+            {
+                //We have hashed the value so get it.
+                return DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD_HASH));
+            }
+            else
+            {
+                //Use MD4
+                String passHash = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_PASSWORD));
+                if (passHash != null)
+                {
+                    return passHash;
+                }
+            }
         }
+
+        logger.error("Request made of MD4 hash for "+userName+" but the unable to find it.");
+        return null;
     }
 
     @Override
@@ -796,8 +902,7 @@ public class RepositoryAuthenticationDao implements MutableAuthenticationDao, In
     
     /**
      * Remove from the cache and lock the value for the transaction
-     * @param key
-     * @param lock
+     * @param key String
      */
     private void removeAuthenticationFromCache(String key)
     {

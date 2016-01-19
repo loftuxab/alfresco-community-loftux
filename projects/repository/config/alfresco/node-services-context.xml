@@ -235,6 +235,17 @@
          <value>${index.tracking.purgeSize}</value>
       </property>
    </bean>
+   
+   <!-- String length adjustment -->
+   <bean id="nodeStringLengthWorker" class="org.alfresco.repo.node.db.NodeStringLengthWorker">
+      <constructor-arg index="0" ref="nodeDAO" />
+      <constructor-arg index="1" ref="jobLockService" />
+      <constructor-arg index="2" ref="transactionService" />
+      <constructor-arg index="3" ref="qnameDAO" />
+      <constructor-arg index="4" ref="policyBehaviourFilter" />
+      <constructor-arg index="5" value="${system.maximumStringLength.jobQueryRange}" />
+      <constructor-arg index="6" value="${system.maximumStringLength.jobThreadCount}" />
+   </bean>
 
    <bean id="storesToIgnorePolicies" class="org.springframework.beans.factory.config.SetFactoryBean">
       <property name="sourceSet">
@@ -277,7 +288,13 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
     </bean>
-
+    
+    <!-- The unmovable aspect -->
+    <bean id="unmovableAspect" class="org.alfresco.repo.node.UnmovableAspect" init-method="init">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+    </bean>
+    
     <!-- Encryptor for node properties -->
     <bean id="metadataEncryptor" class="org.alfresco.repo.node.encryption.MetadataEncryptor">
         <property name="dictionaryService" ref="dictionaryService" />
@@ -298,5 +315,12 @@
         <property name="metadataEncryptor" ref="metadataEncryptor"/>
         <property name="jobLockService" ref="jobLockService"/>
     </bean>
+       
+     <!-- The cascade update aspect -->
+    <bean id="cascadeUpdateAspect" class="org.alfresco.repo.node.CascadeUpdateAspect" init-method="init">
+        <property name="nodeService" ref="nodeService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="solrTrackingComponent" ref="solrTrackingComponent" />
+    </bean>   
        
 </beans>

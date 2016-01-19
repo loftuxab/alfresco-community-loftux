@@ -26,7 +26,7 @@ import org.alfresco.service.cmr.transfer.TransferEvent;
  * An abstract implementation of TransferEvent.
  * Also implements the operations required by RangedTransferEvent.
  * @see TransferEvent
- * @see RangedTransferEvent
+ * @see org.alfresco.service.cmr.transfer.RangedTransferEvent
  */
 public abstract class TransferEventImpl implements TransferEvent
 {
@@ -89,7 +89,7 @@ public abstract class TransferEventImpl implements TransferEvent
     
     /**
      * The position in the range
-     * @return
+     * @return long
      */
     public long getPosition()
     {
@@ -98,7 +98,7 @@ public abstract class TransferEventImpl implements TransferEvent
     
     /**
      * The maximum range
-     * @return
+     * @return long
      */
     public long getRange()
     {

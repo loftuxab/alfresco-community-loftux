@@ -46,7 +46,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * Attempts to write content using any of the getWriter() methods will succeed. Though the content does not actually
  * get stored anywhere.
  * <p>
- * Both reads and writes are slow - the readers and writers returned by this class sleep for {@link pauseMillis} after
+ * Both reads and writes are slow - the readers and writers returned by this class sleep for {@link #pauseMillis} after
  * each operation.
  * 
  * @author Matt Ward
@@ -255,7 +255,7 @@ class SlowContentStore extends AbstractContentStore
      * Length of time in milliseconds that ReadableByteChannel and WriteableByteChannel objects returned
      * by SlowContentStore will pause for during read and write operations respectively.
      *  
-     * @param pauseMillis
+     * @param pauseMillis int
      */
     public void setPauseMillis(int pauseMillis)
     {

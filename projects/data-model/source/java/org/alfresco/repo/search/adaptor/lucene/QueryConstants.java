@@ -189,4 +189,6 @@ public interface QueryConstants
     public static final String FIELD_TAG_SUGGEST = "suggest_TAG";
    
     public static final String FIELD_VERSION = "_version_";
+    
+    public static final String FIELD_CASCADETX = "CASCADETX";
 }

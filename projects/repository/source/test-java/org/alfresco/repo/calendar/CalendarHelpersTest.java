@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -51,8 +52,8 @@ public class CalendarHelpersTest
    private final static long ONE_HOUR_MS = 1 * 60 * 60 * 1000L;
    private final static long TWO_DAYS_MS = 2 * 24 * ONE_HOUR_MS;
    
-   private static SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd");
-   private static SimpleDateFormat fullDayFmt = new SimpleDateFormat("EEEE");
+   private static SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+   private static SimpleDateFormat fullDayFmt = new SimpleDateFormat("EEEE", Locale.ENGLISH);
    
    /**
     * UTC+10, no daylight savings
@@ -2098,7 +2099,7 @@ public class CalendarHelpersTest
       assertEquals(1*60*60*1000, tz.getOffset(date(2007,3,26).getTime()));
       assertEquals(1*60*60*1000, tz.getOffset(date(2007,3,31).getTime()));
       assertEquals(1*60*60*1000, tz.getOffset(date(2007,9,1).getTime()));
-      assertEquals(1*60*60*1000, tz.getOffset(date(2007,10,28).getTime()));
+      assertEquals(1*60*60*1000, tz.getOffset(date(2007,10,27).getTime()));
       assertEquals(0*60*60*1000, tz.getOffset(date(2007,10,29).getTime()));
       assertEquals(0*60*60*1000, tz.getOffset(date(2007,11,1).getTime()));
       

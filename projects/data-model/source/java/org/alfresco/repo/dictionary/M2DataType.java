@@ -102,7 +102,7 @@ public class M2DataType
 
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {

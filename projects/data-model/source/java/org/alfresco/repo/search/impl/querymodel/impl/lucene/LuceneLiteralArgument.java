@@ -31,9 +31,9 @@ public class LuceneLiteralArgument extends BaseLiteralArgument
 {
 
     /**
-     * @param name
-     * @param type
-     * @param value
+     * @param name String
+     * @param type QName
+     * @param value Serializable
      */
     public LuceneLiteralArgument(String name, QName type, Serializable value)
     {

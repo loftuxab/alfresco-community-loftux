@@ -101,10 +101,9 @@ public class ActivityServiceImplTest extends TestCase
         
         activityService.postActivity("org.alfresco.testActivityType3", "site1", "appToolA", "{ \"var1\" : \"val1\" }");
 
-        //ignore posting this type even though its valid
+         // ignore posting this type even though its valid
         activityService.postActivity("file-previewed", "site1", "appToolA", "{ \"var1\" : \"val1\" }");
-
-    }
+    }   
     
     public void testPostInvalidActivities() throws Exception
     {

@@ -79,8 +79,8 @@ public abstract class BaseApplicationContextHelper
     /**
      * Build a classloader for the given classLocations, using the thread's context class loader as its parent.
      * 
-     * @param classLocations
-     * @return
+     * @param classLocations String[]
+     * @return ClassLoader
      * @throws IOException
      */
     public static ClassLoader buildClassLoader(String[] classLocations) throws IOException
@@ -161,7 +161,7 @@ public abstract class BaseApplicationContextHelper
     
     /**
      * Closes and releases the application context.  On the next call to
-     * {@link #getApplicationContext()}, a new context will be given.
+     * {@link #getApplicationContext(String[])} , a new context will be given.
      */
     public static synchronized void closeApplicationContext()
     {

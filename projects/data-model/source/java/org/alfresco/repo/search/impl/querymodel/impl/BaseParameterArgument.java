@@ -30,9 +30,10 @@ import org.alfresco.repo.search.impl.querymodel.ParameterArgument;
 public class BaseParameterArgument extends BaseStaticArgument implements ParameterArgument
 {
     private String parameterName;
-    
+
     /**
-     * @param name
+     * @param name String
+     * @param parameterName String
      */
     public BaseParameterArgument(String name, String parameterName)
     {

@@ -51,7 +51,7 @@ public class ScriptTransferService extends BaseScopableProcessorExtension
     private List<QName> excludedAspects = new ArrayList<QName>();
 
     /**
-     * @param transferService
+     * @param transferService TransferService
      */
     public void setTransferService(TransferService transferService)
     {
@@ -60,7 +60,7 @@ public class ScriptTransferService extends BaseScopableProcessorExtension
 
     /**
      * 
-     * @return
+     * @return TransferService
      */
     public TransferService getTransferService()
     {
@@ -121,7 +121,7 @@ public class ScriptTransferService extends BaseScopableProcessorExtension
      * Nodes are to be locked read only on target.
      * 
      * @param targetName the name of the target to transfer to
-     * @param nodes the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String 
+     * @param nodesToTransfer the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String
      * @return node ref of transfer report.  
      */
     @SuppressWarnings("unchecked")
@@ -178,7 +178,7 @@ public class ScriptTransferService extends BaseScopableProcessorExtension
      * Nodes are not locked on the target.
      * 
      * @param targetName the name of the target to transfer to
-     * @param nodes the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String 
+     * @param nodesToTransfer the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String
      * @return node ref of transfer report.  
      */
     @SuppressWarnings("unchecked")
@@ -234,7 +234,7 @@ public class ScriptTransferService extends BaseScopableProcessorExtension
      * Nodes are not locked on the target.
      * 
      * @param targetName the name of the target to transfer to
-     * @param nodes the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String 
+     * @param nodesToRemove the nodes to transfer - Java Script Array of either ScriptNodes, NodeRef or String
      * @return node ref of transfer report.  
      */
     @SuppressWarnings("unchecked")

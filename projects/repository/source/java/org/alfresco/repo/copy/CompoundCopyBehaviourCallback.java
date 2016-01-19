@@ -125,7 +125,7 @@ public class CompoundCopyBehaviourCallback extends AbstractCopyBehaviourCallback
 
     /**
      * Individual callbacks effectively have a veto on the copy i.e. if one of the
-     * callbacks returns <tt>false</tt> for {@link CopyBehaviourCallback#mustCopy(NodeRef)},
+     * callbacks returns <tt>false</tt> for {@link CopyBehaviourCallback#getMustCopy(org.alfresco.service.namespace.QName, org.alfresco.repo.copy.CopyDetails)},
      * then the copy will NOT proceed.  However, a warning is generated indicating that
      * there is a conflict in the defined behaviour.
      * 
@@ -181,7 +181,7 @@ public class CompoundCopyBehaviourCallback extends AbstractCopyBehaviourCallback
     }
 
     /**
-     * Uses the {@link ChildAssocCopyAction} ordering to drive priority i.e. a vote
+     * Uses the ChildAssocCopyAction ordering to drive priority i.e. a vote
      * to copy will override a vote NOT to copy.
      * 
      * @return          Returns the most lively choice of action 
@@ -217,7 +217,7 @@ public class CompoundCopyBehaviourCallback extends AbstractCopyBehaviourCallback
     }
 
     /**
-     * Uses the {@link ChildAssocRecurseAction} ordering to drive recursive copy behaviour.
+     * Uses the  ChildAssocRecurseAction ordering to drive recursive copy behaviour.
      * 
      * @return          Returns the most lively choice of action 
      */

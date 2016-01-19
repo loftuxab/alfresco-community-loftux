@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -22,8 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.index.shard.ShardMethodEnum;
+import org.alfresco.repo.index.shard.ShardState;
+import org.alfresco.repo.index.shard.ShardStateBuilder;
 import org.alfresco.repo.solr.SOLRTrackingComponent;
 import org.alfresco.repo.solr.Transaction;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
@@ -53,6 +57,74 @@ public class TransactionsGet extends DeclarativeWebScript
         String maxTxnIdParam = req.getParameter("maxTxnId");
         String toCommitTimeParam = req.getParameter("toCommitTime");
         String maxResultsParam = req.getParameter("maxResults");
+        
+        String baseUrl = req.getParameter("baseUrl");
+        String hostName = req.getParameter("hostName");
+        String template = req.getParameter("template");
+        String instance = req.getParameter("instance");
+        String numberOfShards = req.getParameter("numberOfShards");
+        String port = req.getParameter("port");
+        String stores = req.getParameter("stores");
+        String isMaster = req.getParameter("isMaster");
+        String hasContent = req.getParameter("hasContent");
+        String shardMethod = req.getParameter("shardMethod");
+        
+        String lastUpdated =  req.getParameter("lastUpdated");
+        String lastIndexedChangeSetCommitTime =  req.getParameter("lastIndexedChangeSetCommitTime");
+        String lastIndexedChangeSetId =  req.getParameter("lastIndexedChangeSetId");
+        String lastIndexedTxCommitTime =  req.getParameter("lastIndexedTxCommitTime");
+        String lastIndexedTxId =  req.getParameter("lastIndexedTxId");
+        
+        if(baseUrl != null)
+        {
+            ShardState shardState =  ShardStateBuilder.shardState()
+                    .withMaster(Boolean.valueOf(isMaster))
+                    .withLastUpdated(Long.valueOf(lastUpdated))
+                    .withLastIndexedChangeSetCommitTime(Long.valueOf(lastIndexedChangeSetCommitTime))
+                    .withLastIndexedChangeSetId(Long.valueOf(lastIndexedChangeSetId))
+                    .withLastIndexedTxCommitTime(Long.valueOf(lastIndexedTxCommitTime))
+                    .withLastIndexedTxId(Long.valueOf(lastIndexedTxId))
+                    .withShardInstance()
+                        .withBaseUrl(baseUrl)
+                        .withPort(Integer.valueOf(port))
+                        .withHostName(hostName)
+                        .withShard()
+                            .withInstance(Integer.valueOf(instance))
+                            .withFloc()
+                                .withNumberOfShards(Integer.valueOf(numberOfShards))
+                                .withTemplate(template)
+                                .withHasContent(Boolean.valueOf(hasContent))
+                                .withShardMethod(ShardMethodEnum.getShardMethod(shardMethod))
+                                .endFloc()
+                            .endShard()
+                         .endShardInstance()
+                    .build();
+            
+            for(String store : stores.split(","))
+            {
+                shardState.getShardInstance().getShard().getFloc().getStoreRefs().add(new StoreRef(store));
+            }
+            
+            for(String pName : req.getParameterNames())
+            {
+                if(pName.startsWith("floc.property."))
+                {
+                    String key = pName.substring("floc.property.".length());
+                    String value = req.getParameter(pName);
+                    shardState.getShardInstance().getShard().getFloc().getPropertyBag().put(key, value);
+                }
+                else  if(pName.startsWith("state.property."))
+                {
+                    String key = pName.substring("state.property.".length());
+                    String value = req.getParameter(pName);
+                    shardState.getPropertyBag().put(key, value);
+                }
+            }
+            
+            solrTrackingComponent.registerShardState(shardState);
+   
+        }
+        
 
         Long minTxnId = (minTxnIdParam == null ? null : Long.valueOf(minTxnIdParam));
         Long fromCommitTime = (fromCommitTimeParam == null ? null : Long.valueOf(fromCommitTimeParam));
@@ -84,5 +156,4 @@ public class TransactionsGet extends DeclarativeWebScript
         
         return model;
     }
-
 }

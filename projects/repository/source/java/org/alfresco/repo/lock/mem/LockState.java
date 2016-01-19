@@ -44,11 +44,12 @@ public final class LockState implements Serializable
     /**
      * Constructor.
      * 
-     * @param nodeRef
-     * @param lockType
-     * @param owner
-     * @param secondsToExpire
-     * @param additionalInfo
+     * @param nodeRef NodeRef
+     * @param lockType LockType
+     * @param owner String
+     * @param expires Date
+     * @param lifetime Lifetime
+     * @param additionalInfo String
      */
     private LockState(NodeRef nodeRef, LockType lockType, String owner, Date expires,
                 Lifetime lifetime, String additionalInfo)
@@ -130,7 +131,7 @@ public final class LockState implements Serializable
     /**
      * Returns whether this {@link LockState} is for a lock or whether there is no
      * lock defined for the node. If a lock is defined for a node, that does not mean that
-     * the node <em>is</em> locked - the {@link LockService} must be used to determine that.
+     * the node <em>is</em> locked - the {@link org.alfresco.service.cmr.lock.LockService} must be used to determine that.
      * 
      * @return true if there is a lock defined for the node.
      */

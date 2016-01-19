@@ -31,6 +31,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.evaluator.ActionConditionEvaluator;
 import org.alfresco.repo.action.executer.ActionExecuter;
+import org.alfresco.repo.action.executer.LoggingAwareExecuter;
 import org.alfresco.repo.copy.CopyBehaviourCallback;
 import org.alfresco.repo.copy.CopyDetails;
 import org.alfresco.repo.copy.CopyServicePolicies;
@@ -216,7 +217,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     /**
      * Set the asynchronous action execution queues
      * 
-     * @param asynchronousActionExecutionQueue the asynchronous action execution
+     * @param asynchronousActionExecutionQueues the asynchronous action execution
      *            queues
      * @deprecated Rather than inject a Map<String, AsynchronousActionExecutionQueue>, it is
      *             preferable to inject individual {@link AsynchronousActionExecutionQueue} instances
@@ -230,8 +231,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     
     /**
      * This method registers an {@link AsynchronousActionExecutionQueue} with the {@link ActionService}.
-     * @param key
-     * @param asyncExecQueue
+     * @param key String
+     * @param asyncExecQueue AsynchronousActionExecutionQueue
      * @since Thor Phase 2 Sprint 2
      */
     public void registerAsynchronousActionExecutionQueue(String key, AsynchronousActionExecutionQueue asyncExecQueue)
@@ -400,7 +401,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     }
 
     /**
-     * @see org.alfresco.service.cmr.action.ActionService#createAction()
+     * @see org.alfresco.service.cmr.action.ActionService#createAction(String)
      */
     public Action createAction(String name)
     {
@@ -827,11 +828,10 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     public void directActionExecution(Action action, NodeRef actionedUponNodeRef)
     {
         // Debug output
-        if (logger.isDebugEnabled() == true)
+        if (logger.isDebugEnabled())
         {
-            logger
-                        .debug("The action is being executed as the user: "
-                                    + this.authenticationContext.getCurrentUserName());
+            logger.debug("The action is being executed as the user: "
+                         + this.authenticationContext.getCurrentUserName());
         }
 
         // Get the action executer and execute
@@ -1233,8 +1233,8 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     /**
      * Save the condition properties
      * 
-     * @param conditionNodeRef
-     * @param condition
+     * @param conditionNodeRef NodeRef
+     * @param condition ActionCondition
      */
     private void saveConditionProperties(NodeRef conditionNodeRef, ActionCondition condition)
     {
@@ -1662,9 +1662,6 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
         }
     }
 
-    /**
-     * @see org.alfresco.repo.action.RuntimeActionService#getPostTransactionPendingActions()
-     */
     @SuppressWarnings("unchecked")
     private List<PendingAction> getPostTransactionPendingActions()
     {
@@ -1780,7 +1777,7 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
     }
 
     /**
-     * @return Returns {@link AdctionParameterTypeCopyBehaviourCallback}
+     * @return Returns {@link CopyBehaviourCallback}
      */
     public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails)
     {
@@ -1819,4 +1816,12 @@ public class ActionServiceImpl implements ActionService, RuntimeActionService, A
         ActionParameterTypeCopyBehaviourCallback.INSTANCE.repointNodeRefs(sourceNodeRef, targetNodeRef,
                     ActionModel.PROP_PARAMETER_VALUE, copyMap, nodeService);
     }
+    
+    @Override
+    public boolean onLogException(Action action, Log logger, Throwable t, String message)
+    {
+        LoggingAwareExecuter executer = (LoggingAwareExecuter) this.applicationContext.getBean(action.getActionDefinitionName());
+        return executer.onLogException(logger,t, message);
+    }
+    
 }

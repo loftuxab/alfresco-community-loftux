@@ -18,9 +18,9 @@ System variables provided by this component:
   * postgres_create_super_user
 
 - Changelog 02 Jul 2007:
-	* Add the choice to ask database parameters in installation time. (Backwards compatibility)
+    * Add the choice to ask database parameters in installation time. (Backwards compatibility)
 - Changelog 14 Jun 2007:
-	* Add createsupersuer variable to handle if database user created has or not superuser privileges. It is value is set to 1 by default for compatibility.
+    * Add createsupersuer variable to handle if database user created has or not superuser privileges. It is value is set to 1 by default for compatibility.
 -->
 <component>
     <name>postgresinitdb</name>
@@ -28,11 +28,14 @@ System variables provided by this component:
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>0</show>
+    <shouldPackRuleList>
+        <isTrue value="${postgres_component_enabled}"/>
+    </shouldPackRuleList>
     <parameterList>
         <stringParameter>
             <title>Database Configuration</title>
             <name>database_name</name>
-            <explanation>Set the database name for the database that will be created.</explanation>
+            <explanation>Specify the name of the database.</explanation>
             <description>Database name</description>
             <ask>0</ask>
             <value/>
@@ -41,7 +44,7 @@ System variables provided by this component:
         <stringParameter>
             <name>database_user</name>
             <title>Database Configuration</title>
-            <explanation>Set the user that will use the database.</explanation>
+            <explanation>Set the database user.</explanation>
             <description>User</description>
             <ask>0</ask>
             <value/>
@@ -49,7 +52,7 @@ System variables provided by this component:
         <passwordParameter>
             <name>database_user_password</name>
             <title>Database Configuration</title>
-            <explanation>Set the password for the user that will use the database.</explanation>
+            <explanation>Specify the password for the database user.</explanation>
             <description>Password</description>
             <descriptionRetype>Re-enter password</descriptionRetype>
             <ask>0</ask>
@@ -76,21 +79,18 @@ System variables provided by this component:
         <actionGroup>
             <actionList>
                 <runProgram>
-                    <runAs>postgres</runAs>
                     <progressText>Creating user and database</progressText>
-                    <program>${postgres_root_directory}/bin/pg_ctl</program>
-                    <programArguments>start</programArguments>
+                    <program>su</program>
+                    <programArguments>postgres -s /bin/sh -c "\"${postgres_root_directory}/bin/pg_ctl\" start"</programArguments>
                     <ruleList>
-                        <compareText logic="equals" text="${installer_root_install}" value="1"/>
-			<compareText text="${postgres_installation_type}" logic="equals" value="bundled"/>
+                        <isTrue value="${installer_is_root_install}"/>
                     </ruleList>
                 </runProgram>
                 <runProgram>
                     <program>${postgres_root_directory}/bin/pg_ctl</program>
                     <programArguments>start</programArguments>
                     <ruleList>
-                        <compareText logic="does_not_equal" text="${installer_root_install}" value="1"/>
-			<compareText text="${postgres_installation_type}" logic="equals" value="bundled"/>
+                        <isFalse value="${installer_is_root_install}"/>
                     </ruleList>
                 </runProgram>
                 <wait>
@@ -101,8 +101,8 @@ System variables provided by this component:
                 <platformTest>
                     <type>unix</type>
                 </platformTest>
+                <compareText text="${postgres_installation_type}" logic="equals" value="bundled"/>
             </ruleList>
         </actionGroup>
     </postInstallationActionList>
 </component>
-

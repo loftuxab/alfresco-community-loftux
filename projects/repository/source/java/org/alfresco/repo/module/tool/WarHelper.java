@@ -4,6 +4,10 @@ import org.alfresco.service.cmr.module.ModuleDetails;
 
 import de.schlichtherle.truezip.file.TFile;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.jar.Manifest;
+
 /**
  * Performs various actions on a war file or exploded war directory
  *
@@ -17,15 +21,15 @@ public interface WarHelper
     /**
      * Gets the module details or an available alias
      * @param war   a valid war file or exploded directory from a war
-     * @param installingModuleDetails
+     * @param installingModuleDetails ModuleDetails
      * @return ModuleDetails
      */
     public ModuleDetails getModuleDetailsOrAlias(TFile war, ModuleDetails installingModuleDetails);
     
     /**
      * Checks the dependencies of this module
-     * @param war
-     * @param installingModuleDetails
+     * @param war TFile
+     * @param installingModuleDetails ModuleDetails
      */
     public void checkModuleDependencies(TFile war, ModuleDetails installingModuleDetails);
      
@@ -35,13 +39,13 @@ public interface WarHelper
      * @param war   a valid war file or exploded directory from a war
      */
     public void checkCompatibleVersion(TFile war, ModuleDetails installingModuleDetails);
- 
+
     /**
      * This checks to see if the module that is being installed is compatible with the war.
      * If not module edition is specfied then it will just return.  However, if an edition is specified and it doesn't match
      * then an error is thrown.
      * @param war   a valid war file or exploded directory from a war
-     * @param installingModuleDetails
+     * @param installingModuleDetails ModuleDetails
      */
     public void checkCompatibleEdition(TFile war, ModuleDetails installingModuleDetails);
 
@@ -50,9 +54,36 @@ public interface WarHelper
      * Returns true if the Share war manifest states its a share war.
      * @since 3.4.11,4.1.1,Community 4.2
      * 
-     * @param war
+     * @param war TFile
      * @return boolean - true if it is a share war
      */
 	public boolean isShareWar(TFile war);
-    
+
+    /**
+     * Lists all the currently installed modules in the WAR
+     * @since 5.1
+     * @param war the war
+     * @return List<ModuleDetails> an unordered list of module details.
+     * @throws ModuleManagementToolException
+     */
+    List<ModuleDetails> listModules(TFile war);
+
+    /**
+     * Backs up a given file or directory.
+     *
+     * @since 5.1
+     * @param file   the file to backup
+     * @return the absolute path to the backup file.
+     */
+    public String backup(TFile file) throws IOException;
+
+    /**
+     * Finds a war manifest file.
+     * @since 5.1
+     * @param war the war
+     * @return Manifest
+     * @throws ModuleManagementToolException
+     */
+    public Manifest findManifest(TFile war) throws ModuleManagementToolException;
+
 }

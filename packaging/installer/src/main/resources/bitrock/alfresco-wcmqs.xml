@@ -5,10 +5,12 @@
     <canBeEdited>1</canBeEdited>
     <selected>0</selected>
     <show>1</show>
-
+    <shouldPackRuleList>
+        <isTrue value="${alfrescowcmqs_component_enabled}"/>
+    </shouldPackRuleList>
     <parameterList>
+        <booleanParameter name="alfrescowcmqs_component_enabled" ask="0" value="1" />
     </parameterList>
-  
     <folderList>
         <folder>
             <description>Program Files</description>
@@ -19,7 +21,7 @@
               <distributionFile origin="${alfresco_wcmqs_source_file}" allowWildcards="1"/>
             </distributionFileList>
             <actionList>
-                <setInstallerVariable name="alfresco_apply_amps" value="1" />
+                <setInstallerVariable name="alfresco_apply_amps" value="1"/>
             </actionList>
         </folder>
         <folder>
@@ -31,7 +33,7 @@
               <distributionFile origin="${alfresco_wcmqs_share_source_file}" allowWildcards="1"/>
             </distributionFileList>
             <actionList>
-                <setInstallerVariable name="alfresco_apply_amps_share" value="1" />
+                <setInstallerVariable name="alfresco_apply_amps_share" value="1"/>
             </actionList>
         </folder>
         <folder>
@@ -39,17 +41,17 @@
             <name>warfiles</name>
             <destination>${installdiralfresco}</destination>
             <distributionFileList>
-                <distributionFile origin="${alfresco_wcmqs_war_source_file}" />
-                <distributionFile origin="${alfresco_awe_war_source_file}" />
+                <distributionFile origin="${alfresco_wcmqs_war_source_file}"/>
+                <distributionFile origin="${alfresco_awe_war_source_file}"/>
             </distributionFileList>
         </folder>
         <folder>
-            <description>Config Files</description>
+            <description>Configuration Files</description>
             <destination>${alfresco_shared_directory}/alfresco/web-extension</destination>
             <name>awecustomwebextension</name>
             <platforms>all</platforms>
             <actionList>
-                <alfrescoConfigure alfrescoFiles="*/*" />
+                <alfrescoConfigure alfrescoFiles="*/*"/>
             </actionList>
             <distributionFileList>
                 <distributionFile origin="${alfresco_awe_config_source_file}/web-extension/*" allowWildcards="1"/>
@@ -81,10 +83,10 @@
             </substitutionList>
         </substitute>
     </postInstallationActionList>
-    <postUninstallationActionList> 
+    <postUninstallationActionList>
         <actionGroup>
             <actionList>
-                <deleteFile path="${installdir}/webquickstart.log" />
+                <deleteFile path="${installdir}/webquickstart.log"/>
             </actionList>
             <ruleList>
                 <compareText text="${deleteConfirm}" logic="equals" value="yes" />
@@ -92,4 +94,3 @@
         </actionGroup>
     </postUninstallationActionList>
 </component>
-

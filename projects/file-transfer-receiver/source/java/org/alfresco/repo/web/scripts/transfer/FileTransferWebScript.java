@@ -73,9 +73,9 @@ public class FileTransferWebScript extends AbstractWebScript
     }
 
     /**
-     * @param command
-     * @param req
-     * @param res
+     * @param command String
+     * @param req WebScriptRequest
+     * @param res WebScriptResponse
      */
     private void processCommand(String command, WebScriptRequest req, WebScriptResponse res)
     {

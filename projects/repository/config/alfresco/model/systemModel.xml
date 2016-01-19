@@ -77,6 +77,10 @@
                <type>d:content</type>
                <multiple>false</multiple>
             </property>               
+            <property name="sys:keyStore">
+               <type>d:content</type>
+               <multiple>false</multiple>
+            </property>    			
          </properties>
       </type>      
 
@@ -241,6 +245,11 @@
          <title>Undeletable</title>
       </aspect>
       
+      <!-- aspect to tag nodes that are, by default, unmovable -->
+      <aspect name="sys:unmovable">
+         <title>Unmovable</title>
+      </aspect>
+      
       <!-- aspect to tag nodes during delete operations -->
       <aspect name="sys:pendingDelete">
          <title>Pending Delete</title>
@@ -364,6 +373,25 @@
                <title>Got First Content Chunk</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
+               <multiple>false</multiple>
+            </property>
+         </properties>
+      </aspect>
+      
+      <!-- Aspect to record the last transaction that requires a cascade update to index children (like move, rename, link and unlink) -->
+      <aspect name="sys:cascadeUpdate">
+         <title>Cascade update</title>
+         <properties>
+            <property name="sys:cascadeCRC">
+               <title>Cascade CRC</title>
+               <type>d:long</type>
+               <mandatory>false</mandatory>
+               <multiple>false</multiple>
+            </property>
+            <property name="sys:cascadeTx">
+               <title>Cascade Tx</title>
+               <type>d:long</type>
+               <mandatory>false</mandatory>
                <multiple>false</multiple>
             </property>
          </properties>

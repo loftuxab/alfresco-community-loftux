@@ -28,6 +28,7 @@
                 <value>classpath:alfresco/caches.properties</value>
                 <!-- Enterprise defaults -->
                 <!--  Overrides supplied if this is an enterprise install (none exist for community) -->
+                <value>classpath*:alfresco/enterprise/caches.properties</value>
                 <value>classpath*:alfresco/enterprise/repository.properties</value>
                 <!-- <value>classpath:alfresco/jndi.properties</value> -->
                 <!--  Overrides supplied by modules -->
@@ -241,9 +242,6 @@
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
-        <property name="sysAdminParams">
-            <ref bean="sysAdminParams"/>
-        </property>
         <property name="allowWrite">
             <value>${server.transaction.allow-writes}</value>
         </property>
@@ -373,6 +371,8 @@
                 <value>alfresco.messages.replication</value>
                 <value>alfresco.messages.categories</value>
                 <value>alfresco.messages.authentication</value>
+                <value>alfresco.messages.file-folder-service</value>
+                <value>alfresco.messages.custommodel-service</value>
             </list>
         </property>
     </bean>
@@ -556,7 +556,6 @@
                 <value>cm:content</value>
             </list>
         </property>
-        <property name="enableAutoVersioning" value="${version.store.enableAutoVersioning}" />
     </bean>
 
     <!--                 -->
@@ -584,13 +583,8 @@
         <property name="workflowService" ref="WorkflowService"/>
         <property name="tenantService" ref="tenantService"/>
         <property name="tenantAdminService" ref="tenantAdminService"/>
-        <property name="searchService" ref="searchService"/>
-	    <property name="storeUrls">
-	        <list>
-	            <value>${spaces.store}</value>
-	            <value>${spaces.archive.store}</value>
-	        </list>
-	    </property>
+        <property name="transactionService" ref="transactionService"/>
+        <property name="qnameDAO" ref="qnameDAO"/>
         <property name="enforceTenantInNamespace" value="${models.enforceTenantInNamespace}"/>
     </bean>
 
@@ -644,6 +638,7 @@
         <property name="tenantService">
             <ref bean="tenantService"/>
         </property>
+        <property name="globalProperties" ref="global-properties"/>
     </bean>
 
     <bean id="dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="resourceBundles">
@@ -661,6 +656,7 @@
                 <value>alfresco/model/imapModel.xml</value>
                 <value>alfresco/model/transferModel.xml</value>
                 <value>alfresco/model/solrFacetModel.xml</value>
+                <value>alfresco/model/customModelManagementModel.xml</value>
 
                 <!-- Content models -->
                 <value>alfresco/model/applicationModel.xml</value>
@@ -688,14 +684,11 @@
                 <!-- Remote Credentials model -->
                 <value>alfresco/model/remoteCredentialsModel.xml</value>
 
-                <!-- Share Data Lists model -->
-                <value>alfresco/model/datalistModel.xml</value>
-
                 <!-- QuickShare (aka PublicView) -->
                 <value>alfresco/model/quickShareModel.xml</value>
 
-                <!-- Share UI model -->
-                <value>alfresco/model/shareUiModel.xml</value>
+                <!-- Surf model -->
+                <value>alfresco/model/surfModel.xml</value>
 
                 <!-- Site model -->
                 <value>alfresco/model/siteModel.xml</value>
@@ -713,7 +706,6 @@
                 <value>alfresco/messages/application-model</value>
                 <value>alfresco/messages/forum-model</value>
                 <value>alfresco/messages/email-server-model</value>
-                <value>alfresco/messages/data-list-model</value>
                 <value>alfresco/messages/transfer-model</value>
                 <value>alfresco/messages/publishing-model</value>
                 <value>alfresco/messages/site-model</value>
@@ -1003,6 +995,22 @@
                 <value>solr</value>
             </list>
         </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="solr.port" value-ref="solrPortEarlyChecker" />
+                <entry key="solr.port.ssl" value-ref="solrSSLPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="solrPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="Solr" />
+        <constructor-arg value="false" />
+        <constructor-arg value="false" />
+    </bean>
+    <bean id="solrSSLPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="Solr SSL" />
+        <constructor-arg value="false" />
+        <constructor-arg value="false" />
     </bean>
 
     <bean id="solr4" class="org.alfresco.repo.search.impl.solr.SolrChildApplicationContextFactory" parent="abstractPropertyBackedBean">
@@ -1028,6 +1036,22 @@
                 <value>solr4</value>
             </list>
         </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="solr.port" value-ref="solr4PortEarlyChecker" />
+                <entry key="solr.port.ssl" value-ref="solr4SSLPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="solr4PortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="Solr" />
+        <constructor-arg value="false" />
+        <constructor-arg value="false" />
+    </bean>
+    <bean id="solr4SSLPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="Solr SSL" />
+        <constructor-arg value="false" />
+        <constructor-arg value="false" />
     </bean>
     
     <bean id="buildonly" class="org.alfresco.repo.management.subsystems.LuceneChildApplicationContextFactory" parent="abstractPropertyBackedBean">

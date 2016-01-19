@@ -345,7 +345,6 @@ public class ShareUserSearchPage extends AbstractUtils
      * @param keyWordSearchText - Different Search types.
      * @return list of Search Results.
      * @throws Exception
-     * @throws PageException
      */
     public static List<SearchResult> advanceSearch(WebDrone driver, List<String> info, Map<String, String> keyWordSearchText) throws Exception
     {
@@ -353,7 +352,7 @@ public class ShareUserSearchPage extends AbstractUtils
         // loadAdvanceSearch method will return content search page or folder
         // TODO: subs: Why is this render necessary again?
         AdvanceSearchPage advanceSearchPage = navigateToAdvanceSearch(driver, info).render();
-
+        waitInSeconds(2);
         if (keyWordSearchText.get(SearchKeys.KEYWORD.getSearchKeys()) != null)
         {
             advanceSearchPage.inputKeyword(keyWordSearchText.get(SearchKeys.KEYWORD.getSearchKeys()));
@@ -363,7 +362,7 @@ public class ShareUserSearchPage extends AbstractUtils
             advanceSearchPage.inputTitle(keyWordSearchText.get(SearchKeys.TITLE.getSearchKeys()));
         }
         if (keyWordSearchText.get(SearchKeys.NAME.getSearchKeys()) != null)
-        {
+        {          
             advanceSearchPage.inputName(keyWordSearchText.get(SearchKeys.NAME.getSearchKeys()));
         }
         if (keyWordSearchText.get(SearchKeys.DESCRIPTION.getSearchKeys()) != null)
@@ -386,6 +385,7 @@ public class ShareUserSearchPage extends AbstractUtils
         {
             advanceSearchPage.inputModifier(keyWordSearchText.get(SearchKeys.MODIFIER.getSearchKeys()));
         }
+        advanceSearchPage.render(maxWaitTime);
         searchResults = advanceSearchPage.clickSearch().render(refreshDuration);
         driver.waitForPageLoad(5);
         List<SearchResult> searchOutput = searchResults.getResults();
@@ -480,11 +480,11 @@ public class ShareUserSearchPage extends AbstractUtils
      * User should be logged in and on the Advance Search Page
      * @param driver
      * @return SearchResultsPage
-     * @throws Exception
      */
     public static FacetedSearchPage clickSearchOnAdvanceSearch(WebDrone driver)
     {
         AdvanceSearchPage searchPage = (AdvanceSearchPage) ShareUser.getSharePage(driver);
+        waitInSeconds(1);
         FacetedSearchPage shareResultsPage = (FacetedSearchPage) searchPage.clickSearch();
         return shareResultsPage.render();
     }

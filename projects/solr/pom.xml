@@ -6,8 +6,8 @@
     
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>se.loftux.alfresco</groupId>
-        <version>LX81</version>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
@@ -30,7 +30,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-legacy-lucene</artifactId>
             <version>${project.version}</version>
             <exclusions>
@@ -45,7 +45,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-solrclient</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -128,6 +128,34 @@
                 <configuration>
                         <test>AlfrescoSolrEventListenerTest#testAllMatch*</test>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>write-alfresco-version</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                            <replaceregexp
+                                file="${solr.config.folder}/archive-SpacesStore/conf/solrcore.properties"
+                                match="alfresco.version=.*$"
+                                replace="alfresco.version=${version.major}.${version.minor}.${version.revision}${version.label} (${version.build})"
+                                byline="true"/>
+                            <replaceregexp
+                                file="${solr.config.folder}/workspace-SpacesStore/conf/solrcore.properties"
+                                match="alfresco.version=.*$"
+                                replace="alfresco.version=${version.major}.${version.minor}.${version.revision}${version.label} (${version.build})"
+                                byline="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

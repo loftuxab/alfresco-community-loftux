@@ -67,11 +67,15 @@
             <value>${solr.query.maximumResultsFromUnlimitedQuery}</value>
         </property>
         <property name="anyDenyDenies" value="${security.anyDenyDenies}"/>
+        <property name="defaultUnshardedFacetLimit" value="${solr.defaultUnshardedFacetLimit}"/>
+        <property name="defaultShardedFacetLimit" value="${solr.defaultShardedFacetLimit}"/>
+        <property name="useDynamicShardRegistration" value="${solr.useDynamicShardRegistration}"/>
     </bean>
     
     
     <!--The configurable RPC user mappings - actually a post-processed composite property! -->
     <bean id="solr4.store.mappings" class="org.springframework.beans.factory.config.ListFactoryBean">
+        <property name="singleton" value="false"/>
         <property name="sourceList">
             <list>
                 <bean class="org.alfresco.repo.search.impl.solr.SolrStoreMapping">
@@ -90,6 +94,15 @@
                     <property name="identifier">
                         <value>SpacesStore</value>
                     </property>
+                    <property name="nodeString">
+                        <value>${solr4.alfresco.nodeString}</value>
+                    </property>
+                    <property name="numShards">
+                        <value>${solr4.alfresco.numShards}</value>
+                    </property>
+                    <property name="replicationFactor">
+                        <value>${solr4.alfresco.replicationFactor}</value>
+                    </property>
                 </bean>
                 <bean class="org.alfresco.repo.search.impl.solr.SolrStoreMapping">
                     <property name="beanName">
@@ -106,6 +119,15 @@
                     </property>
                     <property name="identifier">
                         <value>SpacesStore</value>
+                    </property>
+                    <property name="nodeString">
+                        <value>${solr4.archive.nodeString}</value>
+                    </property>
+                    <property name="numShards">
+                        <value>${solr4.archive.numShards}</value>
+                    </property>
+                    <property name="replicationFactor">
+                        <value>${solr4.archive.replicationFactor}</value>
                     </property>
                 </bean>
             </list>
@@ -305,8 +327,8 @@
         <property name="enabled">
             <value>${solr.suggester.enabled}</value>
         </property>
-        <property name="solrAdminHTTPClient">
-            <ref bean="search.solrAdminHTTPCLient" />
+        <property name="solrQueryHTTPClient">
+            <ref bean="search.solrQueryHTTPCLient" />
         </property>
     </bean>
 

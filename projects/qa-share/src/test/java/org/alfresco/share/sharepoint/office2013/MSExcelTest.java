@@ -238,7 +238,7 @@ public class MSExcelTest extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
                 // 7. Locked document and working copy are present;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9830 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9830 + fileType).render();
                 Assert.assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.");
                 Map<String, Object> properties = detailsPage.getProperties();
                 Assert.assertEquals(properties.get("Name"), xlsFileName_9830 + " (Working Copy)" + fileType);
@@ -295,7 +295,7 @@ public class MSExcelTest extends AbstractUtils
 
                 // 5. Document version history is correctly dispalyed; Changes are
                 // applied;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9831 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9831 + fileType).render();
                 Assert.assertTrue(detailsPage.isCheckedOut(), "The document is not checkout");
                 Assert.assertEquals(detailsPage.getDocumentVersion(), fileVersion);
                 String documentContent = detailsPage.getDocumentBody();
@@ -434,7 +434,7 @@ public class MSExcelTest extends AbstractUtils
                 // 4. Go to site Document Library and verify changes are applied to the
                 // working copy;
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9834 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9834 + fileType).render();
                 Map<String, Object> properties = detailsPage.getProperties();
                 Assert.assertEquals(properties.get("Name"), xlsFileName_9834 + " (Working Copy)" + fileType);
                 String documentContent = detailsPage.getDocumentBody();
@@ -644,7 +644,7 @@ public class MSExcelTest extends AbstractUtils
                 documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
                 // 6. Navigate the document;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9837 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9837 + fileType).render();
 
                 // 6. Changes are not applied to the original file; Version is not
                 // increased to new major one.
@@ -902,7 +902,7 @@ public class MSExcelTest extends AbstractUtils
                 DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render(maxWaitTime);
 
                 // 7. Excel Document is still checked out; Changes are not applied;
-                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9841 + fileType);
+                DocumentDetailsPage detailsPage = documentLibPage.selectFile(xlsFileName_9841 + fileType).render();
                 assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.", "File " + xlsFileName_9841 + " isn't locked");
 
                 String documentContent = detailsPage.getDocumentBody();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -54,8 +54,9 @@ import org.alfresco.util.EqualsHelper;
     /**
      * Construct
      * 
-     * @param m2Association  association definition
-     * @return  the definition
+     * @param classDef  ClassDefinition
+     * @param assoc  M2ClassAssociation
+     * @param resolver  NamespacePrefixResolver
      */
     /*package*/ M2AssociationDefinition(ClassDefinition classDef, M2ClassAssociation assoc, NamespacePrefixResolver resolver)
     {
@@ -94,12 +95,12 @@ import org.alfresco.util.EqualsHelper;
     {
         if (targetClassName == null)
         {
-            throw new DictionaryException("Target class of association " + name.toPrefixString() + " must be specified");
+            throw new DictionaryException("d_dictionary.association.target_class_not_specified", name.toPrefixString());
         }
         targetClass = query.getClass(targetClassName);
         if (targetClass == null)
         {
-            throw new DictionaryException("Target class " + targetClassName.toPrefixString() + " of association " + name.toPrefixString() + " is not found");
+            throw new DictionaryException("d_dictionary.association.target_class_not_found", targetClassName.toPrefixString(), name.toPrefixString());
         }
     }
     

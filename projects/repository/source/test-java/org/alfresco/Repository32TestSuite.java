@@ -22,9 +22,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * See {@link RepositoryMisc01TestSuite}
+ * See {@link Repository01TestSuite}
  *
- * @Author Alan Davis
+ * @author Alan Davis
  */
 public class Repository32TestSuite extends TestSuite
 {

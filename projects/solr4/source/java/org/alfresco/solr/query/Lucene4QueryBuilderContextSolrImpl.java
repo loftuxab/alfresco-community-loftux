@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import org.alfresco.repo.search.MLAnalysisMode;
 import org.alfresco.repo.search.adaptor.lucene.LuceneQueryParserAdaptor;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
 import org.alfresco.repo.search.impl.querymodel.impl.lucene.LuceneQueryBuilderContext;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -51,18 +52,19 @@ public class Lucene4QueryBuilderContextSolrImpl implements LuceneQueryBuilderCon
 
     /**
      * Context for building lucene queries
-     * 
+     *
      * @param dictionaryService
      * @param namespacePrefixResolver
      * @param tenantService
      * @param searchParameters
-     * @param config
-     * @param indexReader
+     * @param defaultSearchMLAnalysisMode
+     * @param req
+     * @param model
      */
     public Lucene4QueryBuilderContextSolrImpl(DictionaryService dictionaryService, NamespacePrefixResolver namespacePrefixResolver, TenantService tenantService,
-            SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, SolrQueryRequest req, AlfrescoSolrDataModel model)
+            SearchParameters searchParameters, MLAnalysisMode defaultSearchMLAnalysisMode, SolrQueryRequest req, AlfrescoSolrDataModel model, FTSQueryParser.RerankPhase rerankPhase)
     {
-          lqp = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), req.getSchema().getAnalyzer());
+          lqp = new Solr4QueryParser(req.getSchema(), Version.LUCENE_48, searchParameters.getDefaultFieldName(), req.getSchema().getQueryAnalyzer(), rerankPhase);
 //        lqp.setDefaultOperator(AbstractLuceneQueryParser.OR_OPERATOR);
         lqp.setDictionaryService(dictionaryService);
         lqp.setNamespacePrefixResolver(namespacePrefixResolver);

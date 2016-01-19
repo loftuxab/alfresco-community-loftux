@@ -33,7 +33,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.DictionaryRepositoryBootstrap;
-import org.alfresco.repo.dictionary.ModelValidatorImpl;
 import org.alfresco.repo.dictionary.RepositoryLocation;
 import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.model.Repository;
@@ -140,9 +139,8 @@ public class ScriptNodeTest
     private static TenantAdminService          TENANT_ADMIN_SERVICE;
     private static MessageService              MESSAGE_SERVICE;
     private static TransactionService          TRANSACTION_SERVICE;
-    private static ModelValidatorImpl		   MODEL_VALIDATOR;
     private static PolicyComponent             POLICY_COMPONENT;
-    
+
     private static TestSiteAndMemberInfo USER_ONES_TEST_SITE;
     private static NodeRef               USER_ONES_TEST_FILE;
     
@@ -179,9 +177,8 @@ public class ScriptNodeTest
         TENANT_ADMIN_SERVICE  = APP_CONTEXT_INIT.getApplicationContext().getBean("tenantAdminService", TenantAdminService.class);
         MESSAGE_SERVICE       = APP_CONTEXT_INIT.getApplicationContext().getBean("messageService", MessageService.class);
         TRANSACTION_SERVICE   = APP_CONTEXT_INIT.getApplicationContext().getBean("transactionComponent", TransactionService.class);
-        MODEL_VALIDATOR 	  = APP_CONTEXT_INIT.getApplicationContext().getBean("modelValidator", ModelValidatorImpl.class);
         POLICY_COMPONENT      = APP_CONTEXT_INIT.getApplicationContext().getBean("policyComponent", PolicyComponent.class);
-		
+
         USER_ONES_TEST_SITE = STATIC_TEST_SITES.createTestSiteWithUserPerRole(GUID.generate(), "sitePreset", SiteVisibility.PRIVATE, USER_ONE_NAME);
         USER_ONES_TEST_FILE = STATIC_TEST_NODES.createQuickFile(MimetypeMap.MIMETYPE_TEXT_PLAIN, USER_ONES_TEST_SITE.doclib, "test.txt", USER_ONE_NAME);		
     }
@@ -198,7 +195,7 @@ public class ScriptNodeTest
 
     /**
      * Create test content, can be versionable.
-     * @param versionable 
+     * @param versionable boolean
      */
     private void createTestContent(boolean versionable)
     {
@@ -224,10 +221,6 @@ public class ScriptNodeTest
         bootstrap.setMessageService(MESSAGE_SERVICE);
         bootstrap.setPolicyComponent(POLICY_COMPONENT);
 
-        List<String> storeUrlsToValidate = new ArrayList<String>(1);
-        storeUrlsToValidate.add(this.storeRef.toString());
-        MODEL_VALIDATOR.setStoreUrls(storeUrlsToValidate);
-
         RepositoryLocation location = new RepositoryLocation();
         location.setStoreProtocol(storeRef.getProtocol());
         location.setStoreId(storeRef.getIdentifier());
@@ -249,10 +242,6 @@ public class ScriptNodeTest
     private void revertBootstrap()
     {
         bootstrap.destroy();
-
-        List<String> storeUrlsToValidate = new ArrayList<String>(1);
-        storeUrlsToValidate.add(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.toString());
-        MODEL_VALIDATOR.setStoreUrls(storeUrlsToValidate);
 
         RepositoryLocation location = new RepositoryLocation();
         location.setStoreProtocol(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.getProtocol());

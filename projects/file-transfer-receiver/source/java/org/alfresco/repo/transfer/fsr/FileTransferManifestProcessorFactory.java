@@ -31,8 +31,9 @@ public class FileTransferManifestProcessorFactory implements ManifestProcessorFa
     /**
      * The requisite processor
      *
-     * @param receiver
-     * @param transferId
+     * @param receiver TransferReceiver
+     * @param transferId String
+     * @param out TransferRequsiteWriter
      * @return the requisite processor
      */
     public TransferManifestProcessor getRequsiteProcessor(
@@ -46,8 +47,8 @@ public class FileTransferManifestProcessorFactory implements ManifestProcessorFa
     /**
      * The commit processors
      *
-     * @param receiver
-     * @param transferId
+     * @param receiver TransferReceiver
+     * @param transferId String
      * @return the requisite processor
      */
     public List<TransferManifestProcessor> getCommitProcessors(TransferReceiver receiver, String transferId)

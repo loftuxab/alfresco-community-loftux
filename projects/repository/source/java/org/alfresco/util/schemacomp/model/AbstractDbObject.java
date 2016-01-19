@@ -44,8 +44,8 @@ public abstract class AbstractDbObject implements DbObject
     /**
      * Instantiate, giving the object a parent and a name.
      * 
-     * @param parent
-     * @param name
+     * @param parent DbObject
+     * @param name String
      */
     public AbstractDbObject(DbObject parent, String name)
     {
@@ -161,8 +161,8 @@ public abstract class AbstractDbObject implements DbObject
     }
 
     /**
-     * Provides an implementation of {@link DbObject#diff(DbObject, Results)}. The template
-     * method {@link #doDiff(DbObject, Results)} provides the subclass specific diffing logic,
+     * Provides an implementation of {@link DbObject#diff(DbObject, DiffContext)}. The template
+     * method {@link #doDiff(DbObject, DiffContext)} provides the subclass specific diffing logic,
      * whilst this method handles the workflow required in most cases: set the path's prefix that will be
      * used to explain where differences occur; compare the name fields of the two objects; delegate to the
      * subclass specific diffing (if any); remove the last path addition ready for the next object to perform
@@ -196,8 +196,8 @@ public abstract class AbstractDbObject implements DbObject
     /**
      * Override this method to provide subclass specific diffing logic.
      * 
-     * @param right
-     * @param differences
+     * @param right DbObject
+     * @param ctx DiffContext
      */
     protected void doDiff(DbObject right, DiffContext ctx)
     {

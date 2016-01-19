@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>se.loftux.alfresco</groupId>
+        <groupId>org.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX81</version>
+        <version>5.1-SNAPSHOT</version>
     </parent>
     <artifactId>alfresco-packaging</artifactId>
     <packaging>pom</packaging>
@@ -12,18 +12,11 @@
 
     <modules>
         <module>file-transfer-receiver</module>
-        <module>wcmqs</module>
-        <module>webeditor</module>
         <module>solr1</module>
+        <module>solr4</module>
         <module>distribution</module>
         <module>installer</module>
     </modules>
-
-    <properties>
-        <alfresco.package.name>alfresco-community</alfresco.package.name>
-        <alfresco.war.artifactId>alfresco</alfresco.war.artifactId>
-        <share.war.artifactId>share</share.war.artifactId>
-    </properties>
 
     <build>                  
     <!-- Switch back to Maven default -->

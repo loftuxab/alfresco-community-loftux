@@ -21,6 +21,7 @@ package org.alfresco.repo.action.executer;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.repo.action.ActionDefinitionImpl;
 import org.alfresco.repo.action.ParameterizedItemAbstractBase;
 import org.alfresco.repo.lock.LockUtils;
@@ -41,7 +42,8 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Roy Wetherall
  */
-public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstractBase implements ActionExecuter
+@AlfrescoPublicApi
+public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstractBase implements ActionExecuter, LoggingAwareExecuter
 {
     private static Log logger = LogFactory.getLog(ActionExecuterAbstractBase.class);
     
@@ -218,7 +220,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
             ((ActionDefinitionImpl)this.actionDefinition).setTrackStatus(getTrackStatus());
             ((ActionDefinitionImpl)this.actionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
             ((ActionDefinitionImpl)this.actionDefinition).setRuleActionExecutor(this.name);
-            ((ActionDefinitionImpl)this.actionDefinition).setParameterDefinitions(getParameterDefintions());
+            ((ActionDefinitionImpl)this.actionDefinition).setLocalizedParameterDefinitions(getLocalizedParameterDefinitions());
             ((ActionDefinitionImpl)this.actionDefinition).setApplicableTypes(this.applicableTypes);
         }
         return this.actionDefinition;
@@ -286,7 +288,7 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
     /**
      * Set the queueName which will execute this action
      * if blank or null then the action will be executed on the "default" queue
-     * @param the name of the execution queue which should execute this action.
+     * @param queueName name of the execution queue which should execute this action.
      */ 
     public void setQueueName(String queueName) 
     {
@@ -295,5 +297,11 @@ public abstract class ActionExecuterAbstractBase extends ParameterizedItemAbstra
 
     public String getQueueName() {
         return queueName;
+    }
+    
+    @Override
+    public boolean onLogException(Log logger, Throwable t, String message)
+    {
+        return false;
     }
 }

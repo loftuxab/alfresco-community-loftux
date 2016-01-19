@@ -44,8 +44,8 @@ import org.alfresco.service.namespace.QName;
     /**
      * Construct
      * 
-     * @param query
-     * @param delegate
+     * @param query ModelQuery
+     * @param delegate ModelQuery
      */
     /*package*/ DelegateModelQuery(ModelQuery query, ModelQuery delegate)
     {

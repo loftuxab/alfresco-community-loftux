@@ -43,7 +43,8 @@ public class ContextAwareQuery extends Query
     private SearchParameters searchParameters;
     
     /**
-     * @param luceneQuery
+     * @param luceneQuery Query
+     * @param searchParameters SearchParameters
      */
     public ContextAwareQuery(Query luceneQuery, SearchParameters searchParameters)
     {
@@ -54,7 +55,7 @@ public class ContextAwareQuery extends Query
     
     
     /**
-     * @param b
+     * @param b float
      * @see org.apache.lucene.search.Query#setBoost(float)
      */
     public void setBoost(float b)
@@ -65,7 +66,7 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @return
+     * @return float
      * @see org.apache.lucene.search.Query#getBoost()
      */
     public float getBoost()
@@ -76,8 +77,8 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @param field
-     * @return
+     * @param field String
+     * @return String
      * @see org.apache.lucene.search.Query#toString(java.lang.String)
      */
     public String toString(String field)
@@ -88,7 +89,7 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @return
+     * @return String
      * @see org.apache.lucene.search.Query#toString()
      */
     public String toString()
@@ -99,8 +100,8 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @param searcher
-     * @return
+     * @param searcher IndexSearcher
+     * @return Weight
      * @throws IOException
      * @see org.apache.lucene.search.Query#createWeight(org.apache.lucene.search.IndexSearcher)
      */
@@ -112,8 +113,8 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @param reader
-     * @return
+     * @param reader IndexReader
+     * @return Query
      * @throws IOException
      * @see org.apache.lucene.search.Query#rewrite(org.apache.lucene.index.IndexReader)
      */
@@ -125,7 +126,7 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @param terms
+     * @param terms Set<Term>
      * @see org.apache.lucene.search.Query#extractTerms(java.util.Set)
      */
     public void extractTerms(Set<Term> terms)
@@ -136,7 +137,7 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @return
+     * @return Query
      * @see org.apache.lucene.search.Query#clone()
      */
     public Query clone()

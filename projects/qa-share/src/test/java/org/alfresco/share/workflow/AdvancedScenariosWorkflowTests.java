@@ -454,7 +454,7 @@ public class AdvancedScenariosWorkflowTests extends AbstractWorkflow
         editDocumentPropertiescl.selectSave().render();
 
         DocumentLibraryPage cldocumentLibraryPage = ShareUser.openSitesDocumentLibrary(hybridDrone, cloudSite1Name).render();
-        cldocumentLibraryPage.selectFile(fileName);
+        cldocumentLibraryPage.selectFile(fileName).render();
         editDocumentPropertiescl = ShareUserSitePage.getEditPropertiesFromDocLibPage(hybridDrone, cloudSite1Name, fileName);
         Assert.assertTrue((modifiedTitle + cloudUser1).equals(editDocumentPropertiescl.getDocumentTitle()),
                 "Document Title modified by CL User is not present for Cloud.");

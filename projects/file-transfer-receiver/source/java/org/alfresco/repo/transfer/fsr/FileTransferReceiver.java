@@ -134,6 +134,11 @@ public class FileTransferReceiver implements TransferReceiver
     private DescriptorDAO descriptorDAO;
     private String sourceRepoId;
     
+    /**
+      * Runnables that will be invoked after commit.
+      */
+    private List<FSRRunnable> postCommit;
+    
 
     public void cancel(String transferId) throws TransferException
     {
@@ -235,6 +240,23 @@ public class FileTransferReceiver implements TransferReceiver
             {
                 log.error("Failed to clean up transfer. Lock may still be in place: " + transferId, ex);
             }
+            
+            // let's run postCommit
+            if (postCommit != null && postCommit.size() > 0)
+            {
+                for (FSRRunnable runnable : postCommit)
+                {
+                    try
+                    {
+                        runnable.setTransferId(transferId);
+                        runnable.run();
+                    }
+                    catch (Throwable t)
+                    {
+                       	log.error("Error from postCommit event t:" + t.toString(), t);
+                    }
+                }
+            } 
         }
 
     }
@@ -369,7 +391,7 @@ public class FileTransferReceiver implements TransferReceiver
     }
 
     /**
-     * @param stagingFolder
+     * @param file File
      */
     private void deleteFile(File file)
     {
@@ -685,8 +707,6 @@ public class FileTransferReceiver implements TransferReceiver
 
         /**
          * Make the lock - called on main thread
-         *
-         * @throws LockAquisitionException
          */
         public synchronized void makeLock()
         {
@@ -816,7 +836,7 @@ public class FileTransferReceiver implements TransferReceiver
     /**
      * Timeout a transfer. Called after the lock has been released via a timeout. This is the last chance to clean up.
      *
-     * @param transferId
+     * @param transferId String
      */
     private void timeout(final String transferId)
     {
@@ -952,7 +972,7 @@ public class FileTransferReceiver implements TransferReceiver
     }
 
     /**
-     * @return
+     * @return NodeRef
      */
     private NodeRef createTransferRecord()
     {
@@ -1059,4 +1079,12 @@ public class FileTransferReceiver implements TransferReceiver
     {
         return new DbHelperImpl(fileTransferInfoDAO, transactionService, sourceRepoId);
     }
+        
+   	public void setPostCommit(List<FSRRunnable> postCommit) {
+   		this.postCommit = postCommit;
+   	}
+   
+   	public List<FSRRunnable> getPostCommit() {
+   		return postCommit;
+   	}
 }

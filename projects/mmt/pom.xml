@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>se.loftux.alfresco</groupId>
+        <groupId>org.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>LX81</version>
+        <version>5.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-mmt</artifactId>
@@ -11,19 +11,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-driver-zip</artifactId>
-            <version>7.5.5</version>
+            <version>${dependency.truezip.version}</version>
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-file</artifactId>
-            <version>7.5.5</version>
+            <version>${dependency.truezip.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

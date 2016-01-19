@@ -401,11 +401,11 @@ public class RepositoryFolderTests2 extends AbstractUtils
     public void AONE_3567() throws Exception
     {
         String testName = getTestName();
-        String folder1 = getFolderName(testName + System.currentTimeMillis());        
-        String description = testName + System.currentTimeMillis();    
-               
+        String folder1 = getFolderName(testName + System.currentTimeMillis());
+        String description = testName + System.currentTimeMillis();
+
         ShareUser.login(drone, testUser);
-        
+
         // Navigate to repository page
         ShareUserRepositoryPage.openRepositorySimpleView(drone);
 
@@ -428,9 +428,9 @@ public class RepositoryFolderTests2 extends AbstractUtils
         selectAspectsPage = selectAspectsPage.add(aspects).render();
 
         // Verify assert added to currently selected right hand side
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.EFFECTIVITY));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY));
 
         // remove aspects from list
         aspects.remove(CLASSIFIABLE);
@@ -440,23 +440,23 @@ public class RepositoryFolderTests2 extends AbstractUtils
         selectAspectsPage = selectAspectsPage.remove(aspects).render();
 
         // Verify assert added to currently selected right hand side
-        Assert.assertFalse(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE));
+        Assert.assertFalse(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE));
 
         // Click on Apply changes on select aspects page
         selectAspectsPage.clickApplyChanges().render();
 
         // Select more options in folder1 and click on Manage Aspects
         ShareUserRepositoryPage.openRepositorySimpleView(drone);
-        
-        String[] basefolderPath = new String[] {baseFolderName};        
+
+        String[] basefolderPath = new String[] {baseFolderName};
         ShareUserRepositoryPage.navigateFoldersInRepositoryPage(drone, basefolderPath);
-        
+
         SelectAspectsPage selectaspectsPage = ShareUserSitePage.getFileDirectoryInfo(drone, folder1).selectManageAspects().render();
 
         // Verify changes are updated successfully
-        Assert.assertTrue(selectaspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE));
-        Assert.assertTrue(selectaspectsPage.getSelectedAspects().contains(DocumentAspect.EFFECTIVITY));
-        
+        Assert.assertTrue(selectaspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE));
+        Assert.assertTrue(selectaspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY));
+
     }
     
     /**
@@ -501,9 +501,9 @@ public class RepositoryFolderTests2 extends AbstractUtils
         selectAspectsPage = selectAspectsPage.add(aspects).render();
 
         // Verify assert added to currently selected right hand side
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.EFFECTIVITY));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY));
 
         // remove aspects from list
         aspects.remove(VERSIONABLE);
@@ -513,8 +513,8 @@ public class RepositoryFolderTests2 extends AbstractUtils
         selectAspectsPage = selectAspectsPage.remove(aspects).render();
 
         // Verify assert added to currently selected right hand side
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE));
-        Assert.assertTrue(selectAspectsPage.getSelectedAspects().contains(DocumentAspect.EFFECTIVITY));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE));
+        Assert.assertTrue(selectAspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY));
 
         // Click on cancel button in select aspects page
         selectAspectsPage.clickCancel().render();
@@ -528,9 +528,9 @@ public class RepositoryFolderTests2 extends AbstractUtils
         SelectAspectsPage selectaspectsPage = ShareUserSitePage.getFileDirectoryInfo(drone, folder1).selectManageAspects().render();
 
         // Verify changes are updated successfully
-        Assert.assertTrue(selectaspectsPage.getAvailableAspects().contains(DocumentAspect.VERSIONABLE));
-        Assert.assertTrue(selectaspectsPage.getAvailableAspects().contains(DocumentAspect.EFFECTIVITY));
-        Assert.assertTrue(selectaspectsPage.getAvailableAspects().contains(DocumentAspect.CLASSIFIABLE));        
+        Assert.assertTrue(selectaspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE));
+        Assert.assertTrue(selectaspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY));
+        Assert.assertTrue(selectaspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE));
     }
 
     /**

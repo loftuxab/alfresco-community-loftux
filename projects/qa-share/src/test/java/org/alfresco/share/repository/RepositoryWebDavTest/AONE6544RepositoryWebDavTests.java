@@ -197,7 +197,7 @@ public class AONE6544RepositoryWebDavTests extends AbstractUtils
         docLibPage.selectFolder(folderName).render();
         Assert.assertTrue(docLibPage.isFileVisible(fileName), "File " + fileName + " isn't visible");
 
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName).render().render();
 
         properties = detailsPage.getProperties();
         Assert.assertNotNull(properties);
@@ -228,7 +228,7 @@ public class AONE6544RepositoryWebDavTests extends AbstractUtils
         docLibPage = docLibPage.selectFolder(folderName).render();
         Assert.assertTrue(docLibPage.isFileVisible(fileName), "File " + fileName + " isn't visible");
 
-        detailsPage = docLibPage.selectFile(fileName).render();
+        detailsPage = docLibPage.selectFile(fileName).render().render();
 
         properties = detailsPage.getProperties();
         Assert.assertNotNull(properties);

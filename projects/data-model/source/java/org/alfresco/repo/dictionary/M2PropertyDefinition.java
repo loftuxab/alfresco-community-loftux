@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -17,6 +17,8 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.alfresco.repo.dictionary;
+
+import static org.alfresco.service.cmr.dictionary.DictionaryException.DuplicateDefinitionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -148,15 +150,15 @@ import org.springframework.util.StringUtils;
             QName qname = def.getName();
             if (constraintsByQName.containsKey(qname))
             {
-                throw new DictionaryException(
+                throw new DuplicateDefinitionException(
                         "d_dictionary.property.err.duplicate_constraint_on_property",
                         def.getName().toPrefixString(), m2PropertyDef.name.toPrefixString());
             }
             else if (modelConstraints.containsKey(qname))
             {
-                throw new DictionaryException(
+                throw new DuplicateDefinitionException(
                         "d_dictionary.model.err.duplicate_constraint_on_model",
-                        def.getName().toPrefixString());
+                        def.getName().toPrefixString(), def.getModel().getName().toPrefixString());
             }
             constraintsByQName.put(qname, def);
             constraints.add(def);

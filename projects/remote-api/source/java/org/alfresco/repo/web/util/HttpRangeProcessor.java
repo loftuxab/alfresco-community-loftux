@@ -58,7 +58,7 @@ public class HttpRangeProcessor
     /**
      * Constructor.
      * 
-     * @param contentService
+     * @param contentService ContentService
      */
     public HttpRangeProcessor(ContentService contentService)
     {
@@ -444,7 +444,6 @@ public class HttpRangeProcessor
      * @param os      ServletOutputStream
      * @param offset  Assumed InputStream position - to calculate skip bytes from
      * 
-     * @return current InputStream position - so the stream can be reused if required 
      */
     private void streamRangeBytes(final Range r, final InputStream is, final OutputStream os, long offset)
        throws IOException
@@ -578,6 +577,10 @@ public class HttpRangeProcessor
                 end = Long.parseLong(range.substring(separator + 1));
              }
              
+             if (start > end)
+             {
+                 throw new IllegalArgumentException("Range start can not be less than range end: " + range);
+             }
              // return object to represent the byte-range
              return new Range(contentType, start, end, entityLength);
           }

@@ -27,8 +27,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.api.AlfrescoPublicApi;   
 import org.alfresco.repo.content.MimetypeMap;
@@ -313,7 +315,7 @@ public abstract class TikaPoweredMetadataExtracter
      * null by default so parse all.
      * 
      * @param metadata
-     * @param sourceMimeType
+     * @param targetMimeType
      * @return the document selector
      */
     protected DocumentSelector getDocumentSelector(Metadata metadata, String targetMimeType)
@@ -386,7 +388,7 @@ public abstract class TikaPoweredMetadataExtracter
             //  keys onto their own content model
             for(String tikaKey : metadata.names()) 
             {
-               putRawValue(tikaKey, metadata.get(tikaKey), rawProperties);
+               putRawValue(tikaKey, getMetadataValue(metadata, tikaKey), rawProperties);
             }
             
             // Now, map the common Tika metadata keys onto
@@ -395,14 +397,14 @@ public abstract class TikaPoweredMetadataExtracter
             //  to work without needing any changes
             
             // The simple ones
-            putRawValue(KEY_AUTHOR, metadata.get(Metadata.AUTHOR), rawProperties);
-            putRawValue(KEY_TITLE, metadata.get(Metadata.TITLE), rawProperties);
-            putRawValue(KEY_COMMENTS, metadata.get(Metadata.COMMENTS), rawProperties);
+            putRawValue(KEY_AUTHOR, getMetadataValue(metadata, Metadata.AUTHOR), rawProperties);
+            putRawValue(KEY_TITLE, getMetadataValue(metadata, Metadata.TITLE), rawProperties);
+            putRawValue(KEY_COMMENTS, getMetadataValue(metadata, Metadata.COMMENTS), rawProperties);
             
             // Get the subject and description, despite things not
             //  being nearly as consistent as one might hope
-            String subject = metadata.get(Metadata.SUBJECT);
-            String description = metadata.get(Metadata.DESCRIPTION);
+            String subject = getMetadataValue(metadata, Metadata.SUBJECT);
+            String description = getMetadataValue(metadata, Metadata.DESCRIPTION);
             if(subject != null && description != null) 
             {
                putRawValue(KEY_DESCRIPTION, description, rawProperties);
@@ -501,6 +503,55 @@ public abstract class TikaPoweredMetadataExtracter
         InputStream inputStream = getInputStream(reader);
         OutputStream outputStream = writer.getContentOutputStream();
         embedder.embed(metadataToEmbed, inputStream, outputStream, null);
+    }
+    
+    private String getMetadataValue(Metadata metadata, String key)
+    {
+        if (metadata.isMultiValued(key))
+        {
+            String[] parts = metadata.getValues(key);
+            
+            // use Set to prevent duplicates
+            Set<String> value = new LinkedHashSet<String>(parts.length);
+            
+            for (int i = 0; i < parts.length; i++)
+            {
+                value.add(parts[i]);
+            }
+            
+            String valueStr = value.toString();
+            
+            // remove leading/trailing braces []
+            return valueStr.substring(1, valueStr.length() - 1);
+        }
+        else
+        {
+            return metadata.get(key);
+        }
+    }
+    
+    /**
+     * Exif metadata for size also returns the string "pixels"
+     * after the number value , this function will 
+     * stop at the first non digit character found in the text
+     * @param sizeText string text
+     * @return the size value
+     */
+    protected String extractSize(String sizeText)
+    {
+        StringBuilder sizeValue = new StringBuilder();
+        for(char c : sizeText.toCharArray())
+        {
+            if(Character.isDigit(c))
+            {
+                sizeValue.append(c);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return sizeValue.toString();
     }
     
     /**

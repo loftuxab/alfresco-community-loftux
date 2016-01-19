@@ -75,8 +75,6 @@ public class SolrContainerScorer extends Scorer
      * 
      * @param weight -
      *            curently unsued
-     * @param tps -
-     *            the term positions for the terms we are trying to find
      * @param root -
      *            the term positions for documents with multiple entries - this
      *            may be null, or contain no matches - it specifies those things
@@ -126,7 +124,7 @@ public class SolrContainerScorer extends Scorer
     }
 
     /**
-     * @return
+     * @return boolean
      * @throws IOException
      */
     private boolean findNext() throws IOException
@@ -149,7 +147,7 @@ public class SolrContainerScorer extends Scorer
     /**
      * Check if we have found a match
      * 
-     * @return
+     * @return boolean
      * @throws IOException
      */
 
@@ -236,7 +234,7 @@ public class SolrContainerScorer extends Scorer
      * @param end - end term position marker
      * @param currentPosition - current path match index
      * @param currentOffset - current path position starting at zero (position being considered is start+offset)  
-     * @return
+     * @return int
      * @throws IOException
      */
     private int checkTail(int start, int end, int currentPosition, int currentOffset, boolean checkLastMatch) throws IOException

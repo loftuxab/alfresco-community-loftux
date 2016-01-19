@@ -37,7 +37,7 @@ public class AuthenticatedHttp extends AbstractHttp
     
     /**
      * @param httpProvider provider class for http-client
-     * @param authDetailProvider provider for authentication details
+     * @param authenticationDetailsProvider provider for authentication details
      */
     public AuthenticatedHttp(HttpClientProvider httpProvider, AuthenticationDetailsProvider authenticationDetailsProvider)
     {
@@ -272,8 +272,8 @@ public class AuthenticatedHttp extends AbstractHttp
     /**
      * Adds the JSON as request-body the the method and sets the correct
      * content-type.
-     * @param method
-     * @param object
+     * @param method EntityEnclosingMethod
+     * @param object JSONObject
      */
     private void populateRequestBody(EntityEnclosingMethod method, JSONObject object)
     {

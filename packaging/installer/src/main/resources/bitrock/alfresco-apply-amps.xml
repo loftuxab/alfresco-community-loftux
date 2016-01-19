@@ -1,6 +1,6 @@
 <component>
     <name>alfrescoapplyamps</name>
-    <description>//Alfresco Appy AMPs</description>
+    <description>//Alfresco Apply AMPs</description>
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>0</show>
@@ -28,7 +28,7 @@
             <name>mmtjar</name>
             <destination>${alfresco_commands_directory}</destination>
             <distributionFileList>
-              <distributionFile origin="${alfresco_mmt_source_file}" allowWildcards="1" />
+                <distributionFile origin="${alfresco_mmt_source_file}" allowWildcards="1" />
             </distributionFileList>
         </folder>
     </folderList>
@@ -53,14 +53,12 @@
                 </runProgram>
             </actionList>
             <ruleEvaluationLogic>or</ruleEvaluationLogic>
-	    <ruleList>
+            <ruleList>
                 <isTrue value="${alfresco_apply_amps}" />
-	        <isTrue value="${alfresco_apply_amps_share}" />
+                <isTrue value="${alfresco_apply_amps_share}" />
             </ruleList>
         </showProgressDialog>
      </postInstallationActionList>
-        <!--/folder>
-    </folderList-->
 </component>
 
 

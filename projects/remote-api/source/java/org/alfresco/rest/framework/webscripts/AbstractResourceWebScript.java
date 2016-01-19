@@ -72,7 +72,14 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
                 {
                     respons.put("toSerialize", result); 
                     respons.put("contentInfo", contentInfo);
-                    setSuccessResponseStatus(res);
+                    if (params.getStatus().getRedirect())
+                    {
+                        res.setStatus(params.getStatus().getCode());
+                    }
+                    else
+                    {
+                        setSuccessResponseStatus(res);
+                    }
                 }
             });
             
@@ -80,6 +87,10 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
             Object toSerialize = respons.get("toSerialize");
             ContentInfo contentInfo = (ContentInfo) respons.get("contentInfo");
             
+            // set caching (MNT-13938)
+            res.setCache(ApiWebScript.CACHE_NEVER);
+            
+            // set content info
             setContentInfoOnResponse(res, contentInfo);
             
             if (toSerialize != null)
@@ -128,7 +139,7 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
      * Renders the result of an execution.
      * 
      * @param res WebScriptResponse
-     * @param respons result of an execution
+     * @param toSerialize result of an execution
      * @throws IOException
      */
     protected void renderJsonResponse(final WebScriptResponse res, final Object toSerialize)
@@ -148,7 +159,7 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
     /**
      * The response status must be set before the response is written by Jackson (which will by default close and commit the response).
      * In a r/w txn, web script buffered responses ensure that it doesn't really matter but for r/o txns this is important.
-     * @param res
+     * @param res WebScriptResponse
      */
     protected void setSuccessResponseStatus(final WebScriptResponse res)
     {
@@ -160,7 +171,7 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
      * Finds the action executor to execute actions on.
      * @param httpMethod - the http method
      * @param params Params
-     * @param resource 
+     * @param resource ResourceWithMetadata
      * @param contentType Request content type
      * @return ActionExecutor the action executor
      */

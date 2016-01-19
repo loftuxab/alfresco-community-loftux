@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -79,10 +79,12 @@ public class SortedResultSet implements ResultSet
     /**
      * Source and resources required to sort
      * 
-     * @param resultSet
-     * @param nodeService
-     * @param searchParameters
-     * @param namespacePrefixResolver
+     * @param resultSet ResultSet
+     * @param nodeService NodeService
+     * @param sortDefinitions List<SortDefinition>
+     * @param namespacePrefixResolver NamespacePrefixResolver
+     * @param dictionaryService DictionaryService
+     * @param locale Locale
      */
     public SortedResultSet(ResultSet resultSet, NodeService nodeService, List<SortDefinition> sortDefinitions, NamespacePrefixResolver namespacePrefixResolver,
             DictionaryService dictionaryService, Locale locale)
@@ -212,6 +214,11 @@ public class SortedResultSet implements ResultSet
         return resultSet.getResultSetMetaData();
     }
 
+    public NodeService getNodeService()
+    {
+        return nodeService;
+    }
+    
     public ResultSetRow getRow(int i)
     {
         if (i < length())
@@ -883,7 +890,7 @@ public class SortedResultSet implements ResultSet
     /**
      * Bulk fetch results in the cache
      * 
-     * @param bulkFetch
+     * @param bulkFetch boolean
      */
     public boolean setBulkFetch(boolean bulkFetch)
     {
@@ -903,7 +910,7 @@ public class SortedResultSet implements ResultSet
     /**
      * Set the bulk fetch size
      * 
-     * @param bulkFetchSize
+     * @param bulkFetchSize int
      */
     public int setBulkFetchSize(int bulkFetchSize)
     {

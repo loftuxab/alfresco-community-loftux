@@ -445,7 +445,7 @@ public class QueryOptions
     }
 
     /**
-     * @param isBulkFetchEnabled 
+     * @param isBulkFetchEnabled boolean
      */
     public void setBulkFetchEnabled(boolean isBulkFetchEnabled)
     {
@@ -461,7 +461,7 @@ public class QueryOptions
     }
     
     /**
-     * @param tenants the tenants to set
+     * @param excludeTenantFilter boolean
      */
     public void setExcludeTenantFilter(boolean excludeTenantFilter)
     {
@@ -500,7 +500,7 @@ public class QueryOptions
     }
 
     /**
-     * @return
+     * @return SearchParameters
      */
     public SearchParameters getAsSearchParmeters()
     {

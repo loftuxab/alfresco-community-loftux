@@ -55,6 +55,7 @@ import org.alfresco.rest.api.tests.PersonInfo;
 import org.alfresco.rest.api.tests.RepoService.TestNetwork;
 import org.alfresco.rest.api.tests.RepoService.TestPerson;
 import org.alfresco.rest.api.tests.RepoService.TestSite;
+import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiException;
 import org.alfresco.rest.api.tests.client.RequestContext;
 import org.alfresco.rest.api.tests.client.data.MemberOfSite;
@@ -484,7 +485,110 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             cleanupProcessInstance(processInfo.getId());
         }
     }
-    
+
+   /* 
+    * Test association definition extraction from the dictionary as per MNT-11472.
+    *  
+    * We are going to test association definition extraction through dictionary, when one is not retrieved in context.
+    * Context doesn't contains all type definitions, because it requires entire history extraction of a process that causes performance implications.   
+    * Type definition extraction from the dictionary is quite fast and it doesn't affect performance.
+    * 
+    */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testAssociationDefinitionExtraction() throws Exception
+    {
+        RequestContext requestContext = initApiClientWithTestUser();
+
+        // The "wbpm:delegatee" custom association is defined in bpmDelegateeModel.xml. This association has "cm:person" target type.
+        final String delegatee = "wbpm_delegatee";
+        final String user = requestContext.getRunAsUser();
+        final String networkId = requestContext.getNetworkId();
+        
+        // Get person
+        final ActivitiScriptNode person = TenantUtil.runAsUserTenant(new TenantRunAsWork<ActivitiScriptNode>()
+        {
+            @Override
+            public ActivitiScriptNode doWork() throws Exception
+            {
+                return getPersonNodeRef(user);
+            }
+        }, user, networkId);
+        
+        // Start custom process instance
+        ProcessInstance processInstance = TenantUtil.runAsUserTenant(new TenantRunAsWork<ProcessInstance>()
+        {
+            @Override
+            public ProcessInstance doWork() throws Exception
+            {
+                deployProcessDefinition("workflow/testCustomDelegatee.bpmn20.xml");
+                String processDefinitionKey = "@" + networkId + "@myProcess";
+                Map<String, Object> variables = new HashMap<String, Object>();
+                variables.put("bpm_assignee", person);
+                variables.put("wf_notifyMe", Boolean.FALSE);
+                variables.put(WorkflowConstants.PROP_INITIATOR, person);
+                return activitiProcessEngine.getRuntimeService().startProcessInstanceByKey(processDefinitionKey, "myProcessKey", variables);
+            }
+        }, user, networkId);
+        
+        // Get task 
+        Task activeTask = activitiProcessEngine.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(activeTask);
+        try
+        {
+            TasksClient tasksClient = publicApiClient.tasksClient();
+
+            // Define the "wbpm_delegatee" variable for the taskDefine delegatee user name. POST request will be executed.
+            JSONArray variablesArray = new JSONArray();
+            JSONObject variableBody = new JSONObject();
+            variableBody.put("name", delegatee);
+            variableBody.put("value", user);
+            variableBody.put("scope", "local");
+            variablesArray.add(variableBody);
+
+            try
+            {
+                // Set variable for the task.
+                JSONObject response = tasksClient.createTaskVariables(activeTask.getId(), variablesArray);
+                assertNotNull(response);
+                JSONObject variable = (JSONObject) response.get("entry");
+                assertEquals(delegatee, variable.get("name"));
+                
+                // Check that d:noderef type was returned with appropriate nodeRef Id value. 
+                assertEquals("d:noderef", variable.get("type"));
+                assertEquals(person.getNodeRef().getId(), variable.get("value"));
+                
+                // Get process variables. GET request will be executed.
+                response = publicApiClient.processesClient().getProcessvariables(processInstance.getId());
+                assertNotNull(response);
+                assertTrue(delegatee + " variable was not set", response.toJSONString().contains(delegatee));
+                JSONArray entries = (JSONArray) response.get("entries");
+
+                // Find "wbpm_delegatee" variable.
+                for (Object entry : entries)
+                {
+                    variable = (JSONObject) ((JSONObject) entry).get("entry");
+                    if (variable.get("name").equals(delegatee))
+                    {
+                        // Check that type corresponds to the target class. 
+                        // It means that assoc type def was retrieved successfully from the dictionary.
+                        assertEquals("cm:person", variable.get("type"));
+                        // Value should be an actual user name.
+                        assertEquals(user, variable.get("value"));
+                    }
+                }
+            }
+            catch (PublicApiException ex)
+            {
+                fail("Unexpected result " + ex);
+            }
+        }
+        finally
+        {
+            cleanupProcessInstance(processInstance);
+        }
+    }
+
     @Test
     @SuppressWarnings("unchecked")
     public void testUpdateTaskAuthorization() throws Exception
@@ -1057,6 +1161,29 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
     
     @Test
     @SuppressWarnings("unchecked")
+    public void testSetOutcome() throws Exception
+    {
+        RequestContext requestContext = initApiClientWithTestUser();
+        ProcessInfo processInf = startReviewPooledProcess(requestContext);
+        Task task = activitiProcessEngine.getTaskService().createTaskQuery().processInstanceId(processInf.getId()).singleResult();
+        TasksClient tasksClient = publicApiClient.tasksClient();
+        activitiProcessEngine.getTaskService().saveTask(task);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("select", "state,variables");
+        HttpResponse response = tasksClient.update("tasks",
+                        task.getId(),
+                        null,
+                        null,
+                        "{\"state\":\"completed\",\"variables\":[{\"name\":\"wf_reviewOutcome\",\"value\":\"Approve\",\"scope\":\"local\"},{\"name\":\"bpm_comment\",\"value\":\"approved by me\",\"scope\":\"local\"}]}",
+                        "Failed to update task", params);
+        assertEquals(200, response.getStatusCode());
+        HistoricTaskInstance historyTask = activitiProcessEngine.getHistoryService().createHistoricTaskInstanceQuery().taskId(task.getId()).includeProcessVariables().includeTaskLocalVariables().singleResult();
+        String outcome = (String) historyTask.getTaskLocalVariables().get("bpm_outcome");
+        assertEquals("Approve", outcome);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
     public void testResolveTask() throws Exception
     {
         RequestContext requestContext = initApiClientWithTestUser();
@@ -1414,6 +1541,7 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             // Test status filtering - completed
             params.clear();
             params.put("where", "(status = 'completed' AND processId = '" + processInstance.getId() + "')");
+            params.put("orderBy", "dueAt DESC");
             assertTasksPresentInTaskQuery(params, tasksClient, false, completedTask.getId());
             
             // Test status filtering - any
@@ -1448,6 +1576,7 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertTasksPresentInTaskQuery(params, tasksClient, activeTask.getId());
             
             params.put("where", "(status = 'completed' AND assignee = '" + anotherUserId + "')");
+            params.put("orderBy", "endedAt");
             assertTasksPresentInTaskQuery(params, tasksClient, completedTask.getId());
             
             params.put("where", "(status = 'any' AND assignee = '" + anotherUserId + "')");
@@ -1743,6 +1872,18 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             {
                 assertEquals(HttpStatus.BAD_REQUEST.value(), expected.getHttpResponse().getStatusCode());
             }
+
+            params.clear();
+            params.put("where", "(status = 'completed' AND processDefinitionName = 'Adhoc Activiti Process')");
+            JSONObject response = publicApiClient.processesClient().getTasks(processInstance.getId(), params);
+            assertNotNull(response);
+            JSONObject paginationJSON = (JSONObject) response.get("pagination");
+            assertEquals(1l, paginationJSON.get("count"));
+
+            params.clear();
+            params.put("where", "(status = 'any' AND variables/numberVar < 'd:int 5')");
+            assertEquals(0, getResultSizeForTaskQuery(params, tasksClient));
+
         }
         finally
         {
@@ -1807,7 +1948,7 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertEquals(4l, paginationJSON.get("count"));
             assertEquals(6l, paginationJSON.get("totalItems"));
             assertEquals(2l, paginationJSON.get("skipCount"));
-            assertEquals(true, paginationJSON.get("hasMoreItems"));
+            assertEquals(false, paginationJSON.get("hasMoreItems"));
             jsonEntries = (JSONArray) taskListJSONObject.get("entries");
             assertEquals(4, jsonEntries.size());
             
@@ -1837,7 +1978,7 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertEquals(2l, paginationJSON.get("count"));
             assertEquals(6l, paginationJSON.get("totalItems"));
             assertEquals(4l, paginationJSON.get("skipCount"));
-            assertEquals(true, paginationJSON.get("hasMoreItems"));
+            assertEquals(false, paginationJSON.get("hasMoreItems"));
             jsonEntries = (JSONArray) taskListJSONObject.get("entries");
             assertEquals(2, jsonEntries.size());
         }
@@ -1960,6 +2101,12 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertEquals(taskList.get(0).getId(), taskJSON.get("id"));
             taskJSON = (JSONObject) ((JSONObject) tasksListJSON.get(5)).get("entry");
             assertEquals(taskList.get(numberOfTasks - 1).getId(), taskJSON.get("id"));
+
+            params.put("orderBy", "dueAt DESC");
+            tasksResponseJSON = tasksClient.findTasks(params);
+            tasksListJSON = (JSONArray) tasksResponseJSON.get("entries");
+            assertEquals(6, tasksListJSON.size());
+
         }
         finally
         {

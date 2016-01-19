@@ -1,6 +1,6 @@
 <component>
     <name>alfrescofunctions</name>
-    <description/>
+    <description>//Alfresco Functions</description>
     <canBeEdited>0</canBeEdited>
     <selected>1</selected>
     <show>0</show>
@@ -44,22 +44,22 @@
                     <platformTest type="windows"/>
                 </ruleList>
              </setInstallerVariableFromRegEx>
-	        <substitute>
-		    <files>${alfrescoFiles}</files>
-		    <substitutionList>
-		        <substitution>
+            <substitute>
+            <files>${alfrescoFiles}</files>
+            <substitutionList>
+                        <substitution>
                             <pattern>@@BITROCK_INSTALLDIR@@</pattern>
                             <value>${installdir}</value>
                         </substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@ALFRESCO_DATA_DIR@@</pattern>
                             <value>${alfresco_data_directory}</value>
                         </substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@ALFRESCO_SOLR_DIR@@</pattern>
                             <value>${alfresco_data_directory.dos.unix}/solr</value>
                         </substitution>
- 		        <substitution>
+                        <substitution>
                             <pattern>@@ALFRESCO_SOLR4_DIR@@</pattern>
                             <value>${installdir.unix}/solr4</value>
                         </substitution>
@@ -75,7 +75,7 @@
                             <pattern>@@ALFRESCO_SOLR4_CONTENT_DIR@@</pattern>
                             <value>${alfresco_data_directory.unix}/solr4/content</value>
                         </substitution>
- 		        <substitution>
+                        <substitution>
                             <pattern>@@BITROCK_ALFRESCO_LICENSE_DIR@@</pattern>
                             <value>${installdir.unix}</value>
                             <ruleList>
@@ -109,21 +109,21 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                                 <platformTest type="windows"/>
                             </ruleList>
                         </substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@BITROCK_LO_ROOTDIR@@</pattern>
                             <value>${libreoffice_directory.unix}</value>
                             <ruleList>
                                 <platformTest type="unix"/>
                             </ruleList>
                         </substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@BITROCK_LO_ROOTDIR@@</pattern>
                             <value>${libreoffice_directory.dos.unix}</value>
                             <ruleList>
                                 <platformTest type="windows"/>
                             </ruleList>
                         </substitution>
-		        <substitution>
+                        <substitution>
                             <pattern>@@BITROCK_LIBREOFFICE_PROGRAM_DIR@@</pattern>
                             <value>${libreoffice_directory.dos.unix}/App/libreoffice/program/soffice.exe</value>
                             <ruleList>
@@ -132,9 +132,27 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_LIBREOFFICE_PROGRAM_DIR@@</pattern>
+                            <value>${libreoffice_directory}/program/soffice.bin</value>
+                            <ruleList>
+                                <platformTest type="linux"/>
+                                <fileExists path="${libreoffice_directory}/program/soffice.bin"/>
+                            </ruleList>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_LIBREOFFICE_PROGRAM_DIR@@</pattern>
                             <value>${libreoffice_directory}/program/soffice</value>
                             <ruleList>
                                 <platformTest type="linux"/>
+                                <fileExists negate="1" path="${libreoffice_directory}/program/soffice.bin"/>
+                                <fileExists path="${libreoffice_directory}/program/soffice"/>
+                            </ruleList>
+                        </substitution>
+                        <substitution>
+                            <pattern>@@BITROCK_LIBREOFFICE_PROGRAM_DIR@@</pattern>
+                            <value>${libreoffice_directory}/Contents/MacOS/soffice.bin</value>
+                            <ruleList>
+                                <platformTest type="osx"/>
+                                <fileExists path="${libreoffice_directory}/Contents/MacOS/soffice.bin"/>
                             </ruleList>
                         </substitution>
                         <substitution>
@@ -142,9 +160,11 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                             <value>${libreoffice_directory}/Contents/MacOS/soffice</value>
                             <ruleList>
                                 <platformTest type="osx"/>
+                                <fileExists negate="1" path="${libreoffice_directory}/Contents/MacOS/soffice.bin"/>
+                                <fileExists path="${libreoffice_directory}/Contents/MacOS/soffice"/>
                             </ruleList>
                         </substitution>
-		        <substitution>
+                <substitution>
                             <pattern>@@BITROCK_LIBREOFFICE_JOD_DIR@@</pattern>
                             <value>${libreoffice_directory.dos.unix}/App/libreoffice</value>
                             <ruleList>
@@ -168,34 +188,6 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         <substitution>
                             <pattern>@@BITROCK_LO_PORT@@</pattern>
                             <value>${libreoffice_port}</value>
-                        </substitution>
-			<substitution>
-                            <pattern>@@BITROCK_PDF2SWF_PATH@@</pattern>
-                            <value>${installdir.dos.unix}/swftools/pdf2swf.exe</value>
-                            <ruleList>
-                                <platformTest type="windows"/>
-                            </ruleList>
-                        </substitution>
-			<substitution>
-                            <pattern>@@BITROCK_PDF2SWF_PATH@@</pattern>
-                            <value>${installdir.unix}/common/bin/pdf2swf</value>
-                            <ruleList>
-                                <platformTest type="unix"/>
-                            </ruleList>
-			</substitution>
-                        <substitution>
-                            <pattern>@@BITROCK_PDF2SWF_LANGUAGEDIR@@</pattern>
-                            <value>${installdir.dos.unix}/swftools/japanese</value>
-                            <ruleList>
-                                <platformTest type="windows"/>
-                            </ruleList>
-                        </substitution>
-                        <substitution>
-                            <pattern>@@BITROCK_PDF2SWF_LANGUAGEDIR@@</pattern>
-                            <value>${installdir.unix}/common/japanese</value>
-                            <ruleList>
-                                <platformTest type="unix"/>
-                            </ruleList>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_MYSQL_PORT@@</pattern>
@@ -271,19 +263,15 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_SHUTDOWN_PORT@@</pattern>
-                            <value>${tomcat_server_shutdown_port}</value>
+                            <value>${application_server_shutdown_port}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_AJP_PORT@@</pattern>
-                            <value>${tomcat_server_ajp_port}</value>
+                            <value>${application_server_ajp_port}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_TOMCAT_HOST@@</pattern>
                             <value>${application_server_domain}</value>
-                        </substitution>
-                        <substitution>
-                            <pattern>@@BITROCK_SHAREPOINT_PORT@@</pattern>
-                            <value>${alfresco_sharepoint_port}</value>
                         </substitution>
                         <substitution>
                             <pattern>@@BITROCK_QUICKR_PORT@@</pattern>
@@ -310,7 +298,7 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                             <value>${java_home_directory.dos}</value>
                         </substitution>
                     </substitutionList>
-		</substitute>
+        </substitute>
             </actionList>
         </actionDefinition>
         <actionDefinition name="alfrescoCheckJDBCDriver">
@@ -340,7 +328,7 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         <autodetectJava>
                             <abortOnError>0</abortOnError>
                             <showMessageOnError>1</showMessageOnError>
-                            <customErrorMessage>This release was packaged to run on J2SE ${java_min_version} or later. Please install a compatible Java version and try again.</customErrorMessage>
+                            <customErrorMessage>This release was packaged to run on J2SE ${java_min_version} or later. Install a compatible Java version and try again.</customErrorMessage>
                             <promptUser>0</promptUser>
                             <validVersionList>
                                 <validVersion>
@@ -369,7 +357,7 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         <throwError>
                             <abortOnError>0</abortOnError>
                             <showMessageOnError>1</showMessageOnError>
-                            <text>The version of Java you have selected is 32 bit, but this is a 64 bit installation of Alfresco. Please install a 64bit version of Java before continuing, or go back and ensure the “Java” component is selected.</text>
+                            <text>The version of Java you have selected is 32 bit, but this is a 64 bit installation of Alfresco. Install a 64 bit version of Java before continuing, or go back and ensure the “Java” component is selected.</text>
                             <ruleList>
                                 <compareText text="${alfrescoInstallerBitness}" logic="equals" value="64"/>
                                 <compareText text="${java_bitness}" value="32"/>
@@ -379,7 +367,7 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                         <autodetectJava>
                             <abortOnError>1</abortOnError>
                             <showMessageOnError>1</showMessageOnError>
-                            <customErrorMessage>This release was packaged to run on J2SE ${java_min_version} or later. Please install a compatible Java version and try again.</customErrorMessage>
+                            <customErrorMessage>This release was packaged to run on J2SE ${java_min_version} or later. Install a compatible Java version and try again.</customErrorMessage>
                             <promptUser>0</promptUser>
                             <validVersionList>
                                 <validVersion>
@@ -444,7 +432,7 @@ img.exe=${'${img.root}'}\\convert.exe</value>
                             </ruleList>
                         </setInstallerVariable>
                         <showWarning>
-                            <text>Java Home path contains spaces. Alfresco may not function properly, as the JVM itself has bugs when the installation path contains spaces. Reinstall the JVM in a path that does not contain spaces.</text>
+                            <text>Java Home path contains spaces. Alfresco might not work properly, as the JVM has problems when the installation path contains spaces. Reinstall the JVM in a path that does not contain spaces.</text>
                             <ruleList>
                                 <compareText>
                                     <text>${java_home_directory}</text>

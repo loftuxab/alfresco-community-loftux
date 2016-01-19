@@ -4,8 +4,8 @@
     <name>Alfresco MBeans</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>se.loftux.alfresco</groupId>
-        <version>LX81</version>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

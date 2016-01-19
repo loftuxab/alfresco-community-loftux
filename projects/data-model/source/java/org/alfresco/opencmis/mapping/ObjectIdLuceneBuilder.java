@@ -46,7 +46,7 @@ public class ObjectIdLuceneBuilder extends BaseLuceneBuilder
 	/**
      * Construct
      * 
-     * @param serviceRegistry
+     * @param dictionaryService DictionaryService
      */
     public ObjectIdLuceneBuilder(DictionaryService dictionaryService)
     {

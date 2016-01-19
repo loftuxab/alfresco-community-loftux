@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -103,7 +103,6 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
 {
     private CIFSConfigBean cifsConfigBean;
     private FTPConfigBean ftpConfigBean;
-    private NFSConfigBean nfsConfigBean;
     private List<DeviceContext> filesystemContexts;
     private SecurityConfigBean securityConfigBean;
     private CoreServerConfigBean coreServerConfigBean;
@@ -138,11 +137,6 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
     public void setFtpConfigBean(FTPConfigBean ftpConfigBean)
     {
         this.ftpConfigBean = ftpConfigBean;
-    }
-
-    public void setNfsConfigBean(NFSConfigBean nfsConfigBean)
-    {
-        this.nfsConfigBean = nfsConfigBean;
     }
     
     public void setFilesystemContexts(List<DeviceContext> filesystemContexts)
@@ -1229,6 +1223,22 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
                 ftpConfig.setFTPPort(DefaultFTPServerPort);
             }
 
+            // Check for an FTP server timeout for connection to client
+            Integer sessionTimeout = ftpConfigBean.getSessionTimeout();
+            if (sessionTimeout != null)
+            {
+                ftpConfig.setFTPSrvSessionTimeout(sessionTimeout);
+                if (ftpConfig.getFTPSrvSessionTimeout() < 0)
+                    throw new AlfrescoRuntimeException("FTP server session timeout must have positive value or zero");
+            }
+            else
+            {
+
+                // Use the default timeout
+
+                ftpConfig.setFTPSrvSessionTimeout(DefaultFTPSrvSessionTimeout);
+            }
+
             // Check if anonymous login is allowed
 
             if (ftpConfigBean.getAllowAnonymous())
@@ -1545,197 +1555,6 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
     }
 
     /**
-     * Process the NFS server configuration
-     */
-    protected void processNFSServerConfig()
-    {
-        // If the configuration section is not valid then NFS is disabled
-
-        if (nfsConfigBean == null)
-        {
-            removeConfigSection(NFSConfigSection.SectionName);
-            return;
-        }
-
-        // Check if the server has been disabled
-
-        if (!nfsConfigBean.getServerEnabled())
-        {
-            removeConfigSection(NFSConfigSection.SectionName);
-            return;
-        }
-
-        // Create the NFS configuration section
-
-        NFSConfigSection nfsConfig = new NFSConfigSection(this);
-
-        try
-        {
-            // Check if the port mapper is enabled
-
-            if (nfsConfigBean.getPortMapperEnabled())
-                nfsConfig.setNFSPortMapper(true);
-
-            // Check for the thread pool size
-
-            Integer poolSize = nfsConfigBean.getThreadPool();
-
-            if (poolSize != null)
-            {
-
-                // Range check the pool size value
-
-                if (poolSize < 4)
-                {
-                    throw new AlfrescoRuntimeException("NFS thread pool size is below minimum of 4");
-                }
-                // Set the thread pool size
-
-                nfsConfig.setNFSThreadPoolSize(poolSize);
-            }
-
-            // NFS packet pool size
-
-            Integer pktPoolSize = nfsConfigBean.getPacketPool();
-
-            if (pktPoolSize != null)
-            {
-                // Range check the pool size value
-
-                if (pktPoolSize < 10)
-                    throw new AlfrescoRuntimeException("NFS packet pool size is below minimum of 10");
-
-                if (pktPoolSize < nfsConfig.getNFSThreadPoolSize() + 1)
-                    throw new AlfrescoRuntimeException("NFS packet pool must be at least thread pool size plus one");
-
-                // Set the packet pool size
-
-                nfsConfig.setNFSPacketPoolSize(pktPoolSize);
-            }
-
-            // Check for a port mapper server port
-
-            Integer portMapperPort = nfsConfigBean.getPortMapperPort();
-            if (portMapperPort != null)
-            {
-                nfsConfig.setPortMapperPort(portMapperPort);
-                if ( nfsConfig.getPortMapperPort() == -1) 
-                {
-                	logger.info("NFS portmapper registration disabled");
-                }
-                else 
-                {
-                	if (nfsConfig.getPortMapperPort() <= 0 || nfsConfig.getPortMapperPort() >= 65535)
-                	{
-                		throw new AlfrescoRuntimeException("NFS Port mapper server port out of valid range");
-                	}
-                }
-            }
-
-            // Check for a mount server port
-
-            Integer mountServerPort = nfsConfigBean.getMountServerPort();
-            if (mountServerPort != null)
-            {
-                nfsConfig.setMountServerPort(mountServerPort);
-                if (nfsConfig.getMountServerPort() < 0 || nfsConfig.getMountServerPort() >= 65535)
-                {
-                    throw new AlfrescoRuntimeException("NFS Mount server port out of valid range");
-                }
-            }
-
-            // Check for an NFS server port
-
-            Integer nfsServerPort = nfsConfigBean.getNfsServerPort();
-            if (nfsServerPort != null)
-            {
-                nfsConfig.setNFSServerPort(nfsServerPort);
-                if (nfsConfig.getNFSServerPort() < 0 || nfsConfig.getNFSServerPort() >= 65535)
-                {
-                    throw new AlfrescoRuntimeException("NFS server port out of valid range");
-                }
-            }
-
-            // Check for an RPC registration port
-            
-            Integer rpcRegisterPort = nfsConfigBean.getRpcRegisterPort();
-            if ( rpcRegisterPort != null)
-            {
-                nfsConfig.setRPCRegistrationPort( rpcRegisterPort);
-                if ( nfsConfig.getRPCRegistrationPort() < 0 || nfsConfig.getRPCRegistrationPort() >= 65535)
-                {
-                    throw new AlfrescoRuntimeException("RPC registrtion port out of valid range");
-                }
-            }
-            
-            // Check for NFS debug flags
-
-            String flags = nfsConfigBean.getDebugFlags();
-            int nfsDbg = 0;
-
-            if (flags != null && flags.length() > 0)
-            {
-
-                // Parse the flags
-
-                flags = flags.toUpperCase();
-                StringTokenizer token = new StringTokenizer(flags, ",");
-
-                while (token.hasMoreTokens())
-                {
-
-                    // Get the current debug flag token
-
-                    String dbg = token.nextToken().trim();
-
-                    // Find the debug flag name
-
-                    int idx = 0;
-
-                    while (idx < m_nfsDebugStr.length && m_nfsDebugStr[idx].equalsIgnoreCase(dbg) == false)
-                        idx++;
-
-                    if (idx >= m_nfsDebugStr.length)
-                        throw new AlfrescoRuntimeException("Invalid NFS debug flag, " + dbg);
-
-                    // Set the debug flag
-
-                    nfsDbg += 1 << idx;
-                }
-
-                // Set the NFS debug flags
-
-                nfsConfig.setNFSDebug(nfsDbg);
-            }
-
-            // Check if mount server debug output is enabled
-
-            if (nfsConfigBean.getMountServerDebug())
-                nfsConfig.setMountServerDebug(true);
-
-            // Check if portmapper debug output is enabled
-
-            if (nfsConfigBean.getPortMapperDebug())
-                nfsConfig.setPortMapperDebug(true);
-
-            // Create the RPC authenticator
-            RpcAuthenticator rpcAuthenticator = nfsConfigBean.getRpcAuthenticator();
-            if (rpcAuthenticator != null)
-            {
-                nfsConfig.setRpcAuthenticator(rpcAuthenticator);
-            }
-            else
-            {
-                throw new AlfrescoRuntimeException("RPC authenticator configuration missing, require user mappings");
-            }
-        }
-        catch (InvalidConfigurationException ex)
-        {
-            throw new AlfrescoRuntimeException(ex.getMessage());
-        }
-    }
-
-    /**
      * Process the filesystems configuration
      */
     protected void processFilesystemsConfig()
@@ -1876,8 +1695,8 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
      * the disk interface is a {@link BufferedContentDiskDriver} and its disk
      * interface is a ContentDiskDriver2 (wrapped by several other DiskInterface objects).
      * 
-     * @param diskInterface
-     * @return
+     * @param diskInterface ExtendedDiskInterface
+     * @return boolean
      */
     private boolean isContentDiskDriver2(ExtendedDiskInterface diskInterface)
     {
@@ -2228,7 +2047,8 @@ public class ServerConfigurationBean extends AbstractServerConfigurationBean imp
      * 
      * TODO - what about desktop actions etc?
      * 
-     * @param diskCtx
+     * @param uniqueName String
+     * @param diskCtx AlfrescoContext
      */
     public void initialiseRuntimeContext(String uniqueName, AlfrescoContext diskCtx)
     {

@@ -192,7 +192,7 @@ public class JscriptWorkflowTask extends BaseScopableProcessorExtension implemen
     /**
      * End the task
      * 
-     * @param transition
+     * @param transitionId
      *            transition to end the task for
      */
     public void endTask(String transitionId)
@@ -203,7 +203,7 @@ public class JscriptWorkflowTask extends BaseScopableProcessorExtension implemen
     /**
      * Get the available transition ids.
      * 
-     * @return
+     * @return ScriptableHashMap
      */
     public ScriptableHashMap<String, String> getTransitions()
     {
@@ -222,7 +222,7 @@ public class JscriptWorkflowTask extends BaseScopableProcessorExtension implemen
     /**
      * Get the packe resources (array of noderefs)
      * 
-     * @return
+     * @return Scriptable
      */
     public Scriptable getPackageResources()
     {

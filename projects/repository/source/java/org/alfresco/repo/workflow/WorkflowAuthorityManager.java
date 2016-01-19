@@ -39,7 +39,7 @@ public class WorkflowAuthorityManager
     /**
      * Convert Alfresco authority to user id
      * 
-     * @param authority
+     * @param authority NodeRef
      * @return actor id
      */
     public String mapAuthorityToName(NodeRef authority)
@@ -50,8 +50,8 @@ public class WorkflowAuthorityManager
     /**
      * Convert authority name to an Alfresco Authority
      * 
-     * @param names
-     *            the authority names to convert
+     * @param name
+     *            the authority name to convert
      * @return the Alfresco authorities
      */
     public NodeRef mapNameToAuthority(String name)

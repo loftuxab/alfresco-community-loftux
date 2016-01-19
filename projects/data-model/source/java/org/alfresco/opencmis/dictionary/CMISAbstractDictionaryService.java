@@ -79,7 +79,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
 	/**
      * Set the mapping service
      * 
-     * @param cmisMapping
+     * @param cmisMapping CMISMapping
      */
     public void setCmisMapping(CMISMapping cmisMapping)
     {
@@ -89,7 +89,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the property accessor mapping service
      * 
-     * @param accessor mapping
+     * @param accessorMapping mapping
      */
     public void setPropertyAccessorMapping(PropertyAccessorMapping accessorMapping)
     {
@@ -99,7 +99,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the property lucene mapping service
      * 
-     * @param lucene mapping
+     * @param luceneBuilderMapping mapping
      */
     public void setPropertyLuceneBuilderMapping(PropertyLuceneBuilderMapping luceneBuilderMapping)
     {
@@ -109,7 +109,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the dictionary Service
      * 
-     * @param dictionaryService
+     * @param dictionaryService DictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -119,7 +119,7 @@ public abstract class CMISAbstractDictionaryService extends AbstractLifecycleBea
     /**
      * Set the dictionary DAO
      * 
-     * @param dictionaryDAO
+     * @param dictionaryDAO DictionaryDAO
      */
     public void setDictionaryDAO(DictionaryDAO dictionaryDAO)
     {

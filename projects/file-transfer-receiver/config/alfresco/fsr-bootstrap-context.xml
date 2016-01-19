@@ -191,6 +191,25 @@ xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.sprin
         <property name="progressMonitor" ref="transferProgressMonitor" />
         <property name="fileTransferInfoDAO" ref="fileTransferInfoDAO" />
         <property name="descriptorDAO" ref="serverDescriptorDAO" />
+        
+        <!--
+        Configure your post commit runnables here. 
+        <property name="postCommit"> 
+           <list> 
+           <bean class="org.alfresco.repo.transfer.fsr.FSRScriptRunnable"> 
+               <property name="program">
+                           <value>${fileTransferReceiver.program}</value>
+                       </property>
+                       <property name="directory">
+                           <value>${fileTransferReceiver.directory}</value>
+                       </property>
+                   </bean>
+           </list>
+       </property>
+       -->
+        
+        
+        
     </bean>
 
     <bean id="fTransferManifestProcessorFactory" class="org.alfresco.repo.transfer.fsr.FileTransferManifestProcessorFactory" />

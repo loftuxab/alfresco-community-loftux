@@ -79,7 +79,7 @@ public class CMISAtomAppendTests extends CMISAppendTest
     @Test(groups = {"IntermittentBugs"})
     public void AONE_14609() throws Exception
     {
-        appendSeveralChunksTest(drone, getFileName(getTestName()));
+        appendSeveralChunksTest(drone, getFileName(getTestName() + ".txt"));
     }
 
     @Test(groups = {"IntermittentBugs"})
@@ -90,7 +90,7 @@ public class CMISAtomAppendTests extends CMISAppendTest
         {
             try
             {
-                RandomAccessFile f = new RandomAccessFile("fileName.txt", "rw");
+                RandomAccessFile f = new RandomAccessFile(DATA_FOLDER + file150mbName, "rw");
                 f.setLength(150000000);
             }
             catch (Exception e)

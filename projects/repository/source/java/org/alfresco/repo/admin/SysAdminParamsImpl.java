@@ -23,10 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.alfresco.repo.transaction.TransactionServiceImpl;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.license.LicenseService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -35,8 +38,11 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAware, InitializingBean
 {
+    private static Log logger = LogFactory.getLog(SysAdminParams.class);
+    
     /** Token name to substitute current servers DNS name or TCP/IP address into a host name **/
     private static final String TOKEN_LOCAL_NAME = "${localname}";
+    private static final QName VETO = QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "SysAdminParams");
     
     /** The local server name to which the above token will expand. */
     private final String localName;
@@ -95,35 +101,21 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         localName = srvName;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.
-     * ApplicationContext)
-     */
+    @Override
     public void setApplicationContext(ApplicationContext ctx)
     {
         this.ctx = ctx;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
-     */
+    @Override
     public void afterPropertiesSet() throws Exception
     {
-        if (this.allowWrite)
-        {
-            LicenseService licenseService = null;
-            try
-            {
-                licenseService = (LicenseService) this.ctx.getBean("licenseService");
-                this.allowWrite = licenseService.isLicenseValid();
-            }
-            catch (NoSuchBeanDefinitionException e)
-            {
-                // ignore
-            }
-        }
+        // Set the transaction read-write state by veto
+        // There is no need to attempt to check the dictionary or any other component as they will handle
+        // their own vetoes (MNT-14579)
+        // No logging is required here: it is done in the TransactionService code, already
+        TransactionServiceImpl transactionService = (TransactionServiceImpl) ctx.getBean("transactionService");
+        transactionService.setAllowWrite(allowWrite, VETO);
     }
 
     /**
@@ -147,10 +139,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.admin.SysAdminParams#getAllowedUserList()
-     */
+    @Override
     public List<String> getAllowedUserList()
     {
         return this.allowedUsers;
@@ -167,10 +156,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.maxUsers = new Integer(maxUsers);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.admin.SysAdminParams#getMaxUsers()
-     */
+    @Override
     public int getMaxUsers()
     {
         return this.maxUsers;
@@ -185,17 +171,22 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
     public void setAllowWrite(boolean allowWrite)
     {
         this.allowWrite = allowWrite;
+        if (!allowWrite)
+        {
+            if (logger.isInfoEnabled())
+            {
+                logger.info("'allowWrite' being set to false: Bean property setter.");
+            }
+        }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.admin.SysAdminParams#getAllowWrite()
-     */
+    @Override
     public boolean getAllowWrite()
     {
         return this.allowWrite;
     }
 
+    @Override
     public String getAlfrescoContext()
     {
         return alfrescoContext;
@@ -206,6 +197,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.alfrescoContext = alfrescoContext;
     }
 
+    @Override
     public String getAlfrescoHost()
     {
         return alfrescoHost;
@@ -216,6 +208,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.alfrescoHost = subsituteHost(alfrescoHost);
     }
 
+    @Override
     public int getAlfrescoPort()
     {
         return alfrescoPort;
@@ -226,6 +219,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.alfrescoPort = alfrescoPort;
     }
 
+    @Override
     public String getAlfrescoProtocol()
     {
         return alfrescoProtocol;
@@ -236,6 +230,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.alfrescoProtocol = alfrescoProtocol;
     }
 
+    @Override
     public String getShareContext()
     {
         return shareContext;
@@ -246,6 +241,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.shareContext = shareContext;
     }
 
+    @Override
     public String getShareHost()
     {
         return shareHost;
@@ -256,6 +252,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.shareHost = subsituteHost(shareHost);
     }
 
+    @Override
     public int getSharePort()
     {
         return sharePort;
@@ -266,6 +263,7 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         this.sharePort = sharePort;
     }
 
+    @Override
     public String getShareProtocol()
     {
         return shareProtocol;
@@ -288,18 +286,15 @@ public class SysAdminParamsImpl implements SysAdminParams, ApplicationContextAwa
         return hostName.replace(TOKEN_LOCAL_NAME, localName);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.alfresco.repo.admin.SysAdminParams#getSitePublicGroup()
-     */
-	public String getSitePublicGroup()
-	{
-		return this.sitePublicGroup;
-	}
+    @Override
+    public String getSitePublicGroup()
+    {
+        return this.sitePublicGroup;
+    }
 
-	public void setSitePublicGroup(String sitePublicGroup)
-	{
-		this.sitePublicGroup = sitePublicGroup;
-	}
+    public void setSitePublicGroup(String sitePublicGroup)
+    {
+        this.sitePublicGroup = sitePublicGroup;
+    }
 
 }

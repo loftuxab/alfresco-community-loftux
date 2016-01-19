@@ -129,9 +129,8 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * Adds a child association
 	 * 
-	 * @param classRef
-	 * @param qname
-	 * @param childAssocRef
+	 * @param classRef QName
+	 * @param childAssocRef ChildAssociationRef
 	 */
 	public void addChildAssociation(QName classRef, ChildAssociationRef childAssocRef) 
 	{
@@ -153,9 +152,9 @@ public class PolicyScope extends AspectDetails
 	
 	/**
 	 * 
-	 * @param classRef
-	 * @param childAssocRef
-	 * @param alwaysTraverseAssociation
+	 * @param classRef QName
+	 * @param childAssocRef ChildAssociationRef
+	 * @param alwaysTraverseAssociation boolean
 	 */
 	public void addChildAssociation(QName classRef, ChildAssociationRef childAssocRef, boolean alwaysTraverseAssociation) 
 	{
@@ -178,8 +177,8 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * Get a child association
 	 * 
-	 * @param classRef
-	 * @return
+	 * @param classRef QName
+	 * @return List<ChildAssociationRef>
 	 */
 	public List<ChildAssociationRef> getChildAssociations(QName classRef) 
 	{
@@ -222,9 +221,8 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * Add an association
 	 * 
-	 * @param classRef
-	 * @param qname
-	 * @param nodeAssocRef
+	 * @param classRef QName
+	 * @param nodeAssocRef AssociationRef
 	 */
 	public void addAssociation(QName classRef, AssociationRef nodeAssocRef)
 	{
@@ -249,8 +247,8 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * Get associations
 	 * 
-	 * @param classRef
-	 * @return
+	 * @param classRef QName
+	 * @return List<AssociationRef>
 	 */
 	public List<AssociationRef> getAssociations(QName classRef) 
 	{
@@ -394,7 +392,7 @@ public class PolicyScope extends AspectDetails
 	 * Add a child association 
 	 * 
 	 * @param childAssocRef		the child assoc reference
-	 * @param alwaysDeepCopy	indicates whether the assoc should always be traversed
+	 * @param alwaysTraverseAssociation	indicates whether the assoc should always be traversed
 	 */
 	protected void addChildAssociation(ChildAssociationRef childAssocRef, boolean alwaysTraverseAssociation) 
 	{
@@ -431,7 +429,6 @@ public class PolicyScope extends AspectDetails
 	/**
 	 * Adds an association to be copied
 	 * 
-	 * @param qname			the qualified name of the association
 	 * @param nodeAssocRef	the association reference
 	 */
 	protected void addAssociation(AssociationRef nodeAssocRef)

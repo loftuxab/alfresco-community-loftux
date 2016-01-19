@@ -60,7 +60,7 @@ public interface CannedQueryDAO
      * @param queryName             the name of the query e.g. <b>select_userCount</b>
      * @param parameterObj          the values to drive the selection (may be <tt>null</tt> if not required)
      * @return                      the unique result (never <tt>null</tt>)
-     * @throws                      concurrency-related exception if a single object was not found
+     * @throws IllegalArgumentException     concurrency-related exception if a single object was not found
      */
     <R> R executeQueryUnique(String sqlNamespace, String queryName, Object parameterObj);
     
@@ -90,7 +90,6 @@ public interface CannedQueryDAO
      * @param offset                the number of results to skip
      * @param limit                 the maximum number of results to retrieve or <code>Integer.MAX_VALUE</code>
      *                              for no limit
-     * @return                      the list of results
      */
     <R> void executeQuery(
             String sqlNamespace,

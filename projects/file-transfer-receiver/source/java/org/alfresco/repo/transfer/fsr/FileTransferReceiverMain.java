@@ -32,7 +32,7 @@ public class FileTransferReceiverMain
     private static Log logger = LogFactory.getLog(FileTransferReceiverMain.class);
 
     /**
-     * @param args
+     * @param args String[]
      */
     public static void main(String[] args)
     {

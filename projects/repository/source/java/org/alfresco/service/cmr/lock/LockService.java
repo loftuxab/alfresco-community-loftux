@@ -46,7 +46,6 @@ public interface LockService
     * A lock made with this call will never expire.
     * 
     * @param  nodeRef  a reference to a node 
-    * @param  userName  a reference to the user that will own the lock
     * @param  lockType the lock type
     * @throws UnableToAquireLockException
     *                  thrown if the lock could not be obtained
@@ -266,7 +265,6 @@ public interface LockService
     * will be raised and the process rolled back.
     * 
     * @param  nodeRefs  the node references
-    * @param  userName   the user reference
     * @throws UnableToReleaseLockException
     *                  thrown if the lock could not be released
     */
@@ -277,7 +275,7 @@ public interface LockService
    /**
     * Gets the lock status for the node reference relative to the current user.
     * 
-    * @see LockService#getLockStatus(NodeRef, NodeRef)
+    * @see LockService#getLockStatus(NodeRef)
     * 
     * @param nodeRef    the node reference
     * @return           the lock status
@@ -289,7 +287,7 @@ public interface LockService
    /**
     * Gets the lock status for the node reference for the specified user.
     * 
-    * @see LockService#getLockStatus(NodeRef, NodeRef)
+    * @see LockService#getLockStatus(NodeRef)
     * 
     * @param nodeRef    the node reference
     * @param userName   the user name
@@ -343,7 +341,7 @@ public interface LockService
    /**
     * Retrieve the additional lock info associated with a node ref.
     * <p>
-    * @param nodeRef
+    * @param nodeRef NodeRef
     * @return Additional info string or null
     */
    public String getAdditionalInfo(NodeRef nodeRef);
@@ -357,7 +355,7 @@ public interface LockService
     * The returned data is intended for information purposes only, e.g. returning the timeout
     * in a WebDAV response.
     * 
-    * @param nodeRef
+    * @param nodeRef NodeRef
     * @return LockState
     */
    public LockState getLockState(NodeRef nodeRef);
@@ -367,7 +365,7 @@ public interface LockService
     * will be honoured. Requests for ephemeral locks with expiry times greater than
     * this value will be automatically converted to a request for a persistent lock.
     *  
-    * @param threshSecs
+    * @param threshSecs int
     */
    public void setEphemeralExpiryThreshold(int threshSecs);
 }

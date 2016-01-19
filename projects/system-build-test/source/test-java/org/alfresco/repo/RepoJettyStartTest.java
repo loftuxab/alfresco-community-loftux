@@ -187,6 +187,9 @@ public class RepoJettyStartTest extends TestCase
 
             server.start();
 
+            //give solr 20sec to sync
+            Thread.sleep(20000);  
+			
             System.out.println("[" + new Date() + "] startJetty: ... embedded Jetty server started !");
         }
         catch (Exception e)

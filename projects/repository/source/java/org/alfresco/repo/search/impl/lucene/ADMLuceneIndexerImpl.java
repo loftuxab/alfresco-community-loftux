@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -48,8 +48,10 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.ContentTransformer;
 import org.alfresco.repo.content.transform.TransformerDebug;
 import org.alfresco.repo.dictionary.IndexTokenisationMode;
+import org.alfresco.repo.search.AspectIndexFilter;
 import org.alfresco.repo.search.IndexerException;
 import org.alfresco.repo.search.MLAnalysisMode;
+import org.alfresco.repo.search.TypeIndexFilter;
 import org.alfresco.repo.search.impl.lucene.analysis.DateTimeAnalyser;
 import org.alfresco.repo.search.impl.lucene.analysis.MLTokenDuplicator;
 import org.alfresco.repo.search.impl.lucene.analysis.VerbatimAnalyser;
@@ -158,6 +160,16 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     private Map<String, Deque<Helper>> toFTSIndex = Collections.emptyMap();
 
     /**
+     * Ignore indexing by node type. By default TypeIndexFilter allows all types, so can be not set in unit tests.
+     */
+    private TypeIndexFilter typeIndexFilter = new TypeIndexFilter();
+
+    /**
+     * Ignore indexing by node aspects. By default AspectIndexFilter allows all aspects, so can be not set in unit tests.
+     */
+    private AspectIndexFilter aspectIndexFilter = new AspectIndexFilter();
+
+    /**
      * Default construction
      */
     ADMLuceneIndexerImpl()
@@ -168,7 +180,7 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     /**
      * IOC setting of the node service
      * 
-     * @param nodeService
+     * @param nodeService NodeService
      */
     public void setNodeService(NodeService nodeService)
     {
@@ -178,7 +190,7 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     /**
      * IOC setting of the tenant service
      * 
-     * @param tenantService
+     * @param tenantService TenantService
      */
     public void setTenantService(TenantService tenantService)
     {
@@ -188,7 +200,7 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     /**
      * IOC setting of the content service
      * 
-     * @param contentService
+     * @param contentService ContentService
      */
     public void setContentService(ContentService contentService)
     {
@@ -197,11 +209,29 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
 
     /**
      * Setter of the transformer debug. 
-     * @param transformerDebug
+     * @param transformerDebug TransformerDebug
      */
     public void setTransformerDebug(TransformerDebug transformerDebug)
     {
         this.transformerDebug = transformerDebug;
+    }
+
+    /**
+     * Setter of the typeIndexFilter
+     * @param typeIndexFilter
+     */
+    public void setTypeIndexFilter(TypeIndexFilter typeIndexFilter)
+    {
+        this.typeIndexFilter = typeIndexFilter;
+    }
+
+    /**
+     * Setter of the aspectIndexFilter
+     * @param aspectIndexFilter
+     */
+    public void setAspectIndexFilter(AspectIndexFilter aspectIndexFilter)
+    {
+        this.aspectIndexFilter = aspectIndexFilter;
     }
 
     /*
@@ -445,9 +475,9 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     /**
      * Generate an indexer
      * 
-     * @param storeRef
-     * @param deltaId
-     * @param config
+     * @param storeRef StoreRef
+     * @param deltaId String
+     * @param config LuceneConfig
      * @return - the indexer instance
      * @throws LuceneIndexException
      */
@@ -583,8 +613,8 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
         /**
          * Helper class to hold two related objects
          * 
-         * @param first
-         * @param second
+         * @param first F
+         * @param second S
          */
         public Pair(F first, S second)
         {
@@ -1030,6 +1060,14 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
                 {
                     continue;
                 }
+            }
+            
+            QName nodeType = nodeService.getType(nodeRef);
+            Set<QName> aspects = nodeService.getAspects(nodeRef);
+            boolean ignoreRegeneration = (typeIndexFilter.shouldBeIgnored(nodeType) || aspectIndexFilter.shouldBeIgnored(aspects));
+            if (ignoreRegeneration)
+            {
+                continue;
             }
 
             // Skip the root, which is a single document
@@ -1932,7 +1970,7 @@ public class ADMLuceneIndexerImpl extends AbstractLuceneIndexerImpl<NodeRef> imp
     /**
      * Does the node type or any applied aspect allow this node to have child associations?
      * 
-     * @param nodeRef
+     * @param nodeRef NodeRef
      * @return true if the node may have children
      */
     private boolean mayHaveChildren(NodeRef nodeRef)

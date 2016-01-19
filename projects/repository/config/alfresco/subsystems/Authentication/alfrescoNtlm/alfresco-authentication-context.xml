@@ -9,6 +9,9 @@
       <property name="authenticationManager">
          <ref bean="authenticationManager" />
       </property>
+      <property name="compositePasswordEncoder">
+         <ref bean="compositePasswordEncoder" />
+      </property>
       <property name="allowGuestLogin">
          <value>${alfresco.authentication.allowGuestLogin}</value>
       </property>
@@ -81,8 +84,7 @@
       <property name="authorityService" ref="authorityService" />
       <property name="tenantService" ref="tenantService" />
       <property name="namespaceService" ref="namespaceService" />
-      <property name="passwordEncoder" ref="passwordEncoder" />
-      <property name="sha256PasswordEncoder" ref="sha256PasswordEncoder" />
+      <property name="compositePasswordEncoder" ref="compositePasswordEncoder" />
       <property name="policyComponent" ref="policyComponent" />
       <property name="authenticationCache" ref="authenticationCache" />
       <property name="singletonCache" ref="immutableSingletonCache"/>
@@ -147,17 +149,14 @@
    </bean>
 
    <!-- We provide a DAO to plug into the Acegi DaoAuthenticationProvider  -->
-
-   <bean id="daoAuthenticationProvider" class="net.sf.acegisecurity.providers.dao.DaoAuthenticationProvider">
+   <bean id="daoAuthenticationProvider" class="org.alfresco.repo.security.authentication.RepositoryAuthenticationProvider">
       <property name="authenticationDao">
          <ref bean="authenticationDao" />
       </property>
       <property name="saltSource">
          <ref bean="saltSource" />
       </property>
-      <property name="passwordEncoder">
-         <ref bean="passwordEncoder" />
-      </property>
+      <property name="compositePasswordEncoder" ref="compositePasswordEncoder" />
    </bean>
 
    <!-- The DAO also acts as a salt provider.                              -->

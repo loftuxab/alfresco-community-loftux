@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -33,6 +33,7 @@ import org.springframework.dao.DataIntegrityViolationException;
  * DAO services for <b>alf_content_data</b> table
  * 
  * @author Derek Hulley
+ * @author Steven Glover
  * @since 3.2
  */
 public interface ContentDataDAO
@@ -57,7 +58,7 @@ public interface ContentDataDAO
      * Creates an immediately-orphaned content URL, if possible
      * 
      * @param contentUrl    the URL to create if it doesn't exist
-     * @parma orphanTime    the recorded orphan time or <tt>null</tt> to apply the current time
+     * @param orphanTime    the recorded orphan time or <tt>null</tt> to apply the current time
      * @return              Returns the ID-URL pair
      * @throws DataIntegrityViolationException      if the URL already exists
      */
@@ -108,7 +109,6 @@ public interface ContentDataDAO
      * @param contentUrlHandler         the callback object to process the rows
      * @param maxOrphanTimeExclusive    the maximum orphan time (exclusive)
      * @param maxResults                the maximum number of results (1 or greater)
-     * @return                          Returns a list of orphaned content URLs ordered by ID
      */
     void getContentUrlsOrphaned(
             ContentUrlHandler contentUrlHandler,
@@ -116,12 +116,24 @@ public interface ContentDataDAO
             int maxResults);
     
     /**
+     * Enumerate all available content URLs that were orphaned and cleanup for these urls failed
+     * 
+     * @param contentUrlHandler         the callback object to process the rows
+     * @param maxResults                the maximum number of results (1 or greater)
+     */
+    void getContentUrlsKeepOrphaned(
+            ContentUrlHandler contentUrlHandler,
+            int maxResults);
+    
+    /**
      * Delete a batch of content URL entities.
      */
     int deleteContentUrls(List<Long> ids);
-
+    
     /**
      * Get a content url entity by contentUrl
+     * 
+     * @return                          <tt>null</tt> if the url does not exist
      * 
      * @since 5.0
      * @param contentUrl
@@ -132,6 +144,8 @@ public interface ContentDataDAO
     /**
      * Get a content url entity by contentUrlId
      * 
+     * @return                          <tt>null</tt> if the url does not exist
+     * 
      * @since 5.0
      * @param contentUrlId
      * @return
@@ -139,13 +153,12 @@ public interface ContentDataDAO
     ContentUrlEntity getContentUrl(Long contentUrlId);
 
     /**
-     * Update a content url
+     * Get a content URL or create one if it does not exist
      * 
-     * @since 5.0
+     * @since 5.1
      * @param contentUrlEntity
-     * @return
      */
-    void updateContentUrl(ContentUrlEntity contentUrlEntity);
+    ContentUrlEntity getOrCreateContentUrl(String contentUrl);
 
     /**
      * Updates the content key for the given content url
@@ -161,7 +174,6 @@ public interface ContentDataDAO
      * 
      * @since 5.0
      * @param contentUrlId
-     * @param contentUrlKeyEntity
      */
     boolean updateContentUrlKey(long contentUrlId, ContentUrlKeyEntity contentUrlKey);
 
@@ -170,7 +182,9 @@ public interface ContentDataDAO
      * master key, starting from 'fromId' and returning at most 'maxResults' entities.
      * 
      * @since 5.0
-     * @param contentUrlEntity
+     * @param masterKeyAlias master key alias
+     * @param fromId id
+     * @param maxResults max results
      * @return
      */
     List<ContentUrlKeyEntity> getSymmetricKeysByMasterKeyAlias(String masterKeyAlias, long fromId, int maxResults);

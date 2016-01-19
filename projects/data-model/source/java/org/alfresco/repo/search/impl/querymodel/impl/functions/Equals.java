@@ -34,11 +34,6 @@ public class Equals extends BaseComparison
 {
     public final static String NAME = "Equals";
     
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public Equals()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, ARGS);   

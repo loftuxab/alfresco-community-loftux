@@ -610,7 +610,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         assertTrue(documentLibraryPage.isItemVisble(fileName), fileName + " file isn't displayed");
 
         //Check that the changes made by FTPS are displayed;
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
     }
 
@@ -660,7 +660,7 @@ public class RepositoryFtpsTest extends FtpsUtil
         assertEquals(ShareUserSitePage.getContentCount(drone), 1, "Incorrect document count: " + ShareUserSitePage.getContentCount(drone));
 
         //Check that the changes made by FTPS are displayed;
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
         assertEquals(detailsPage.getDocumentBody().contains(testUser), true, "The changes are not displayed");
     }
 

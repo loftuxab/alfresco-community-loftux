@@ -40,6 +40,8 @@ import org.alfresco.repo.version.common.VersionHistoryImpl;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.repo.version.common.VersionUtil;
 import org.alfresco.repo.version.common.versionlabel.SerialVersionLabelPolicy;
+import org.alfresco.repo.version.traitextender.VersionServiceExtension;
+import org.alfresco.repo.version.traitextender.VersionServiceTrait;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.AspectMissingException;
@@ -56,6 +58,11 @@ import org.alfresco.service.cmr.version.VersionServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.traitextender.AJProxyTrait;
+import org.alfresco.traitextender.Extend;
+import org.alfresco.traitextender.ExtendedTrait;
+import org.alfresco.traitextender.Extensible;
+import org.alfresco.traitextender.Trait;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,11 +72,18 @@ import org.springframework.extensions.surf.util.ParameterCheck;
 /**
  * Version2 Service - implements version2Store (a lighter implementation of the lightWeightVersionStore)
  */
-public class Version2ServiceImpl extends VersionServiceImpl implements VersionService, Version2Model
+public class Version2ServiceImpl extends VersionServiceImpl implements VersionService, Version2Model,Extensible
 {
     private static Log logger = LogFactory.getLog(Version2ServiceImpl.class);
     
     private PermissionService permissionService;
+
+    private ExtendedTrait<VersionServiceTrait> versionServiceTrait;
+    
+    public Version2ServiceImpl()
+    {
+        versionServiceTrait=new ExtendedTrait<VersionServiceTrait>(AJProxyTrait.create(this, VersionServiceTrait.class));
+    }
     
     public void setPermissionService(PermissionService permissionService)
     {
@@ -87,6 +101,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public StoreRef getVersionStoreReference()
     {
         if (logger.isDebugEnabled())
@@ -99,6 +114,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
     
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public Version createVersion(
             NodeRef nodeRef,
             Map<String, Serializable> versionProperties)
@@ -126,6 +142,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
     
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public Collection<Version> createVersion(
             Collection<NodeRef> nodeRefs,
             Map<String, Serializable> versionProperties)
@@ -361,6 +378,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public VersionHistory getVersionHistory(NodeRef nodeRef)
     {
         if (logger.isDebugEnabled())
@@ -381,6 +399,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public Version getCurrentVersion(NodeRef nodeRef)
     {
         if (logger.isDebugEnabled())
@@ -439,12 +458,12 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     /**
      * Creates a new version node, setting the properties both calculated and specified.
      *
-     * @param versionableNodeRef  the reference to the node being versioned
+     * @param sourceTypeRef  the reference to the node being versioned
      * @param versionHistoryRef   version history node reference
-     * @param preceedingNodeRef   the version node preceeding this in the version history
-     *                               , null if none
+     * @param standardVersionProperties   version properties
      * @param versionProperties   version properties
      * @param versionNumber          the version number
+     * @param nodeDetails          PolicyScope
      * @return                    the version node reference
      */
     protected NodeRef createNewVersion(
@@ -940,6 +959,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void revert(NodeRef nodeRef)
     {
         if (logger.isDebugEnabled())
@@ -952,6 +972,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void revert(NodeRef nodeRef, boolean deep)
     {
         if (logger.isDebugEnabled())
@@ -964,6 +985,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void revert(NodeRef nodeRef, Version version)
     {
         if (logger.isDebugEnabled())
@@ -976,6 +998,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void revert(NodeRef nodeRef, Version version, boolean deep)
     {
         if (logger.isDebugEnabled())
@@ -1019,18 +1042,14 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     
                 Map<QName, Serializable> forumProps = null;
                 
-                // Collect forum properties
-                // only if previous version hasn't discussable aspect
-                if (needToRestoreDiscussion)
+                // always collect forum properties
+                Map<QName, Serializable> currentVersionProp = this.nodeService.getProperties(nodeRef);
+                forumProps = new HashMap<QName, Serializable>();
+                for (QName key : currentVersionProp.keySet())
                 {
-                    Map<QName, Serializable> currentVersionProp = this.nodeService.getProperties(nodeRef);
-                    forumProps = new HashMap<QName, Serializable>();
-                    for (QName key : currentVersionProp.keySet())
+                    if (key.getNamespaceURI().equals(NamespaceService.FORUMS_MODEL_1_0_URI))
                     {
-                        if (key.getNamespaceURI().equals(NamespaceService.FORUMS_MODEL_1_0_URI))
-                        {
-                            forumProps.put(key, currentVersionProp.get(key));
-                        }
+                        forumProps.put(key, currentVersionProp.get(key));
                     }
                 }
                     
@@ -1089,10 +1108,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
             this.nodeService.setProperties(nodeRef, newProps);
                 
                 //Restore forum properties
-                if (needToRestoreDiscussion)
-                {
-                    this.nodeService.addProperties(nodeRef, forumProps);
-                }
+                this.nodeService.addProperties(nodeRef, forumProps);
 
             Set<QName> aspectsToRemove = new HashSet<QName>(oldAspectQNames);
         	aspectsToRemove.removeAll(newAspectQNames);
@@ -1270,6 +1286,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public NodeRef restore(
                 NodeRef nodeRef,
                 NodeRef parentNodeRef,
@@ -1280,6 +1297,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
      }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public NodeRef restore(
             NodeRef nodeRef,
             NodeRef parentNodeRef,
@@ -1365,6 +1383,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void deleteVersionHistory(NodeRef nodeRef)
                                      throws AspectMissingException
     {
@@ -1403,6 +1422,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
     
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public void deleteVersion(NodeRef nodeRef, Version version)
     {
         if (logger.isDebugEnabled())
@@ -1439,6 +1459,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
     
     @Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public boolean isAVersion(NodeRef nodeRef)
     {
         if (logger.isDebugEnabled())
@@ -1456,6 +1477,7 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
     }
 	
 	@Override
+    @Extend(extensionAPI=VersionServiceExtension.class,traitAPI=VersionServiceTrait.class)
     public boolean isVersioned(NodeRef nodeRef)
     {
 	    if (logger.isDebugEnabled())
@@ -1470,5 +1492,11 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
         	realNodeRef = VersionUtil.convertNodeRef(nodeRef);        	
         }
         return this.dbNodeService.hasAspect(realNodeRef, ContentModel.ASPECT_VERSIONABLE);
+    }
+
+	@Override
+    public <T extends Trait> ExtendedTrait<T> getTrait(Class<? extends T> traitAPI)
+    {
+        return (ExtendedTrait<T>) versionServiceTrait;
     }
 }

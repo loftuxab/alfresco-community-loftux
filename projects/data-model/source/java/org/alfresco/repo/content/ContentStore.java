@@ -20,6 +20,7 @@ package org.alfresco.repo.content;
 
 import java.util.Date;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.service.cmr.repository.ContentAccessor;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -50,7 +51,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * </ul>
  * <p>
  * Where the store cannot handle a particular content URL request, the
- * {@link UnsupportedContentUrlException} must be generated.  This will allow
+ * {@code UnsupportedContentUrlException} must be generated.  This will allow
  * various implementations to provide fallback code to other stores where
  * possible.
  * <p>
@@ -62,6 +63,7 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  * @since 1.0
  * @author Derek Hulley
  */
+@AlfrescoPublicApi
 public interface ContentStore
 {
     /**
@@ -80,7 +82,7 @@ public interface ContentStore
      * 
      * @param contentUrl        the content URL to check
      * @return                  Returns <tt>true</tt> if none of the other methods on the store
-     *                          will throw an {@link UnsupportedContentUrlException} when given
+     *                          will throw an {@code UnsupportedContentUrlException} when given
      *                          this URL.
      * 
      * @since 2.1
@@ -146,7 +148,7 @@ public interface ContentStore
      * @return
      *      Returns true if the content exists, otherwise false if the content doesn't
      *      exist or <b>if the URL is not applicable to this store</b>.
-     * @throws UnsupportedContentUrlException
+     * @throws org.alfresco.repo.content.UnsupportedContentUrlException
      *      if the content URL supplied is not supported by the store
      * @throws ContentIOException
      *      if an IO error occurs
@@ -162,14 +164,14 @@ public interface ContentStore
      * @param contentUrl    the path to where the content is located
      * @return              Returns a read-only content accessor for the given URL.  There may
      *                      be no content at the given URL, but the reader must still be returned.
-     * @throws UnsupportedContentUrlException
+     * @throws org.alfresco.repo.content.UnsupportedContentUrlException
      *      if the content URL supplied is not supported by the store
      * @throws ContentIOException
      *      if an IO error occurs
      *
      * @see #exists(String)
      * @see ContentReader#exists()
-     * @see EmptyContentReader
+     * @see org.alfresco.repo.content.EmptyContentReader
      */
     public ContentReader getReader(String contentUrl);
     
@@ -183,7 +185,7 @@ public interface ContentStore
      * be valid for all subsequent read attempts.
      * <p>
      * By supplying a reader to existing content, the store implementation may
-     * enable {@link RandomAccessContent random access}.  The store implementation
+     * enable random access.  The store implementation
      * can enable this by copying the existing content into the new location
      * before supplying a writer onto the new content.
      * 
@@ -200,7 +202,6 @@ public interface ContentStore
      * @throws ContentIOException
      *      if an IO error occurs
      *
-     * @see #getWriteSupport()
      * @see ContentWriter#addListener(ContentStreamListener)
      * @see ContentWriter#getContentUrl()
      */
@@ -208,14 +209,12 @@ public interface ContentStore
     
     /**
      * Get all URLs for the store, regardless of creation time.
-     * @return
-     *      Returns a set of all unique content URLs in the store
      * @throws ContentIOException
      *      if an IO error occurs
      * @throws UnsupportedOperationException
      *      if the store is unable to provide the information
      * 
-     * @see #getUrls(Date, Date)
+     * @see #getUrls(Date, Date, ContentUrlHandler)
      * 
      * @deprecated              in 5.0.  The API is no longer used by Alfresco;
      *                          efficient APIs can be provided by the implementations, if required

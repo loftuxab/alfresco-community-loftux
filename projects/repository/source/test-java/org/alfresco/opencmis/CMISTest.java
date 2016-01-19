@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -56,14 +56,25 @@ import org.alfresco.repo.audit.model.AuditModelRegistryImpl;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.domain.audit.AuditDAO;
 import org.alfresco.repo.domain.node.NodeDAO;
 import org.alfresco.repo.model.Repository;
+import org.alfresco.repo.node.archive.NodeArchiveService;
+import org.alfresco.repo.security.authentication.AuthenticationContext;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.tenant.TenantAdminService;
+import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.repo.version.VersionableAspectTest;
+import org.alfresco.repo.workflow.WorkflowDeployer;
 import org.alfresco.service.cmr.action.ActionCondition;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.lock.LockService;
 import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -77,6 +88,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleService;
 import org.alfresco.service.cmr.rule.RuleType;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -85,6 +97,8 @@ import org.alfresco.service.cmr.tagging.TaggingService;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.cmr.version.VersionType;
+import org.alfresco.service.cmr.workflow.WorkflowAdminService;
+import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -94,6 +108,7 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.AllowableActions;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
+import org.apache.chemistry.opencmis.commons.data.FailedToDeleteData;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
 import org.apache.chemistry.opencmis.commons.data.ObjectInFolderList;
@@ -103,11 +118,13 @@ import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionContainer;
 import org.apache.chemistry.opencmis.commons.enums.AclPropagation;
 import org.apache.chemistry.opencmis.commons.enums.Action;
 import org.apache.chemistry.opencmis.commons.enums.ChangeType;
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
+import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
@@ -126,6 +143,7 @@ import org.apache.chemistry.opencmis.commons.impl.server.AbstractServiceFactory;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.CmisService;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
@@ -139,6 +157,9 @@ import org.springframework.extensions.webscripts.GUID;
  */
 public class CMISTest
 {
+    private static final QName TEST_START_TASK = QName.createQName("http://www.alfresco.org/model/workflow/test/1.0", "startTaskVarScriptAssign");
+    private static final QName TEST_WORKFLOW_TASK = QName.createQName("http://www.alfresco.org/model/workflow/test/1.0", "assignVarTask");
+    
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext(new String[]{ApplicationContextHelper.CONFIG_LOCATIONS[0],"classpath:test-cmisinteger_modell-context.xml"});
 
     private FileFolderService fileFolderService;
@@ -153,13 +174,22 @@ public class CMISTest
     private AuthorityService authorityService;
     private AuditModelRegistryImpl auditSubsystem;
     private PermissionService permissionService;
-	private DictionaryDAO dictionaryDAO;
+    private DictionaryDAO dictionaryDAO;
     private CMISDictionaryService cmisDictionaryService;
+    private AuditDAO auditDAO;
+    private ActionService actionService;
+    private RuleService ruleService;
+    private NodeArchiveService nodeArchiveService;
+    private DictionaryService dictionaryService;
+    private WorkflowService workflowService;
+    private WorkflowAdminService workflowAdminService;
+    private AuthenticationContext authenticationContext;
+    private TenantAdminService tenantAdminService;
+    private TenantService tenantService;
+    private SearchService searchService;
+    private java.util.Properties globalProperties;
 
-	private AlfrescoCmisServiceFactory factory;
-
-	private ActionService actionService;
-	private RuleService ruleService;
+    private AlfrescoCmisServiceFactory factory;
 	
     private CMISConnector cmisConnector;
     
@@ -319,6 +349,7 @@ public class CMISTest
         this.namespaceService = (NamespaceService) ctx.getBean("namespaceService");
         this.repositoryHelper = (Repository)ctx.getBean("repositoryHelper");
     	this.factory = (AlfrescoCmisServiceFactory)ctx.getBean("CMISServiceFactory");
+        this.versionService = (VersionService) ctx.getBean("versionService");
     	this.cmisConnector = (CMISConnector) ctx.getBean("CMISConnector");
         this.nodeDAO = (NodeDAO) ctx.getBean("nodeDAO");
         this.authorityService = (AuthorityService)ctx.getBean("AuthorityService");
@@ -326,6 +357,24 @@ public class CMISTest
         this.permissionService = (PermissionService) ctx.getBean("permissionService");
     	this.dictionaryDAO = (DictionaryDAO)ctx.getBean("dictionaryDAO");
     	this.cmisDictionaryService = (CMISDictionaryService)ctx.getBean("OpenCMISDictionaryService1.1");
+        this.auditDAO = (AuditDAO) ctx.getBean("auditDAO");
+        this.nodeArchiveService = (NodeArchiveService) ctx.getBean("nodeArchiveService");
+        this.dictionaryService = (DictionaryService) ctx.getBean("dictionaryService");
+        this.workflowService = (WorkflowService) ctx.getBean("WorkflowService");
+        this.workflowAdminService = (WorkflowAdminService) ctx.getBean("workflowAdminService");
+        this.authenticationContext = (AuthenticationContext) ctx.getBean("authenticationContext");
+        this.tenantAdminService = (TenantAdminService) ctx.getBean("tenantAdminService");
+        this.tenantService = (TenantService) ctx.getBean("tenantService");
+        this.searchService = (SearchService) ctx.getBean("SearchService");
+        
+        this.globalProperties = (java.util.Properties) ctx.getBean("global-properties");
+        this.globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "true");
+    }
+    
+    @After
+    public void after()
+    {
+        this.globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "false");
     }
     
     /**
@@ -437,7 +486,7 @@ public class CMISTest
      * Test for MNT-9203.
      */
     @Test
-    public void testCeheckIn()
+    public void testCheckIn()
     {
         String repositoryId = null;
         ObjectData objectData = null;
@@ -446,7 +495,7 @@ public class CMISTest
 
         final String folderName = "testfolder." + GUID.generate();
         final String docName = "testdoc.txt." + GUID.generate();
-        final String customModel = "my.new.model";
+        final String customModel = "cmistest.model";
 
         final QName testCustomTypeQName = QName.createQName(customModel, "sop");
         final QName authorisedByQname = QName.createQName(customModel, "authorisedBy");
@@ -498,7 +547,7 @@ public class CMISTest
                 service = factory.getService(context);
 
                 PropertyStringImpl prop = new PropertyStringImpl();
-                prop.setId("my:" + authorisedByQname.toPrefixString());
+                prop.setId("abc:" + authorisedByQname.toPrefixString());
                 prop.setValue(null);
 
                 Collection<PropertyData<?>> propsList = new ArrayList<PropertyData<?>>();
@@ -522,16 +571,111 @@ public class CMISTest
         }
     }
 
-    private FileInfo createContent(final String folderName, final String docName, final boolean isRule)
+    /**
+     * Test for MNT-10537.
+     */
+    @Test
+    public void testModelAvailability() throws Exception
+    {
+        final WorkflowDeployer testWorkflowDeployer = new WorkflowDeployer();
+
+        // setup dependencies
+        testWorkflowDeployer.setTransactionService(transactionService);
+        testWorkflowDeployer.setWorkflowService(workflowService);
+        testWorkflowDeployer.setWorkflowAdminService(workflowAdminService);
+        testWorkflowDeployer.setAuthenticationContext(authenticationContext);
+        testWorkflowDeployer.setDictionaryDAO(dictionaryDAO);
+        testWorkflowDeployer.setTenantAdminService(tenantAdminService);
+        testWorkflowDeployer.setTenantService(tenantService);
+        testWorkflowDeployer.setNodeService(nodeService);
+        testWorkflowDeployer.setNamespaceService(namespaceService);
+        testWorkflowDeployer.setSearchService(searchService);
+
+        // populate workflow parameters
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty(WorkflowDeployer.ENGINE_ID, "jbpm");
+        props.setProperty(WorkflowDeployer.LOCATION, "jbpmresources/test_taskVarScriptAssign.xml");
+        props.setProperty(WorkflowDeployer.MIMETYPE, "text/xml");
+        props.setProperty(WorkflowDeployer.REDEPLOY, Boolean.FALSE.toString());
+
+        List<java.util.Properties> definitions = new ArrayList<java.util.Properties>(1);
+        definitions.add(props);
+
+        testWorkflowDeployer.setWorkflowDefinitions(definitions);
+
+        List<String> models = new ArrayList<String>(1);
+        models.add("jbpmresources/testWorkflowModel.xml");
+
+        testWorkflowDeployer.setModels(models);
+
+        // deploy test workflow
+        RetryingTransactionHelper txnHelper = transactionService.getRetryingTransactionHelper();
+        txnHelper.setForceWritable(true);
+        txnHelper.doInTransaction(new RetryingTransactionCallback<Object>()
+        {
+            @Override
+            public Object execute() throws Throwable
+            {
+                return AuthenticationUtil.runAs(new RunAsWork<Object>()
+                {
+                    public Object doWork()
+                    {
+                        testWorkflowDeployer.init();
+                        return null;
+                    }
+                }, AuthenticationUtil.getSystemUserName());
+            }
+
+        }, false, true);
+
+        org.alfresco.service.cmr.dictionary.TypeDefinition startTaskTypeDefinition = this.dictionaryService.getType(TEST_START_TASK);
+        org.alfresco.service.cmr.dictionary.TypeDefinition workflowTaskTypeDefinition = this.dictionaryService.getType(TEST_WORKFLOW_TASK);
+
+        // check that workflow types were correctly bootstrapped
+        assertNotNull(startTaskTypeDefinition);
+        assertNotNull(workflowTaskTypeDefinition);
+
+        // check that loaded model is available via CMIS API
+        CallContext context = new SimpleCallContext("admin", "admin", CmisVersion.CMIS_1_1);
+        CmisService service = factory.getService(context);
+        try
+        {
+            List<RepositoryInfo> repositories = service.getRepositoryInfos(null);
+            assertTrue(repositories.size() > 0);
+            List<TypeDefinitionContainer> container = service.getTypeDescendants(repositories.get(0).getId(), null, new BigInteger("-1"), true, null);
+            assertTrue("Workflow model haven't been loaded", container.toString().contains("testwf:startTaskVarScriptAssign"));
+        }
+        finally
+        {
+            service.close();
+        }
+    }
+
+    private FileInfo createContent(final String folderName, final String docName,
+            final boolean isRule)
+    {
+        return createContent(null, folderName, docName, isRule);
+    }
+
+    private FileInfo createContent(final FileInfo parentFolder, final String folderName, final String docName, final boolean isRule)
     {
         final FileInfo folderInfo = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<FileInfo>()
         {
             @Override
             public FileInfo execute() throws Throwable
             {
-                NodeRef companyHomeNodeRef = repositoryHelper.getCompanyHome();
+                NodeRef nodeRef;
 
-                FileInfo folderInfo = fileFolderService.create(companyHomeNodeRef, folderName, ContentModel.TYPE_FOLDER);
+                if (parentFolder != null)
+                {
+                    nodeRef = parentFolder.getNodeRef();
+                }
+                else
+                {
+                    nodeRef = repositoryHelper.getCompanyHome();
+                }
+                
+                FileInfo folderInfo = fileFolderService.create(nodeRef, folderName, ContentModel.TYPE_FOLDER);
                 nodeService.setProperty(folderInfo.getNodeRef(), ContentModel.PROP_NAME, folderName);
                 assertNotNull(folderInfo);
 
@@ -711,7 +855,8 @@ public class CMISTest
 				@Override
 				public Void execute(CmisService cmisService)
 				{
-					cmisService.setContentStream(repositoryId, objectIdHolder, true, null, contentStreamHTML, null);
+                    Holder<String> latestObjectIdHolder = getHolderOfObjectOfLatestVersion(cmisService, repositoryId, objectIdHolder);
+                    cmisService.setContentStream(repositoryId, latestObjectIdHolder, true, null, contentStreamHTML, null);
 					return null;
 				}
             });
@@ -793,6 +938,12 @@ public class CMISTest
             });
             assertEquals("Mimetype is not defined correctly.", MimetypeMap.MIMETYPE_HTML, contentType);
         }
+    }
+
+    private Holder<String> getHolderOfObjectOfLatestVersion(CmisService cmisService, String repositoryId, Holder<String> currentHolder)
+    {
+        ObjectData oData = cmisService.getObjectOfLatestVersion(repositoryId, currentHolder.getValue(), null, Boolean.FALSE, null, null, null, null, null, null, null);
+        return new Holder<String>(oData.getId());
     }
 
     /**
@@ -1007,6 +1158,107 @@ public class CMISTest
     	}
     }
    
+    /**
+     * Test for MNT-13366.
+     */
+    @Test
+    public void testDeleteTree()
+    {
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+
+        FileInfo parentFolder = null;
+        FileInfo childFolder1 = null;
+
+        try
+        {
+            // Create a parent folder: parentFolder:
+            String parentFolderName = "parentFolder" + GUID.generate();
+            parentFolder = createContent(parentFolderName, null, false);
+            final NodeRef parentFolderNodeRef = parentFolder.getNodeRef();
+            final String parentFolderID = parentFolderNodeRef.getId();
+
+            // Create a child folder: parentFolder -> childFolder1:
+            String childFolder1Name = "childFolder1" + GUID.generate();
+            childFolder1 = createContent(parentFolder, childFolder1Name, null, false);
+            final NodeRef childFolder1NodeRef = childFolder1.getNodeRef();
+
+            // Create a child folder for previous child folder, which will contain a file:
+            // parentFolder -> childFolder1 -> childFolder2 -> testdoc.txt
+            String childFolder2Name = "childFolder2" + GUID.generate();
+            String docName = "testdoc.txt" + GUID.generate();
+            final NodeRef childFolder2NodeRef = createContent(childFolder1, childFolder2Name, docName, false).getNodeRef();
+
+            // Store a reference to the file "testdoc.txt" contained by childFolder2:
+            List<FileInfo> childFolder2FileList = fileFolderService.list(childFolder2NodeRef);
+            final NodeRef childFolder2FileNodeRef = childFolder2FileList.get(0).getNodeRef();
+
+            List<RepositoryInfo> repositories = withCmisService(new CmisServiceCallback<List<RepositoryInfo>>()
+            {
+                @Override
+                public List<RepositoryInfo> execute(CmisService cmisService)
+                {
+                    List<RepositoryInfo> repositories = cmisService.getRepositoryInfos(null);
+                    return repositories;
+                }
+            });
+
+            assertTrue(repositories.size() > 0);
+            RepositoryInfo repo = repositories.get(0);
+            final String repositoryId = repo.getId();
+
+            withCmisService(new CmisServiceCallback<Void>()
+            {
+                @Override
+                public Void execute(CmisService cmisService)
+                {
+
+                    // CMIS delete tree:
+                    FailedToDeleteData failedItems = cmisService.deleteTree(repositoryId, parentFolderID, Boolean.TRUE,
+                        UnfileObject.DELETE, Boolean.TRUE, null);
+
+                    assertEquals(failedItems.getIds().size(), 0);
+
+                    // Reference to the archive root node (the trash-can):
+                    NodeRef archiveRootNode = nodeArchiveService.getStoreArchiveNode(repositoryHelper.getCompanyHome().getStoreRef());
+
+                    // Get the archived ("canned") version of folders and file and check that hirarchy is correct:
+                    // ArchiveRoot -> archivedParentFolder -> archivedChildFolder1 -> archivedChildFolder2 -> archivedChildFolder2File.
+
+                    // Check parentFolder:
+                    NodeRef archivedParentFolderNodeRef = nodeArchiveService.getArchivedNode(parentFolderNodeRef);
+                    assertTrue(nodeService.getPrimaryParent(archivedParentFolderNodeRef).getParentRef().equals(archiveRootNode));
+
+                    // Check childFolder1:               
+                    NodeRef archivedChildFolder1NodeRef = nodeArchiveService.getArchivedNode(childFolder1NodeRef);
+                    assertTrue(nodeService.getPrimaryParent(archivedChildFolder1NodeRef).getParentRef().equals(archivedParentFolderNodeRef));
+                    assertFalse(nodeService.getPrimaryParent(archivedChildFolder1NodeRef).getParentRef().equals(archiveRootNode));
+
+                    // Check childFolder2:                    
+                    NodeRef archivedChildFolder2NodeRef = nodeArchiveService.getArchivedNode(childFolder2NodeRef);
+                    assertTrue(nodeService.getPrimaryParent(archivedChildFolder2NodeRef).getParentRef().equals(archivedChildFolder1NodeRef));
+                    assertFalse(nodeService.getPrimaryParent(archivedChildFolder2NodeRef).getParentRef().equals(archiveRootNode));
+
+                    // Check childFolder2's file ("testdoc.txt"):                     
+                    NodeRef archivedChildFolder2FileNodeRef = nodeArchiveService.getArchivedNode(childFolder2FileNodeRef);
+                    assertTrue(nodeService.getPrimaryParent(archivedChildFolder2FileNodeRef).getParentRef().equals(archivedChildFolder2NodeRef));
+                    assertFalse(nodeService.getPrimaryParent(archivedChildFolder2FileNodeRef).getParentRef().equals(archiveRootNode));
+                    
+                    return null;
+                };
+            });
+        }
+        finally
+        {
+            if (parentFolder != null && fileFolderService.exists(parentFolder.getNodeRef()))
+            {
+                fileFolderService.delete(parentFolder.getNodeRef());
+            }
+
+            AuthenticationUtil.popAuthentication();
+        }
+    }
+
     /**
      * Test for ALF-18151.
      */
@@ -1374,7 +1626,8 @@ public class CMISTest
             @Override
             public Void execute(CmisService cmisService)
             {
-                cmisService.updateProperties(repositoryId, objectIdHolder, null, newProperties, null);
+                Holder<String> latestObjectIdHolder = getHolderOfObjectOfLatestVersion(cmisService, repositoryId, objectIdHolder);
+                cmisService.updateProperties(repositoryId, latestObjectIdHolder, null, newProperties, null);
                 return null;
             }
         }, CmisVersion.CMIS_1_1);
@@ -2188,6 +2441,57 @@ public class CMISTest
 			}
 		}, "user2", "tenant2");
 	}
+
+    /**
+     * MNT-13529: Just-installed Alfresco does not return a CMIS latestChangeLogToken
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testMNT13529() throws Exception
+    {
+        setupAudit();
+
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        try
+        {
+            // Delete the entries, it simulates just installed Alfresco for reproduce the issue
+            final Long appId = auditSubsystem.getAuditApplicationByName("CMISChangeLog").getApplicationId();
+            RetryingTransactionCallback<Void> deletedCallback = new RetryingTransactionCallback<Void>()
+            {
+                public Void execute() throws Throwable
+                {
+                    auditDAO.deleteAuditEntries(appId, null, null);
+                    return null;
+                }
+            };
+            transactionService.getRetryingTransactionHelper().doInTransaction(deletedCallback);
+
+            // Retrieve initial latestChangeLogToken
+            final String initialChangeLogToken = withCmisService(new CmisServiceCallback<String>()
+            {
+                @Override
+                public String execute(CmisService cmisService)
+                {
+                    List<RepositoryInfo> repositories = cmisService.getRepositoryInfos(null);
+                    assertNotNull(repositories);
+                    assertTrue(repositories.size() > 0);
+                    RepositoryInfo repo = repositories.iterator().next();
+
+                    return repo.getLatestChangeLogToken();
+                }
+            }, CmisVersion.CMIS_1_1);
+
+            assertNotNull(initialChangeLogToken);
+            assertEquals("0", initialChangeLogToken);
+        }
+        finally
+        {
+            auditSubsystem.destroy();
+            AuthenticationUtil.popAuthentication();
+        }
+    }
     
     /**
      * MNT-11726: Test that {@link CMISChangeEvent} contains objectId of node in short form (without StoreRef).
@@ -2999,5 +3303,205 @@ public class CMISTest
                 return null;
             }
         }, CmisVersion.CMIS_1_1);
+    }
+    
+    /**
+     * Test to ensure that set of aspect returned by cmisService#getAllVersions for latest version is the same 
+     * as for the object returned by cmisService#getObjectByPath.
+     * 
+     * See <a href="https://issues.alfresco.com/jira/browse/MNT-9557">MNT-9557</a>
+     */
+    @Test
+    public void testLastVersionOfVersionSeries()
+    {
+        CallContext context = new SimpleCallContext("admin", "admin", CmisVersion.CMIS_1_0);
+        
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        final String FOLDER = "testUpdatePropertiesSetDeleteContentVersioning-" + GUID.generate(),
+                     DOC = "documentProperties-" + GUID.generate();
+        
+        try
+        {
+            final NodeRef nodeRef = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef>()
+            {
+                @Override
+                public NodeRef execute() throws Throwable
+                {
+                    // create folder
+                    FileInfo folderInfo = fileFolderService.create(repositoryHelper.getCompanyHome(), FOLDER, ContentModel.TYPE_FOLDER);
+                    nodeService.setProperty(folderInfo.getNodeRef(), ContentModel.PROP_NAME, FOLDER);
+                    assertNotNull(folderInfo);
+
+                    // create documents
+                    FileInfo document = fileFolderService.create(folderInfo.getNodeRef(), DOC, ContentModel.TYPE_CONTENT);
+                    nodeService.setProperty(document.getNodeRef(), ContentModel.PROP_NAME, DOC);
+                    nodeService.setProperty(document.getNodeRef(), ContentModel.PROP_DESCRIPTION, "Initial doc");
+
+                    return document.getNodeRef();
+                }
+            });
+
+            transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>()
+            {
+                @Override
+                public Void execute() throws Throwable
+                {
+                    // make sure that there is no version history yet
+                    assertNull(versionService.getVersionHistory(nodeRef));
+
+                    // create a version
+                    // turn off auto-versioning
+                    Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+                    props.put(ContentModel.PROP_INITIAL_VERSION, false);
+                    props.put(ContentModel.PROP_AUTO_VERSION, false);
+                    props.put(ContentModel.PROP_AUTO_VERSION_PROPS, false);
+
+                    versionService.ensureVersioningEnabled(nodeRef, props);
+
+                    return null;
+                }
+            });
+
+            transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>()
+            {
+                @Override
+                public Void execute() throws Throwable
+                {
+                    assertNotNull(versionService.getVersionHistory(nodeRef));
+                    // create another one version
+                    versionService.createVersion(nodeRef, null);
+
+                    return null;
+                }
+            });
+
+            final String NEW_DOC_NAME = transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<String>()
+            {
+                @Override
+                public String execute() throws Throwable
+                {
+                    // add aspect to the node
+                    String newDocName = DOC + GUID.generate();
+                    nodeService.addAspect(nodeRef, ContentModel.ASPECT_AUTHOR, null);
+                    nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, newDocName);
+
+                    return newDocName;
+                }
+            });
+
+            CmisService cmisService = factory.getService(context);
+            String repositoryId = cmisService.getRepositoryInfos(null).get(0).getId();
+            
+            List<ObjectData> versions = 
+                cmisService.getAllVersions(repositoryId, nodeRef.toString(), null, null, null, null);
+            assertNotNull(versions);
+            // get the latest version
+            ObjectData latestVersion = versions.get(0);
+            // get the object
+            ObjectData object = 
+                // cmisService.getObjectOfLatestVersion(repositoryId, nodeRef.toString(), null, false, null, null, null, null, false, false, null);
+                cmisService.getObjectByPath(repositoryId, "/" + FOLDER + "/" + NEW_DOC_NAME, null, null, null, null, false, false, null);
+            
+            assertNotNull(latestVersion);
+            assertNotNull(object);
+            
+            Object objectDescriptionString = object.getProperties().getProperties().get("cmis:name").getValues().get(0);
+            Object latestVersionDescriptionString = latestVersion.getProperties().getProperties().get("cmis:name").getValues().get(0);
+            // ensure that node and latest version both have same description
+            assertEquals(objectDescriptionString, latestVersionDescriptionString);
+            
+            Set<String> documentAspects = new HashSet<String>();
+            for (CmisExtensionElement cmisEE : object.getProperties().getExtensions().get(0).getChildren())
+            {
+                documentAspects.add(cmisEE.getValue());
+            }
+            Set<String> latestVersionAspects = new HashSet<String>();
+            for (CmisExtensionElement cmisEE : latestVersion.getProperties().getExtensions().get(0).getChildren())
+            {
+                latestVersionAspects.add(cmisEE.getValue());
+            }
+            // ensure that node and latest version both have the same set of aspects 
+            assertEquals(latestVersionAspects, documentAspects);
+        }
+        finally
+        {
+            AuthenticationUtil.popAuthentication();
+        }
+    }
+
+    /**
+     * Test to ensure that versioning properties have default values defined in Alfresco content model.
+     * Testing  <b>cm:initialVersion</b>, <b>cm:autoVersion</b> and <b>cm:autoVersionOnUpdateProps</b> properties 
+     * 
+     * @throws Exception
+     */
+    @Test
+    public void testVersioningPropertiesHaveDefaultValue() throws Exception
+    {
+        AuthenticationUtil.pushAuthentication();
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+
+        try
+        {
+            // Create document via CMIS
+            final NodeRef documentNodeRef = withCmisService(new CmisServiceCallback<NodeRef>()
+            {
+                @Override
+                public NodeRef execute(CmisService cmisService)
+                {
+                    String repositoryId = cmisService.getRepositoryInfos(null).get(0).getId();
+
+                    String rootNodeId = cmisService.getObjectByPath(repositoryId, "/", null, true, IncludeRelationships.NONE, null, false, true, null).getId();
+
+                    Collection<PropertyData<?>> propsList = new ArrayList<PropertyData<?>>();
+                    propsList.add(new PropertyStringImpl(PropertyIds.NAME, "Folder-" + GUID.generate()));
+                    propsList.add(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "cmis:folder"));
+
+                    String folderId = cmisService.createFolder(repositoryId, new PropertiesImpl(propsList), rootNodeId, null, null, null, null);
+
+                    propsList = new ArrayList<PropertyData<?>>();
+                    propsList.add(new PropertyStringImpl(PropertyIds.NAME, "File-" + GUID.generate()));
+                    propsList.add(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, "cmis:document"));
+
+                    String nodeId = cmisService.createDocument(repositoryId, new PropertiesImpl(propsList), folderId, null, null, null, null, null, null);
+
+                    return new NodeRef(nodeId.substring(0, nodeId.indexOf(';')));
+                }
+            }, CmisVersion.CMIS_1_1);
+
+            // check versioning properties
+            transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<List<Void>>()
+            {
+                @Override
+                public List<Void> execute() throws Throwable
+                {
+                    assertTrue(nodeService.exists(documentNodeRef));
+                    assertTrue(nodeService.hasAspect(documentNodeRef, ContentModel.ASPECT_VERSIONABLE));
+
+                    AspectDefinition ad = dictionaryService.getAspect(ContentModel.ASPECT_VERSIONABLE);
+                    Map<QName, org.alfresco.service.cmr.dictionary.PropertyDefinition> properties = ad.getProperties();
+
+                    for (QName qName : new QName[] {ContentModel.PROP_INITIAL_VERSION, ContentModel.PROP_AUTO_VERSION, ContentModel.PROP_AUTO_VERSION_PROPS})
+                    {
+                        Serializable property = nodeService.getProperty(documentNodeRef, qName);
+
+                        assertNotNull(property);
+
+                        org.alfresco.service.cmr.dictionary.PropertyDefinition pd = properties.get(qName);
+                        assertNotNull(pd.getDefaultValue());
+
+                        assertEquals(property, Boolean.parseBoolean(pd.getDefaultValue()));
+                    }
+
+                    return null;
+                }
+            });
+        }
+        finally
+        {
+            AuthenticationUtil.popAuthentication();
+        }
     }
 }

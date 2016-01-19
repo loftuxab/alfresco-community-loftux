@@ -65,8 +65,10 @@ public class ActivityPostServiceImpl implements ActivityPostService
     
     private boolean userNamesAreCaseSensitive = false;
 
-    public void setIgnoredActivityTypes(String ignoredActivityTypes) {
-        if(ignoredActivityTypes!= null && ignoredActivityTypes.length() > 0){
+    public void setIgnoredActivityTypes(String ignoredActivityTypes) 
+    {
+        if (ignoredActivityTypes!= null && ignoredActivityTypes.length() > 0)
+        {
             this.ignoredActivityTypes = Arrays.asList(ignoredActivityTypes.split(","));
         }
     }
@@ -211,13 +213,12 @@ public class ActivityPostServiceImpl implements ActivityPostService
                 throw new IllegalArgumentException("Invalid activity type - exceeds " + ActivityPostDAO.MAX_LEN_ACTIVITY_TYPE + " chars: " + activityType);
             }
 
-            //Loftux START
-            if(ignoredActivityTypes != null && ignoredActivityTypes.contains(activityType)){
-                //do not log the activity for ignored activity types.
+            if (ignoredActivityTypes != null && ignoredActivityTypes.contains(activityType))
+            {
+                // do not log the activity for ignored activity types.
                 logger.debug("Ignoring activity type for posting: " + activityType);
                 return;
             }
-            //Loftux END
             
             // optional - default to empty string
             if (activityData == null)
@@ -393,7 +394,7 @@ public class ActivityPostServiceImpl implements ActivityPostService
      * Validate that the nodeRef property - if present in the activity data - is valid
      * on a basic level (it can be used to construct a NodeRef object).
      * 
-     * @param activityPost
+     * @param jo
      * @throws JSONException 
      */
     private NodeRef checkNodeRef(JSONObject jo) throws JSONException

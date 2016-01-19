@@ -18,7 +18,11 @@
  */
 package org.apache.solr.handler.component;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.solr.query.AbstractQParser;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -36,6 +42,7 @@ import org.apache.solr.common.SolrException.ErrorCode;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.ShardParams;
+import org.apache.solr.common.util.ContentStream;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
 import org.apache.solr.core.CloseHook;
@@ -55,6 +62,9 @@ import org.apache.solr.util.RTimer;
 import org.apache.solr.util.SolrPluginUtils;
 import org.apache.solr.util.plugin.PluginInfoInitialized;
 import org.apache.solr.util.plugin.SolrCoreAware;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,6 +207,44 @@ public class AlfrescoSearchHandler extends RequestHandlerBase implements SolrCor
         return components;
     }
 
+    private void readJsonIntoContent(SolrQueryRequest req)
+    {
+        Iterable<ContentStream> streams = req.getContentStreams();
+
+        JSONObject json = (JSONObject) req.getContext().get(AbstractQParser.ALFRESCO_JSON);
+
+        if (json == null)
+        {
+            if (streams != null)
+            {
+
+                try
+                {
+                    Reader reader = null;
+                    for (ContentStream stream : streams)
+                    {
+                        reader = new BufferedReader(new InputStreamReader(stream.getStream(), "UTF-8"));
+                    }
+
+                    // TODO - replace with streaming-based solution e.g. SimpleJSON ContentHandler
+                    if (reader != null)
+                    {
+                        json = new JSONObject(new JSONTokener(reader));
+                        req.getContext().put(AbstractQParser.ALFRESCO_JSON, json);
+                    }
+                }
+                catch (JSONException e)
+                {
+                    // This is expected when there is no json element to the request
+                }
+                catch (IOException e)
+                {
+                    throw new AlfrescoRuntimeException("IO Error parsing query parameters", e);
+                }
+            }
+        }
+    }
+    
     @Override
     public void handleRequestBody(SolrQueryRequest req, SolrQueryResponse rsp) throws Exception
     {
@@ -206,6 +254,8 @@ public class AlfrescoSearchHandler extends RequestHandlerBase implements SolrCor
 //        {
 //            throw new SolrException(ErrorCode.BAD_REQUEST, "Search requests cannot accept content streams");
 //        }
+        
+        readJsonIntoContent(req);
 
         ResponseBuilder rb = new ResponseBuilder(req, rsp, components);
         if (rb.requestInfo != null)
@@ -341,6 +391,10 @@ public class AlfrescoSearchHandler extends RequestHandlerBase implements SolrCor
                             params.remove(CommonParams.HEADER_ECHO_PARAMS);
                             params.set(ShardParams.IS_SHARD, true); // a sub (shard) request
                             params.set(ShardParams.SHARD_URL, shard); // so the shard knows what was asked
+                            if(req.getContext().get(AbstractQParser.ALFRESCO_JSON) != null)
+                            {
+                                params.set(AbstractQParser.ALFRESCO_JSON, ((JSONObject)req.getContext().get(AbstractQParser.ALFRESCO_JSON)).toString());
+                            }
                             if (rb.requestInfo != null)
                             {
                                 // we could try and detect when this is needed, but it could be tricky

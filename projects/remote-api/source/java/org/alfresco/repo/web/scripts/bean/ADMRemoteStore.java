@@ -385,7 +385,9 @@ public class ADMRemoteStore extends BaseRemoteStore
     /**
      * Creates multiple XML documents encapsulated in a single one. 
      * 
-     * @param content       XML document containing multiple document contents to write
+     * @param res       WebScriptResponse
+     * @param store       String
+     * @param in       XML document containing multiple document contents to write
      */
     @Override
     protected void createDocuments(WebScriptResponse res, String store, InputStream in)
@@ -863,8 +865,8 @@ public class ADMRemoteStore extends BaseRemoteStore
      * <p>
      * Disassmbles the path to correct match either user, site or generic folder path.
      * 
-     * @param path
-     * @param create
+     * @param path String
+     * @param create boolean
      * 
      * @return NodeRef to the "surf-config" folder, or null if it does not exist yet.
      */

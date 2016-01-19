@@ -77,13 +77,13 @@ public abstract class ActionConditionEvaluatorAbstractBase extends Parameterized
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setDescriptionKey(getDescriptionKey());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setAdhocPropertiesAllowed(getAdhocPropertiesAllowed());
 			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setConditionEvaluator(this.name);
-			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setParameterDefinitions(getParameterDefintions());
+			((ActionConditionDefinitionImpl)this.actionConditionDefinition).setLocalizedParameterDefinitions(getLocalizedParameterDefinitions());
 		}
 		return this.actionConditionDefinition;
 	}
 	
 	/**
-     * @see org.alfresco.repo.action.evaluator.ActionConditionEvaluator#evaluate(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.evaluator.ActionConditionEvaluator#evaluate(org.alfresco.service.cmr.action.ActionCondition, org.alfresco.service.cmr.repository.NodeRef)
      */
     public boolean evaluate(ActionCondition actionCondition, NodeRef actionedUponNodeRef)
     {

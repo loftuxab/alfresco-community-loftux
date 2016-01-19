@@ -407,9 +407,9 @@ public class AclTracker extends AbstractTracker
     }
 
     /**
-     * @param changeSetsFound
-     * @param lastGoodChangeSetCommitTimeInIndex
-     * @return
+     * @param changeSetsFound BoundedDeque<AclChangeSet>
+     * @param lastGoodChangeSetCommitTimeInIndex long
+     * @return Long
      */
     protected Long getChangeSetFromCommitTime(BoundedDeque<AclChangeSet> changeSetsFound, long lastGoodChangeSetCommitTimeInIndex)
     {
@@ -473,8 +473,8 @@ public class AclTracker extends AbstractTracker
     }
 
     /**
-     * @param acl
-     * @param readers
+     * @param aclReaderList List<AclReaders>
+     * @param overwrite boolean
      */
     protected void indexAcl(List<AclReaders> aclReaderList, boolean overwrite) throws IOException
     {
@@ -578,8 +578,8 @@ public class AclTracker extends AbstractTracker
 
 
     /**
-     * @param acltxid
-     * @return
+     * @param acltxid Long
+     * @return List<Long>
      */
     public List<Long> getAclsForDbAclTransaction(Long acltxid)
     {
@@ -630,7 +630,6 @@ public class AclTracker extends AbstractTracker
     }
     
     /**
-     * @param reader
      * @throws AuthenticationException
      * @throws IOException
      * @throws JSONException
@@ -839,8 +838,25 @@ public class AclTracker extends AbstractTracker
         @Override
         protected void doWork() throws IOException, AuthenticationException, JSONException
         {
-            List<AclReaders> readers = client.getAclReaders(acls);
-            indexAcl(readers, true);
+            List<Acl> filteredAcls = filterAcls(acls);
+            if(filteredAcls.size() > 0)
+            {
+                List<AclReaders> readers = client.getAclReaders(filteredAcls);
+                indexAcl(readers, true);
+            }
+        }
+        
+        private List<Acl> filterAcls(List<Acl> acls)
+        {
+            ArrayList<Acl> filteredList = new ArrayList<Acl>(acls.size());
+            for(Acl acl : acls)
+            {
+                if(isInAclShard(acl.getId()))
+                {
+                    filteredList.add(acl);
+                }
+            }
+            return filteredList;
         }
     }
 

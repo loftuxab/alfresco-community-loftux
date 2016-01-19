@@ -39,7 +39,8 @@ public class ShareUserProfile extends AbstractUtils
     
     /**
      * Deletes the specified trashcan item if found
-     * @param WebDrone
+     * @param driver
+     * @param itemName
      * @ param String itemName to be deleted
      * @return TrashCanPage
      */

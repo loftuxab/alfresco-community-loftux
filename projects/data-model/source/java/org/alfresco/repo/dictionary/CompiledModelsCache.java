@@ -54,6 +54,34 @@ public class CompiledModelsCache extends AbstractAsynchronouslyRefreshedCache<Di
     }
 
     /**
+     * @param tenantId the tenantId of cache that will be removed from live cache
+     * @return removed DictionaryRegistry
+     */
+    public void remove(final String tenantId)
+    {
+        //TODO Should be reworked when ACE-2001 will be implemented
+        liveLock.writeLock().lock();
+        try
+        {
+            DictionaryRegistry dictionaryRegistry = live.get(tenantId);
+            if (dictionaryRegistry != null)
+            {
+                live.remove(tenantId);
+                dictionaryRegistry.remove();
+                
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Removed dictionary register for tenant " + tenantId);
+                }
+            }
+        }
+        finally
+        {
+            liveLock.writeLock().unlock();
+        }
+    }
+
+    /**
      * @param dictionaryDAO the dictionaryDAOImpl to set
      */
     public void setDictionaryDAO(DictionaryDAOImpl dictionaryDAO)
@@ -67,19 +95,5 @@ public class CompiledModelsCache extends AbstractAsynchronouslyRefreshedCache<Di
     public void setTenantService(TenantService tenantService)
     {
         this.tenantService = tenantService;
-    }
-	
-    @Override
-    public void remove(final String tenantId)
-    {
-        removeInternal(tenantId);
-        //Broadcast action to cluster members
-        super.remove(tenantId);
-    }
-	
-    @Override
-    protected void onRemoveEntry(DictionaryRegistry dictionaryRegistry)	
-    {
-        dictionaryRegistry.remove();
     }
 }

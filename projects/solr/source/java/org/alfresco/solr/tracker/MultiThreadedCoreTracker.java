@@ -347,7 +347,6 @@ public class MultiThreadedCoreTracker extends CoreTracker
     }
 
     /**
-     * @param reader
      * @throws AuthenticationException
      * @throws IOException
      * @throws JSONException

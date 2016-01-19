@@ -57,47 +57,47 @@ public interface ChannelType
     
     /**
      * Returns the unique identifier of this channel type
-     * @return
+     * @return String
      */
     String getId();
     
     /**
      * Returns the title (display name) of this channel type.
      * The title may be localised, but this is implementation specific
-     * @return
+     * @return String
      */
     String getTitle();
     
     /**
      * Each channel is stored in the repository as a node. This operation returns
      * the qualified name of the type of that node.
-     * @return
+     * @return QName
      */
     QName getChannelNodeType();
 
     /**
      * Does this channel type support publishing content?
-     * @return
+     * @return boolean
      */
     boolean canPublish();
     
     /**
      * Does this channel type support unpublishing content? That is to say, once content has been published
      * to a channel of this type, can it later be removed from that channel?
-     * @return
+     * @return boolean
      */
     boolean canUnpublish();
     
     /**
      * Does this channel type support status updates?
-     * @return
+     * @return boolean
      */
     boolean canPublishStatusUpdates();
     
     /**
      * Send the specified status update to the specified channel
-     * @param channel
-     * @param status
+     * @param channel Channel
+     * @param status String
      */
     void sendStatusUpdate(Channel channel, String status);
     
@@ -160,4 +160,16 @@ public interface ChannelType
      * @return The resource that represents the requested icon if available. <code>null</code> otherwise.
      */
     Resource getIcon(String size);
+
+    /**
+     * If a channel type is hidden then it doesn't appear in the list returned by {@link ChannelService#getChannelTypes()}
+     * @param hidden
+     */
+    void setHidden(boolean hidden);
+
+    /**
+     * If a channel type is hidden then it doesn't appear in the list returned by {@link ChannelService#getChannelTypes()}
+     * @param hidden
+     */
+    boolean isHidden();
 }

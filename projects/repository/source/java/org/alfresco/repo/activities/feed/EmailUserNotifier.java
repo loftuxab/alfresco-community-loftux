@@ -45,7 +45,6 @@ public class EmailUserNotifier extends AbstractUserNotifier implements Initializ
 
     private AuthenticationContext authenticationContext;
     private ActionService actionService;
-    private boolean optIn = true;
 
     public void setAuthenticationContext(AuthenticationContext authenticationContext)
 	{
@@ -77,11 +76,6 @@ public class EmailUserNotifier extends AbstractUserNotifier implements Initializ
 		this.excludedEmailSuffixes = excludedEmailSuffixes;
 	}
 
-    public void setOptIn(boolean optIn)
-    {
-        this.optIn = optIn;
-    }
-
 	/**
      * Perform basic checks to ensure that the necessary dependencies were injected.
      */
@@ -109,12 +103,7 @@ public class EmailUserNotifier extends AbstractUserNotifier implements Initializ
 		String emailAddress = (String)personProps.get(ContentModel.PROP_EMAIL);
 		Boolean emailFeedDisabled = (Boolean)personProps.get(ContentModel.PROP_EMAIL_FEED_DISABLED);
 
-        if ((emailFeedDisabled != null) && (emailFeedDisabled == true))        
-        {
-            return true;
-        }
-
-        if ((emailFeedDisabled == null) && (this.optIn == true))
+        if ((emailFeedDisabled != null) && (emailFeedDisabled == true))
         {
             return true;
         }

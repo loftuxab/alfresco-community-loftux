@@ -50,7 +50,7 @@ public abstract class TenantUtil
      * 
      * @param runAsWork    the unit of work to do
      * @param uid          the user ID
-     * @param tenanDomain  the tenant domain
+     * @param tenantDomain  the tenant domain
      * @return Returns     the work's return value
      */
     public static <R> R runAsUserTenant(final TenantRunAsWork<R> runAsWork, final String uid, final String tenantDomain)
@@ -69,7 +69,7 @@ public abstract class TenantUtil
      * after the call.
      * 
      * @param runAsWork    the unit of work to do
-     * @param tenanDomain  the tenant domain
+     * @param tenantDomain  the tenant domain
      * @return Returns     the work's return value
      */
     public static <R> R runAsTenant(final TenantRunAsWork<R> runAsWork, String tenantDomain)

@@ -72,8 +72,6 @@ public interface Constraint
      * Initializes the constraint with appropriate values, which will depend
      * on the implementation itself.  This method can be implemented as a
      * once-off, i.e. reinitialization does not have to be supported.
-     * 
-     * @param parameters constraint parameters
      */
     public void initialize();
     

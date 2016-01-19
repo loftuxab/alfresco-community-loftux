@@ -217,10 +217,10 @@ public interface MethodHandler
      * @param oldURL the previous URL for a document that has changed names or directory location in the Web site
      * @param newURL the new URL for a document that has changed names or directory locations in the Web site.
      * @param urlList The list of site-relative URLs for the current method
-     * @param renameOption parameter that specifies how links should handle to and from the new page.
-     * @param putOption enables the server to overwrite an existing file if the value is set to <b>overwrite</b> and disallows overwrites if the value is set to <b>edit</b>
+     * @param renameOptionSet parameter that specifies how links should handle to and from the new page.
+     * @param putOptionSet enables the server to overwrite an existing file if the value is set to <b>overwrite</b> and disallows overwrites if the value is set to <b>edit</b>
      * @param docopy <b>true</b> to copy the file to the destination; <b>false</b> to move the file to the destination
-     * @param validateWelcomeNames
+     * @param validateWelcomeNames boolean
      * @return DocMetaInfo
      */
     public DocsMetaInfo moveDocument(String serviceName, String oldURL, String newURL, List<String> urlList, EnumSet<RenameOption> renameOptionSet,
@@ -231,7 +231,7 @@ public interface MethodHandler
      * 
      * @param serviceName specifies the URL of the Web site that a method should act upon
      * @param document document to create
-     * @param putOption enables the server to overwrite an existing file if the value is set to <b>overwrite</b> and disallows overwrites if the value is set to <b>edit</b>
+     * @param putOptionSet enables the server to overwrite an existing file if the value is set to <b>overwrite</b> and disallows overwrites if the value is set to <b>edit</b>
      * @param comment provides a comment for the file being uploaded
      * @param keepCheckedOut <i>true</i> to check in the specified document to source control and immediately check it back out. <i>false</i> to only check the document in to
      *        source control.
@@ -246,10 +246,10 @@ public interface MethodHandler
      * @param siteUrl specifies the server-relative URL of a site
      * @param location specifies the site-relative URL of a document library or of a folder or file within a document library
      * @param fileDialogFilterValue specifies the file type extension by which to filter the view in the file dialog box. For example, <i>*.doc</i>, <i>*.txt</i>, or <i>*.htm</i>
-     * @param rootFolder
+     * @param rootFolder String
      * @param sortField specify the name of the field on which to sort ({@link VtiSortField})
      * @param sortDir indicate an <i>ascending (asc)</i> or <i>descending (desc)</i> sort order ({@link VtiSort})
-     * @param view
+     * @param view String
      * @return DialogsMetaInfo
      */
     public DialogsMetaInfo getFileOpen(String siteUrl, String location, List<String> fileDialogFilterValue, String rootFolder, VtiSortField sortField, VtiSort sortDir, String view);

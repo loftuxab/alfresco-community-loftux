@@ -25,7 +25,8 @@ import java.util.Iterator;
 
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.AlfrescoSolrDataModel.FieldUse;
-import org.apache.solr.client.solrj.SolrRequest;
+import org.alfresco.solr.query.MimetypeGroupingQParserPlugin;
+import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.handler.component.ResponseBuilder;
@@ -46,19 +47,107 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void prepare(ResponseBuilder rb) throws IOException
     {
-        SolrQueryRequest req = rb.req;
-        SolrParams params = req.getParams();
-        
-        ModifiableSolrParams fixed = new ModifiableSolrParams();
-        fixFacetParams(fixed, params, rb);
-        req.setParams(fixed);
-       
+    	 SolrQueryRequest req = rb.req;
+         SolrParams params = req.getParams();
+         
+         ModifiableSolrParams fixed = new ModifiableSolrParams();
+         fixFilterQueries(fixed, params, rb);
+         fixFacetParams(fixed, params, rb);
+         copyOtherQueryParams(fixed, params);
+         
+         if(fixed.get(CommonParams.SORT) != null)
+         {
+             fixed.remove(CommonParams.RQ);
+         }
+         
+         req.setParams(fixed);
     }
 
     
     /**
+     * @param fixed
      * @param params
-     * @return
+     * @param rb
+     */
+    private void fixFilterQueries(ModifiableSolrParams fixed, SolrParams params, ResponseBuilder rb)
+    {
+        for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
+        {
+            String name = it.next();
+            if(name.equals("fq"))
+            {
+                String[] values = params.getParams(name);
+                if(values != null)
+                {
+                    String[] fixedValues = new String[values.length];
+                    for(int i = 0; i < values.length; i++)
+                    {
+                        String value = values[i];
+                        if(value.startsWith("{!"))
+                        {
+                            fixedValues[i] = value;
+                        }
+                        else
+                        {
+                            if(value.startsWith("contentSize():"))
+                            {
+                                value = "cm:content.size:" + removeQuotes(value.substring("contentSize():".length()));
+                            }
+                            else if(value.startsWith("mimetype():"))
+                            {
+                                value = removeQuotes(value.substring("mimetype():".length()));
+                                ArrayList<String> expand = MimetypeGroupingQParserPlugin.getReverseMappings().get(value);
+                                if(expand == null)
+                                {
+                                    value = "cm:content.mimetype:\""+value+"\"";
+                                }
+                                else
+                                {
+                                    StringBuilder builder = new StringBuilder();
+                                    builder.append("cm:content.mimetype:(");
+                                    for(int j = 0; j < expand.size(); j++)
+                                    {
+                                        if(j > 0)
+                                        {
+                                            builder.append(" OR ");
+                                        }
+                                        builder.append('"');
+                                        builder.append(expand.get(j));
+                                        builder.append('"');
+                                    }
+                                    builder.append(')');
+                                    value = builder.toString();
+                                    
+                                }
+                            }
+                            fixedValues[i] = "{!afts}"+value;
+                        }
+                    }
+                    fixed.add(name, fixedValues);
+                }
+                
+            }
+        }
+    }
+
+    private String removeQuotes(String quoted)
+    {
+        if(quoted.startsWith("\"") && quoted.endsWith("\""))
+        {
+            return quoted.substring(1, quoted.length()-1);
+        }
+        else
+        {
+            return quoted;
+        }
+    }
+
+
+    /**
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param rb ResponseBuilder
+     * @return SolrParams
      */
     private SolrParams fixFacetParams(ModifiableSolrParams fixed, SolrParams params, ResponseBuilder rb)
     {
@@ -71,6 +160,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
         HashMap<String, String> statsFieldMappings = new HashMap<>();
         HashMap<String, String> statsFacetMappings = new HashMap<>();
        
+        HashMap<String, String> functionMappings = new HashMap<>();
         
         rewriteFacetFieldList(fixed, params, "facet.field", fieldMappings, rb.req);
         rewriteFacetFieldList(fixed, params, "facet.date", dateMappings, rb.req);
@@ -81,17 +171,43 @@ public class RewriteFacetParametersComponent extends SearchComponent
         rewriteFacetFieldList(fixed, params, "stats.field", statsFieldMappings, rb.req);
         rewriteFacetFieldList(fixed, params, "stats.facet", statsFacetMappings, rb.req);
         
-        rewriteFacetFieldOptions(fixed, params, "facet.field", fieldMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.date", dateMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.range", rangeMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.pivot", pivotMappings);
-        rewriteFacetFieldOptions(fixed, params, "facet.interval", intervalMappings);
+        mapFacetFunctions(fixed, params, "facet.field", functionMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.prefix", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.contains", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.contains.ignoreCase", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.sort", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.limit", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.offset", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.mincount", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.missing", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.method", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.enum.cache.minDF", fieldMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.enum.cache.minDF", fieldMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.range.start", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.end", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.gap", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.hardend", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.include", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.other", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.method", rangeMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.range.limit", rangeMappings);
+      
+        rewriteFacetFieldOptions(fixed, params, "facet.pivot.mincount", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.sort", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.limit", pivotMappings);
+        rewriteFacetFieldOptions(fixed, params, "facet.offset", pivotMappings);
+        
+        rewriteFacetFieldOptions(fixed, params, "facet.interval.set", intervalMappings);
+        
+       
         
         // TODO: 
         //    f.<stats_field>.stats.facet=<new Field> 
         //    would require a more complex rewrite  
         
-        copyNonFacetParams(fixed, params);
+       
         
         rb.rsp.add("_original_parameters_", params);
         rb.rsp.add("_field_mappings_", fieldMappings);
@@ -101,8 +217,79 @@ public class RewriteFacetParametersComponent extends SearchComponent
         rb.rsp.add("_interval_mappings_", intervalMappings);
         rb.rsp.add("_stats_field_mappings_", statsFieldMappings);
         rb.rsp.add("_stats_facet_mappings_", statsFacetMappings);
+        rb.rsp.add("_facet_function_mappings_", functionMappings);
         
         return fixed;
+    }
+
+
+    /**
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param string
+     * @param fieldMappings
+     */
+    private void mapFacetFunctions(ModifiableSolrParams fixed, SolrParams params, String string, HashMap<String, String> facetFunctionMappings)
+    {
+        
+        String[] facetFieldsOrig = params.getParams(string);
+        if(facetFieldsOrig != null)
+        {
+            for(String facetFields : facetFieldsOrig)
+            {
+                String[] fields = facetFields.split(",");
+
+                for(String field : fields)
+                {
+                    field = field.trim();
+                    if(field.endsWith("()"))
+                    {
+                        if(isMimetypeAndHasFQ(params, field))
+                        {
+                            String function =  "{!" + field.substring(0, field.length()-2)+ " group=false }";
+                            fixed.add("fq", function);
+                            facetFunctionMappings.put(field,  function);
+                        }
+                        else
+                        {
+                            String function =  "{!" + field.substring(0, field.length()-2)+ " group=true}";
+                            fixed.add("fq", function);
+                            facetFunctionMappings.put(field,  function);
+                        }
+                    }
+
+                }
+            }   
+        }
+    }
+
+
+    /**
+     * @param params
+     * @param field
+     * @return
+     */
+    private boolean isMimetypeAndHasFQ(SolrParams params, String field)
+    {
+        if(!field.equals("mimetype()"))
+        {
+            return false;
+        }
+        else
+        {
+        	String[] filterQueries = params.getParams("fq");
+        	if(filterQueries != null)
+        	{
+        		for(String fq : filterQueries)
+        		{
+        			if(fq.startsWith("mimetype():"))
+        			{
+        				return true;
+        			}
+        		}
+        	}
+        }
+        return false;
     }
 
 
@@ -110,27 +297,28 @@ public class RewriteFacetParametersComponent extends SearchComponent
      * @param fixed
      * @param params
      */
-    private void copyNonFacetParams(ModifiableSolrParams fixed, SolrParams params)
+    private void copyOtherQueryParams(ModifiableSolrParams fixed, SolrParams params)
     {
         for(Iterator<String> it = params.getParameterNamesIterator(); it.hasNext(); /**/)
         {
             String name = it.next();
-            if(name.startsWith("f.") || name.startsWith("facet.field") || name.startsWith("facet.date") || name.startsWith("facet.range") || name.startsWith("facet.pivot") || name.startsWith("facet.interval")|| name.startsWith("stats."))
+            if(name.equals("fq") || name.startsWith("f.") || name.equals("facet.field") || name.equals("facet.date") || name.equals("facet.range") || name.equals("facet.pivot") || name.equals("facet.interval")|| name.startsWith("stats."))
             {
                 // Already done 
                 continue;
             }    
             else
             {
-                fixed.add(name, params.getParams(name));
+                fixed.set(name, params.getParams(name));
             }
         }
     }
 
-
     /**
-     * @param fixed
-     * @param params
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param paramName String
+     * @param fieldMappings HashMap<String, String>
      */
     private void rewriteFacetFieldOptions(ModifiableSolrParams fixed, SolrParams params, String paramName, HashMap<String, String> fieldMappings)
     {
@@ -139,22 +327,24 @@ public class RewriteFacetParametersComponent extends SearchComponent
             String name = it.next();
             if(name.startsWith("f."))
             {
-                int index = name.indexOf("."+paramName, 2);
-                if(index > -1)
+                if(name.endsWith("."+paramName))
                 {
-                    String source = name.substring(2, index);
+
+                    String source = name.substring(2, name.length() - paramName.length() - 1);
                     if(fieldMappings.containsKey(source))
                     {
-                        fixed.add("f."+fieldMappings.get(source)+name.substring(index), params.getParams(name));
+                        fixed.set("f."+fieldMappings.get(source)+"."+paramName, params.getParams(name));
                     }
                     else
                     {
-                        fixed.add(name, params.getParams(name));
+                        fixed.set(name, params.getParams(name));
                     }
+
+
                 }
                 else
                 {
-                    fixed.add(name, params.getParams(name));
+                    fixed.set(name, params.getParams(name));
                 }
             }       
         }
@@ -162,8 +352,11 @@ public class RewriteFacetParametersComponent extends SearchComponent
 
 
     /**
-     * @param fixed
-     * @param params
+     * @param fixed ModifiableSolrParams
+     * @param params SolrParams
+     * @param paramName String
+     * @param fieldMappings HashMap<String, String>
+     * @param req SolrQueryRequest
      */
     private void rewriteFacetFieldList(ModifiableSolrParams fixed, SolrParams params, String paramName, HashMap<String, String> fieldMappings, SolrQueryRequest req)
     {
@@ -171,16 +364,51 @@ public class RewriteFacetParametersComponent extends SearchComponent
         if(facetFieldsOrig != null)
         {
             ArrayList<String> newFacetFields = new ArrayList<String>();
-            for(String facetField : facetFieldsOrig)
+            for(String facetFields : facetFieldsOrig)
             {
-                String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(facetField, FieldUse.FACET, req);
-                if(!mappedField.equals(facetField))
+                StringBuilder commaSeparated = new StringBuilder();
+                String[] fields = facetFields.split(",");
+                
+                for(String field : fields)
                 {
-                    fieldMappings.put(facetField, mappedField);
+                    field = field.trim();
+                    
+                    if(field.endsWith("()"))
+                    {
+                        // skip facet functions 
+                        continue;
+                    }
+                    
+                    
+                    if(req.getSchema().getFieldOrNull(field) != null)
+                    {
+                        if(commaSeparated.length() > 0)
+                        {
+                            commaSeparated.append(",");
+                        }
+                        commaSeparated.append(field);
+                    }
+                    else
+                    {
+                        String mappedField = AlfrescoSolrDataModel.getInstance().mapProperty(field, FieldUse.FACET, req);
+                        
+                        if(commaSeparated.length() > 0)
+                        {
+                            commaSeparated.append(",");
+                        }
+                        commaSeparated.append(mappedField);
+                    }
                 }
-                newFacetFields.add(mappedField);
+                if(!facetFields.equals(commaSeparated.toString()))
+                {
+                    fieldMappings.put(facetFields, commaSeparated.toString());
+                }
+                if(commaSeparated.length() > 0)
+                {
+                    newFacetFields.add(commaSeparated.toString());
+                }
             }
-            fixed.add(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
+            fixed.set(paramName,  newFacetFields.toArray(new String[newFacetFields.size()]));
         }
     }
 
@@ -191,7 +419,7 @@ public class RewriteFacetParametersComponent extends SearchComponent
     @Override
     public void process(ResponseBuilder rb) throws IOException
     {
-       // Nothing to do
+        
     }
 
     /* (non-Javadoc)

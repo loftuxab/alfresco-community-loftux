@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -36,7 +36,8 @@ public class VersionSeriesCheckedOutByProperty extends AbstractProperty
     /**
      * Construct
      * 
-     * @param serviceRegistry
+     * @param serviceRegistry ServiceRegistry
+     * @param connector CMISConnector
      */
     public VersionSeriesCheckedOutByProperty(ServiceRegistry serviceRegistry, CMISConnector connector)
     {
@@ -52,8 +53,7 @@ public class VersionSeriesCheckedOutByProperty extends AbstractProperty
 
         if (nodeInfo.isPWC())
         {
-            return getServiceRegistry().getNodeService().getProperty(nodeInfo.getNodeRef(),
-                    ContentModel.PROP_WORKING_COPY_OWNER);
+            return nodeInfo.getNodeProps().get(ContentModel.PROP_WORKING_COPY_OWNER);
         } else
         {
             return getServiceRegistry().getNodeService().getProperty(nodeInfo.getCurrentNodeNodeRef(),

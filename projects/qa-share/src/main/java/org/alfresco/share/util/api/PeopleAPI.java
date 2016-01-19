@@ -69,7 +69,6 @@ public class PeopleAPI extends PublicAPIAbstract
      * @param domain
      * @param personId
      * @param params
-     * @param preferenceId
      * @return {@link Preference}
      * @throws PublicApiException
      */

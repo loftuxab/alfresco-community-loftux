@@ -25,7 +25,7 @@ public interface QNameFilter
     
     /**
      * Indicates that this QName should be excluded.
-     * @param typeQName
+     * @param typeQName QName
      * @return boolean true if it is excluded
      */
     boolean isExcluded(QName typeQName);

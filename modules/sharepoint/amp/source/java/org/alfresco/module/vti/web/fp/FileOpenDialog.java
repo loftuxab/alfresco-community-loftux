@@ -50,28 +50,28 @@ import freemarker.template.TemplateException;
 
 /**
  * Class for handling FileOpen Dialog
- *
+ * 
  * @author Mike Shavnev
  *
  */
 public class FileOpenDialog extends AbstractMethod
 {
     private static Log logger = LogFactory.getLog(FileOpenDialog.class);
-
+    
     private static final String METHOD_NAME = "dialogview";
-
-   private Template template = null;
-
+ 
+	private Template template = null;
+    
     public String getName()
     {
         return METHOD_NAME;
     }
-
+    
     /**
      * Returns web-view for 'File Open' window.
-     *
+     * 
      * @param request Vti Frontpage request ({@link VtiFpRequest})
-     * @param response Vti Frontpage response ({@link VtiFpResponse})
+     * @param response Vti Frontpage response ({@link VtiFpResponse})      
      */
     protected void doExecute(VtiFpRequest request, VtiFpResponse response) throws VtiMethodException, IOException
     {
@@ -81,7 +81,7 @@ public class FileOpenDialog extends AbstractMethod
         }
         String location = request.getNotEncodedParameter("location");
         String site = getSiteUrl(request);
-
+        
         List<String> fileDialogFilterValue = Arrays.asList(request.getParameter("FileDialogFilterValue").split(";"));
         String rootFolder = request.getParameter("RootFolder", "");
         VtiSortField sortField = request.getParameter("SortField", VtiSortField.TYPE);
@@ -101,7 +101,7 @@ public class FileOpenDialog extends AbstractMethod
 
         Collections.sort(items, new DialogMetaInfoComparator(sortField, sort));
         URI uri = null;
-
+        
         try
         {
             uri = new URI(urlHelper.getExternalBaseURL());
@@ -116,7 +116,7 @@ public class FileOpenDialog extends AbstractMethod
         int port = uri.getPort();
         StringBuilder host = new StringBuilder(uri.getHost());
 
-        if ((HttpSchemes.HTTP.equalsIgnoreCase(scheme) && port != 80) ||
+        if ((HttpSchemes.HTTP.equalsIgnoreCase(scheme) && port != 80) || 
                 (HttpSchemes.HTTPS.equalsIgnoreCase(scheme) && port != 443))
         {
             host.append(":");

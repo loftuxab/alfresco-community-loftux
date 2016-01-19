@@ -26,6 +26,7 @@ import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.Bits;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 /**
  * Caching wrapper for {@link SolrPathQuery}.
@@ -53,7 +54,9 @@ public class SolrCachingPathScorer extends AbstractSolrCachingScorer
         if (results == null)
         {
             // Cache miss: get path query results and cache them
-            results = searcher.getDocSet(wrappedPathQuery);
+            WrappedQuery wrapped = new WrappedQuery(wrappedPathQuery);
+            wrapped.setCache(false);
+            results = searcher.getDocSet(wrapped);
             searcher.cacheInsert(CacheConstants.ALFRESCO_PATH_CACHE, wrappedPathQuery, results);
         }
         

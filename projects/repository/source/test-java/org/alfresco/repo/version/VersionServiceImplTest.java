@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.AssertionFailedError;
@@ -94,6 +95,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     private PersonService personService;
     private VersionableAspect versionableAspect;
     private List<String> excludedOnUpdateProps;
+    private Properties globalProperties;
     
     @Override
     protected void onSetUpInTransaction() throws Exception
@@ -102,6 +104,8 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
         personService = (PersonService) applicationContext.getBean("personService");
         versionableAspect = (VersionableAspect) applicationContext.getBean("versionableAspect");
         excludedOnUpdateProps = versionableAspect.getExcludedOnUpdateProps();
+        globalProperties = (Properties) applicationContext.getBean("global-properties");
+        globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "true");
     }
 
     @Override
@@ -110,6 +114,7 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
         super.onTearDownAfterTransaction();
         versionableAspect.setExcludedOnUpdateProps(excludedOnUpdateProps);
         versionableAspect.afterDictionaryInit();
+        globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "false");
     }
 
     public void testSetup()
@@ -247,6 +252,22 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
     	
     	return false;
     }
+    
+    // MNT-13647, MNT-13719 check for comment count in node property
+    public void testCommentsCountProperty() {
+    	final String COMMENT = "<p>Comment</p>";
+    	
+        NodeRef versionableNode = createNewVersionableNode();
+        addComment(versionableNode, COMMENT, false);
+        
+        // Test scenario 1
+        Version v1 = createVersion(versionableNode);
+        addComment(versionableNode, COMMENT, false);
+        Version v2 = createVersion(versionableNode);
+        this.versionService.revert(versionableNode, v1);
+
+        assertEquals("Incorrect comments count:", 2, nodeService.getProperty(versionableNode, ForumModel.PROP_COMMENT_COUNT));
+	}
     
     /**
      * Tests the creation of the initial version of a versionable node
@@ -2694,5 +2715,34 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
                 nodeService.deleteNode(document);
             }
         }
+    }
+    
+    public void test_MNT14143()
+    {
+        // Create a non-versionable node
+        final NodeRef node = createNewNode();
+        
+        Map<QName, Serializable> verProperties = new HashMap<QName, Serializable>(1);
+        verProperties.put(ContentModel.PROP_AUTO_VERSION_PROPS, false);
+        this.versionService.ensureVersioningEnabled(node, verProperties);
+        
+        // add 'dublincore' aspect
+        nodeService.addAspect(node, ContentModel.ASPECT_DUBLINCORE, null);
+        nodeService.setProperty(node, ContentModel.PROP_SUBJECT, "Test subject");
+        
+        Version version10 = this.versionService.getCurrentVersion(node);
+        assertEquals("1.0", version10.getVersionLabel());
+        createVersion(node);
+        Version version11 = this.versionService.getCurrentVersion(node);
+        assertEquals("1.1", version11.getVersionLabel());
+        
+        this.versionService.revert(node, version10);
+        
+        assertFalse(nodeService.hasAspect(node, ContentModel.ASPECT_DUBLINCORE));
+        
+        this.versionService.revert(node, version11);
+        
+        assertTrue(nodeService.hasAspect(node, ContentModel.ASPECT_DUBLINCORE));
+        
     }
 }

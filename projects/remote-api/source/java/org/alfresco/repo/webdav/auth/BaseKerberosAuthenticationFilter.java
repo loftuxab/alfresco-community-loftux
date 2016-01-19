@@ -118,8 +118,8 @@ public abstract class BaseKerberosAuthenticationFilter extends BaseSSOAuthentica
     /**
      * Sets the HTTP service login configuration entry name. The default is <code>"AlfrescoHTTP"</code>.
      * 
-     * @param loginEntryName
-     *            the loginEntryName to set
+     * @param jaasConfigEntryName
+     *            the jaasConfigEntryName to set
      */
     public void setJaasConfigEntryName(String jaasConfigEntryName)
     {
@@ -338,6 +338,11 @@ public abstract class BaseKerberosAuthenticationFilter extends BaseSSOAuthentica
                     // Filter validate hook
                     if (getLogger().isDebugEnabled())
                         getLogger().debug("Authenticated with a ticket parameter.");
+
+                    if (user == null)
+                    {
+                        user = (SessionUser) httpSess.getAttribute(getUserAttributeName());
+                    }
                     onValidate( context, req, resp, new TicketCredentials(user.getTicket()));
 
                     // Chain to the next filter
@@ -612,8 +617,9 @@ public abstract class BaseKerberosAuthenticationFilter extends BaseSSOAuthentica
     /**
      * Restart the Kerberos logon process
      * 
+     * @param context ServletContext
+     * @param req HttpServletRequest
      * @param resp HttpServletResponse
-     * @param httpSess HttpSession
      * @throws IOException
      */
     public void restartLoginChallenge(ServletContext context, HttpServletRequest req, HttpServletResponse resp) throws IOException
@@ -628,12 +634,12 @@ public abstract class BaseKerberosAuthenticationFilter extends BaseSSOAuthentica
         logonStartAgain(context, req, resp);
     }
     
-
     /**
      * The logon to start again
-     * 
+     *
+     * @param context ServletContext
+     * @param req HttpServletRequest
      * @param resp HttpServletResponse
-     * @param httpSess HttpSession
      * @throws IOException
      */
     public void logonStartAgain(ServletContext context, HttpServletRequest req, HttpServletResponse resp) throws IOException

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -59,12 +59,14 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
     private static final String SELECT_NODES_BY_TYPE_AND_NAME_PATTERN = "alfresco.patch.select_nodesByTypeAndNamePattern";
     
     private static final String UPDATE_CONTENT_MIMETYPE_ID = "alfresco.patch.update_contentMimetypeId";
+    private static final String UPDATE_PERSON_SIZECURRENT_TYPE = "alfresco.patch.update_fixSizeCurrentType";
     
     private static final String SELECT_COUNT_NODES_WITH_ASPECTS = "alfresco.patch.select_CountNodesWithAspectIds";
     
     private static final String SELECT_NODES_BY_TYPE_QNAME = "alfresco.patch.select_NodesByTypeQName";
     private static final String SELECT_NODES_BY_TYPE_URI = "alfresco.patch.select_NodesByTypeUriId";
     private static final String SELECT_NODES_BY_ASPECT_QNAME = "alfresco.patch.select_NodesByAspectQName";
+    private static final String SELECT_NODES_BY_TYPE_AND_ASPECT_QNAME = "alfresco.patch.select_NodesByTypeAndAspectQNameQName";
     private static final String SELECT_NODES_BY_CONTENT_MIMETYPE = "alfresco.patch.select_NodesByContentMimetype";
     
     private static final String SELECT_COUNT_NODES_WITH_TYPE_ID = "alfresco.patch.select_CountNodesWithTypeId";
@@ -142,6 +144,15 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("newMimetypeId", newMimetypeId);
         params.put("oldMimetypeId", oldMimetypeId);
         return template.update(UPDATE_CONTENT_MIMETYPE_ID, params);
+    }
+    
+    @Override
+    public int updatePersonSizeCurrentType()
+    {
+        Map<String, Object> params = new HashMap<String, Object>(2);
+        Long sizeCurrentPropQNameId = qnameDAO.getOrCreateQName(ContentModel.PROP_SIZE_CURRENT).getFirst();
+        params.put("sizeCurrentQNameId", sizeCurrentPropQNameId);
+        return template.update(UPDATE_PERSON_SIZECURRENT_TYPE, params);
     }
     
     @Override
@@ -247,6 +258,18 @@ public class PatchDAOImpl extends AbstractPatchDAOImpl
         params.put("minNodeId", minNodeId);
         params.put("maxNodeId", maxNodeId);
         return template.selectList(SELECT_NODES_BY_CONTENT_MIMETYPE, params);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Long> getNodesByTypeQNameAndAspectQNameId(long typeQNameId, long aspectQNameId, long minNodeId, long maxNodeId)
+    {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("qnameId1", typeQNameId);
+        params.put("qnameId2", aspectQNameId);
+        params.put("minNodeId", minNodeId);
+        params.put("maxNodeId", maxNodeId);
+        return template.selectList(SELECT_NODES_BY_TYPE_AND_ASPECT_QNAME, params);
     }
 
     @Override

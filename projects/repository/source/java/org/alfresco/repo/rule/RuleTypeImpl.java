@@ -114,7 +114,7 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
     }
     
     /**
-     * @see org.alfresco.service.cmr.rule.RuleType#triggerRuleType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.service.cmr.rule.RuleType#triggerRuleType(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, boolean)
      */
     public void triggerRuleType(NodeRef nodeRef, NodeRef actionedUponNodeRef, boolean executeRuleImmediately)
     {
@@ -149,7 +149,8 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
                     }
                     
                     // Only queue if the rule is not disabled
-                    if (rule.getRuleDisabled() == false && ruleService.rulesEnabled(ruleService.getOwningNodeRef(rule)))
+                    boolean exists = nodeService.exists(rule.getNodeRef());
+                    if (exists && rule.getRuleDisabled() == false && ruleService.rulesEnabled(ruleService.getOwningNodeRef(rule)))
                     {
                         if (logger.isDebugEnabled() == true)
                         {
@@ -168,7 +169,16 @@ public class RuleTypeImpl extends CommonResourceAbstractBase implements RuleType
                     }
                     else if (logger.isDebugEnabled() == true)
                     {
-                        logger.debug("Disabled rule" + ruleContext);
+                        String message = null;
+                        if (exists)
+                        {
+                            message = "Disabled rule " + ruleContext;
+                        }
+                        else
+                        {
+                            message = "Rule " + rule.getNodeRef() + "no longer exist";
+                        }
+                        logger.debug(message);
                     }
                 }
             }

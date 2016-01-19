@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,9 +25,11 @@ import org.alfresco.opencmis.dictionary.CMISDictionaryService;
 import org.alfresco.opencmis.search.CMISQueryService;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.forms.FormService;
+import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.imap.ImapService;
 import org.alfresco.repo.lock.JobLockService;
 import org.alfresco.repo.nodelocator.NodeLocatorService;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper;
 import org.alfresco.repo.search.impl.solr.facet.handler.FacetLabelDisplayHandlerRegistry;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -45,12 +47,13 @@ import org.alfresco.service.cmr.ml.ContentFilterLanguagesService;
 import org.alfresco.service.cmr.ml.EditionService;
 import org.alfresco.service.cmr.ml.MultilingualContentService;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.notification.NotificationService;
 import org.alfresco.service.cmr.rating.RatingService;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
-import org.alfresco.service.cmr.repository.CrossRepositoryCopyService;
+import org.alfresco.service.cmr.repository.DocumentLinkService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.ScriptService;
@@ -139,16 +142,22 @@ public interface ServiceRegistry
     static final QName BLOG_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "BlogService");
     static final QName CALENDAR_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CalendarService");
     static final QName NOTIFICATION_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "NotificationService");
+    static final QName DOCUMENT_LINK_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "DocumentLinkService");
     
+    static final QName MESSAGE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "MessageService");
     // CMIS
     static final QName CMIS_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CMISService");
-    static final QName CMIS_DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CMISDictionaryService");
-    static final QName CMIS_QUERY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "CMISQueryService");
+    static final QName CMIS_DICTIONARY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "OpenCMISDictionaryService");
+    static final QName CMIS_QUERY_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "OpenCMISQueryService");
     static final QName IMAP_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ImapService");
     
     static final QName PUBLIC_SERVICE_ACCESS_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "PublicServiceAccessService");
     
     static final QName WEBDAV_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "webdavService");
+    
+    static final QName MODULE_SERVICE = QName.createQName(NamespaceService.ALFRESCO_URI, "ModuleService");
+    
+    static final QName POLICY_COMPONENT = QName.createQName(NamespaceService.ALFRESCO_URI, "policyComponent");
 
     /**
      * Get the list of services provided by the Repository
@@ -178,12 +187,16 @@ public interface ServiceRegistry
 
     /**
      * @return the descriptor service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     DescriptorService getDescriptorService();
 
     /**
      * @return the transaction service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     TransactionService getTransactionService();
@@ -226,6 +239,8 @@ public interface ServiceRegistry
 
     /**
      * @return the content filter languages service (or null, if one is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ContentFilterLanguagesService getContentFilterLanguagesService();
@@ -280,18 +295,24 @@ public interface ServiceRegistry
 
     /**
      * @return the importer service or null if not present
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ImporterService getImporterService();
 
     /**
      * @return the exporter service or null if not present
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ExporterService getExporterService();
 
     /**
      * @return the rule service (or null, if one is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     RuleService getRuleService();
@@ -328,6 +349,8 @@ public interface ServiceRegistry
 
     /**
      * @return the script execution service (or null if one is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ScriptService getScriptService();
@@ -340,19 +363,25 @@ public interface ServiceRegistry
     
     /**
      * @return the notification service (or null if on is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     NotificationService getNotificationService();
 
     /**
      * @return the audit service (or null if one is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     AuditService getAuditService();
 
     /**
      * Get the ownable service (or null if one is not provided)
-     * @return
+     * @return OwnableService
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     OwnableService getOwnableService();
@@ -377,18 +406,24 @@ public interface ServiceRegistry
 
     /**
      * Get the Multilingual Content Service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     MultilingualContentService getMultilingualContentService();
 
     /**
      * Get the Edition Service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     EditionService getEditionService();
     
     /**
      * Get the Thumbnail Service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ThumbnailService getThumbnailService();
@@ -401,6 +436,8 @@ public interface ServiceRegistry
     
     /**
      * Get the form service (or null if one is not provided)
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     FormService getFormService();
@@ -427,6 +464,8 @@ public interface ServiceRegistry
      * Get the blog service (or null if one is not provided)
      * 
      * @since 4.0
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     BlogService getBlogService();
@@ -435,6 +474,8 @@ public interface ServiceRegistry
      * Get the calendar service (or null if one is not provided)
      * 
      * @since 4.0
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     CalendarService getCalendarService();
@@ -442,6 +483,8 @@ public interface ServiceRegistry
     /**
      * Get the invitation service (or null if one is not provided)
      * @return the invitation service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     InvitationService getInvitationService();
@@ -449,6 +492,8 @@ public interface ServiceRegistry
     /**
      * Get the CMIS Dictionary service (or null if one is not provided)
      * @return the CMIS Dictionary service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     CMISDictionaryService getCMISDictionaryService();
@@ -456,6 +501,8 @@ public interface ServiceRegistry
     /**
      * Get the CMIS Query service (or null if one is not provided)
      * @return the CMIS Query service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     CMISQueryService getCMISQueryService();
@@ -463,20 +510,26 @@ public interface ServiceRegistry
     /**
      * Get the IMAP service (or null if one is not provided)
      * @return the IMAP service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     ImapService getImapService();
     
     /**
-     * Get the IMAP service (or null if one is not provided)
-     * @return the IMAP service
+     * Get the Public Service Access service (or null if one is not provided)
+     * @return the Public Service Access service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     PublicServiceAccessService getPublicServiceAccessService();
     
     /**
      * Get the repo admin service (or null if one is not provided)
-     * @return the invitation service
+     * @return the repo admin service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     RepoAdminService getRepoAdminService();
@@ -484,6 +537,8 @@ public interface ServiceRegistry
     /**
      * Get the sys admin params helper bean.
      * @return the sys admin params bean.
+     * @deprecated This method has been deprecated as it would return an object that is not part of the public API. 
+     * The object itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     SysAdminParams getSysAdminParams();
@@ -491,13 +546,24 @@ public interface ServiceRegistry
     /**
      * Get the webdav service / helper bean.
      * @return the webdav service / helper bean
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     WebDavService getWebDavService();
     
     /**
+     * Get the module service bean.
+     * @return the module service bean
+     */
+    @NotAuditable
+    ModuleService getModuleService();
+    
+    /**
      * Get the Solr facet helper bean
      * @return the Solr facet helper bean
+     * @deprecated This method has been deprecated as it would return an object that is not part of the public API. 
+     * The object itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     SolrFacetHelper getSolrFacetHelper();
@@ -505,7 +571,32 @@ public interface ServiceRegistry
     /**
      * Get the facet label display handler registry bean
      * @return the Facet label display handler registry bean
+     * @deprecated This method has been deprecated as it would return an object that is not part of the public API. 
+     * The object itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
      */
     @NotAuditable
     FacetLabelDisplayHandlerRegistry getFacetLabelDisplayHandlerRegistry();
+    
+    /**
+     * Get the Message service bean.
+     * @return the Message service bean
+     */
+    @NotAuditable
+    MessageService getMessageService();
+
+    /**
+     * Get the document link service
+     * @return the document link service
+     * @deprecated This method has been deprecated as it would return a service that is not part of the public API. 
+     * The service itself is not deprecated, but access to it via the ServiceRegistry will be removed in the future.
+     */
+    @NotAuditable
+    DocumentLinkService getDocumentLinkService();
+    
+    /**
+     * Get the policy component
+     * @return The policy component
+     */
+    @NotAuditable
+    PolicyComponent getPolicyComponent();
 }

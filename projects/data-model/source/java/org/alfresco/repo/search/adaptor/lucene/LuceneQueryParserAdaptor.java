@@ -40,23 +40,23 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
 {
 
     /**
-     * @param field
-     * @param queryText
-     * @param analysisMode
-     * @param luceneFunction
-     * @return
+     * @param field String
+     * @param queryText String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @return Q
      */
     Q getFieldQuery(String field, String queryText, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param field
-     * @param lower
-     * @param upper
-     * @param includeLower
-     * @param includeUpper
-     * @param analysisMode
-     * @param luceneFunction
-     * @return
+     * @param field String
+     * @param lower String
+     * @param upper String
+     * @param includeLower boolean
+     * @param includeUpper boolean
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @return Q
      */
     Q getRangeQuery(String field, String lower, String upper, boolean includeLower, boolean includeUpper, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
@@ -64,7 +64,7 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * A query that matches all docs
      * 
-     * @return
+     * @return Q
      * @throws E
      */
     Q getMatchAllQuery() throws E;
@@ -72,156 +72,157 @@ public interface LuceneQueryParserAdaptor<Q, S, E extends Throwable>
     /**
      * A query that matches no docs.
      * 
-     * @return
+     * @return Q
      * @throws E
      */
     Q getMatchNoneQuery() throws E;
 
     /**
-     * @param field
-     * @param sqlLikeClause
-     * @param analysisMode
-     * @return
+     * @param field String
+     * @param sqlLikeClause String
+     * @param analysisMode AnalysisMode
+     * @return Q
      */
     Q getLikeQuery(String field, String sqlLikeClause, AnalysisMode analysisMode) throws E;
 
     /**
-     * @return
+     * @return SearchParameters
      */
     SearchParameters getSearchParameters();
 
     /**
-     * @param field
-     * @return
+     * @param field String
+     * @return String
      */
     String getSortField(String field) throws E;
 
     /**
      * Wrap generating a potentially complex id + version query
      * 
-     * @param field
-     * @param stringValue
-     * @param analysisMode
-     * @param luceneFunction
-     * @return
+     * @param field String
+     * @param stringValue String
+     * @param analysisMode AnalysisMode
+     * @param luceneFunction LuceneFunction
+     * @return Q
      */
     Q getIdentifierQuery(String field, String stringValue, AnalysisMode analysisMode, LuceneFunction luceneFunction) throws E;
 
     /**
      * Wrap generating a potentially complex id + version query
      * 
-     * @param field
-     * @param stringValue
-     * @param identifier
-     * @return
+     * @param field String
+     * @param stringValue String
+     * @param analysisMode AnalysisMode
+     * @return Q
      */
     Q getIdentifieLikeQuery(String field, String stringValue, AnalysisMode analysisMode) throws E;
 
     /**
-     * @param noLocalField
-     * @return
+     * @param noLocalField String
+     * @return boolean
      */
     boolean sortFieldExists(String noLocalField);
 
     /**
-     * @param field
-     * @param value
-     * @return
-     * @throws ParseException 
+     * @param field String
+     * @param value String
+     * @return Q
+     * @throws E
      */
     Q getFieldQuery(String field, String value) throws E;
 
     /**
-     * @param list 
-     * @param functionContext 
-     * @return
+     * @param list List
+     * @param functionContext FunctionEvaluationContext
+     * @return S
      * @throws E 
      */
     S buildSort(List<Ordering> list, FunctionEvaluationContext functionContext) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param minSimilarity
-     * @return
-     * @throws ParseException 
+     * @param luceneFieldName String
+     * @param term String
+     * @param minSimilarity Float
+     * @return Q
+     * @throws E
      */
     Q getFuzzyQuery(String luceneFieldName, String term, Float minSimilarity) throws E;
 
     /**
      * Get the default field
      * 
-     * @return
+     * @return String
      */
     String getField();
 
     /**
      * Get the default phrase slop
      * 
-     * @return
+     * @return int
      */
     int getPhraseSlop();
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param analysisMode
-     * @param slop
-     * @param luceneFunction
-     * @return
+     * @param luceneFieldName String
+     * @param term String
+     * @param analysisMode AnalysisMode
+     * @param slop Integer
+     * @param luceneFunction LuceneFunction
+     * @return Q
      */
     Q getFieldQuery(String luceneFieldName, String term, AnalysisMode analysisMode, Integer slop, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param analysisMode
-     * @return
+     * @param luceneFieldName String
+     * @param term String
+     * @param analysisMode AnalysisMode
+     * @return Q
      */
     Q getPrefixQuery(String luceneFieldName, String term, AnalysisMode analysisMode) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param first
-     * @param last
-     * @param slop
-     * @param inOrder
-     * @return
+     * @param luceneFieldName String
+     * @param first String
+     * @param last String
+     * @param slop int
+     * @param inOrder boolean
+     * @return Q
      */
     Q getSpanQuery(String luceneFieldName, String first, String last, int slop, boolean inOrder) throws E;
 
     /**
-     * @param luceneFieldName
-     * @param term
-     * @param mode
-     * @return
+     * @param luceneFieldName String
+     * @param term String
+     * @param mode AnalysisMode
+     * @return Q
      */
     Q getWildcardQuery(String luceneFieldName, String term, AnalysisMode mode) throws E;
     
     /**
      * Invert a query - add a mandatory must not match anything query alnogside 
      * 
-     * @param query
-     * @return
+     * @param query Q
+     * @return Q
      */
     Q getNegatedQuery(Q query) throws E;
     
     /**
      * Utility to build conjunctions, disjunctions and negation
-     * @return
+     * @return LuceneQueryParserExpressionAdaptor
      */
     LuceneQueryParserExpressionAdaptor<Q, E> getExpressionAdaptor();
 
     /**
      * A query that matches all alfresco nodes (not extra stuff that may be in the underlying index)
      * 
-     * @return
+     * @return Q
      */
     Q getMatchAllNodesQuery();
 
     /**
-     * @param propertyDef
-     * @return
+     * @param field String
+     * @param propertyDef PropertyDefinition
+     * @return String
      */
     String getDatetimeSortField(String field, PropertyDefinition propertyDef); 
 }

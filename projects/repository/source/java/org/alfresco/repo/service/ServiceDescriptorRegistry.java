@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -24,9 +24,11 @@ import org.alfresco.opencmis.dictionary.CMISDictionaryService;
 import org.alfresco.opencmis.search.CMISQueryService;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.forms.FormService;
+import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.imap.ImapService;
 import org.alfresco.repo.lock.JobLockService;
 import org.alfresco.repo.nodelocator.NodeLocatorService;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.search.impl.solr.facet.SolrFacetHelper;
 import org.alfresco.repo.search.impl.solr.facet.handler.FacetLabelDisplayHandlerRegistry;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -45,11 +47,13 @@ import org.alfresco.service.cmr.ml.ContentFilterLanguagesService;
 import org.alfresco.service.cmr.ml.EditionService;
 import org.alfresco.service.cmr.ml.MultilingualContentService;
 import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.notification.NotificationService;
 import org.alfresco.service.cmr.rating.RatingService;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.DocumentLinkService;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.ScriptService;
@@ -413,12 +417,18 @@ public class ServiceDescriptorRegistry
         return (PublicServiceAccessService)getService(PUBLIC_SERVICE_ACCESS_SERVICE);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getRepoAdminService()
+     */
     @Override
     public RepoAdminService getRepoAdminService()
     {
         return (RepoAdminService)getService(REPO_ADMIN_SERVICE);
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getSysAdminParams()
+     */
     @Override
     public SysAdminParams getSysAdminParams()
     {
@@ -426,10 +436,22 @@ public class ServiceDescriptorRegistry
         return (SysAdminParams) beanFactory.getBean(beanName);
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getWebDavService()
+     */
     @Override
     public WebDavService getWebDavService()
     {
         return (WebDavService)getService(WEBDAV_SERVICE);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.service.ServiceRegistry#getModelService()
+     */
+    @Override
+    public ModuleService getModuleService()
+    {
+        return (ModuleService) getService(MODULE_SERVICE);
     }
     
     @Override
@@ -444,5 +466,22 @@ public class ServiceDescriptorRegistry
     {
         final String beanName = "facet.facetLabelDisplayHandlerRegistry";
         return (FacetLabelDisplayHandlerRegistry) beanFactory.getBean(beanName);
+    }
+
+    @Override
+    public MessageService getMessageService() 
+    {
+        return (MessageService)getService(MESSAGE_SERVICE);
+    }
+    
+    @Override
+    public DocumentLinkService getDocumentLinkService() 
+    {
+        return (DocumentLinkService)getService(DOCUMENT_LINK_SERVICE);
+    }
+    
+    public PolicyComponent getPolicyComponent()
+    {
+        return (PolicyComponent)beanFactory.getBean(POLICY_COMPONENT.getLocalName());
     }
 }

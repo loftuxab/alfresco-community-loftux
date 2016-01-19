@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -159,6 +159,8 @@ public class SearchParameters implements BasicSearchParameters
     private ArrayList<FieldFacet> fieldFacets = new ArrayList<FieldFacet>();
     
     private List<String> facetQueries = new ArrayList<String>();
+    
+    private List<String> filterQueries = new ArrayList<String>();
 
     private Boolean useInMemorySort;
     
@@ -219,6 +221,7 @@ public class SearchParameters implements BasicSearchParameters
         sp.queryConsistency = this.queryConsistency;
         sp.sinceTxId = this.sinceTxId;
         sp.facetQueries.addAll(this.facetQueries);
+        sp.filterQueries.addAll(this.filterQueries);
         sp.searchTerm = this.searchTerm;
         sp.spellCheck = this.spellCheck;
         return sp;
@@ -227,7 +230,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Construct from Query Options
      * 
-     * @param options
+     * @param options QueryOptions
      */
     public SearchParameters(QueryOptions options)
     {
@@ -303,7 +306,7 @@ public class SearchParameters implements BasicSearchParameters
      * Set the stores to be supported - currently there can be only one. Searching across multiple stores is on the todo
      * list.
      * 
-     * @param store
+     * @param store StoreRef
      */
     public void addStore(StoreRef store)
     {
@@ -313,7 +316,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add parameter definitions for the query - used to parameterise the query string
      * 
-     * @param queryParameterDefinition
+     * @param queryParameterDefinition QueryParameterDefinition
      */
     public void addQueryParameterDefinition(QueryParameterDefinition queryParameterDefinition)
     {
@@ -327,7 +330,7 @@ public class SearchParameters implements BasicSearchParameters
      * set to avoid that performance hit if you know you do not want to find results that are yet to be committed (this
      * includes creations, deletions and updates)
      * 
-     * @param excludeDataInTheCurrentTransaction
+     * @param excludeDataInTheCurrentTransaction boolean
      */
     public void excludeDataInTheCurrentTransaction(boolean excludeDataInTheCurrentTransaction)
     {
@@ -403,7 +406,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set the default operator for query elements when they are not explicit in the query.
      * 
-     * @param defaultOperator
+     * @param defaultOperator Operator
      */
     public void setDefaultOperator(Operator defaultOperator)
     {
@@ -434,7 +437,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set how the result set should be limited.
      * 
-     * @param limitBy
+     * @param limitBy LimitBy
      */
     public void setLimitBy(LimitBy limitBy)
     {
@@ -454,7 +457,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Set when permissions are evaluated.
      * 
-     * @param permissionEvaluation
+     * @param permissionEvaluation PermissionEvaluationMode
      */
     public void setPermissionEvaluation(PermissionEvaluationMode permissionEvaluation)
     {
@@ -474,7 +477,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * If limiting the result set in some way, set the limiting value used.
      * 
-     * @param limit
+     * @param limit int
      */
     public void setLimit(int limit)
     {
@@ -496,7 +499,7 @@ public class SearchParameters implements BasicSearchParameters
      * Set the way in which multilingual fields are treated durig a search. This controls in which locales an
      * multilingual fields will match.
      * 
-     * @param mlAnalaysisMode
+     * @param mlAnalaysisMode MLAnalysisMode
      */
     public void setMlAnalaysisMode(MLAnalysisMode mlAnalaysisMode)
     {
@@ -506,7 +509,7 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add a locale to include for multi-lingual text searches. If non are set, the default is to use the user's locale.
      * 
-     * @param locale
+     * @param locale Locale
      */
     public void addLocale(Locale locale)
     {
@@ -685,8 +688,8 @@ public class SearchParameters implements BasicSearchParameters
     /**
      * Add/replace a query template Not all languages support query templates
      * 
-     * @param name
-     * @param template
+     * @param name String
+     * @param template String
      * @return any removed template or null
      */
     public String addQueryTemplate(String name, String template)
@@ -755,7 +758,7 @@ public class SearchParameters implements BasicSearchParameters
     }
 
     /**
-     * @param isBulkFetchEnabled 
+     * @param isBulkFetchEnabled boolean
      */
     public void setBulkFetchEnabled(boolean isBulkFetchEnabled)
     {
@@ -874,6 +877,16 @@ public class SearchParameters implements BasicSearchParameters
         facetQueries.add(facetQuery);
     } 
     
+    public List<String> getFilterQueries()
+    {
+        return filterQueries;
+    }
+    
+    public void addFilterQuery(String filterQuery)
+    {
+        filterQueries.add(filterQuery);
+    } 
+    
     public Locale getSortLocale()
     {
         List<Locale> locales = getLocales();
@@ -929,7 +942,7 @@ public class SearchParameters implements BasicSearchParameters
 
     /**
      * If not null, then the search should only include results from transactions after {@code sinceTxId}.
-     * @param sinceTxId
+     * @param sinceTxId Long
      */
     public void setSinceTxId(Long sinceTxId)
     {
@@ -941,7 +954,14 @@ public class SearchParameters implements BasicSearchParameters
      */
     public String getSearchTerm()
     {
-        return this.searchTerm;
+        if((searchTerm == null) || (searchTerm.length() == 0))
+        {
+            return getQuery();
+        }
+        else
+        {
+            return this.searchTerm;
+        }
     }
 
     /**
@@ -1005,6 +1025,7 @@ public class SearchParameters implements BasicSearchParameters
         result = prime * result + ((useInMemorySort == null) ? 0 : useInMemorySort.hashCode());
         result = prime * result + ((sinceTxId == null) ? 0 : sinceTxId.hashCode());
         result = prime * result + ((facetQueries.isEmpty()) ? 0 : facetQueries.hashCode());
+        result = prime * result + ((filterQueries.isEmpty()) ? 0 : filterQueries.hashCode());
         result = prime * result + ((searchTerm == null) ? 0 : searchTerm.hashCode());
         result = prime * result + (spellCheck ? 1231 : 1237);
         return result;
@@ -1156,6 +1177,8 @@ public class SearchParameters implements BasicSearchParameters
             return false;
         if (!facetQueries.equals(other.facetQueries))
             return false;
+        if (!filterQueries.equals(other.filterQueries))
+            return false;
         if (searchTerm == null)
         {
             if (other.searchTerm != null)
@@ -1194,6 +1217,7 @@ public class SearchParameters implements BasicSearchParameters
                     .append(", maxPermissionCheckTimeMillis=").append(this.maxPermissionCheckTimeMillis)
                     .append(", defaultFieldName=").append(this.defaultFieldName).append(", fieldFacets=")
                     .append(this.fieldFacets).append(", facetQueries=").append(this.facetQueries)
+                    .append(this.filterQueries).append(", filterQueries=").append(this.filterQueries)
                     .append(", useInMemorySort=").append(this.useInMemorySort)
                     .append(", maxRawResultSetSizeForInMemorySort=").append(this.maxRawResultSetSizeForInMemorySort)
                     .append(", extraParameters=").append(this.extraParameters).append(", excludeTenantFilter=")
@@ -1220,7 +1244,7 @@ public class SearchParameters implements BasicSearchParameters
         String field;
         String prefix = null;
         FieldFacetSort sort = null;
-        int limit = 100;
+        Integer limitOrNull = null;
         int offset = 0;
         int minCount = 0;
         boolean countDocsMissingFacetField = false;
@@ -1262,14 +1286,32 @@ public class SearchParameters implements BasicSearchParameters
             this.sort = sort;
         }
 
+        @Deprecated 
+        /**
+         * Will return 100 as the old default but this is now defined in configuration and will be wrong if no explicitly set
+         * 
+         * @return
+         */
         public int getLimit()
         {
-            return limit;
+            return limitOrNull == null ? 100 : limitOrNull.intValue();
         }
 
+        @Deprecated
         public void setLimit(int limit)
         {
-            this.limit = limit;
+            this.limitOrNull = limit;
+        }
+        
+        public void setLimitOrNull(Integer limitOrNull)
+        {
+            this.limitOrNull = limitOrNull;
+        }
+        
+        
+        public Integer getLimitOrNull()
+        {
+            return limitOrNull;
         }
 
         public int getOffset()
@@ -1330,7 +1372,7 @@ public class SearchParameters implements BasicSearchParameters
             result = prime * result + (countDocsMissingFacetField ? 1231 : 1237);
             result = prime * result + enumMethodCacheMinDF;
             result = prime * result + ((field == null) ? 0 : field.hashCode());
-            result = prime * result + limit;
+            result = prime * result + ((limitOrNull == null) ? 0 : limitOrNull.hashCode());
             result = prime * result + ((method == null) ? 0 : method.hashCode());
             result = prime * result + minCount;
             result = prime * result + offset;
@@ -1360,7 +1402,12 @@ public class SearchParameters implements BasicSearchParameters
             }
             else if (!field.equals(other.field))
                 return false;
-            if (limit != other.limit)
+            if (limitOrNull == null)
+            {
+                if (other.limitOrNull != null)
+                    return false;
+            }
+            else if (!limitOrNull.equals(other.limitOrNull))
                 return false;
             if (method != other.method)
                 return false;
@@ -1384,10 +1431,10 @@ public class SearchParameters implements BasicSearchParameters
     }
     
     /**
-     * @param length
-     * @param useInMemorySort2
-     * @param maxRawResultSetSizeForInMemorySort2
-     * @return
+     * @param length int
+     * @param useInMemorySortDefault boolean
+     * @param maxRawResultSetSizeForInMemorySortDefault int
+     * @return boolean
      */
     public boolean usePostSort(int length, boolean useInMemorySortDefault, int maxRawResultSetSizeForInMemorySortDefault)
     {

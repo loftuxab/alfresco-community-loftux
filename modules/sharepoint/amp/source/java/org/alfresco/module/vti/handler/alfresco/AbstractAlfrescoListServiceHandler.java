@@ -28,7 +28,6 @@ import org.alfresco.repo.calendar.CalendarServiceImpl;
 import org.alfresco.repo.discussion.DiscussionServiceImpl;
 import org.alfresco.repo.links.LinksModel;
 import org.alfresco.repo.links.LinksServiceImpl;
-import org.alfresco.repo.wiki.WikiServiceImpl;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +42,7 @@ public abstract class AbstractAlfrescoListServiceHandler implements ListServiceH
     protected static Log logger = LogFactory.getLog(AbstractAlfrescoListServiceHandler.class);
     
     protected static final String DATALIST_CONTAINER = "dataLists";
+    protected static final String WIKI_CONTAINER = "wiki";
 
     // These are commonly used Types
     public static final ListTypeBean TYPE_DOCUMENT_LIBRARY = buildType(VtiBuiltInListType.DOCLIB);
@@ -98,7 +98,7 @@ public abstract class AbstractAlfrescoListServiceHandler implements ListServiceH
        XML_FORMS(115, VtiListBaseType.GENERIC_LIST, "xmlform", null, null),
        NO_CODE_WORKFLOWS(117, VtiListBaseType.GENERIC_LIST, "nocodewf", null, null),
        CUSTOM_WORKFLOWS(118, VtiListBaseType.GENERIC_LIST, "workflowProcess", null, null),
-       WIKI(119, VtiListBaseType.GENERIC_LIST, "webpagelib", WikiServiceImpl.WIKI_COMPONENT, ContentModel.TYPE_CONTENT),
+       WIKI(119, VtiListBaseType.GENERIC_LIST, "webpagelib", WIKI_CONTAINER, ContentModel.TYPE_CONTENT),
        GRID_LIST(120, VtiListBaseType.GENERIC_LIST, "gridlist", null, null),
        NO_CODE_PUBLIC_WORKFLOWS(122, VtiListBaseType.GENERIC_LIST, "nocodepublicwf", null, null),
        ISSUE(1100, VtiListBaseType.ISSUE, "issue", DATALIST_CONTAINER, DataListModel.TYPE_ISSUE),

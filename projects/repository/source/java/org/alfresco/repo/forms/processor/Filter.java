@@ -21,6 +21,7 @@ package org.alfresco.repo.forms.processor;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
 
@@ -30,6 +31,7 @@ import org.alfresco.repo.forms.FormData;
  *
  * @author Gavin Cornwell
  */
+@AlfrescoPublicApi
 public interface Filter<ItemType, PersistType>
 {
     /**
@@ -52,7 +54,7 @@ public interface Filter<ItemType, PersistType>
      * @param fields Restricted list of fields to include
      * @param forcedFields List of fields to forcibly include
      * @param form The Form object
-     * @param @param context Map representing optional context that
+     * @param context Map representing optional context that
      *                can be used during retrieval of the form
      */
     public void beforeGenerate(ItemType item, List<String> fields, List<String> forcedFields, 

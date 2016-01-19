@@ -49,11 +49,6 @@ public class PropertyAccessor extends BaseFunction
         args.put(ARG_PROPERTY, new BaseArgumentDefinition(Multiplicity.SINGLE_VALUED, ARG_PROPERTY, DataTypeDefinition.ANY, true));
     }
 
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public PropertyAccessor()
     {
         super(NAME, DataTypeDefinition.ANY, args);

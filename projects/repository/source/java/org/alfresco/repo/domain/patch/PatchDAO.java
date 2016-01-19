@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -21,6 +21,8 @@ package org.alfresco.repo.domain.patch;
 import java.util.List;
 import java.util.Set;
 
+
+import org.alfresco.repo.domain.node.NodeDAO;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
@@ -36,6 +38,10 @@ public interface PatchDAO
 {
     // DM-related
     
+    /**
+     * @deprecated in 4.1: use {@link NodeDAO#getMaxNodeId()}
+     */
+    @Deprecated
     public long getMaxAdmNodeID();
     
     /**
@@ -46,6 +52,13 @@ public interface PatchDAO
      * @return                  the number of rows affected
      */
     public int updateContentMimetypeIds(Long oldMimetypeId, Long newMimetypeId);
+    
+    /**
+     * Update all <b>alf_node_properties</b> of 'sizeCurrent' name to have correct persisted type of Long.
+     * 
+     * @return                  the number of rows affected
+     */
+    public int updatePersonSizeCurrentType();
     
     /**
      * Query for a list of nodes that have a given type and share the same name pattern (SQL LIKE syntax)
@@ -97,6 +110,16 @@ public interface PatchDAO
      * @return          IDs of the nodes
      */
     public List<Long> getNodesByContentPropertyMimetypeId(Long mimetypeId, Long minNodeId, Long maxNodeId);
+
+    /**
+     * Find all the nodes ids with the given aspect and type
+     * @param typeQNameId - the id of the type qname
+     * @param aspectQNameId - the id of the aspect qname
+     * @param minNodeId - min node id in the result set - inclusive
+     * @param maxNodeId - max node id in the result set - exclusive
+     * @return List
+     */
+    public List<Long> getNodesByTypeQNameAndAspectQNameId(long typeQNameId, long aspectQNameId, long minNodeId, long maxNodeId);
     
     /**
      * Gets the total number of nodes which match the given Type QName.

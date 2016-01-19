@@ -128,7 +128,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
             
             // Click 'Change Type' action
             ChangeTypePage changeTypePage = detailsPage.selectChangeType().render();
@@ -183,7 +183,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
             String[] fileInfo = { fileName, DOCLIB };
             ShareUser.uploadFileInFolder(drone, fileInfo);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
             
             // Click "Edit Properties" in Actions section;
             EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -242,7 +242,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
             // Click Start Workflow from Actions section
 
@@ -320,7 +320,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
             // Click Start Workflow from Actions section
 
             StartWorkFlowPage startWorkFlowPage = ShareUserWorkFlow.selectStartWorkFlowFromDetailsPage(drone).render();
@@ -390,7 +390,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
             AddCommentForm addCommentForm = detailsPage.clickAddCommentButton();
 
             // 1. Type any text and make it bold;
@@ -469,7 +469,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
             Assert.assertEquals(documentLibraryPage.getFileDirectoryInfo(fileName).getCommentsCount(), 1);
 
             // Go to Details page and delete the comment
-            detailsPage = documentLibraryPage.selectFile(fileName);
+            detailsPage = documentLibraryPage.selectFile(fileName).render();
             detailsPage.removeComment(text);
 
             // Go to document library and verify comment counter
@@ -539,7 +539,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(customDrone, siteName);
             // Document details page has been opened;
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             Assert.assertFalse(detailsPage.getDocumentVersion().equals("1.0"));
 
             // Click Download icon for previous version;
@@ -604,7 +604,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
 
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
-           DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+           DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
 
             // Click Start Workflow from Actions section
 
@@ -676,7 +676,7 @@ public class DocumentDetailsActionsTest extends AbstractUtils
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
             // TODO: Use util as adobe
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
             
             // Click Start Workflow from Actions section
             StartWorkFlowPage startWorkFlowPage = detailsPage.selectStartWorkFlowIcon().render();

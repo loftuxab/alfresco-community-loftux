@@ -60,7 +60,7 @@ public class StandardNodeCrawlerImpl implements NodeCrawler
     }
 
     /**
-     * @param serviceRegistry
+     * @param serviceRegistry ServiceRegistry
      */
     public StandardNodeCrawlerImpl(ServiceRegistry serviceRegistry)
     {
@@ -69,8 +69,8 @@ public class StandardNodeCrawlerImpl implements NodeCrawler
     }
 
     /**
-     * @param nodeService
-     *            the nodeService to set
+     * @param serviceRegistry
+     *            the serviceRegistry to set
      */
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
@@ -146,8 +146,8 @@ public class StandardNodeCrawlerImpl implements NodeCrawler
     }
 
     /**
-     * @param thisNode
-     * @return
+     * @param thisNode NodeRef
+     * @return Set<NodeRef>
      */
     private Set<NodeRef> findSubsequentNodes(NodeRef thisNode)
     {
@@ -160,8 +160,8 @@ public class StandardNodeCrawlerImpl implements NodeCrawler
     }
 
     /**
-     * @param thisNode
-     * @return
+     * @param thisNode NodeRef
+     * @return boolean
      */
     private boolean includeNode(NodeRef thisNode)
     {

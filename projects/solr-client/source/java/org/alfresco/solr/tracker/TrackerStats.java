@@ -70,8 +70,8 @@ public class TrackerStats
     }
 
     /**
-     * @param modelTimes2
-     * @return
+     * @param all ConcurrentHashMap<String, IncrementalStats>
+     * @return SimpleStats
      */
     private SimpleStats aggregateResults(ConcurrentHashMap<String, IncrementalStats> all)
     {
@@ -301,17 +301,17 @@ public class TrackerStats
 
     }
 
-    static class Bucket
+    public static class Bucket
     {
         IncrementalStats incrementalStats;
 
-        double leftBoundary;
+        public double leftBoundary;
 
-        double rightBoundary;
+        public double rightBoundary;
 
-        double countLeft;
+        public double countLeft;
 
-        double countRight;
+        public double countRight;
 
         Bucket(IncrementalStats incrementalStats, double leftBoundary, double rightBoundary)
         {
@@ -375,7 +375,7 @@ public class TrackerStats
 
     }
 
-    static class IncrementalStats
+    public static class IncrementalStats
     {
         Date start = new Date();
         
@@ -395,7 +395,7 @@ public class TrackerStats
         
         InformationServerCollectionProvider server;
 
-        IncrementalStats(int scale, int buckets, InformationServerCollectionProvider infoSrv)
+        public IncrementalStats(int scale, int buckets, InformationServerCollectionProvider infoSrv)
         {
             this.scale = scale;
             this.buckets = buckets;
@@ -405,7 +405,7 @@ public class TrackerStats
         }
 
         /**
-         * @return
+         * @return ISimpleOrderedMap
          */
         public ISimpleOrderedMap<Object> getNamedList(boolean includeHist, boolean includeValues)
         {
@@ -458,7 +458,7 @@ public class TrackerStats
             return map;
         }
 
-        synchronized void reset()
+        public synchronized void reset()
         {
             moments = new double[5];
 
@@ -473,7 +473,7 @@ public class TrackerStats
             start = new Date();
         }
 
-        synchronized void add(double xUnscaled)
+        public synchronized void add(double xUnscaled)
         {
             double x = xUnscaled / scale;
             if ((moments[0] == 0) || (x > max))
@@ -514,50 +514,7 @@ public class TrackerStats
                 else if (moments[0] == buckets)
                 {
                     values.add(Double.valueOf(x));
-
-                    // generate initial bucket list
-                    Collections.sort(values);
-                    FOUND: for (int i = 0; i < values.size(); i++)
-                    {
-                        for (Bucket b : hist)
-                        {
-                            if ((b.leftBoundary <= values.get(i)) && (values.get(i) < b.rightBoundary))
-                            {
-                                b.add(values.get(i));
-                                continue FOUND;
-                            }
-
-                        }
-                        if (i < values.size() - 1)
-                        {
-                            double start = values.get(i);
-                            double end = start + 1.0D;
-
-                            END: for (int j = i + 1; j < values.size(); j++)
-                            {
-                                if (values.get(j) > start)
-                                {
-                                    end = values.get(j);
-                                    break END;
-                                }
-                            }
-
-                            Bucket b = new Bucket(this, start, end);
-                            hist.add(b);
-                        }
-                        else
-                        {
-                            double first = values.get(0);
-                            double last = values.get(values.size() - 1);
-                            double width = 1.0D;
-                            if (values.size() > 1)
-                            {
-                                width = (last - first) / (values.size() - 1);
-                            }
-                            Bucket b = new Bucket(this, last, last + width);
-                            hist.add(b);
-                        }
-                    }
+                    buildInitialBuckets();
                 }
                 else
                 {
@@ -574,7 +531,7 @@ public class TrackerStats
                             merge(bestToMerge.getFirst());
                         }
                     }
-                    else if (x > hist.get(hist.size() - 1).rightBoundary)
+                    else if (x >= hist.get(hist.size() - 1).rightBoundary)
                     {
                         double delta = (x - hist.get(hist.size() - 1).rightBoundary) / 3.0;
                         Bucket b = new Bucket(this, hist.get(hist.size() - 1).rightBoundary, x + delta);
@@ -600,12 +557,72 @@ public class TrackerStats
                         }
                         Pair<Integer, Double> bestToMerge = findBestToMerge();
                         Pair<Integer, Double> bestToSplit = findBestToSplit();
+                       
                         if (bestToMerge.getSecond() - bestToSplit.getSecond() < 0)
                         {
-                            merge(bestToMerge.getFirst());
-                            split(bestToMerge.getFirst() < bestToSplit.getFirst() ? bestToSplit.getFirst() - 1 : bestToSplit.getFirst());
+                            if(hist.size() < buckets)
+                            {
+                                split(bestToSplit.getFirst());
+                            }
+                            else
+                            {
+                                merge(bestToMerge.getFirst());
+                                split(bestToMerge.getFirst() < bestToSplit.getFirst() ? bestToSplit.getFirst() - 1 : bestToSplit.getFirst());
+                            }
                         }
                     }
+                }
+            }
+        }
+
+        /**
+         * 
+         */
+        private void buildInitialBuckets()
+        {
+            // generate initial bucket list
+            Collections.sort(values);
+            FOUND: for (int i = 0; i < values.size(); i++)
+            {
+                for (Bucket b : hist)
+                {
+                    if ((b.leftBoundary <= values.get(i)) && (values.get(i) < b.rightBoundary))
+                    {
+                        b.add(values.get(i));
+                        continue FOUND;
+                    }
+
+                }
+                if (i < values.size() - 1)
+                {
+                    double start = values.get(i);
+                    double end = start + 1.0D;
+
+                    END: for (int j = i + 1; j < values.size(); j++)
+                    {
+                        if (values.get(j) > start)
+                        {
+                            end = values.get(j);
+                            break END;
+                        }
+                    }
+
+                    Bucket b = new Bucket(this, start, end);
+                    b.add(values.get(i));
+                    hist.add(b);
+                }
+                else
+                {
+                    double first = values.get(0);
+                    double last = values.get(values.size() - 1);
+                    double width = 1.0D;
+                    if (values.size() > 1)
+                    {
+                        width = (last - first) / (values.size() - 1);
+                    }
+                    Bucket b = new Bucket(this, last, last + width);
+                    b.add(values.get(i));
+                    hist.add(b);
                 }
             }
         }
@@ -662,27 +679,27 @@ public class TrackerStats
             return new Pair<Integer, Double>(bucket, maxError);
         }
 
-        synchronized long getN()
+        public synchronized long getN()
         {
             return (long) moments[0];
         }
 
-        synchronized double getMin()
+        public synchronized double getMin()
         {
             return min;
         }
 
-        synchronized double getMax()
+        public synchronized double getMax()
         {
             return max;
         }
 
-        synchronized double getMean()
+        public synchronized double getMean()
         {
             return moments[1];
         }
 
-        synchronized double getVarience()
+        public synchronized double getVarience()
         {
             if (moments[0] > 1)
             {
@@ -694,12 +711,12 @@ public class TrackerStats
             }
         }
 
-        synchronized double getStandardDeviation()
+        public synchronized double getStandardDeviation()
         {
             return Math.sqrt(getVarience());
         }
 
-        synchronized double getSkew()
+        public synchronized double getSkew()
         {
             if (moments[0] > 2)
             {
@@ -712,7 +729,7 @@ public class TrackerStats
             }
         }
 
-        synchronized double getKurtosis()
+        public synchronized double getKurtosis()
         {
             if (moments[0] > 3)
             {
@@ -729,6 +746,17 @@ public class TrackerStats
                 return Double.NaN;
             }
         }
+        
+        public synchronized List<Bucket> getHistogram()
+        {
+            if(hist.size() == 0)
+            {
+                buildInitialBuckets();
+            }
+            return hist;
+        }
+        
+     
 
         synchronized IncrementalStats copy()
         {
@@ -767,7 +795,7 @@ public class TrackerStats
     }
 
     /**
-     * @param l
+     * @param time long
      */
     public void addModelTime(long time)
     {
@@ -781,7 +809,7 @@ public class TrackerStats
     }
 
     /**
-     * @param l
+     * @param time long
      */
     public void addAclTime(long time)
     {
@@ -795,7 +823,7 @@ public class TrackerStats
     }
 
     /**
-     * @param l
+     * @param time long
      */
     public void addNodeTime(long time)
     {
@@ -809,8 +837,8 @@ public class TrackerStats
     }
 
     /**
-     * @param docCount
-     * @param l
+     * @param docCount int
+     * @param time long
      */
     public void addElapsedNodeTime(int docCount, long time)
     {
@@ -833,8 +861,8 @@ public class TrackerStats
     }
     
     /**
-     * @param docCount
-     * @param l
+     * @param docCount int
+     * @param time long
      */
     public void addElapsedAclTime(int docCount, long time)
     {
@@ -857,8 +885,8 @@ public class TrackerStats
     }
     
     /**
-     * @param docCount
-     * @param l
+     * @param docCount int
+     * @param time long
      */
     public void addElapsedContentTime(int docCount, long time)
     {
@@ -881,7 +909,7 @@ public class TrackerStats
     }
     
     /**
-     * @param size
+     * @param size int
      */
     public void addTxDocs(int size)
     {
@@ -895,7 +923,7 @@ public class TrackerStats
     }
 
     /**
-     * @param size
+     * @param size int
      */
     public void addChangeSetAcls(int size)
     {
@@ -909,7 +937,7 @@ public class TrackerStats
     }
 
     /**
-     * @param l
+     * @param time long
      */
     public void addDocTransformationTime(long time)
     {

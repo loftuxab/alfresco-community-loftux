@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.AbstractContentStore;
 import org.alfresco.repo.content.ContentContext;
@@ -64,6 +65,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * 
  * @author Derek Hulley
  */
+@AlfrescoPublicApi
 public class FileContentStore
         extends AbstractContentStore
         implements ApplicationContextAware, ApplicationListener<ApplicationEvent>
@@ -304,7 +306,6 @@ public class FileContentStore
      * 
      * @param file the file from which to create the URL
      * @return Returns the equivalent content URL
-     * @throws Exception
      */
     /*package*/ String makeContentUrl(File file)
     {
@@ -340,8 +341,6 @@ public class FileContentStore
      * @throws UnsupportedContentUrlException
      *                      if the URL is invalid and doesn't support the
      *                      {@link FileContentStore#STORE_PROTOCOL correct protocol}
-     * 
-     * @see #checkUrl(String)
      */
     /*package*/ File makeFile(String contentUrl)
     {
@@ -430,7 +429,7 @@ public class FileContentStore
 
     /**
      * This implementation requires that the URL start with
-     * {@link FileContentStore#STORE_PROTOCOL }.
+     * {@link FileContentStore#STORE_PROTOCOL } or {@link FileContentStore#SPOOF_PROTOCOL }
      */
     public ContentReader getReader(String contentUrl)
     {
@@ -535,7 +534,6 @@ public class FileContentStore
      *            the created before dat6e
      * @param handler
      *            the handler
-     * @return the urls
      */
     @SuppressWarnings("deprecation")
     public void getUrls(Date createdAfter, Date createdBefore, ContentUrlHandler handler)
@@ -556,7 +554,6 @@ public class FileContentStore
      * @param handler the callback to use for each URL
      * @param createdAfter only get URLs for content create after this date
      * @param createdBefore only get URLs for content created before this date
-     * @return a list of all files within the given directory and all subdirectories
      */
     @SuppressWarnings("deprecation")
     private void getUrls(File directory, ContentUrlHandler handler, Date createdAfter, Date createdBefore)

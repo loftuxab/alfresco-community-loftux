@@ -197,8 +197,7 @@ public class CMISStrictDictionaryService extends CMISAbstractDictionaryService
     /**
      * Create Type Definitions
      * 
-     * @param registry
-     * @param classQNames
+     * @param classQName QName
      */
     private AbstractTypeDefinitionWrapper createTypeDef(QName classQName)
     {
@@ -277,8 +276,8 @@ public class CMISStrictDictionaryService extends CMISAbstractDictionaryService
     /**
      * Create Relationship Definitions
      * 
-     * @param registry
-     * @param classQNames
+     * @param registry CMISDictionaryRegistry
+     * @param classQNames Collection<QName
      */
     private Collection<RelationshipTypeDefintionWrapper> createAssocDefs(CMISDictionaryRegistry registry,
     		Collection<QName> classQNames)

@@ -26,7 +26,7 @@ import org.apache.solr.handler.component.SearchComponent;
 /**
  * Sets a boolean flag ("processedDenies") in the JSON response indicating that
  * the results (should) have been processed with respect to anyDenyDenies
- * (i.e. {@link AbstractQParser} has added the correct clause to the search query).
+ * (i.e. {@link org.alfresco.solr.query.AbstractQParser} has added the correct clause to the search query).
  * 
  * @author Matt Ward
  */
@@ -64,5 +64,16 @@ public class SetProcessedDeniesComponent extends SearchComponent
     public String getVersion()
     {
         return "1.0";
+    }
+    
+    @Override
+    public void finishStage(ResponseBuilder rb) {
+      if (rb.stage != ResponseBuilder.STAGE_GET_FIELDS) {
+        return;
+      }
+      
+      Boolean processedDenies = (Boolean) rb.req.getContext().get(PROCESSED_DENIES);
+      processedDenies = (processedDenies == null) ? false : processedDenies;
+      rb.rsp.add(PROCESSED_DENIES, processedDenies);
     }
 }

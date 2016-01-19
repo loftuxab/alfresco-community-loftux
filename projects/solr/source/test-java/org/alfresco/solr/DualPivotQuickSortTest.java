@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * Test case for {@link DualPivotQuickSort}.
  * 
- * Provides tests methods for {@link DualPivotQuickSort.sort} and {@link Arrays.sort}, for comparing their time. 
+ * Provides tests methods for {@link DualPivotQuickSort#sort} and {@link Arrays#sort}, for comparing their time.
  *
  * @author Alex Miller
  */

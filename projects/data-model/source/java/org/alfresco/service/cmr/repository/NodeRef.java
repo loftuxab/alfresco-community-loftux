@@ -190,7 +190,7 @@ public final class NodeRef implements EntityRef, Serializable
      * Converts a {@link String} containing a comma-separated list of {@link NodeRef} Ids into NodeRefs.
      * If a <code>logger</code> is supplied then invalid ids are logged as warnings.
      * @param values the {@link String} of {@link NodeRef} ids.
-     * @param logger
+     * @param logger Log
      * @return A {@link List} of {@link NodeRef NodeRefs}.
      */
     public static List<NodeRef> getNodeRefs(String values, Log logger)

@@ -125,8 +125,6 @@ public class SiteAdminChangeVisibilityTest extends AbstractUtils
 
     /**
      * logs out the user after each test method.
-     * 
-     * @throws Exception
      */
     @AfterMethod
     public void logout()

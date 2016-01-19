@@ -157,7 +157,7 @@ public abstract class AbstractReindexComponent implements IndexRecovery
     /**
      * Set the low-level transaction component to use
      * 
-     * @param transactionComponent provide transactions to index each missed transaction
+     * @param transactionService provide transactions to index each missed transaction
      */
     public void setTransactionService(TransactionServiceImpl transactionService)
     {
@@ -749,7 +749,6 @@ public abstract class AbstractReindexComponent implements IndexRecovery
     /**
      * Callback to notify caller whenever a node has been indexed
      * 
-     * @see 
      * @author Derek Hulley
      * @since 2.1.4
      */
@@ -1242,7 +1241,7 @@ public abstract class AbstractReindexComponent implements IndexRecovery
      * <p>
      * Commits are guaranteed to occur in the order in which this reindex jobs are added to the queue.
      *
-     * @see #reindexTransaction(long)
+     * @see #reindexTransaction(Long, boolean)
      * @see #waitForAsynchronousReindexing()
      * @since 2.1.4
      */

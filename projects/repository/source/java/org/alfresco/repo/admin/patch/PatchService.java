@@ -51,13 +51,13 @@ public interface PatchService
      * Apply all outstanding patches that are relevant to the repo. If there is a failure, then the patches that were
      * applied will remain so, but the process will not attempt to apply any further patches.
      * 
-     * @return Returns true if all outstanding patches were applied, or false if the process was termintated before all
+     * @return Returns true if all outstanding patches were applied, or false if the process was terminated before all
      *         patches could be applied.
      */
     public boolean applyOutstandingPatches();
     
     /**
-     * Apply the specified patch that is relevant to the repo.
+     * Apply the specified patch that is relevant to the repo, regardless of the <b>deferred</b> flag.
      * 
      * @param patch the patch object
      * @return true if the specified patch and its dependencies were applied, or
@@ -68,9 +68,9 @@ public interface PatchService
     /**
      * Retrieves all applied patches between two specific times.
      * 
-     * @param from
+     * @param fromDate
      *            the start date of the search, or null to get all patches from the start
-     * @param to
+     * @param toDate
      *            the end date of the search, or null to g
      * @return Returns all applied patches (successful or not)
      */

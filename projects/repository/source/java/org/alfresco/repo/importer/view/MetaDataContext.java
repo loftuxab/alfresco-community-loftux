@@ -38,9 +38,8 @@ public class MetaDataContext extends ElementContext
     /**
      * Construct
      * 
-     * @param elementName
-     * @param dictionary
-     * @param importer
+     * @param elementName QName
+     * @param context ElementContext
      */
     public MetaDataContext(QName elementName, ElementContext context)
     {

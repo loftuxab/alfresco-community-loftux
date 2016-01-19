@@ -34,8 +34,8 @@ public interface CMISDictionaryService
     /**
      * Find type for type id
      * 
-     * @param typeId
-     * @return
+     * @param typeId String
+     * @return TypeDefinitionWrapper
      */
     TypeDefinitionWrapper findType(String typeId);
 
@@ -45,9 +45,9 @@ public interface CMISDictionaryService
      * Find type for Alfresco class name. Optionally, constrain match to one of
      * specified CMIS scopes
      * 
-     * @param clazz
-     * @param matchingScopes
-     * @return
+     * @param clazz QName
+     * @param matchingScopes BaseTypeId...
+     * @return TypeDefinitionWrapper
      */
     TypeDefinitionWrapper findTypeForClass(QName clazz, BaseTypeId... matchingScopes);
 
@@ -62,8 +62,8 @@ public interface CMISDictionaryService
     /**
      * Find a type by its query name
      * 
-     * @param queryName
-     * @return
+     * @param queryName String
+     * @return TypeDefinitionWrapper
      */
     TypeDefinitionWrapper findTypeByQueryName(String queryName);
 
@@ -77,7 +77,7 @@ public interface CMISDictionaryService
     /**
      * Get all Types
      * 
-     * @return
+     * @return List<TypeDefinitionWrapper>
      */
     List<TypeDefinitionWrapper> getAllTypes();
 
@@ -86,8 +86,8 @@ public interface CMISDictionaryService
     /**
      * Find data type
      * 
-     * @param dataType
-     * @return
+     * @param dataType QName
+     * @return PropertyType
      */
     PropertyType findDataType(QName dataType);
 

@@ -247,7 +247,7 @@ public class NodePropertyValue implements Cloneable, Serializable
             }
 
             /**
-             * Strings longer than the maximum of {@link NodePropertyValue#DEFAULT_MAX_STRING_LENGTH}
+             * Strings longer than the maximum of {@link org.alfresco.repo.domain.schema.SchemaBootstrap#DEFAULT_MAX_STRING_LENGTH}
              * characters will be serialized.
              */
             @Override
@@ -640,7 +640,6 @@ public class NodePropertyValue implements Cloneable, Serializable
          * Converts a value to this type.  The implementation must be able to cope with any legitimate
          * source value.
          * 
-         * @see DefaultTypeConverter.INSTANCE#convert(Class, Object)
          */
         abstract Serializable convert(Serializable value);
     }
@@ -977,7 +976,7 @@ public class NodePropertyValue implements Cloneable, Serializable
      * No conversion is done.
      * 
      * @param persistedType the value type
-     * @param value the value - it may only be null if the persisted type is {@link ValueType#NULL}
+     * @param value the value - it may only be null if the persisted type is {@code ValueType#NULL}
      */
     public void setPersistedValue(ValueType persistedType, Serializable value)
     {

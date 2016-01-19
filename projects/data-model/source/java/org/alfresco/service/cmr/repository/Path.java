@@ -80,7 +80,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
      * Add a path element to the beginning of the path.  This operation is useful in cases where
      * a path is built by traversing up a hierarchy.
      * 
-     * @param pathElement
+     * @param pathElement Path.Element
      * @return Returns this instance of the path
      */
     public Path prepend(Path.Element pathElement)
@@ -92,7 +92,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Merge the given path into the beginning of this path.
      * 
-     * @param path
+     * @param path Path
      * @return Returns this instance of the path
      */
     public Path prepend(Path path)
@@ -104,7 +104,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Appends a path element to the end of the path
      * 
-     * @param pathElement
+     * @param pathElement Path.Element
      * @return Returns this instance of the path
      */
     public Path append(Path.Element pathElement)
@@ -116,7 +116,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Append the given path of this path.
      * 
-     * @param path
+     * @param path Path
      * @return Returns this instance of the path
      */
     public Path append(Path path)
@@ -316,6 +316,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
      * <p>
      * In <b>/x/y/z</b>, elements are <b>x</b>, <b>y</b> and <b>z</b>.
      */
+    @AlfrescoPublicApi
     public abstract static class Element implements Serializable
     {
         private static final long serialVersionUID = 5396069341092867660L;
@@ -326,8 +327,8 @@ public final class Path implements Iterable<Path.Element>, Serializable
         public abstract String getElementString();
 
         /**
-         * @param tenantService
-         * @return
+         * @param tenantService TenantService
+         * @return Element
          */
         @AlfrescoPublicApi
         public abstract Element getBaseNameElement(TenantService tenantService);
@@ -440,6 +441,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
      * Represents a qualified path to an attribute,
      * including the sibling for repeated properties/attributes to retrieve e.g. <b>/@{namespace}name[5]</b> 
      */
+    @AlfrescoPublicApi
     public static class AttributeElement extends Element
     {
         private static final long serialVersionUID = 3256727281668863544L;
@@ -448,7 +450,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
         private int position = -1;
         
         /**
-         * @param ref a reference to the specific parent-child association
+         * @param attribute QName
          */
         public AttributeElement(QName attribute)
         {
@@ -545,6 +547,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Represents the <b>//</b> or <b>/descendant-or-self::node()</b> xpath element
      */
+    @AlfrescoPublicApi
     public static class DescendentOrSelfElement extends Element
     {
         private static final long serialVersionUID = 3258410616875005237L;
@@ -586,6 +589,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Represents the <b>/.</b> xpath element
      */
+    @AlfrescoPublicApi
     public static class SelfElement extends Element
     {
         private static final long serialVersionUID = 3834311739151300406L;
@@ -626,6 +630,7 @@ public final class Path implements Iterable<Path.Element>, Serializable
     /**
      * Represents the <b>/..</b> xpath element
      */
+    @AlfrescoPublicApi
     public static class ParentElement extends Element
     {
         private static final long serialVersionUID = 3689915080477456179L;

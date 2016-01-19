@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
+
  *
  * This file is part of Alfresco
  *
@@ -178,7 +179,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     private ResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
 
     /**
-     * @see PropertyValue#DEFAULT_MAX_STRING_LENGTH
+     * @see #DEFAULT_MAX_STRING_LENGTH
      */
     private static final void setMaxStringLength(int length)
     {
@@ -234,7 +235,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     /**
      * Defines the DatabaseMetaDataHelper to be used
      * 
-     * @param databaseMetaDataHelper
+     * @param databaseMetaDataHelper DatabaseMetaDataHelper
      */
     public void setDatabaseMetaDataHelper(DatabaseMetaDataHelper databaseMetaDataHelper)
     {
@@ -467,7 +468,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
      * Register a new script for execution after the Hibernate schema creation phase.  The order of registration
      * determines the order of execution.
      * 
-     * @param postCreateScriptUrl           the script URL, possibly containing the <b>${db.script.dialect}</b> placeholder
+     * @param postUpdateScriptUrl           the script URL, possibly containing the <b>${db.script.dialect}</b> placeholder
      */
     public void addPostCreateScriptUrl(String postUpdateScriptUrl)
     {
@@ -1329,7 +1330,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                     }
                     continue;
                 }
-				// Handle looping control
+                // Handle looping control
                 else if (sql.startsWith("--FOREACH"))
                 {
                     // --FOREACH table.column batch.size.property
@@ -1338,13 +1339,13 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                     if (args.length == 3 && (sepIndex = args[1].indexOf('.')) != -1)
                     {
                         doBatch = true;
-						// Select the upper bound of the table column
+                        // Select the upper bound of the table column
                         String stmt = "SELECT MAX(" + args[1].substring(sepIndex+1) + ") AS upper_limit FROM " + args[1].substring(0, sepIndex);
                         Object fetchedVal = executeStatement(connection, stmt, "upper_limit", false, line, scriptFile);                        
                         if (fetchedVal instanceof Number)
                         {
                             batchUpperLimit = ((Number)fetchedVal).intValue();
-							// Read the batch size from the named property
+                            // Read the batch size from the named property
                             String batchSizeString = globalProperties.getProperty(args[2]);
                             // Fall back to the default property
                             if (batchSizeString == null)
@@ -1473,7 +1474,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                         
                         if (this.dialect != null && this.dialect instanceof MySQLInnoDBDialect)
                         {
-                        	// note: enable bootstrap on MySQL 5.5 (eg. for auto-generated SQL, such as JBPM)
+                            // note: enable bootstrap on MySQL 5.5 (eg. for auto-generated SQL, such as JBPM)
                             sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=InnoDB");
                         }
                         
@@ -1839,7 +1840,8 @@ public class SchemaBootstrap extends AbstractLifecycleBean
      * Collate differences and validation problems with the schema with respect to an appropriate
      * reference schema.
      * 
-     * @param outputFileNameTemplate
+     * @param outputFileNameTemplate String
+     * @param out PrintWriter
      * @return the number of potential problems found.
      */
     public synchronized int validateSchema(String outputFileNameTemplate, PrintWriter out)
@@ -2038,7 +2040,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
      * If dbPrefixes is null, then the default list is used (see {@link MultiFileDumper#DEFAULT_PREFIXES})
      * The dump files' paths are logged at info level.
      * 
-     * @param whenDumped
+     * @param whenDumped String
      * @param dbPrefixes Array of database object prefixes to filter by, e.g. "alf_"
      * @return List of output files.
      */
@@ -2066,8 +2068,8 @@ public class SchemaBootstrap extends AbstractLifecycleBean
      * of database object prefixes is used for filtering.
      * 
      * @see #dumpSchema(String, String[])
-     * @param whenDumped
-     * @return
+     * @param whenDumped String
+     * @return List<File>
      */
     private List<File> dumpSchema(String whenDumped)
     {
@@ -2120,20 +2122,20 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     @Override
     protected void onShutdown(ApplicationEvent event)
     {
-		// Shut down DB, if required
-		Class<?> dialectClazz = this.dialect.getClass();
-		if (dialectClazz.equals(DerbyDialect.class))
-		{
-			try
-			{
-				DriverManager.getConnection("jdbc:derby:;shutdown=true");
-			}
-			// Derby shutdown always triggers an exception, even when clean
-			catch (Throwable e) 
-			{
-			}
-		}
-	}
+        // Shut down DB, if required
+        Class<?> dialectClazz = this.dialect.getClass();
+        if (dialectClazz.equals(DerbyDialect.class))
+        {
+            try
+            {
+                DriverManager.getConnection("jdbc:derby:;shutdown=true");
+            }
+            // Derby shutdown always triggers an exception, even when clean
+            catch (Throwable e) 
+            {
+            }
+        }
+    }
     
     /**
      * This is a workaround for the odd Spring-Hibernate interaction during configuration.

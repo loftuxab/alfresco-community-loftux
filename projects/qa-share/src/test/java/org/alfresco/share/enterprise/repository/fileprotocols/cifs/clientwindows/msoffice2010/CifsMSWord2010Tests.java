@@ -234,7 +234,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + docFileName_6265 + docxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType).render().render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -289,7 +289,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // are displayed correctly.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -336,7 +336,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They
         // are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType);
+        detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -383,7 +383,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They
         // are displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType);
+        detailsPage = documentLibPage.selectFile(docFileName_6265 + docxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -417,7 +417,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         File file = new File(DATA_FOLDER + CIFS_LOCATION + SLASH + docFileName_6266 + docxFileType);
         ShareUserSitePage.uploadFile(drone, file).render();
 
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType).render();
 
         // Click "Edit Properties" in Actions section;
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
@@ -473,7 +473,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // displayed correctly.
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -521,7 +521,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They are
         // displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType);
+        detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -568,7 +568,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // The document's metadata and version history are not broken. They are
         // displayed correctly.
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
-        detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType);
+        detailsPage = documentLibPage.selectFile(docFileName_6266 + docxFileType).render();
 
         editPropertiesPage = detailsPage.selectEditProperties().render();
         editPropertiesPage.getDocumentTitle();
@@ -623,7 +623,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6269 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6269 + docxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(docxFileName_6269 + docxFileType));
@@ -798,7 +798,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6269 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6269 + docxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(docxFileName_6269 + docxFileType));
@@ -997,7 +997,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6267 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6267 + docxFileType).render();
 
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(docxFileName_6267 + docxFileType));
@@ -1194,7 +1194,7 @@ public class CifsMSWord2010Tests extends AbstractUtils
         // All changes are present and displayed correctly.
         ShareUser.login(drone, testUser);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6268 + docxFileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(docxFileName_6268 + docxFileType).render();
         EditDocumentPropertiesPage editPropertiesPage = detailsPage.selectEditProperties().render();
         Assert.assertTrue(editPropertiesPage.getName().equals(docxFileName_6268 + docxFileType));
         editPropertiesPage.clickCancel();

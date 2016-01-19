@@ -16,20 +16,27 @@ import com.icegreen.greenmail.util.DummySSLServerSocketFactory;
 import com.icegreen.greenmail.util.ServerSetup;
 
 import java.io.IOException;
-import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.net.ssl.SSLServerSocket;
 
+
 public class ImapServer extends AbstractServer {
+
+    private AtomicReference<Exception> serverOpeningExceptionRef;
 
     public ImapServer(ServerSetup setup, Managers managers) {
         super(setup, managers);
+    }
+    
+    public ImapServer(ServerSetup setup, Managers managers, AtomicReference<Exception> serverOpeningExceptionRef ) {
+        this(setup, managers);
+        this.serverOpeningExceptionRef = serverOpeningExceptionRef;
     }
     
     protected synchronized ServerSocket openServerSocket() throws IOException {
@@ -69,11 +76,19 @@ public class ImapServer extends AbstractServer {
 
     public void run() {
         try {
-
+            IOException serverOpeningException = null;
             try {
                 serverSocket = openServerSocket();
             } catch (IOException e) {
+                serverOpeningException = e;
                 throw new RuntimeException(e);
+            } finally {
+                if (serverOpeningExceptionRef != null){
+                    synchronized (serverOpeningExceptionRef) {
+                        serverOpeningExceptionRef.set(serverOpeningException);
+                        serverOpeningExceptionRef.notify();
+                    }
+                }
             }
 
             while (keepOn()) {

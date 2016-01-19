@@ -79,14 +79,16 @@ public class ZipDownloadExporter extends BaseExporter
 
     /**
      * Construct
-     * 
-     * @param destDir
-     * @param zipFile
-     * @param transactionHelper 
-     * @param l 
-     * @param actionedUponNodeRef 
-     * @param dataFile
-     * @param contentDir
+     *
+     * @param zipFile File
+     * @param checkOutCheckInService CheckOutCheckInService
+     * @param nodeService NodeService
+     * @param transactionHelper RetryingTransactionHelper
+     * @param updateService DownloadStatusUpdateService
+     * @param downloadStorage DownloadStorage
+     * @param downloadNodeRef NodeRef
+     * @param total long
+     * @param totalFileCount long
      */
     public ZipDownloadExporter(File zipFile, CheckOutCheckInService checkOutCheckInService, NodeService nodeService, RetryingTransactionHelper transactionHelper, DownloadStatusUpdateService updateService, DownloadStorage downloadStorage, NodeRef downloadNodeRef, long total, long totalFileCount)
     {

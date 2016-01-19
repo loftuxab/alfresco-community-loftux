@@ -81,20 +81,6 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         ShareUser.logout(drone);
     }
 
-    /**
-     * AONE-15646:Message - Empty
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15646() throws Exception
-    {
-        dataPrep(getTestName());
-        // TODO: TestLink- Update the TestLink testcase to move the related precondition steps into test steps.
-    }
 
     /**
      * AONE-15646:Message - Empty
@@ -102,7 +88,7 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
     @Test(groups = {"Hybrid","IntermittentBugs"}, enabled = true)
     public void AONE_15646() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
@@ -114,6 +100,8 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         String defaultWorkFlowName = "(No Message)";
         String defaultTaskName = "(No Message)";
         String dueDate = getDueDateString();
+
+        dataPrep(testName);
 
         try
         {
@@ -214,28 +202,13 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         }
     }
 
-    /**
-     * AONE-15647:Message - Single line
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15647() throws Exception
-    {
-        dataPrep(getTestName());
-        // TODO: TestLink- Update the TestLink testcase to move the related precondition steps into test steps.
-    }
-
-    /**
+     /**
      * AONE-15647:Message - Single line
      */
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15647() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
@@ -246,6 +219,8 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
 
         String workFlowName = testName + System.currentTimeMillis() + "-1-WF";
         String dueDate = getDueDateString();
+
+        dataPrep(testName);
 
         try
         {
@@ -346,21 +321,6 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         }
     }
 
-    /**
-     * AONE-15648:Message - Multiple lines
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15648() throws Exception
-    {
-        dataPrep(getTestName());
-        // TODO: TestLink- Update the TestLink testcase to move the related precondition steps into test steps.
-    }
-
     // TODO - Extra spaces in Message if the workflow is created with message contains multiple lines (ALF-20523)
     /**
      * AONE-15648:Message - Multiple lines
@@ -368,7 +328,7 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
     @Test(groups = {"Hybrid","IntermittentBugs"}, enabled = true)
     public void AONE_15648() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
@@ -380,6 +340,8 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         String workFlowName = testName + System.currentTimeMillis() + "-1-WF\n" + testName + System.currentTimeMillis() + "-2-WF";
         // String workFlowName = testName + System.currentTimeMillis() + "-1-WF\n" + "   " + testName + System.currentTimeMillis() + "-2-WF";
         String dueDate = getDueDateString();
+
+        dataPrep(testName);
 
         try
         {
@@ -486,26 +448,11 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
 
     /**
      * AONE-15649:Message - Negative case
-     * <ul>
-     * <li>1) Create a OP User (User1)</li>
-     * <li>2) Create 2 Cloud Users (cloudUser, Reviewer1)</li>
-     * <li>3) Login as OP User and set up Cloud Sync with cloudUser</li>
-     * </ul>
-     */
-    @Test(groups = "DataPrepHybrid")
-    public void dataPrep_AONE_15649() throws Exception
-    {
-        dataPrep(getTestName());
-        // TODO: TestLink- Update the TestLink testcase to move the related precondition steps into test steps.
-    }
-
-    /**
-     * AONE-15649:Message - Negative case
      */
     @Test(groups = "Hybrid", enabled = true)
     public void AONE_15649() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + System.currentTimeMillis();
         String user1 = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String cloudUser = getUserNameForDomain(testName, DOMAIN_HYBRID);
         String opSiteName = getSiteName(testName) + System.currentTimeMillis() + "-OP";
@@ -520,6 +467,8 @@ public class WorkFlowOptionsMessageTest extends AbstractWorkflow
         String workFlowName1 = "!@#$%^&*()_+|/?.,<>:;=-{}[]" + System.currentTimeMillis() + "-1-WF";
         String workFlowName2 = " ";
         String dueDate = getDueDateString();
+
+        dataPrep(testName);
 
         try
         {

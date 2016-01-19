@@ -199,6 +199,12 @@ public class ActionServiceImplTest extends BaseAlfrescoSpringTest
         ActionCondition condition = this.actionService.createActionCondition(NoConditionEvaluator.NAME);
         assertNotNull(condition);
         assertEquals(NoConditionEvaluator.NAME, condition.getActionConditionDefinitionName());
+
+        Map<String, Serializable> params = new HashMap<>(0);
+        condition = this.actionService.createActionCondition(NoConditionEvaluator.NAME, params);
+        assertNotNull(condition);
+        assertEquals(NoConditionEvaluator.NAME, condition.getActionConditionDefinitionName());
+
     }
 
       /**
@@ -217,6 +223,11 @@ public class ActionServiceImplTest extends BaseAlfrescoSpringTest
     public void testCreateAction()
     {
         Action action = this.actionService.createAction(AddFeaturesActionExecuter.NAME);
+        assertNotNull(action);
+        assertEquals(AddFeaturesActionExecuter.NAME, action.getActionDefinitionName());
+
+        Map<String, Serializable> params = new HashMap<>(0);
+        action = this.actionService.createAction(AddFeaturesActionExecuter.NAME, params);
         assertNotNull(action);
         assertEquals(AddFeaturesActionExecuter.NAME, action.getActionDefinitionName());
     }
@@ -394,13 +405,20 @@ public class ActionServiceImplTest extends BaseAlfrescoSpringTest
         assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_LOCKABLE));
         assertTrue(this.nodeService.hasAspect(this.nodeRef, ContentModel.ASPECT_VERSIONABLE));
     }    
-    
+
     public void testGetAndGetAllWithNoActions()
     {
         assertNull(this.actionService.getAction(this.nodeRef, AddFeaturesActionExecuter.NAME));
         List<Action> actions = this.actionService.getActions(this.nodeRef);
         assertNotNull(actions);
         assertEquals(0, actions.size());
+    }
+	
+    public void testExecuteActionWithNoParameterDef()
+    {
+        Action action = this.actionService.createAction("empty-action");
+        this.actionService.executeAction(action, this.nodeRef);
+        assertTrue("If we got here then the test is successful", true);
     }
     
     /**
@@ -976,7 +994,6 @@ public class ActionServiceImplTest extends BaseAlfrescoSpringTest
      * @param sleepTime
      * @param maxTries
      * @param test
-     * @param context
      */
     public static void postAsyncActionTest(
             TransactionService transactionService,

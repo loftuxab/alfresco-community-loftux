@@ -33,6 +33,7 @@ import net.sf.acegisecurity.providers.dao.User;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.permissions.AclDAO;
+import org.alfresco.repo.node.db.traitextender.NodeServiceTrait;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -47,6 +48,8 @@ import org.alfresco.repo.security.permissions.NodePermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionEntry;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.PermissionServiceSPI;
+import org.alfresco.repo.security.permissions.impl.traitextender.PermissionServiceExtension;
+import org.alfresco.repo.security.permissions.impl.traitextender.PermissionServiceTrait;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.version.Version2Model;
@@ -65,6 +68,12 @@ import org.alfresco.service.cmr.security.PermissionContext;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.traitextender.AJExtender;
+import org.alfresco.traitextender.Extend;
+import org.alfresco.traitextender.ExtendedTrait;
+import org.alfresco.traitextender.Extensible;
+import org.alfresco.traitextender.AJProxyTrait;
+import org.alfresco.traitextender.Trait;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.Pair;
 import org.alfresco.util.PropertyCheck;
@@ -79,7 +88,7 @@ import org.springframework.extensions.surf.util.AbstractLifecycleBean;
  * 
  * @author andyh
  */
-public class PermissionServiceImpl extends AbstractLifecycleBean implements PermissionServiceSPI
+public class PermissionServiceImpl extends AbstractLifecycleBean implements PermissionServiceSPI,Extensible
 {
     static SimplePermissionReference OLD_ALL_PERMISSIONS_REFERENCE = new SimplePermissionReference(
             QName.createQName("", PermissionService.ALL_PERMISSIONS),
@@ -141,6 +150,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     protected PermissionReference allPermissionReference;
 
     protected boolean anyDenyDenies = false;
+
+    private final ExtendedTrait<PermissionServiceTrait> permissionServiceTrait;
     
     /**
      * Standard spring construction.
@@ -148,6 +159,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     public PermissionServiceImpl()
     {
         super();
+        permissionServiceTrait=new ExtendedTrait<PermissionServiceTrait>(AJProxyTrait.create(this, PermissionServiceTrait.class));
     }
 
     //
@@ -158,7 +170,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     
     /**
      * Set the dictionary service
-     * @param dictionaryService 
+     * @param dictionaryService DictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -184,7 +196,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the permissions model dao
      * 
-     * @param modelDAO
+     * @param modelDAO ModelDAO
      */
     public void setModelDAO(ModelDAO modelDAO)
     {
@@ -194,7 +206,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the node service.
      * 
-     * @param nodeService
+     * @param nodeService NodeService
      */
     public void setNodeService(NodeService nodeService)
     {
@@ -204,7 +216,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the ownable service.
      * 
-     * @param ownableService
+     * @param ownableService OwnableService
      */
     public void setOwnableService(OwnableService ownableService)
     {
@@ -213,7 +225,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     
     /**
      * Set the tenant service.
-     * @param tenantService
+     * @param tenantService TenantService
      */
     public void setTenantService(TenantService tenantService)
     {
@@ -223,7 +235,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the permissions dao component
      * 
-     * @param permissionsDaoComponent
+     * @param permissionsDaoComponent PermissionsDaoComponent
      */
     public void setPermissionsDaoComponent(PermissionsDaoComponent permissionsDaoComponent)
     {
@@ -233,7 +245,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the authority service.
      * 
-     * @param authorityService
+     * @param authorityService AuthorityService
      */
     public void setAuthorityService(AuthorityService authorityService)
     {
@@ -243,7 +255,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the dynamic authorities
      * 
-     * @param dynamicAuthorities
+     * @param dynamicAuthorities List<DynamicAuthority>
      */
     public void setDynamicAuthorities(List<DynamicAuthority> dynamicAuthorities)
     {
@@ -253,7 +265,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the ACL DAO component.
      * 
-     * @param aclDaoComponent
+     * @param aclDaoComponent AclDAO
      */
     public void setAclDAO(AclDAO aclDaoComponent)
     {
@@ -291,7 +303,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Set the policy component
      * 
-     * @param policyComponent
+     * @param policyComponent PolicyComponent
      */
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
@@ -301,8 +313,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Cache clear on move node
      * 
-     * @param oldChildAssocRef
-     * @param newChildAssocRef
+     * @param oldChildAssocRef ChildAssociationRef
+     * @param newChildAssocRef ChildAssociationRef
      */
     public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef)
     {
@@ -312,7 +324,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Cache clear on create of a child association from an authority container.
      * 
-     * @param childAssocRef
+     * @param childAssocRef ChildAssociationRef
      */
     public void onCreateChildAssociation(ChildAssociationRef childAssocRef)
     {
@@ -322,7 +334,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Cache clear on delete of a child association from an authority container.
      * 
-     * @param childAssocRef
+     * @param childAssocRef ChildAssociationRef
      */
     public void beforeDeleteChildAssociation(ChildAssociationRef childAssocRef)
     {
@@ -366,26 +378,36 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     // Permissions Service
     //
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public String getOwnerAuthority()
     {
         return OWNER_AUTHORITY;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public String getAllAuthorities()
     {
         return ALL_AUTHORITIES;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public String getAllPermission()
     {
         return ALL_PERMISSIONS;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<AccessPermission> getPermissions(NodeRef nodeRef)
     {
         return getAllPermissionsImpl(nodeRef, true, true);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<AccessPermission> getAllSetPermissions(NodeRef nodeRef)
     {
         HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
@@ -397,6 +419,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         return accessPermissions;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<AccessPermission> getAllSetPermissions(StoreRef storeRef)
     {
         HashSet<AccessPermission> accessPermissions = new HashSet<AccessPermission>();
@@ -429,6 +453,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         return accessPermissions;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<String> getSettablePermissions(NodeRef nodeRef)
     {
         Set<PermissionReference> settable = getSettablePermissionReferences(nodeRef);
@@ -440,6 +466,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         return strings;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<String> getSettablePermissions(QName type)
     {
         Set<PermissionReference> settable = getSettablePermissionReferences(type);
@@ -451,16 +479,22 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         return strings;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public NodePermissionEntry getSetPermissions(NodeRef nodeRef)
     {
         return permissionsDaoComponent.getPermissions(tenantService.getName(nodeRef));
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public NodePermissionEntry getSetPermissions(StoreRef storeRef)
     {
         return permissionsDaoComponent.getPermissions(storeRef);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public AccessStatus hasPermission(NodeRef passedNodeRef, final PermissionReference permIn)
     {
         // If the node ref is null there is no sensible test to do - and there
@@ -603,6 +637,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
 
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public AccessStatus hasPermission(Long aclID, PermissionContext context, String permission)
     {
         return hasPermission(aclID, context, getPermissionReference(permission));
@@ -680,9 +716,20 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         }, AuthenticationUtil.getSystemUserName());
         available.add(getAllPermissionReference());
         available.add(OLD_ALL_PERMISSIONS_REFERENCE);
-
+        
         if (!(available.contains(permission)))
         {
+            Set<PermissionReference> permissionsSystemBase = AuthenticationUtil.runAsSystem(new RunAsWork<Set<PermissionReference>>()
+                    {
+                        public Set<PermissionReference> doWork() throws Exception
+                        {
+                            return modelDAO.getAllPermissions(ContentModel.TYPE_BASE, aspectQNames);
+                        }
+                    });
+            if(permissionsSystemBase.contains(permission) && authorisations.contains(AuthenticationUtil.getAdminRoleName()))
+            {
+                return AccessStatus.ALLOWED;
+            }
             return AccessStatus.DENIED;
         }
 
@@ -789,7 +836,9 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Get the authorisations for the currently authenticated user
      * 
-     * @param auth
+     * @param auth Authentication
+     * @param nodeRef NodeRef
+     * @param required PermissionReference
      * @return the set of authorisations
      */
     protected Set<String> getAuthorisations(Authentication auth, NodeRef nodeRef, PermissionReference required)
@@ -860,18 +909,24 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         return dynAuths;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public NodePermissionEntry explainPermission(NodeRef nodeRef, PermissionReference perm)
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void clearPermission(StoreRef storeRef, String authority)
     {
         permissionsDaoComponent.deletePermissions(storeRef, authority);
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermission(StoreRef storeRef, String authority, String perm)
     {
         deletePermission(storeRef, authority, getPermissionReference(perm));
@@ -883,12 +938,16 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermissions(StoreRef storeRef)
     {
         permissionsDaoComponent.deletePermissions(storeRef);
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void setPermission(StoreRef storeRef, String authority, String perm, boolean allow)
     {
         setPermission(storeRef, authority, getPermissionReference(perm), allow);
@@ -900,12 +959,16 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermissions(NodeRef nodeRef)
     {
         permissionsDaoComponent.deletePermissions(tenantService.getName(nodeRef));
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermissions(NodePermissionEntry nodePermissionEntry)
     {
         permissionsDaoComponent.deletePermissions(tenantService.getName(nodePermissionEntry.getNodeRef()));
@@ -915,6 +978,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * @see #deletePermission(NodeRef, String, PermissionReference)
      */
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermission(PermissionEntry permissionEntry)
     {
         NodeRef nodeRef = permissionEntry.getNodeRef();
@@ -929,6 +994,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void clearPermission(NodeRef nodeRef, String authority)
     {
         permissionsDaoComponent.deletePermissions(tenantService.getName(nodeRef), authority);
@@ -941,6 +1008,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void setPermission(PermissionEntry permissionEntry)
     {
         // TODO - not MT-enabled nodeRef - currently only used by tests
@@ -948,6 +1017,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void setPermission(NodePermissionEntry nodePermissionEntry)
     {
         // TODO - not MT-enabled nodeRef- currently only used by tests
@@ -955,6 +1026,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         accessCache.clear();
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions)
     {
         NodeRef actualRef = tenantService.getName(nodeRef);
@@ -965,21 +1038,29 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * @see org.alfresco.service.cmr.security.PermissionService#getInheritParentPermissions(org.alfresco.service.cmr.repository.NodeRef)
      */
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public boolean getInheritParentPermissions(NodeRef nodeRef)
     {
         return permissionsDaoComponent.getInheritParentPermissions(tenantService.getName(nodeRef));
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public PermissionReference getPermissionReference(QName qname, String permissionName)
     {
         return modelDAO.getPermissionReference(qname, permissionName);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public PermissionReference getAllPermissionReference()
     {
         return allPermissionReference;
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public String getPermission(PermissionReference permissionReference)
     {
         if (modelDAO.isUnique(permissionReference))
@@ -992,36 +1073,50 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         }
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public PermissionReference getPermissionReference(String permissionName)
     {
         return modelDAO.getPermissionReference(null, permissionName);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<PermissionReference> getSettablePermissionReferences(QName type)
     {
         return modelDAO.getExposedPermissions(type);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<PermissionReference> getSettablePermissionReferences(NodeRef nodeRef)
     {
         return modelDAO.getExposedPermissions(tenantService.getName(nodeRef));
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermission(NodeRef nodeRef, String authority, String perm)
     {
         deletePermission(nodeRef, authority, getPermissionReference(perm));
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public AccessStatus hasPermission(NodeRef nodeRef, String perm)
     {
         return hasPermission(nodeRef, getPermissionReference(perm));
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void setPermission(NodeRef nodeRef, String authority, String perm, boolean allow)
     {
         setPermission(nodeRef, authority, getPermissionReference(perm), allow);
     }
 
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public void deletePermissions(String recipient)
     {
         permissionsDaoComponent.deletePermissions(recipient);
@@ -1035,6 +1130,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
      * doesn't take into account node types/aspects for permissions
      *  
      */
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public AccessStatus hasReadPermission(NodeRef nodeRef)
     {
         AccessStatus status = AccessStatus.DENIED;
@@ -1154,6 +1251,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
      * {@inheritDoc}
      */
     @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<String> getReaders(Long aclId)
     {
         AccessControlList acl = aclDaoComponent.getAccessControlList(aclId);
@@ -1191,10 +1289,11 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     }
     
     /**
-     * @param aclId
+     * @param aclId Long
      * @return set of authorities denied permission on the ACL
      */
     @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<String> getReadersDenied(Long aclId)
     {
         AccessControlList acl = aclDaoComponent.getAccessControlList(aclId);
@@ -1694,8 +1793,6 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
          * 
          * @param pe -
          *            the permissions entry to consider
-         * @param granters -
-         *            the set of granters
          * @param authorisations -
          *            the set of authorities
          * @param denied -
@@ -1838,10 +1935,9 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Internal hook point for recursion
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
-         * @param recursiveIn
+         * @param authorisations Set<String>
+         * @param aclId Long
+         * @param context PermissionContext
          * @return true if granted
          */
         boolean evaluate(Set<String> authorisations, Long aclId, PermissionContext context)
@@ -1894,7 +1990,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check if we have a global permission
          * 
-         * @param authorisations
+         * @param authorisations Set<String>
          * @return true if granted
          */
         private boolean checkGlobalPermissions(Set<String> authorisations)
@@ -1912,9 +2008,9 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check that a given authentication is available on a node
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
+         * @param authorisations Set<String>
+         * @param aclId Long
+         * @param context PermissionContext
          * @return true if a check is required
          */
         boolean checkRequired(Set<String> authorisations, Long aclId, PermissionContext context)
@@ -1958,14 +2054,12 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Is a permission granted
          * 
-         * @param pe -
-         *            the permissions entry to consider
-         * @param granters -
-         *            the set of granters
+         * @param ace AccessControlEntry
          * @param authorisations -
          *            the set of authorities
          * @param denied -
          *            the set of denied permissions/authority pais
+         * @param context PermissionContext
          * @return true if granted
          */
         private boolean isGranted(AccessControlEntry ace, Set<String> authorisations, Set<Pair<String, PermissionReference>> denied, PermissionContext context)
@@ -2031,14 +2125,12 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Is a permission granted
          * 
-         * @param pe -
-         *            the permissions entry to consider
-         * @param granters -
-         *            the set of granters
+         * @param ace AccessControlEntry
          * @param authorisations -
          *            the set of authorities
-         * @param denied -
+         * @param allowed -
          *            the set of denied permissions/authority pais
+         * @param context PermissionContext
          * @return true if granted
          */
         private boolean isDenied(AccessControlEntry ace, Set<String> authorisations, Set<Pair<String, PermissionReference>> allowed, PermissionContext context)
@@ -2186,10 +2278,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Internal hook point for recursion
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
-         * @param recursiveIn
+         * @param authority String
+         * @param aclId Long
          * @return true if granted
          */
         boolean evaluate(String authority, Long aclId)
@@ -2249,7 +2339,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check if we have a global permission
          * 
-         * @param authorisations
+         * @param authority String
          * @return true if granted
          */
         private boolean checkGlobalPermissions(String authority)
@@ -2267,9 +2357,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check that a given authentication is available on a node
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
+         * @param authority String
+         * @param aclId Long
          * @return true if a check is required
          */
         boolean checkRequired(String authority, Long aclId)
@@ -2298,12 +2387,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Is a permission granted
          * 
-         * @param pe -
-         *            the permissions entry to consider
-         * @param granters -
-         *            the set of granters
-         * @param authorisations -
-         *            the set of authorities
+         * @param ace AccessControlEntry
+         * @param authority String
          * @param denied -
          *            the set of denied permissions/authority pais
          * @return true if granted
@@ -2450,10 +2535,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Internal hook point for recursion
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
-         * @param recursiveIn
+         * @param authority String
+         * @param aclId Long
          * @return true if granted
          */
         boolean evaluate(String authority, Long aclId)
@@ -2513,7 +2596,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check if we have a global permission
          * 
-         * @param authorisations
+         * @param authority String
          * @return true if granted
          */
         private boolean checkGlobalPermissions(String authority)
@@ -2531,9 +2614,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Check that a given authentication is available on a node
          * 
-         * @param authorisations
-         * @param nodeRef
-         * @param denied
+         * @param authority String
+         * @param aclId Long
          * @return true if a check is required
          */
         boolean checkRequired(String authority, Long aclId)
@@ -2562,14 +2644,10 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
         /**
          * Is a permission granted
          * 
-         * @param pe -
-         *            the permissions entry to consider
-         * @param granters -
-         *            the set of granters
-         * @param authorisations -
-         *            the set of authorities
-         * @param denied -
-         *            the set of denied permissions/authority pais
+         * @param ace AccessControlEntry
+         * @param authority String
+         * @param allowed -
+         *            the set of allowed permissions/authority pais
          * @return true if granted
          */
         private boolean isDenied(AccessControlEntry ace, String authority, Set<Pair<String, PermissionReference>> allowed)
@@ -2690,7 +2768,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     /**
      * Converts specified version nodeRef (eg. versionStore://...) to versioned nodeRef (eg. workspace://SpacesStore/...)
      * 
-     * @param nodeRef - <b>always</b> version nodeRef (ie. in the 'version' store)
+     * @param versionNodeRef - <b>always</b> version nodeRef (ie. in the 'version' store)
      * @return versioned nodeRef (ie.in the 'live' store)
      */
     @SuppressWarnings("deprecation")
@@ -2721,6 +2799,7 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
      * {@inheritDoc}
      */
     @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
     public Set<String> getAuthorisations()
     {
         // Use TX cache 
@@ -2740,5 +2819,11 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
             AlfrescoTransactionSupport.bindResource("MyAuthCache", auths);
         }
         return Collections.unmodifiableSet(auths);   
+    }
+
+    @Override
+    public <M extends Trait> ExtendedTrait<M>  getTrait(Class<? extends M> traitAPI)
+    {   
+        return (ExtendedTrait<M>) permissionServiceTrait;
     }
 }

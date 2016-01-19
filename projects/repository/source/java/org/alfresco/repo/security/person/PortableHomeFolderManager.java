@@ -116,7 +116,7 @@ public class PortableHomeFolderManager implements HomeFolderManager
     /**
      * Register a home folder provider.
      * 
-     * @param provider
+     * @param provider HomeFolderProvider
      */
     @SuppressWarnings("deprecation")
     public void addProvider(HomeFolderProvider provider)
@@ -127,7 +127,7 @@ public class PortableHomeFolderManager implements HomeFolderManager
     /**
      * Register a home folder provider.
      * 
-     * @param provider
+     * @param provider HomeFolderProvider2
      */
     public void addProvider(HomeFolderProvider2 provider)
     {
@@ -153,7 +153,7 @@ public class PortableHomeFolderManager implements HomeFolderManager
 
     /**
      * Set the default home folder provider (user which none is specified or when one is not found)
-     * @param defaultProvider
+     * @param defaultProvider HomeFolderProvider2
      */
     public void setDefaultProvider(HomeFolderProvider2 defaultProvider)
     {
@@ -262,7 +262,7 @@ public class PortableHomeFolderManager implements HomeFolderManager
     }
     
     /**
-     * Helper method for {@link HomeFolderProvider2.getHomeFolder} (so that it
+     * Helper method for {@link HomeFolderProvider2#getHomeFolder} (so that it
      * does not need its own NodeService) that returns a person property value.
      */
     public String getPersonProperty(NodeRef person, QName name)
@@ -312,7 +312,7 @@ public class PortableHomeFolderManager implements HomeFolderManager
     }
 
     /**
-     * Helper method for {@link HomeFolderProvider2.getHomeFolder(NodeRef)}
+     * Helper method for {@link HomeFolderProvider2#getHomeFolder(NodeRef)}
      * implementations to return a {@link HomeSpaceNodeRef}
      * @param referenceRootNode indicates that a reference to the root node
      *        should be returned if the home folder property on the person

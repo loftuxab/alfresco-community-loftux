@@ -30,6 +30,7 @@ import static org.alfresco.repo.invitation.WorkflowModelNominatedInvitation.wfVa
 import static org.alfresco.repo.invitation.WorkflowModelNominatedInvitation.wfVarServerPath;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -40,6 +41,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.i18n.MessageService;
+import org.alfresco.repo.invitation.activiti.SendNominatedInviteDelegate;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
@@ -69,6 +71,8 @@ public class InviteSender
 {
     public static final String WF_INSTANCE_ID = "wf_instanceId";
     public static final String WF_PACKAGE = "wf_package";
+    public static final String SITE_LEAVE_HASH = "#leavesite";
+    private static final String SITE_DASHBOARD_ENDPOINT_PATTERN =  "/page/site/{0}/dashboard";
 
     private static final List<String> expectedProperties = Arrays.asList(wfVarInviteeUserName,//
                 wfVarResourceName,//
@@ -111,12 +115,25 @@ public class InviteSender
     }
 
     /**
-     * Sends an invitation email.
+     * Implemented for backwards compatibility
      * 
-     * @param properties A Map containing the properties needed to send the
-     *            email.
+     * @param properties
+     * @deprecated
+     * @see {@link #sendMail(String, String, Map)}
      */
     public void sendMail(Map<String, String> properties)
+    {
+        sendMail(SendNominatedInviteDelegate.EMAIL_TEMPLATE_XPATH, SendNominatedInviteDelegate.EMAIL_SUBJECT_KEY, properties);
+    }
+    
+    /**
+     * Sends an invitation email.
+     * 
+     * @param emailTemplateXpath the XPath to the email template in the repository
+     * @param emailSubjectKey the subject of the email
+     * @param properties A Map containing the properties needed to send the email.
+     */
+    public void sendMail(String emailTemplateXpath, String emailSubjectKey, Map<String, String> properties)
     {
         checkProperties(properties);
         ParameterCheck.mandatory("Properties", properties);
@@ -126,9 +143,9 @@ public class InviteSender
         Action mail = actionService.createAction(MailActionExecuter.NAME);
         mail.setParameterValue(MailActionExecuter.PARAM_FROM, getEmail(inviter));
         mail.setParameterValue(MailActionExecuter.PARAM_TO, getEmail(invitee));
-        mail.setParameterValue(MailActionExecuter.PARAM_SUBJECT, "invitation.invitesender.email.subject");
+        mail.setParameterValue(MailActionExecuter.PARAM_SUBJECT, emailSubjectKey);
         mail.setParameterValue(MailActionExecuter.PARAM_SUBJECT_PARAMS, new Object[] {ModelUtil.getProductName(repoAdminService), getSiteName(properties)});
-        mail.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, getEmailTemplateNodeRef());
+        mail.setParameterValue(MailActionExecuter.PARAM_TEMPLATE, getEmailTemplateNodeRef(emailTemplateXpath));
         mail.setParameterValue(MailActionExecuter.PARAM_TEMPLATE_MODEL, 
                 (Serializable)buildMailTextModel(properties, inviter, invitee));
         mail.setParameterValue(MailActionExecuter.PARAM_IGNORE_SEND_FAILURE, true);
@@ -136,7 +153,7 @@ public class InviteSender
     }
 
     /**
-     * @param properties
+     * @param properties Map<String, String>
      */
     private void checkProperties(Map<String, String> properties)
     {
@@ -169,9 +186,15 @@ public class InviteSender
     private Map<String, String> buildArgs(Map<String, String> properties, NodeRef inviter, NodeRef invitee)
     {
         String params = buildUrlParamString(properties);
-        String acceptLink = makeLink(properties.get(wfVarServerPath), properties.get(wfVarAcceptUrl), params);
-        String rejectLink = makeLink(properties.get(wfVarServerPath), properties.get(wfVarRejectUrl), params);
-
+        String acceptLink = makeLink(properties.get(wfVarServerPath), properties.get(wfVarAcceptUrl), params, null);
+        String rejectLink = makeLink(properties.get(wfVarServerPath), properties.get(wfVarRejectUrl), params, null);
+        
+        String siteDashboardEndpoint = getSiteDashboardEndpoint(properties);
+        String siteDashboardLink = makeLink(properties.get(wfVarServerPath), 
+                siteDashboardEndpoint, null, null);
+        String siteLeaveLink = makeLink(properties.get(wfVarServerPath), 
+                siteDashboardEndpoint, null, SITE_LEAVE_HASH);
+        
         Map<String, String> args = new HashMap<String, String>();
         args.put("inviteePersonRef", invitee.toString());
         args.put("inviterPersonRef", inviter.toString());
@@ -181,15 +204,32 @@ public class InviteSender
         args.put("inviteeGenPassword", properties.get(wfVarInviteeGenPassword));
         args.put("acceptLink", acceptLink);
         args.put("rejectLink", rejectLink);
+        args.put("siteDashboardLink", siteDashboardLink);
+        args.put("siteLeaveLink", siteLeaveLink);
         return args;
     }
 
-    protected String makeLink(String location, String endpoint, String queryParams)
+    protected String makeLink(String location, String endpoint, String queryParams, String hashParam)
     {
         location = location.endsWith("/") ? location : location + "/";
         endpoint = endpoint.startsWith("/") ? endpoint.substring(1) : endpoint;
-        queryParams = queryParams.startsWith("?") ? queryParams : "?" + queryParams;
-        return location + endpoint + queryParams;
+        if (queryParams != null)
+        {
+            queryParams = queryParams.startsWith("?") ? queryParams : "?" + queryParams;
+        }
+        else
+        {
+            queryParams = "";
+        }
+        if (hashParam != null)
+        {
+            hashParam = hashParam.startsWith("#") ? hashParam : "#" + hashParam;
+        }
+        else
+        {
+            hashParam = "";
+        }
+        return location + endpoint + queryParams + hashParam;
     }
 
     private String getRoleName(Map<String, String> properties) 
@@ -214,10 +254,10 @@ public class InviteSender
         return new NodeRef(packageRef);
     }
 
-    private NodeRef getEmailTemplateNodeRef()
+    private NodeRef getEmailTemplateNodeRef(String emailTemplateXPath)
     {
         List<NodeRef> nodeRefs = searchService.selectNodes(repository.getRootHome(), 
-                    "app:company_home/app:dictionary/app:email_templates/cm:invite/cm:invite-email.html.ftl", null, 
+                    emailTemplateXPath, null, 
                     this.namespaceService, false);
         
         if (nodeRefs.size() == 1) 
@@ -260,5 +300,11 @@ public class InviteSender
             siteName = siteTitle;
         }
         return siteName;
+    }
+    
+    private String getSiteDashboardEndpoint(Map<String, String> properties)
+    {
+        String siteName = properties.get(wfVarResourceName);
+        return MessageFormat.format(SITE_DASHBOARD_ENDPOINT_PATTERN, siteName);
     }
 }

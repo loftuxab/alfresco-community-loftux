@@ -29,6 +29,10 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.test_category.OwnJVMTestsCategory;
 import org.alfresco.util.ApplicationContextHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.experimental.categories.Category;
 import org.springframework.context.ApplicationContext;
 
@@ -48,6 +52,8 @@ public class JobLockServiceTest extends TestCase
 {
     public static final String NAMESPACE = "http://www.alfresco.org/test/JobLockServiceTest";
     
+    private static final Log logger = LogFactory.getLog(JobLockServiceTest.class);
+    
     private ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
 
     private TransactionService transactionService;
@@ -63,7 +69,7 @@ public class JobLockServiceTest extends TestCase
     private QName lockABA;
     private QName lockABB;
     private QName lockABC;
-    
+
     @Override
     public void setUp() throws Exception
     {
@@ -86,7 +92,7 @@ public class JobLockServiceTest extends TestCase
         lockABB = QName.createQName(NAMESPACE, "a-" + testName + ".b-" + testName + ".b-" + testName);
         lockABC = QName.createQName(NAMESPACE, "a-" + testName + ".b-" + testName + ".c-" + testName);
     }
-    
+
     public void testSetUp()
     {
         assertNotNull(jobLockService);
@@ -109,8 +115,21 @@ public class JobLockServiceTest extends TestCase
         lockToken = jobLockService.getLock(lockAAA, 20L, 5L, 0);            // No retries
         jobLockService.refreshLock(lockToken, lockAAA, 20L);
         jobLockService.releaseLock(lockToken, lockAAA);
+
+        try
+        {
+            jobLockService.getLock(lockAAA, 20L, 5L, -1);
+            fail("getLock should have failed ");
+        }
+        catch (IllegalArgumentException expected)
+        {
+           expected.getMessage().contains("Job lock retry count cannot be negative");
+        }
+
     }
-    
+
+
+
     public void testEnforceTxn()
     {
         try
@@ -352,50 +371,64 @@ public class JobLockServiceTest extends TestCase
     
     public synchronized void testLockCallbackReleaseSelf() throws Exception
     {
-        final QName lockQName = QName.createQName(NAMESPACE, getName());
-        final long lockTTL = 1000L;
-        final String lockToken = jobLockService.getLock(lockQName, lockTTL);
-
-        final int[] checked = new int[1];
-        final int[] released = new int[1];
-        // Immediately-inactive job, releasing the lock
-        JobLockRefreshCallback callback = new JobLockRefreshCallback()
-        {
-            @Override
-            public boolean isActive()
-            {
-                checked[0]++;
-                jobLockService.releaseLock(lockToken, lockQName);
-                return false;
-            }
-            
-            @Override
-            public void lockReleased()
-            {
-                released[0]++;
-            }
-        };
-
-        jobLockService.refreshLock(lockToken, lockQName, lockTTL, callback);
-        // The first refresh will occur in 500ms
-        wait(1000L);
-        // Should NOT get a callback saying that the lock has been released
-        assertFalse("Lock should be optimistically released", released[0] > 0);
+        // ACE-4347 extra debug logging just for this test so we can see what's going on when it next fails
+        Level saveLogLevel = Logger.getLogger("org.alfresco.repo.lock").getLevel();
+        Logger.getLogger("org.alfresco.repo.lock").setLevel(Level.ALL);
         try
         {
-            jobLockService.getLock(lockQName, lockTTL);
+            final QName lockQName = QName.createQName(NAMESPACE, getName());
+            final long lockTTL = 1000L;
+            final String lockToken = jobLockService.getLock(lockQName, lockTTL);
+    
+            final int[] checked = new int[1];
+            final int[] released = new int[1];
+            // Immediately-inactive job, releasing the lock
+            JobLockRefreshCallback callback = new JobLockRefreshCallback()
+            {
+                @Override
+                public boolean isActive()
+                {
+                    checked[0]++;
+                    jobLockService.releaseLock(lockToken, lockQName);
+                    return false;
+                }
+                
+                @Override
+                public void lockReleased()
+                {
+                    released[0]++;
+                }
+            };
+    
+            jobLockService.refreshLock(lockToken, lockQName, lockTTL, callback);
+            // The first refresh will occur in 500ms
+            wait(1000L);
+            // Should NOT get a callback saying that the lock has been released
+            assertFalse("Lock should be optimistically released", released[0] > 0);
+            try
+            {
+                jobLockService.getLock(lockQName, lockTTL);
+            }
+            catch (LockAcquisitionException e)
+            {
+                fail("Lock should have been released by callback infrastructure");
+            }
+            
+            // Check that the timed callback is killed properly
+            int checkedCount = checked[0];
+            int releasedCount = released[0];
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("checkedCount=" + checkedCount + ",releasedCount=" + releasedCount);
+            }
+            wait(10000L);
+            assertEquals("Lock callback timer was not terminated", checkedCount, checked[0]);
+            assertEquals("Lock callback timer was not terminated", releasedCount, released[0]);
         }
-        catch (LockAcquisitionException e)
+        finally
         {
-            fail("Lock should have been released by callback infrastructure");
+            Logger.getLogger("org.alfresco.repo.lock").setLevel(saveLogLevel);
         }
-        
-        // Check that the timed callback is killed properly
-        int checkedCount = checked[0];
-        int releasedCount = released[0];
-        wait(2000L);
-        assertEquals("Lock callback timer was not terminated", checkedCount, checked[0]);
-        assertEquals("Lock callback timer was not terminated", releasedCount, released[0]);
     }
     
     /**
@@ -460,4 +493,135 @@ public class JobLockServiceTest extends TestCase
         assertEquals("Lock callback timer was not terminated", checkedCount, checked[0]);
         assertEquals("Lock callback timer was not terminated", releasedCount, released[0]);
     }
+    
+    public void testGetLockWithCallbackNullLock()       { runGetLockWithCallback(0); }
+    public void testGetLockWithCallbackNullCallback()   { runGetLockWithCallback(1); }
+    public void testGetLockWithCallbackShortTTL()       { runGetLockWithCallback(2); }
+    public void testGetLockWithCallbackLocked()         { runGetLockWithCallback(3); }
+    public void testGetLockWithCallbackNormal()         { runGetLockWithCallback(4); }
+    
+    public void runGetLockWithCallback(int t)
+    {
+        // ACE-4347 extra debug logging just for this test so we can see what's going on when it next fails
+        Level saveLogLevel = Logger.getLogger("org.alfresco.repo.lock").getLevel();
+        Logger.getLogger("org.alfresco.repo.lock").setLevel(Level.ALL);
+
+        logger.debug("runGetLockWithCallback "+t+
+            "\n----------------------------------------"+
+            "\n"+Thread.currentThread().getStackTrace()[2].getMethodName()+
+            "\n----------------------------------------");
+        
+        String token  = null;
+        String tokenB = null;
+        try 
+        { 
+            QName        lockName   = t==0 ? null : lockA;
+            TestCallback callback   = t==1 ? null : new TestCallback();
+            long         timeToLive = t==2 ? 1    : 50; 
+
+            if (t==3) 
+            {
+                // default num retries * default retry wait + time to create lock (pessimistic)
+                long ttlLongerThanDefaultRetry = 10*20 + 2000;
+                tokenB = jobLockService.getLock(lockA, ttlLongerThanDefaultRetry);
+            }                
+
+            token = jobLockService.getLock(lockName, timeToLive, callback);
+
+            if (t<4) fail("expected getLock to fail");
+            
+            if (callback == null) throw new IllegalStateException();
+            
+            assertEquals(false,callback.released);
+            assertEquals(0,callback.isActiveCount);
+            
+            Thread.sleep(40);
+            
+            assertEquals(false,callback.released);
+            assertEquals(1,callback.isActiveCount);
+            
+            callback.isActive = false;
+            
+            Thread.sleep(1000); // need to make this quite long to account for slow database updates
+            
+            assertEquals(true,callback.released);
+            assertEquals(2,callback.isActiveCount);
+        }
+        catch (IllegalArgumentException e)
+        {            
+            switch (t)
+            {
+                case 0: logger.debug("null lock      => exception as expected: "+e); break;
+                case 1: logger.debug("null callback  => exception as expected: "+e); break;
+                case 2: logger.debug("short ttl      => exception as expected: "+e); break;
+                default: fail("exception not expected: "+e); break;
+            }
+        }
+        catch (LockAcquisitionException e)
+        {            
+            switch (t)
+            {
+                case 3: logger.debug("already locked => exception as expected: "+e); break;
+                default: fail("exception not expected: "+e); break;
+            }
+        }
+        catch (Exception e)
+        {
+            fail("exception not expected: "+e);
+        }
+        finally
+        {
+            if (token != null) 
+            {
+                logger.debug("token should have been released");
+                if (jobLockService.releaseLockVerify(token, lockA))
+                {
+                    fail("token not released");
+                }
+            }
+            
+            if (tokenB != null) 
+            {
+                logger.debug("tokenB should be released");
+                jobLockService.releaseLockVerify(tokenB, lockA);
+            }
+            
+            try
+            {
+                logger.debug("lock should have been released so check can acquire");
+                String tokenC = jobLockService.getLock(lockA, 50);
+                jobLockService.releaseLock(tokenC, lockA);
+            }
+            catch (LockAcquisitionException e)
+            {
+                fail("lock not released");
+            }
+            
+            logger.debug("runGetLockWithCallback\n----------------------------------------");
+
+            Logger.getLogger("org.alfresco.repo.lock").setLevel(saveLogLevel);
+        }
+    }
+    
+    private class TestCallback implements JobLockRefreshCallback
+    {
+        public volatile long isActiveCount;
+        public volatile boolean released;
+        public volatile boolean isActive = true;
+
+        @Override
+        public boolean isActive()
+        {
+            isActiveCount++;
+            logger.debug("TestCallback.isActive => "+isActive+" ("+isActiveCount+")");
+            return isActive;
+        }
+
+        @Override
+        public void lockReleased()
+        {
+            logger.debug("TestCallback.lockReleased");
+            released = true;
+        }
+    }    
 }

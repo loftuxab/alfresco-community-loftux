@@ -318,7 +318,6 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
      * @param type1Msg Type1NTLMMessage
      * @param req HttpServletRequest
      * @param res HttpServletResponse
-     * @param session HttpSession
      * @exception IOException
      */
     protected void processType1(Type1NTLMMessage type1Msg, HttpServletRequest req,
@@ -428,9 +427,7 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
      * @param type3Msg Type3NTLMMessage
      * @param req HttpServletRequest
      * @param res HttpServletResponse
-     * @param session HttpSession
-     * @param chain FilterChain
-     * 
+     *
      * @exception IOException
      * @exception ServletException
      */
@@ -674,10 +671,10 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Validate the MD4 hash against local password
      * 
-     * @param type3Msg
-     * @param ntlmDetails
-     * @param authenticated
-     * @param md4hash
+     * @param type3Msg Type3NTLMMessage
+     * @param ntlmDetails NTLMLogonDetails
+     * @param authenticated boolean
+     * @param md4hash String
      * 
      * @return true if password hash is valid, false otherwise
      */
@@ -746,9 +743,9 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Perform an NTLMv1 hashed password check
      * 
-     * @param String md4hash
-     * @param byte[] challenge
-     * @param Type3NTLMMessage type3Msg
+     * @param md4hash String
+     * @param challenge byte[]
+     * @param type3Msg Type3NTLMMessage
      * @param checkLMHash boolean
      * @return boolean
      */
@@ -801,9 +798,9 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Perform an NTLMv2 check
      * 
-     * @param String md4hash
-     * @param byte[] challenge
-     * @param Type3NTLMMessage type3Msg
+     * @param md4hash String
+     * @param challenge byte[]
+     * @param type3Msg Type3NTLMMessage
      * @return boolean
      */
     protected final boolean checkNTLMv2(String md4hash, byte[] challenge, Type3NTLMMessage type3Msg)
@@ -900,9 +897,9 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Perform an NTLMv2 session key check
      * 
-     * @param String md4hash
-     * @param byte[] challenge
-     * @param Type3NTLMMessage type3Msg
+     * @param md4hash String
+     * @param challenge byte[]
+     * @param type3Msg Type3NTLMMessage
      * @return boolean
      */
     protected final boolean checkNTLMv2SessionKey(String md4hash, byte[] challenge, Type3NTLMMessage type3Msg)
@@ -981,9 +978,8 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Get the stored MD4 hashed password for the user, or null if the user does not exist
      * 
-     * @param userName
-     * @param md4hash
-     * 
+     * @param userName String
+     *
      * @return MD4 hash or null
      */
     protected String getMD4Hash(String userName)
@@ -1039,9 +1035,9 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
     /**
      * Restart the NTLM logon process
      * 
-     * @param context
-     * @param resp
-     * @param httpSess
+     * @param context ServletContext
+     * @param req HttpServletRequest
+     * @param res SessHttpServletResponse
      * @throws IOException
      */
     public void restartLoginChallenge(ServletContext context, HttpServletRequest req, HttpServletResponse res) throws IOException
@@ -1056,8 +1052,9 @@ public abstract class BaseNTLMAuthenticationFilter extends BaseSSOAuthentication
             clearSession(session);
         }
         
+        // check for "chrome" since Chrome user-agent contains a Safari version
         String userAgent = req.getHeader("user-agent");
-        if (userAgent != null && userAgent.indexOf("Safari") != -1)
+        if (userAgent != null && userAgent.indexOf("Safari") != -1 && userAgent.indexOf("Chrome") == -1)
         {
             final PrintWriter out = res.getWriter();
             out.println("<html><head></head>");

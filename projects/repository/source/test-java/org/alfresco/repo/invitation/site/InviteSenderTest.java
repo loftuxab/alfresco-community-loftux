@@ -49,6 +49,8 @@ import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.admin.SysAdminParamsImpl;
 import org.alfresco.repo.i18n.MessageService;
+import org.alfresco.repo.invitation.activiti.SendNominatedInviteAddDirectDelegate;
+import org.alfresco.repo.invitation.activiti.SendNominatedInviteDelegate;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
@@ -94,6 +96,8 @@ public class InviteSenderTest extends TestCase
 
     private static final String acceptUrl = "/accpet";
     private static final String rejectUrl = "/reject";
+    private static final String dashboardUrl = "/dashboard";
+    private static final String leaveSiteUrl = "/dashboard#leavesite";
     private static final String role = "Role";
     private static final String password = "password";
     private static final String ticket = "Ticket";
@@ -107,15 +111,17 @@ public class InviteSenderTest extends TestCase
     private InviteSender sender;
     private Map<String,Serializable> lastSetMailModel;
 
-    public void testSendMailWorkingPath() throws Exception
+    protected void testSendMailWorkingPath(
+            String emailTemplateXpath, String emailSubjectKey, boolean requireAcceptance) throws Exception
     {
         String rolePropertyName = "invitation.invitesender.email.role.Role";
-        String subjectPropertyName = "invitation.invitesender.email.subject";
+        String subjectPropertyName = 
+                requireAcceptance ? "invitation.invitesender.email.subject" : "invitation.invitesender.emailAddDirect.subject";
 
         String subjectMsg = "Subject message";
 
         Map<String, String> properties = buildDefaultProperties();
-        sender.sendMail(properties);
+        sender.sendMail(emailTemplateXpath, emailSubjectKey, properties);
 
         verify(messageService).getMessage(eq(rolePropertyName));
 
@@ -155,13 +161,26 @@ public class InviteSenderTest extends TestCase
         assertEquals(inviter.node.toString(), argsMap.get("inviterPersonRef"));
         assertEquals(siteShortName, argsMap.get("siteName"));
         assertEquals(invitee.name, argsMap.get("inviteeUserName"));
-        assertEquals(password, argsMap.get("inviteeGenPassword"));
-        assertEquals(
-                    "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=invitee&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    argsMap.get("acceptLink"));
-        assertEquals(
-                    "test://test/path/reject?inviteId=InstanceId&inviteeUserName=invitee&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    argsMap.get("rejectLink"));
+        
+        if (requireAcceptance)
+        {
+            assertEquals(password, argsMap.get("inviteeGenPassword"));
+            assertEquals(
+                        "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=invitee&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        argsMap.get("acceptLink"));
+            assertEquals(
+                        "test://test/path/reject?inviteId=InstanceId&inviteeUserName=invitee&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        argsMap.get("rejectLink"));
+        }
+        else
+        {
+            assertEquals(
+                    "test://test/path/page/site/Full Site Name" + dashboardUrl,
+                    argsMap.get("siteDashboardLink"));
+            assertEquals(
+                    "test://test/path/page/site/Full Site Name" + leaveSiteUrl,
+                    argsMap.get("siteLeaveLink"));
+        }
 
         
         // When no role message is found then the role name is used.
@@ -172,7 +191,7 @@ public class InviteSenderTest extends TestCase
         reset(mailAction, messageService);
         String roleMsg = "role message";
         when(messageService.getMessage(rolePropertyName)).thenReturn(roleMsg);
-        sender.sendMail(properties);
+        sender.sendMail(emailTemplateXpath, emailSubjectKey, properties);
         
         // Grab the args and check
         modelC = ArgumentCaptor.forClass(Map.class);
@@ -184,12 +203,29 @@ public class InviteSenderTest extends TestCase
             
         assertEquals(roleMsg, argsMap.get("inviteeSiteRole"));
     }
+    
+    public void testSendMailWorkingPath() throws Exception
+    {
+        testSendMailWorkingPath(
+                SendNominatedInviteAddDirectDelegate.EMAIL_TEMPLATE_XPATH, 
+                SendNominatedInviteAddDirectDelegate.EMAIL_SUBJECT_KEY,
+                false);
+    }
+    
+    public void testSendMailWorkingPathRequireAcceptance() throws Exception
+    {
+        testSendMailWorkingPath(
+                SendNominatedInviteDelegate.EMAIL_TEMPLATE_XPATH, 
+                SendNominatedInviteDelegate.EMAIL_SUBJECT_KEY,
+                true);
+    }
 
-    public void testSendMailWithWhitespaceUserName() throws Exception
+    protected void testSendMailWithWhitespaceUserName(
+            String emailTemplateXPath, String emailSubjectKey, boolean requireAcceptance) throws Exception
     {
         Map<String, String> properties = buildDefaultProperties();
         properties.put(wfVarInviteeUserName, whitespaceInvitee.name);
-        sender.sendMail(properties);
+        sender.sendMail(emailTemplateXPath, emailSubjectKey, properties);
         
         ArgumentCaptor<Map> modelC = ArgumentCaptor.forClass(Map.class);
         verify(mailAction).setParameterValue(eq(MailActionExecuter.PARAM_TEMPLATE_MODEL), (Serializable)modelC.capture());
@@ -201,23 +237,43 @@ public class InviteSenderTest extends TestCase
         assertEquals(null, model.get("userhome"));
         assertNotNull(model.get("productName"));
         
-        // And the args within it
-        Map<String, String> argsMap = (Map)model.get("args");
-        String acceptLink = argsMap.get("acceptLink");
-        assertEquals(
-                    "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=First%20Second%09third%0aFourth%0d%0aFifth&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    acceptLink);
-        String rejectLink = argsMap.get("rejectLink");
-        assertEquals(
-                    "test://test/path/reject?inviteId=InstanceId&inviteeUserName=First%20Second%09third%0aFourth%0d%0aFifth&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    rejectLink);
+        if (requireAcceptance)
+        {
+            // And the args within it
+            Map<String, String> argsMap = (Map)model.get("args");
+            String acceptLink = argsMap.get("acceptLink");
+            assertEquals(
+                        "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=First%20Second%09third%0aFourth%0d%0aFifth&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        acceptLink);
+            String rejectLink = argsMap.get("rejectLink");
+            assertEquals(
+                        "test://test/path/reject?inviteId=InstanceId&inviteeUserName=First%20Second%09third%0aFourth%0d%0aFifth&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        rejectLink);
+        }
+    }
+    
+    public void testSendMailWithWhitespaceUserName() throws Exception
+    {
+        testSendMailWithWhitespaceUserName(
+                SendNominatedInviteAddDirectDelegate.EMAIL_TEMPLATE_XPATH,
+                SendNominatedInviteAddDirectDelegate.EMAIL_SUBJECT_KEY,
+                false);
+    }
+    
+    public void testSendMailWithWhitespaceUserNameRequireAcceptance() throws Exception
+    {
+        testSendMailWithWhitespaceUserName(
+                SendNominatedInviteDelegate.EMAIL_TEMPLATE_XPATH,
+                SendNominatedInviteDelegate.EMAIL_SUBJECT_KEY,
+                true);
     }
 
-    public void testSendMailWithSpecialCharUserName() throws Exception
+    protected void testSendMailWithSpecialCharUserName(
+            String emailTemplateXpath, String emailSubjectKey, boolean requireAcceptance) throws Exception
     {
         Map<String, String> properties = buildDefaultProperties();
         properties.put(wfVarInviteeUserName, specialCharInvitee.name);
-        sender.sendMail(properties);
+        sender.sendMail(emailTemplateXpath, emailSubjectKey, properties);
         
         ArgumentCaptor<Map> modelC = ArgumentCaptor.forClass(Map.class);
         verify(mailAction).setParameterValue(eq(MailActionExecuter.PARAM_TEMPLATE_MODEL), (Serializable)modelC.capture());
@@ -229,30 +285,49 @@ public class InviteSenderTest extends TestCase
         assertEquals(null, model.get("userhome"));
         assertNotNull(model.get("productName"));
         
-        // And the args within it
-        Map<String, String> argsMap = (Map)model.get("args");
-        String acceptLink = argsMap.get("acceptLink");
-        assertEquals(
-                    "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=%c3%a0%c3%a2%c3%a6%c3%a7%c3%a9%c3%a8%c3%aa%c3%ab%c3%ae%c3%af%c3%b4%c5%93%c3%b9%c3%bb%c3%bc%c3%bf%c3%b1&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    acceptLink);
-        String rejectLink = argsMap.get("rejectLink");
-        assertEquals(
-                    "test://test/path/reject?inviteId=InstanceId&inviteeUserName=%c3%a0%c3%a2%c3%a6%c3%a7%c3%a9%c3%a8%c3%aa%c3%ab%c3%ae%c3%af%c3%b4%c5%93%c3%b9%c3%bb%c3%bc%c3%bf%c3%b1&siteShortName=Full Site Name&inviteTicket=Ticket",
-                    rejectLink);
+        if (requireAcceptance)
+        {
+            // And the args within it
+            Map<String, String> argsMap = (Map)model.get("args");
+            String acceptLink = argsMap.get("acceptLink");
+            assertEquals(
+                        "test://test/path/accpet?inviteId=InstanceId&inviteeUserName=%c3%a0%c3%a2%c3%a6%c3%a7%c3%a9%c3%a8%c3%aa%c3%ab%c3%ae%c3%af%c3%b4%c5%93%c3%b9%c3%bb%c3%bc%c3%bf%c3%b1&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        acceptLink);
+            String rejectLink = argsMap.get("rejectLink");
+            assertEquals(
+                        "test://test/path/reject?inviteId=InstanceId&inviteeUserName=%c3%a0%c3%a2%c3%a6%c3%a7%c3%a9%c3%a8%c3%aa%c3%ab%c3%ae%c3%af%c3%b4%c5%93%c3%b9%c3%bb%c3%bc%c3%bf%c3%b1&siteShortName=Full Site Name&inviteTicket=Ticket",
+                        rejectLink);
+        }
+    }
+    
+    public void testSendMailWithSpecialCharUserName() throws Exception
+    {
+        testSendMailWithSpecialCharUserName(
+                SendNominatedInviteAddDirectDelegate.EMAIL_TEMPLATE_XPATH,
+                SendNominatedInviteAddDirectDelegate.EMAIL_SUBJECT_KEY,
+                false);
+    }
+    
+    public void testSendMailWithSpecialCharUserNameRequireAcceptance() throws Exception
+    {
+        testSendMailWithSpecialCharUserName(
+                SendNominatedInviteDelegate.EMAIL_TEMPLATE_XPATH, 
+                SendNominatedInviteDelegate.EMAIL_SUBJECT_KEY,
+                true);
     }
     
     public void testValidServerPath() throws Exception
     {      
         String validPath = "test://test/path/accept?hello";
-        String link = sender.makeLink("test://test/path", "accept", "hello");
+        String link = sender.makeLink("test://test/path", "accept", "hello", null);
         assertEquals(validPath, link);
-        link = sender.makeLink("test://test/path/", "accept", "hello");
+        link = sender.makeLink("test://test/path/", "accept", "hello", null);
         assertEquals(validPath, link);
-        link = sender.makeLink("test://test/path", "/accept", "hello");
+        link = sender.makeLink("test://test/path", "/accept", "hello", null);
         assertEquals(validPath, link);
-        link = sender.makeLink("test://test/path/", "/accept", "hello");
+        link = sender.makeLink("test://test/path/", "/accept", "hello", null);
         assertEquals(validPath, link);
-        link = sender.makeLink("test://test/path", "/accept", "?hello");
+        link = sender.makeLink("test://test/path", "/accept", "?hello", null);
         assertEquals(validPath, link);
     }
     
@@ -291,7 +366,7 @@ public class InviteSenderTest extends TestCase
     /**
      * Mocks up a Repository that will return the inviter as the current user.
      * 
-     * @return
+     * @return Repository
      */
     private Repository mockRepository()
     {
@@ -301,7 +376,7 @@ public class InviteSenderTest extends TestCase
     }
 
     /**
-     * @return
+     * @return ServiceRegistry
      */
     private ServiceRegistry mockServices()
     {
@@ -360,7 +435,7 @@ public class InviteSenderTest extends TestCase
     /**
      * Mocks up a SiteService that returns appropriate SiteInfo.
      * 
-     * @return
+     * @return SiteService
      */
     private SiteService mockSiteService()
     {
@@ -374,7 +449,7 @@ public class InviteSenderTest extends TestCase
      * Mocks up a SearchService that will return the template NodeRef when
      * queried.
      * 
-     * @return
+     * @return SearchService
      */
     private SearchService mockSearchService()
     {
@@ -393,7 +468,7 @@ public class InviteSenderTest extends TestCase
      * Mocks up a PersonService that returns the correct NodeRef when given a
      * user name.
      * 
-     * @return
+     * @return PersonService
      */
     private PersonService mockPersonService()
     {
@@ -408,7 +483,7 @@ public class InviteSenderTest extends TestCase
     /**
      * Mocks up NodeService to return email adresses for inviter and invitee.
      * 
-     * @return
+     * @return NodeService
      */
     private NodeService mockNodeService()
     {

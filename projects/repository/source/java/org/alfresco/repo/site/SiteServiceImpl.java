@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,11 +47,13 @@ import org.alfresco.query.CannedQueryParameters;
 import org.alfresco.query.CannedQueryResults;
 import org.alfresco.query.CannedQuerySortDetails;
 import org.alfresco.query.CannedQuerySortDetails.SortOrder;
+import org.alfresco.query.PageDetails;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.activities.ActivityType;
 import org.alfresco.repo.admin.SysAdminParams;
 import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.domain.node.NodeDAO;
 import org.alfresco.repo.events.EventPreparator;
 import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.node.NodeArchiveServicePolicies;
@@ -92,7 +96,6 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
-import org.alfresco.service.cmr.security.AuthorityService.AuthorityFilter;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -106,6 +109,7 @@ import org.alfresco.service.cmr.tagging.TaggingService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.GUID;
 import org.alfresco.util.Pair;
 import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.PropertyMap;
@@ -149,7 +153,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     // note: caches are tenant-aware (if using EhCacheAdapter shared cache)
     
     private SimpleCache<String, Object> singletonCache; // eg. for siteHomeNodeRef
-    private final String KEY_SITEHOME_NODEREF = "key.sitehome.noderef";
+    private static final String KEY_SITEHOME_NODEREF = "key.sitehome.noderef";
     
     private SimpleCache<String, NodeRef> siteNodeRefCache; // for site shortname to nodeRef lookup
     
@@ -188,9 +192,12 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     private SitesPermissionCleaner sitesPermissionsCleaner;
     private PolicyComponent policyComponent;
     private PublicServiceAccessService publicServiceAccessService;
+    private NodeDAO nodeDAO;
     private EventPublisher eventPublisher;
     
     private NamedObjectRegistry<CannedQueryFactory<? extends Object>> cannedQueryRegistry;
+    
+    private static int GET_CHILD_ASSOCS_PAGE_SIZE = 512;
 
     /**
      * Set the path to the location of the sites root folder.  For example:
@@ -365,6 +372,11 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     public void setPublicServiceAccessService(PublicServiceAccessService publicServiceAccessService)
     {
         this.publicServiceAccessService = publicServiceAccessService;
+    }
+    
+    public void setNodeDAO(NodeDAO nodeDAO)
+    {
+        this.nodeDAO = nodeDAO;
     }
 
     /**
@@ -576,9 +588,10 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
      * Note - Changes here likely need to be replicated to the {@link #updateSite(SiteInfo)}
      *  method too, as that also has to deal with Site Permissions.
      * 
-     * @param siteNodeRef
-     * @param shortName
-     * @param visibility
+     * @param siteNodeRef NodeRef
+     * @param shortName String
+     * @param visibility SiteVisibility
+     * @param memberships Map<String, Set<String>>
      */
     private void setupSitePermissions(
             final NodeRef siteNodeRef, final String shortName, final SiteVisibility visibility, final Map<String, Set<String>> memberships)
@@ -703,7 +716,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     /**
      * Gets a map containing the site's custom properties
      * 
-     * @return  Map<QName, Serializable>    map containing the custom properties of the site
+     * @return  map containing the custom properties of the site
      */
     private Map<QName, Serializable> getSiteCustomProperties(Map<QName, Serializable> properties)
     {
@@ -723,7 +736,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     /**
      * Gets a map containing the site's custom properties
      * 
-     * @return  Map<QName, Serializable>    map containing the custom properties of the site
+     * @return  map containing the custom properties of the site
      */
     private Map<QName, Serializable> getSiteCustomProperties(NodeRef siteNodeRef)
     {
@@ -1180,13 +1193,6 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         };
     }
 
-        /**
-     * This method returns the {@link SiteInfo siteInfos} for sites to which the specified user has access.
-     * Note that if the user has access to more than 1000 sites, the list will be truncated to 1000 entries.
-     * 
-     * @param userName the username
-     * @return a list of {@link SiteInfo site infos}.
-     */
     public String resolveSite(String group)
     {
         // purge non Site related Groups and strip the group name down to the site "shortName" it relates too
@@ -1206,44 +1212,20 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         return null;
     }
 
+    /**
+     * This method returns the {@link SiteInfo siteInfos} for sites to which the specified user has access.
+     * Note that if the user has access to more than 1000 sites, the list will be truncated to 1000 entries.
+     * 
+     * @param userName the username
+     * @return a list of {@link SiteInfo site infos}.
+     */
     private List<SiteInfo> listSitesImpl(final String userName, int size)
     {
-        final int maxResults = size > 0 ? size : 1000;
-        final Set<String> siteNames = new TreeSet<String>();
-        authorityService.getContainingAuthoritiesInZone(AuthorityType.GROUP, userName, AuthorityService.ZONE_APP_SHARE, new AuthorityFilter(){
-            @Override
-            public boolean includeAuthority(String authority)
-            {
-                if (siteNames.size() < maxResults)
-                {
-                    String siteName = resolveSite(authority);
-                    // MNT-10836 fix, after MNT-10109 we should also check site existence
-                    if (siteName == null || getSite(siteName) == null)
-                    {
-                        return false;
-                    }
-                    return siteNames.add(siteName);
-                }
-                return false;
-            }}, maxResults);
-        if (siteNames.isEmpty())
+        List<SiteMembership> siteMemberships = listSiteMemberships(userName, size);
+        List<SiteInfo> result = new ArrayList<SiteInfo>(siteMemberships.size());
+        for (SiteMembership membership : siteMemberships)
         {
-            return Collections.emptyList();
-        }
-        List<ChildAssociationRef> assocs = this.nodeService.getChildrenByName(
-                getSiteRoot(),
-                ContentModel.ASSOC_CONTAINS,
-                siteNames);
-        List<SiteInfo> result = new ArrayList<SiteInfo>(assocs.size());
-        for (ChildAssociationRef assoc : assocs)
-        {
-            // Ignore any node that is not a "site" type
-            NodeRef site = assoc.getChildRef();
-            QName siteClassName = this.directNodeService.getType(site);
-            if (this.dictionaryService.isSubClass(siteClassName, SiteModel.TYPE_SITE))
-            {
-                result.add(createSiteInfo(site));
-            }
+            result.add(membership.getSiteInfo());
         }
         return result;
     }
@@ -1263,8 +1245,8 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         Map<QName, Serializable> properties = this.directNodeService.getProperties(siteNodeRef);
         String shortName = (String) properties.get(ContentModel.PROP_NAME);
         String sitePreset = (String) properties.get(PROP_SITE_PRESET);
-        String title = (String) properties.get(ContentModel.PROP_TITLE);
-        String description = (String) properties.get(ContentModel.PROP_DESCRIPTION);
+        String title = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_TITLE));
+        String description = DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_DESCRIPTION));
 
         // Get the visibility of the site
         SiteVisibility visibility = getSiteVisibility(siteNodeRef);
@@ -1356,8 +1338,8 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     /**
      * Get the site implementation given a short name
      * 
-     * @param shortName
-     * @return
+     * @param shortName String
+     * @return SiteInfo
      */
     private SiteInfo getSiteImpl(String shortName)
     {
@@ -1559,10 +1541,10 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
                 }
             }
 
-            // If the site was moderated before, undo the work of #setModeratedPermissions
+            // If the site was moderated/private before, undo the work of #setModeratedPermissions/#setPrivatePermissions
             //   by restoring inherited permissions on the containers
             // (Leaving the old extra permissions on containers is fine)
-            if (SiteVisibility.MODERATED.equals(currentVisibility) == true)
+            if (SiteVisibility.MODERATED.equals(currentVisibility) == true || SiteVisibility.PRIVATE.equals(currentVisibility) == true)
             {
                 List<FileInfo> folders = fileFolderService.listFolders(siteNodeRef);
                 for(FileInfo folder : folders)
@@ -1592,7 +1574,13 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
             }
             else if (SiteVisibility.PRIVATE.equals(updatedVisibility))
             {
-                // No additional permissions need to be granted for a site become private
+                // Set the private permissions on all the containers the site already has
+                List<FileInfo> folders = fileFolderService.listFolders(siteNodeRef);
+                for(FileInfo folder : folders)
+                {
+                    NodeRef containerNodeRef = folder.getNodeRef();
+                    setPrivatePermissions(shortName, containerNodeRef);
+                }
             }
             
             // Update the site node reference with the updated visibility value
@@ -1725,23 +1713,10 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         {
             throw new SiteDoesNotExistException(shortName);
         }
-        
-        // Build an array of name filter tokens pre lowercased to test against person properties
-        // We require that matching people have at least one match against one of these on
-        //  either their firstname or last name
-        String nameFilterLower = null;
-        String[] nameFilters = new String[0];
-        if (nameFilter != null && nameFilter.length() != 0)
-        {
-            StringTokenizer t = new StringTokenizer(nameFilter, " ");
-            nameFilters = new String[t.countTokens()];
-            for (int i=0; t.hasMoreTokens(); i++)
-            {
-                nameFilters[i] = t.nextToken().toLowerCase();
-            }
-            nameFilterLower = nameFilter.toLowerCase();
-        }
-        
+
+        String[] nameFilters = tokenizeFilterLowercase(nameFilter);
+        String nameFilterLower = nameFilters.length>0?nameFilter.toLowerCase():null;
+
         QName siteType = directNodeService.getType(siteNodeRef);
         Set<String> permissions = this.permissionService.getSettablePermissions(siteType);
         Map<String, String> groupsToExpand = new HashMap<String, String>(32);
@@ -1813,6 +1788,9 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
                             }
                         }
                         break;
+                    default:
+                        // TODO: Should error but do not want to break anything here, so will fall through (DH)
+                        break;
                     }
                 }
             }
@@ -1847,10 +1825,28 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         }
     }
 
+    /*
+    * Build an array of name filter tokens pre lowercased to test against person properties
+    * We require that matching people have at least one match against one of these on
+    * either their firstname or last name
+    */
+    static String[] tokenizeFilterLowercase(String nameFilter)
+    {
+        String[] nameFilters = new String[0];
+        if (nameFilter != null && nameFilter.length() != 0)
+        {
+            String[] tokens = nameFilter.split(" ");
+            nameFilters = new String[tokens.length];
+            for (int i = 0; i <tokens.length ; i++)
+            {
+                nameFilters[i] = tokens[i].toLowerCase();
+            }
+        }
+        return nameFilters;
+    }
+
     public PagingResults<SiteMembership> listMembersPaged(String shortName, boolean collapseGroups, List<Pair<SiteService.SortFields, Boolean>> sortProps, PagingRequest pagingRequest)
     {
-        SiteMembershipCannedQueryFactory sitesCannedQueryFactory = (SiteMembershipCannedQueryFactory)cannedQueryRegistry.getNamedObject("sitesCannedQueryFactory");
-
         CannedQueryPageDetails pageDetails = new CannedQueryPageDetails(pagingRequest.getSkipCount(), pagingRequest.getMaxItems());
 
         // sort details
@@ -1869,7 +1865,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         SiteMembersCannedQueryParams parameterBean = new SiteMembersCannedQueryParams(shortName, collapseGroups);
         CannedQueryParameters params = new CannedQueryParameters(parameterBean, pageDetails, sortDetails, pagingRequest.getRequestTotalCountMax(), pagingRequest.getQueryExecutionId());
 
-        CannedQuery<SiteMembership> query = sitesCannedQueryFactory.getCannedQuery(params);
+		CannedQuery<SiteMembership> query = new SiteMembersCannedQuery(this, personService, nodeService, params);
 
         CannedQueryResults<SiteMembership> results = query.execute();
 
@@ -1982,23 +1978,10 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         {
             size = Integer.MAX_VALUE;
         }
-        
-        // Build an array of name filter tokens pre lowercased to test against person properties
-        // We require that matching people have at least one match against one of these on
-        // either their firstname or last name
-        String nameFilterLower = null;
-        String[] nameFilters = new String[0];
-        if (nameFilter != null && nameFilter.length() != 0)
-        {
-            StringTokenizer t = new StringTokenizer(nameFilter, " ");
-            nameFilters = new String[t.countTokens()];
-            for (int i = 0; t.hasMoreTokens(); i++)
-            {
-                nameFilters[i] = t.nextToken().toLowerCase();
-            }
-            nameFilterLower = nameFilter.toLowerCase();
-        }
 
+        String[] nameFilters = tokenizeFilterLowercase(nameFilter);
+        String nameFilterLower = nameFilters.length>0?nameFilter.toLowerCase():null;
+        
         List<SiteMemberInfo> members = new ArrayList<SiteMemberInfo>(32);
 
         QName siteType = directNodeService.getType(siteNodeRef);
@@ -2131,9 +2114,9 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
      * One of the user's firstname or lastname must match at least
      *  one of the filters given.
      * 
-     * @param filter
-     * @param username
-     * @return
+     * @param nameFilters String[]
+     * @param username String
+     * @return boolean
      */
     private boolean matchPerson(final String[] nameFilters, final String username)
     {
@@ -2270,7 +2253,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         List<String> groups = getPermissionGroups(shortName, authorityName);
         for (String group : groups)
         {
-            int index = group.lastIndexOf('_');
+            int index = group.indexOf(shortName) + shortName.length();
             if (index != -1)
             {
                 result.add(group.substring(index + 1));
@@ -2660,7 +2643,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
      * </ul>
      * If the containingSite is <code>null</code> then the targetNode's current containing site is used.
      * 
-     * @param targetNode
+     * @param targetNode NodeRef
      * @param containingSite the site which the site is a member of. If <code>null</code>, it will be calculated.
      */
     @Override
@@ -2680,7 +2663,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
 
 
     /**
-     * @see org.alfresco.service.cmr.site.SiteService#getContainer(java.lang.String)
+     * @see org.alfresco.service.cmr.site.SiteService#getContainer(java.lang.String, String)
      */
     public NodeRef getContainer(String shortName, String componentId)
     {
@@ -2726,7 +2709,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     }
 
     /**
-     * @see org.alfresco.service.cmr.site.SiteService#hasContainer(java.lang.String)
+     * @see org.alfresco.service.cmr.site.SiteService#hasContainer(java.lang.String, String)
      */
     public boolean hasContainer(final String shortName, final String componentId)
     {
@@ -2936,7 +2919,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
      * 
      * @param userName      user name
      * @param role          role
-     * @return
+     * @return String
      */
     private String getActivityUserData(String userName, String role)
     {
@@ -3008,9 +2991,9 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
     /**
      * Helper to check that we are not removing the last Site Manager from a site
      * 
-     * @param shortName
-     * @param authorityName
-     * @param role
+     * @param shortName String
+     * @param authorityName String
+     * @param role String
      */
     private void checkLastManagerRemoval(final String shortName, final String authorityName, final String role)
     {
@@ -3045,33 +3028,196 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
         return result;
     }
 
-    public PagingResults<SiteMembership> listSitesPaged(final String userName, List<Pair<SiteService.SortFields, Boolean>> sortProps, final PagingRequest pagingRequest)
+    private String resolveRole(String group)
     {
-        SiteMembershipCannedQueryFactory sitesCannedQueryFactory = (SiteMembershipCannedQueryFactory)cannedQueryRegistry.getNamedObject("sitesCannedQueryFactory");
-
-        CannedQueryPageDetails pageDetails = new CannedQueryPageDetails(pagingRequest.getSkipCount(), pagingRequest.getMaxItems());
-        
-        // sort details
-        CannedQuerySortDetails sortDetails = null;
-        if(sortProps != null)
+        // purge non Site related Groups and strip the group name down to the role
+        if (group.startsWith(GROUP_SITE_PREFIX))
         {
-            List<Pair<? extends Object, SortOrder>> sortPairs = new ArrayList<Pair<? extends Object, SortOrder>>(sortProps.size());
+            int roleIndex = group.lastIndexOf('_');
+            if (roleIndex + 1 <= GROUP_SITE_PREFIX_LENGTH)
+            {
+                // There is no role associated
+                return null;
+            }
+            else
+            {
+                return group.substring(roleIndex + 1);
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public List<SiteMembership> listSiteMemberships(String userName, int size)
+    {
+        final List<String> siteNames = new LinkedList<String>();
+        Map<String, String> roleSitePairs = new HashMap<String, String>();
+        
+        
+        String actualUserName = personService.getUserIdentifier(userName);
+        if(actualUserName == null)
+        {
+            return Collections.emptyList();
+        }
+        
+        /* Get the site names and the map between the site name and the role
+           MNT-13198 - use the bridge table */
+        Set<String> containingAuthorities = authorityService.getContainingAuthorities(AuthorityType.GROUP, actualUserName, false);
+        for(String authority : containingAuthorities)
+        {
+                String siteName = resolveSite(authority);
+                if(siteName == null)
+                {
+                    continue;
+                }
+                
+                /* if the size is not 0 check site existence */
+                if(size > 0)
+                {
+                    /* if we found enough sites ignore the others */
+                    if(siteNames.size() >= size)
+                    {
+                        break;
+                    }
+                    
+                    /* MNT-10836 fix, after MNT-10109 we should also check site existence.
+                       A simple exists check would be better than getting the site properties etc - profiling suggests x2 faster.
+                       If size = -1 the sites that don't exist will be removed when getting the child associations. */
+                    if(!hasSite(siteName))
+                    {
+                        // if the site doesn't exist skip the current authority
+                        continue;
+                    }
+                }
+                
+                /* resolve the role */
+                String role = resolveRole(authority);
+                if (role != null)
+                {
+                    siteNames.add(siteName);
+                    roleSitePairs.put(siteName, role);
+                }
+        }
+        
+        if (siteNames.isEmpty())
+        {
+            return Collections.emptyList();
+        }
+        
+        /* Get the child associations */
+        List<ChildAssociationRef> assocs = getSitesAssocsByName(siteNames);
+        
+        /* Get the node refs and preload the nodes to get the properties faster */
+        List<NodeRef> siteNodes = new LinkedList<NodeRef>();
+        for (ChildAssociationRef assoc : assocs)
+        {
+            siteNodes.add(assoc.getChildRef());
+        }
+        nodeDAO.cacheNodes(siteNodes);
+        
+        /* Compute the site membership objects */
+        List<SiteMembership> result = new LinkedList<SiteMembership>();
+        for (NodeRef site : siteNodes)
+        {
+            /* Ignore any node that is not a "site" type */
+            QName siteClassName = this.directNodeService.getType(site);
+            if (this.dictionaryService.isSubClass(siteClassName, SiteModel.TYPE_SITE))
+            {
+                SiteInfo siteInfo = createSiteInfo(site);
+                result.add(new SiteMembership(siteInfo, userName, roleSitePairs.get(siteInfo.getShortName())));
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Retrieves the child associations for requested site names 
+     * @param siteNames names of the sites to be retrieved
+     * @return list of child associations between the site root and sites having the requested site names
+     */
+    private List<ChildAssociationRef> getSitesAssocsByName(final List<String> siteNames)
+    { 
+        Iterator<String> sitesIterator = siteNames.iterator();
+        List<String> iterationPage = new LinkedList<String>();
+        List<ChildAssociationRef> assocs = new LinkedList<ChildAssociationRef>();
+        List<ChildAssociationRef> childRefPage;
+        
+        NodeRef siteRoot = getSiteRoot();
+        
+        /* iterate the results and retrieve child associations for batches of 512 elements */
+        while(sitesIterator.hasNext())
+        {
+            String element = sitesIterator.next();
+            iterationPage.add(element);
+
+            /* when the page is full, get the child associations and clean the page */
+            if(iterationPage.size() >= GET_CHILD_ASSOCS_PAGE_SIZE)
+            {
+                /* get the child associations for the current page having siteRoot as parent
+                   use directNodeService to avoid permission check */
+                childRefPage = directNodeService.getChildrenByName(siteRoot, ContentModel.ASSOC_CONTAINS, iterationPage);
+                assocs.addAll(childRefPage);
+                iterationPage.clear();
+            }
+        }
+        if(iterationPage.size() > 0)
+        {
+            /* use directNodeService to avoid permission check */
+            childRefPage = directNodeService.getChildrenByName(siteRoot, ContentModel.ASSOC_CONTAINS, iterationPage);
+            assocs.addAll(childRefPage);
+        }
+        
+        return assocs;
+    }
+        
+	public PagingResults<SiteMembership> listSitesPaged(final String userName, List<Pair<SiteService.SortFields, Boolean>> sortProps, final PagingRequest pagingRequest)
+	{
+		List<SiteMembership> siteMembers = listSiteMemberships (userName, 0);
+	    final int totalSize = siteMembers.size();
+	 	final PageDetails pageDetails = PageDetails.getPageDetails(pagingRequest, totalSize);
+	 	final List<SiteMembership> resultList;
+	 	if (sortProps == null)
+	 	{
+	 		resultList = siteMembers;
+	 	}
+	 	else
+	 	{
+	 		List<Pair<? extends Object, SortOrder>> sortPairs = new ArrayList<Pair<? extends Object, SortOrder>>(sortProps.size());
             for (Pair<SiteService.SortFields, Boolean> sortProp : sortProps)
             {
                 sortPairs.add(new Pair<SiteService.SortFields, SortOrder>(sortProp.getFirst(), (sortProp.getSecond() ? SortOrder.ASCENDING : SortOrder.DESCENDING)));
             }
-            
-            sortDetails = new CannedQuerySortDetails(sortPairs);
-        }
+	 		TreeSet<SiteMembership> sortedSet = new TreeSet<SiteMembership>(new SiteMembershipComparator(sortPairs, SiteMembershipComparator.Type.SITES));
+	 		sortedSet.addAll(siteMembers);
+	 		resultList = new ArrayList<SiteMembership>(sortedSet);
+	 	}
+		
+	 	PagingResults<SiteMembership> res = new PagingResults<SiteMembership>() {
+			
+			@Override
+			public boolean hasMoreItems() {
+				return pageDetails.hasMoreItems();
+			}
+			
+			@Override
+			public Pair<Integer, Integer> getTotalResultCount() {
+				Integer size = totalSize;
+				return new Pair<Integer, Integer>(size, size);
+			}
+			
+			@Override
+			public String getQueryExecutionId() {
+				return GUID.generate();
+			}
+			
+			@Override
+			public List<SiteMembership> getPage() {
+				return resultList;
+			}
+		};
 
-        SitesCannedQueryParams parameterBean = new SitesCannedQueryParams(userName);
-        CannedQueryParameters params = new CannedQueryParameters(parameterBean, pageDetails, sortDetails, pagingRequest.getRequestTotalCountMax(), pagingRequest.getQueryExecutionId());
-
-        CannedQuery<SiteMembership> query = sitesCannedQueryFactory.getCannedQuery(params);
-        
-        CannedQueryResults<SiteMembership> results = query.execute();
-
-        return getPagingResults(pagingRequest, results);
+	    return res;
     }
 
     private <T extends Object> PagingResults<T> getPagingResults(PagingRequest pagingRequest, final CannedQueryResults<T> results)
@@ -3130,7 +3276,7 @@ public class SiteServiceImpl extends AbstractLifecycleBean implements SiteServic
             }
         };
     }
-
+	
     /**
      * Private sites have separate ACLs on each component and don't inherit from the
      * site which has consumer role for everyone.

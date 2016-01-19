@@ -29,8 +29,8 @@ import java.util.Set;
 
 import org.alfresco.repo.node.NodeBulkLoader;
 import org.alfresco.repo.transaction.TransactionalResourceHelper;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.InvalidTypeException;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
@@ -70,7 +70,7 @@ public interface NodeDAO extends NodeBulkLoader
      */
     
     /**
-     * @param forceNew          <tt>true</tt> to ensure that a new transaction entry is created
+     * @param ensureNew          <tt>true</tt> to ensure that a new transaction entry is created
      *                          if the current transaction does not have one.
      * @return                  Returns the ID of the current transaction entry or <tt>null</tt> if
      *                          there have not been any modifications to nodes registered in the
@@ -190,7 +190,7 @@ public interface NodeDAO extends NodeBulkLoader
      * @param storeRef          the store to which the node must belong
      * @param uuid              the node store-unique identifier, or <tt>null</tt> to assign a GUID
      * @param nodeTypeQName     the type of the node
-     * @parma nodeLocale        the locale of the node
+     * @param nodeLocale        the locale of the node
      * @param childNodeName     the <b>cm:name</b> of the child node or <tt>null</tt> to use the node's UUID
      * @param auditableProperties   a map containing any <b>cm:auditable</b> properties for the node
      * @return                  Returns the details of the child association created
@@ -352,7 +352,7 @@ public interface NodeDAO extends NodeBulkLoader
      * or in a later transaction.
      * 
      * @param nodeId            the node to change
-     * @param modifiedDate      the date to set for <b>cm:modified</b>
+     * @param date      the date to set for <b>cm:modified</b>
      * @return                  Returns <tt>true</tt> if the <b>cm:modified</b> property was actually set
      * @deprecated Use {@link #setModifiedProperties(Long, Date, String)} to also change the <b>cm:modifier</b> property
      */
@@ -422,7 +422,9 @@ public interface NodeDAO extends NodeBulkLoader
     /**
      * Remove a specific node association
      * 
-     * @param assocId           the node association ID to remove
+     * @param sourceNodeId           the source node ID
+     * @param targetNodeId           the target node id
+     * @param assocTypeQName           the node association QName
      * @return                  Returns the number of associations removed
      */
     public int removeNodeAssoc(Long sourceNodeId, Long targetNodeId, QName assocTypeQName);
@@ -454,6 +456,17 @@ public interface NodeDAO extends NodeBulkLoader
      * @return                  Returns all the node associations where the node is the <b>source</b>
      */
     public Collection<Pair<Long, AssociationRef>> getTargetNodeAssocs(Long sourceNodeId, QName typeQName);
+
+    /**
+     * Get target associations by type of the association, property name and value.
+     * 
+     * @param sourceNodeId    the source of the association
+     * @param typeQName       the type of the association (<tt>null</tt> allowed)
+     * @param propertyQName   property QName (<tt>null</tt> allowed)
+     * @param propertyValue   property value (<tt>null</tt> allowed only if the <b>propertyQName</b> is <tt>null</tt>)
+     * @return                Returns all the node associations where the node is the <b>source</b>.
+     */
+    public Collection<Pair<Long, AssociationRef>> getTargetAssocsByPropertyValue(Long sourceNodeId, QName typeQName, QName propertyQName, Serializable propertyValue);
 
     /**
      * @return                  Returns a specific node association with the given ID
@@ -533,7 +546,7 @@ public interface NodeDAO extends NodeBulkLoader
      * @param childNodeId       the child node ID
      * @param assocTypeQName    the association type
      * @param assocQName        the association path qualified name
-     * @param newIndex          the new index
+     * @param index          the new index
      * @return                  Returns the number of associations modified
      */
     public int setChildAssocIndex(
@@ -613,7 +626,6 @@ public interface NodeDAO extends NodeBulkLoader
      * @param maxResults            the maximum number of results to return. The query will be terminated efficiently
      *                              after that number of results                             
      * @param resultsCallback       the callback that will be called with the results
-     * @return a list of child associations
      */
     public void getChildAssocs(
             Long parentNodeId,
@@ -724,7 +736,7 @@ public interface NodeDAO extends NodeBulkLoader
      * When searching for <code>primaryOnly == true</code>, checks that there is exactly
      * one path.
      * 
-     * @param currentNodePair       the leave or child node to start with
+     * @param nodePair       the leave or child node to start with
      * @param primaryOnly           <tt>true</tt> to follow only primary parent associations
      */
     public List<Path> getPaths(Pair<Long, NodeRef> nodePair, boolean primaryOnly) throws InvalidNodeRefException;
@@ -803,10 +815,10 @@ public interface NodeDAO extends NodeBulkLoader
     /**
      * Remove unused transactions from commit time 'fromCommitTime' to commit time 'toCommitTime'
      * 
-     * @param fromCommitTime	delete unused transactions from commit time
-     * @param toCommitTime		delete unused transactions to commit time
+     * @param fromCommitTime        delete unused transactions from commit time
+     * @param toCommitTime          delete unused transactions to commit time
      * 
-     * @return
+     * @return int
      */
     public int deleteTxnsUnused(long fromCommitTime, long toCommitTime);
     
@@ -839,6 +851,16 @@ public interface NodeDAO extends NodeBulkLoader
     public Long getMaxTxnId();
     
     /**
+     * @return              Returns the minimum node id or <tt>0</tt> if there are no nodes
+     */
+    public Long getMinNodeId();
+    
+    /**
+     * @return              Returns the maximum node id or <tt>0</tt> if there are no nodes
+     */
+    public Long getMaxNodeId();
+    
+    /**
      * Select children by property values
      */
     public void getChildAssocsByPropertyValue(
@@ -850,7 +872,17 @@ public interface NodeDAO extends NodeBulkLoader
     /**
      * Used by the re-encryptor to re-encrypt encryptable properties with a new encryption key.
      */
-    public List<NodePropertyEntity> selectProperties(Collection<PropertyDefinition> propertyDefs);
+    public List<NodePropertyEntity> selectNodePropertiesByTypes(Set<QName> qnames);
+    
+    /**
+     * Select all node properties that are between two node IDs and of the given <b>actual</b> type
+     * 
+     * @param dataType      the actual, original type of the property, as given by one of the constants
+     *                      on {@link DataTypeDefinition#TEXT DataTypeDefinition}
+     * @param minNodeId     the minimum node ID (inclusive)
+     * @param maxNodeId     the maximum node ID (exclusive)
+     */
+    public List<NodePropertyEntity> selectNodePropertiesByDataType(QName dataType, long minNodeId, long maxNodeId);
     
     /**
      * Counts the number of child associations directly under parentNodeId.

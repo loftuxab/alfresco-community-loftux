@@ -151,6 +151,8 @@
             <aspect name="audio:audio" />
             <aspect name="cm:indexControl" />
             <aspect name="dp:restrictable" />
+            <aspect name="vm:custom-virtualization" />
+            <aspect name="vm:system-virtualization" />
          </visible>
 
          <!-- Aspects that a user can add. Same as "visible" if left empty -->
@@ -175,11 +177,12 @@
       -->
       <types>
          <type name="cm:content">
+            <subtype name="vm:virtualFolderTemplate" />
          </type>
 
-         <type name="cm:folder">
+          <type name="cm:folder">
          </type>
- 
+
          <type name="trx:transferTarget">
             <subtype name="trx:fileTransferTarget" />
          </type>
@@ -378,9 +381,12 @@
               sessions" feature of your load balancer must be used.
         NOTE: If alfresco server location is not localhost:8080 then also combine changes from the
               "example port config" section below.
-        *Optional* keystore contains SSL client certificate + trusted CAs.
-        Used to authenticate share to an external SSO system such as CAS
-        Remove the keystore section if not required i.e. for NTLM.
+        *Optional* ssl-config contains:
+              keystore for managing client key and certificate.
+              truststore for managing trusted CAs.
+        Used to authenticate share to an external SSO system such as CAS or 
+        to make share talk to SSL layers that require client certificates.
+        Remove the ssl-config section if not required i.e. for NTLM.
         
         NOTE: For Kerberos SSO rename the "KerberosDisabled" condition above to "Kerberos"
         
@@ -399,15 +405,24 @@
               from your proxy between Share and Alfresco. Note that this is also faster because Share
               will no longer call the /touch REST API before every remote call to the repository.
    -->
+
+   <!-- Security warning -->
+   <!-- For production environment set verify-hostname to true.-->
    <!--
    <config evaluator="string-compare" condition="Remote">
       <remote>
-         <keystore>
-             <path>alfresco/web-extension/alfresco-system.p12</path>
-             <type>pkcs12</type>
-             <password>alfresco-system</password>
-         </keystore>
-         
+         <ssl-config>
+            <keystore-path>alfresco/web-extension/alfresco-system.p12</keystore-path>
+            <keystore-type>pkcs12</keystore-type>
+            <keystore-password>alfresco-system</keystore-password>
+
+            <truststore-path>alfresco/web-extension/ssl-truststore</truststore-path>
+            <truststore-type>JCEKS</truststore-type>
+            <truststore-password>password</truststore-password>
+
+            <verify-hostname>true</verify-hostname>
+         </ssl-config>
+
          <connector>
             <id>alfrescoCookie</id>
             <name>Alfresco Connector</name>

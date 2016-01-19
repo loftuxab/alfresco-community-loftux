@@ -125,6 +125,11 @@ public interface ContentModel
      * @since 3.5.0
      */
     static final QName ASPECT_UNDELETABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "undeletable");
+    
+    /**
+     * Aspect for nodes which are by default not movable.
+     */
+    static final QName ASPECT_UNMOVABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "unmovable");
 
     /**
      * Aspects marking nodes that are pending deletion.
@@ -376,7 +381,7 @@ public interface ContentModel
      * This association type has been deprecated.
      * From Alfresco 3.3 this association no longer exists and has been replaced with
      * {@link RenditionModel#ASSOC_RENDITION rn:rendition} association. From Alfresco
-     * 3.3 onwards {@link QNamePatch a patch} is executed at startup which renames
+     * 3.3 onwards a patch is executed at startup which renames
      * the cm:thumbnails QName to rn:rendition in the database.
      * <P/>
      * This field has been updated to point to that association and references to this
@@ -413,13 +418,15 @@ public interface ContentModel
     static final QName PROP_USER_USERNAME = QName.createQName(USER_MODEL_URI, "username");
     static final QName PROP_PASSWORD = QName.createQName(USER_MODEL_URI, "password");
     static final QName PROP_PASSWORD_SHA256 = QName.createQName(USER_MODEL_URI, "password2");
+    static final QName PROP_PASSWORD_HASH = QName.createQName(USER_MODEL_URI, "passwordHash");
     static final QName PROP_ENABLED = QName.createQName(USER_MODEL_URI, "enabled");
     static final QName PROP_ACCOUNT_EXPIRES = QName.createQName(USER_MODEL_URI, "accountExpires");
     static final QName PROP_ACCOUNT_EXPIRY_DATE = QName.createQName(USER_MODEL_URI, "accountExpiryDate");
     static final QName PROP_CREDENTIALS_EXPIRE = QName.createQName(USER_MODEL_URI, "credentialsExpire");
     static final QName PROP_CREDENTIALS_EXPIRY_DATE = QName.createQName(USER_MODEL_URI, "credentialsExpiryDate");
     static final QName PROP_ACCOUNT_LOCKED = QName.createQName(USER_MODEL_URI, "accountLocked");
-    static final QName PROP_SALT = QName.createQName(USER_MODEL_URI, "salt");    
+    static final QName PROP_SALT = QName.createQName(USER_MODEL_URI, "salt");
+    static final QName PROP_HASH_INDICATOR = QName.createQName(USER_MODEL_URI, "hashIndicator");
     
     // 
     // Indexing control
@@ -432,4 +439,11 @@ public interface ContentModel
     // CMIS aspects
     static final QName ASPECT_CMIS_UPDATE_CONTEXT = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "CMISUpdateContext");
     static final QName PROP_GOT_FIRST_CHUNK = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "gotFirstChunk");
+    
+    
+    // Cascade Update
+    static final QName ASPECT_CASCADE_UPDATE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeUpdate");
+    static final QName PROP_CASCADE_CRC = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeCRC");
+    static final QName PROP_CASCADE_TX = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "cascadeTx");
+    
 }

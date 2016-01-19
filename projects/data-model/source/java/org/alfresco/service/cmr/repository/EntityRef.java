@@ -28,7 +28,7 @@ import org.alfresco.api.AlfrescoPublicApi;
  * This is used primarily as a means of ensuring type safety in collections
  * of mixed type references.
  * 
- * @see org.alfresco.service.cmr.repository.NodeService#removeChildren(NodeRef, QName)
+ * @see org.alfresco.service.cmr.repository.NodeService#removeChild(NodeRef, NodeRef)
  * 
  * @author Derek Hulley
  */

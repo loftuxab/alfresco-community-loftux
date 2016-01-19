@@ -82,8 +82,11 @@
         <property name="cmisDictionaryService">
             <ref bean="OpenCMISDictionaryService" />
         </property>
-        <property name="optionalPatchApplicationCheckBootstrapBean">
+        <property name="metadataIndexCheck1">
             <ref bean="metadataQueryIndexesCheck" />
+        </property>
+        <property name="metadataIndexCheck2">
+            <ref bean="metadataQueryIndexesCheck2" />
         </property>
     </bean>
 
@@ -99,8 +102,11 @@
         <property name="cmisDictionaryService">
             <ref bean="OpenCMISDictionaryService1.1" />
         </property>
-        <property name="optionalPatchApplicationCheckBootstrapBean">
+        <property name="metadataIndexCheck1">
             <ref bean="metadataQueryIndexesCheck" />
+        </property>
+        <property name="metadataIndexCheck2">
+            <ref bean="metadataQueryIndexesCheck2" />
         </property>
     </bean>
 

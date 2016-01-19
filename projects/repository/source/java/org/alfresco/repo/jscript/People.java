@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationException;
@@ -96,7 +95,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
     private int defaultListMaxResults = 5000;
     private boolean honorHintUseCQ = true;
     
-    private static final String HINT_CQ_SUFFIX = " [hint:useCQ]";
+    protected static final String HINT_CQ_SUFFIX = " [hint:useCQ]";
     
     public void afterPropertiesSet() throws Exception
     {
@@ -166,11 +165,11 @@ public class People extends BaseScopableProcessorExtension implements Initializi
     /**
      * Set the service registry
      * 
-     * @param serviceRegistry	the service registry
+     * @param serviceRegistry   the service registry
      */
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
-    	this.services = serviceRegistry;
+        this.services = serviceRegistry;
     }
 
     /**
@@ -232,7 +231,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
     /**
      * Set the UserRegistrySynchronizer
      * 
-     * @param userRegistrySynchronizer
+     * @param userRegistrySynchronizer UserRegistrySynchronizer
      */
     public void setUserRegistrySynchronizer(UserRegistrySynchronizer userRegistrySynchronizer)
     {
@@ -312,8 +311,8 @@ public class People extends BaseScopableProcessorExtension implements Initializi
     public ScriptNode createPerson(String userName, String firstName, String lastName, String emailAddress, 
             String password, boolean setAccountEnabled, boolean notifyByEmail)
     {
-    	ParameterCheck.mandatory("firstName", firstName);
-    	ParameterCheck.mandatory("emailAddress", emailAddress);
+        ParameterCheck.mandatory("firstName", firstName);
+        ParameterCheck.mandatory("emailAddress", emailAddress);
         
         ScriptNode person = null;
         
@@ -322,13 +321,13 @@ public class People extends BaseScopableProcessorExtension implements Initializi
         {
             for (int i=0; i < numRetries; i++)
             {
-            	userName = usernameGenerator.generateUserName(firstName, lastName, emailAddress, i);
-            	
-            	// create person if user name does not already exist
-            	if (!personService.personExists(userName))
-            	{
-            	    break;
-            	}
+                userName = usernameGenerator.generateUserName(firstName, lastName, emailAddress, i);
+                
+                // create person if user name does not already exist
+                if (!personService.personExists(userName))
+                {
+                    break;
+                }
             }
         }
         
@@ -345,19 +344,19 @@ public class People extends BaseScopableProcessorExtension implements Initializi
             
             person = createPerson(userName, firstName, lastName, emailAddress);
             
-    		if (person != null && password != null)
-    		{   			
-    			// create account for person with the userName and password
-    		    authenticationService.createAuthentication(userName, password.toCharArray());
-    		    authenticationService.setAuthenticationEnabled(userName, setAccountEnabled);
-    			
-    			person.save();
-    			
-    			if(notifyByEmail)
-    			{
-    			    personService.notifyPerson(userName, password);
-    			}
-    		}
+            if (person != null && password != null)
+            {               
+                // create account for person with the userName and password
+                authenticationService.createAuthentication(userName, password.toCharArray());
+                authenticationService.setAuthenticationEnabled(userName, setAccountEnabled);
+                
+                person.save();
+                
+                if(notifyByEmail)
+                {
+                    personService.notifyPerson(userName, password);
+                }
+            }
         }
         
         return person;
@@ -513,7 +512,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
      * @param filter filter query string by which to filter the collection of people.
      *          If <pre>null</pre> then all people stored in the repository are returned
      *          
-     * @deprecate see getPeople(filter, maxResults)
+     * @deprecated recated see getPeople(filter, maxResults)
      *          
      * @return people collection as a JavaScript array
      */
@@ -718,8 +717,12 @@ public class People extends BaseScopableProcessorExtension implements Initializi
             // single word with no field will go against _PERSON and expand
 
             // fts-alfresco property search i.e. location:"maidenhead"
-            query.append(term.substring(0, propIndex + 1)).append('"')
-                        .append(term.substring(propIndex + 1));
+            query.append(term.substring(0, propIndex + 1)).append('"');
+            if (propIndex < 0)
+            {
+                query.append('*');
+            }
+            query.append(term.substring(propIndex + 1));
             if (propIndex > 0)
             {
                 query.append('"');
@@ -753,7 +756,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
                     {
                         // simple search: first name, last name and username
                         // starting with term
-                        query.append("_PERSON:\"");
+                        query.append("_PERSON:\"*");
                         query.append(token);
                         query.append("*\" ");
                     }
@@ -766,7 +769,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
                         {
                             token = token.substring(0, token.lastIndexOf("*"));
                         }
-                        multiPartNames.append("\"");
+                        multiPartNames.append("\"*");
                         multiPartNames.append(token);
                         multiPartNames.append("*\"");
                         if (firstToken)
@@ -911,8 +914,8 @@ public class People extends BaseScopableProcessorExtension implements Initializi
 
                 if ("fullName".equalsIgnoreCase(sortBy))
                 {
-                    String firstName = nodeService.getProperty(nodeRef, ContentModel.PROP_FIRSTNAME).toString();
-                    String lastName = nodeService.getProperty(nodeRef, ContentModel.PROP_LASTNAME).toString();
+                    String firstName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_FIRSTNAME);
+                    String lastName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_LASTNAME);
                     String fullName = firstName;
                     if (lastName != null && lastName.length() > 0)
                     {
@@ -1134,8 +1137,7 @@ public class People extends BaseScopableProcessorExtension implements Initializi
      * Gets the members (people) of a group (including all sub-groups)
      * 
      * @param group        the group to retrieve members for
-     * @param recurse      recurse into sub-groups
-     * 
+     *
      * @return members of the group as a JavaScript array
      */
     public Scriptable getMembers(ScriptNode group)
@@ -1234,8 +1236,8 @@ public class People extends BaseScopableProcessorExtension implements Initializi
      * This enables a script to interogate which properties are dealt with by an external
      * system such as LDAP and should not be mutable in any client UI.
      * 
-     * @param username
-     * 
+     * @param username String
+     *
      * @return ScriptableHashMap
      */
     public ScriptableHashMap getImmutableProperties(String username)

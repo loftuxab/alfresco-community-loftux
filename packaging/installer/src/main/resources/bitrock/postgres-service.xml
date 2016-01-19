@@ -4,13 +4,15 @@
     <canBeEdited>1</canBeEdited>
     <selected>1</selected>
     <show>0</show>
-    
+    <shouldPackRuleList>
+        <isTrue value="${postgres_component_enabled}"/>
+    </shouldPackRuleList>
     <parameterList>
          <stringParameter name="postgres_service_name" value="${product_shortname}PostgreSQL" ask="0" />
          <stringParameter name="postgres_displayName" value="${product_fullname} PostgreSQL Service" ask="0" />
          <stringParameter name="postgres_unique_service_name" value="" ask="0" />
          <booleanParameter name="postgres_service_installed" value="0" ask="0" />
-	 <stringParameter name="postgres_service_startup" default="auto" value="auto" ask="0" cliOptionShow="0" />
+     <stringParameter name="postgres_service_startup" default="auto" value="auto" ask="0" cliOptionShow="0" />
     </parameterList>
     
     <postInstallationActionList>
@@ -41,16 +43,16 @@ start /MIN /WAIT cmd /c "${postgres_root_directory.dos}\bin\pg_ctl.exe register 
                     <ruleList>
                         <compareText text="${postgres_unique_service_name}" logic="equals" value="" />                                    
                     </ruleList>
-		</actionGroup>
+        </actionGroup>
                 <setInstallerVariable name="postgres_service_installed" value="1"/>
-		<runProgram>
-		    <program>sc</program>
-		    <programArguments>config "${postgres_unique_service_name}" start= ${postgres_service_startup}</programArguments>
-		    <ruleList>
-			<platformTest type="windows"/>
-			<compareText text="${postgres_service_startup}" logic="does_not_equal" value="auto" />
-		    </ruleList>
-		</runProgram>
+        <runProgram>
+            <program>sc</program>
+            <programArguments>config "${postgres_unique_service_name}" start= ${postgres_service_startup}</programArguments>
+            <ruleList>
+            <platformTest type="windows"/>
+            <compareText text="${postgres_service_startup}" logic="does_not_equal" value="auto" />
+            </ruleList>
+        </runProgram>
                                                        
                     <substitute>
                         <files>${postgres_root_directory}/scripts/servicerun.bat;${postgres_root_directory}/scripts/serviceinstall.bat</files>
@@ -80,7 +82,7 @@ start /MIN /WAIT cmd /c "${postgres_root_directory.dos}\bin\pg_ctl.exe register 
             </actionList>
             <ruleList>
                 <platformTest type="windows"/>
-		<compareText text="${postgres_installation_type}" logic="does_not_equal" value="existing"/>
+        <compareText text="${postgres_installation_type}" logic="does_not_equal" value="existing"/>
             </ruleList>
         </actionGroup>
     </postInstallationActionList>
@@ -94,18 +96,6 @@ start /MIN /WAIT cmd /c "${postgres_root_directory.dos}\bin\pg_ctl.exe register 
             </ruleList>
         </runProgram>
     </preUninstallationActionList>
-
-    <!--installationAbortedActionList>
-        <runProgram>
-            <program>${postgres_root_directory}\scripts\serviceinstall.bat</program>
-            <programArguments>REMOVE</programArguments>
-            <ruleList>
-                <platformTest type="windows"/>
-                <isTrue value="${postgres_service_installed}"/>
-            </ruleList>
-        </runProgram>
-    </installationAbortedActionList-->
-
 
 </component>
 

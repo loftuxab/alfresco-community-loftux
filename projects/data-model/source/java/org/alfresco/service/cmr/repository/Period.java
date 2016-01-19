@@ -45,7 +45,7 @@ public class Period implements Serializable
 
     /**
      * Register a provider
-     * @param periodProvider
+     * @param periodProvider PeriodProvider
      */
     public static void registerProvider(PeriodProvider periodProvider)
     {
@@ -54,7 +54,7 @@ public class Period implements Serializable
 
     /**
      * Find a provider
-     * @param periodType
+     * @param periodType String
      * @return the provider
      * @throws IllegalStateException of there is no implementation
      */
@@ -84,7 +84,7 @@ public class Period implements Serializable
     /**
      * Create a period without an accompanying expression.
      * 
-     * @param period
+     * @param period String
      */
     public Period(String period)
     {
@@ -115,7 +115,7 @@ public class Period implements Serializable
     /**
      * Calculate the next date for this period given the a start date.
      * 
-     * @param date
+     * @param date Date
      * @return the next date.
      */
     public Date getNextDate(Date date)

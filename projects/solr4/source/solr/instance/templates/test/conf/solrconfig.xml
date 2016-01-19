@@ -206,9 +206,12 @@
          can perform merges in the background using separate threads.
          The SerialMergeScheduler (Lucene 2.2 default) does not.
      -->
-    <!-- 
-       <mergeScheduler class="org.apache.lucene.index.ConcurrentMergeScheduler"/>
-       -->
+    
+    <mergeScheduler class="org.apache.lucene.index.ConcurrentMergeScheduler">
+        <int name="maxMergeCount">${merger.maxMergeCount:6}</int>
+        <int name="maxThreadCount">${merger.maxThreadCount:3}</int>
+    </mergeScheduler>
+   
 
     <!-- LockFactory 
 
@@ -838,7 +841,35 @@
        of SearchComponents (see below) and supports distributed
        queries across multiple shards
     -->
-  <requestHandler name="/select" class="org.apache.solr.handler.component.AlfrescoSearchHandler">
+
+
+ <requestHandler name="/select" class="org.apache.solr.handler.component.AlfrescoSearchHandler" lazy="true" >
+    <lst name="defaults">
+     <str name="defType">afts</str>
+     <str name="echoParams">explicit</str>
+     <int name="rows">10</int>
+     <str name="df">suggest</str>
+    </lst>
+    <arr name="components">
+      <str>setLocale</str>
+      <str>ensureModels</str>
+      <str>rewriteFacetParameters</str>
+      <str>query</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>stats</str>
+      <str>debug</str>
+      <str>clearLocale</str>
+      <str>rewriteFacetCounts</str>
+      <!-- <str>addTxId</str> -->
+      <str>spellcheck</str>
+      <str>setProcessedDenies</str>
+    </arr>
+  </requestHandler>
+
+
+    <requestHandler name="/native" class="org.apache.solr.handler.component.AlfrescoSearchHandler">
     <!-- default values for query parameters can be specified, these
          will be overridden by parameters in the request
       -->
@@ -848,16 +879,24 @@
        <str name="df">suggest</str>
      </lst>
 
-    <!-- If the default list of SearchComponents is not desired, that
-         list can either be overridden completely, or components can be
-         prepended or appended to the default list.  (see below)
-      -->
-    <!--
-       <arr name="components">
-         <str>nameOfCustomComponent1</str>
-         <str>nameOfCustomComponent2</str>
-       </arr>
-      -->
+
+   <arr name="components">
+      <str>setLocale</str>
+      <str>ensureModels</str>
+      <str>rewriteFacetParameters</str>
+      <str>query</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>stats</str>
+      <str>debug</str>
+      <str>clearLocale</str>
+      <str>rewriteFacetCounts</str>
+      <!--<str>addTxId</str>-->
+      <str>setProcessedDenies</str>
+    </arr>
+
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
     </requestHandler>
 
   <!-- A request handler that returns indented JSON by default -->
@@ -868,6 +907,7 @@
        <str name="indent">true</str>
        <str name="df">suggest</str>
      </lst>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
@@ -1115,6 +1155,10 @@
     -->
   <requestHandler name="/admin/" 
                   class="solr.admin.AdminHandlers" />
+
+     <requestHandler name="/admin/luke"       class="org.apache.solr.handler.component.AlfrescoLukeRequestHandler" />
+
+
   <!-- This single handler is equivalent to the following... -->
   <!--
      <requestHandler name="/admin/luke"       class="solr.admin.LukeRequestHandler" />
@@ -1339,6 +1383,7 @@
   <searchComponent name="suggest" class="org.alfresco.solr.component.AsyncBuildSuggestComponent">
     <lst name="suggester">
       <str name="name">shingleBasedSuggestions</str>
+      <str name="enabled">${solr.suggester.enabled:true}</str>
       <!-- <str name="lookupImpl">org.apache.solr.spelling.suggest.jaspell.JaspellLookupFactory</str> -->
       <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>  
       <str name="field">suggest</str>
@@ -1395,8 +1440,7 @@
        http://carrot2.github.io/solr-integration-strategies/
     -->
   <searchComponent name="clustering"
-                   enable="${solr.clustering.enabled:false}"
-                   class="solr.clustering.ClusteringComponent" >
+                   class="org.apache.solr.handler.component.AlfrescoSolrClusteringComponent" >
     <lst name="engine">
       <str name="name">lingo</str>
 
@@ -1457,11 +1501,11 @@
       <bool name="clustering">true</bool>
       <bool name="clustering.results">true</bool>
       <!-- Field name with the logical "title" of a each document (optional) -->
-      <str name="carrot.title">name</str>
+      <str name="carrot.title">mltext@m___t@{http://www.alfresco.org/model/content/1.0}title</str>
       <!-- Field name with the logical "URL" of a each document (optional) -->
       <str name="carrot.url">id</str>
       <!-- Field name with the logical "content" of a each document (optional) -->
-      <str name="carrot.snippet">features</str>
+      <str name="carrot.snippet">content@s___t@{http://www.alfresco.org/model/content/1.0}content</str>
       <!-- Apply highlighter to the title/ content and use this for clustering. -->
       <bool name="carrot.produceSummary">true</bool>
       <!-- the maximum number of labels per cluster -->
@@ -1534,7 +1578,7 @@
        http://wiki.apache.org/solr/HighlightingParameters
     -->
   <searchComponent class="solr.HighlightComponent" name="highlight">
-    <highlighting>
+    <highlighting class="org.apache.solr.handler.component.AlfrescoSolrHighlighter" >
       <!-- Configure the standard fragmenter -->
       <!-- This could most likely be commented out in the "default" case -->
       <fragmenter name="gap" 
@@ -1807,6 +1851,12 @@
      <transformer name="qecBooster" class="org.apache.solr.response.transform.EditorialMarkerFactory" />
     -->
     
+  <transformer name="cached" class="org.alfresco.solr.transformer.CachedDocTransformerFactory" >
+  </transformer>
+
+  <transformer name="dv" class="org.alfresco.solr.transformer.DocValueDocTransformerFactory" >
+  </transformer>
+
 
   <!-- Legacy config for the admin interface -->
   <admin>
@@ -1834,6 +1884,7 @@
       <!-- <str>addTxId</str> -->
       <str>setProcessedDenies</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
@@ -1850,6 +1901,13 @@
      <str name="spellcheck.collateExtendedResults">true</str>
      <str name="spellcheck.maxCollationTries">5</str>
      <str name="spellcheck.maxCollations">3</str>
+
+     <str name="carrot.title">mltext@m___t@{http://www.alfresco.org/model/content/1.0}title</str>
+     <str name="carrot.url">id</str>
+     <str name="carrot.snippet">content@s___t@{http://www.alfresco.org/model/content/1.0}content</str>
+     <bool name="carrot.produceSummary">true</bool>
+     <bool name="carrot.outputSubClusters">false</bool>
+    
     </lst>
     <arr name="components">
       <str>setLocale</str>
@@ -1866,7 +1924,10 @@
       <!-- <str>addTxId</str> -->
       <str>spellcheck</str>
       <str>setProcessedDenies</str>
+
+      <str>clustering</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
  <requestHandler name="/cmis" class="org.apache.solr.handler.component.AlfrescoSearchHandler" lazy="true" >
@@ -1888,12 +1949,25 @@
       <!--<str>addTxId</str>-->
       <str>setProcessedDenies</str>
     </arr>
+      <shardHandlerFactory class="org.apache.solr.handler.component.AlfrescoHttpShardHandlerFactory" />
   </requestHandler>
 
 
   <queryParser name="alfresco" class="org.alfresco.solr.query.AlfrescoLuceneQParserPlugin"/>
-  <queryParser name="afts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin"/>
+  <queryParser name="afts" class="org.alfresco.solr.query.AlfrescoFTSQParserPlugin">
+    <str name="rerankPhase">SINGLE_PASS_WITH_AUTO_PHRASE</str>
+  </queryParser>
+
   <queryParser name="cmis" class="org.alfresco.solr.query.CmisQParserPlugin"/>
+
+  <queryParser name="mimetype" class="org.alfresco.solr.query.MimetypeGroupingQParserPlugin" >
+      <str name="mapping">conf/mime_types.csv</str>
+  </queryParser>
+
+  <queryParser name="contentSize" class="org.alfresco.solr.query.ContentSizeGroupingQParserPlugin" >
+      <int name="scale">1</int>
+      <int name="buckets">10</int>
+  </queryParser>
 
   <searchComponent name="setLocale"     class="org.alfresco.solr.component.SetLocaleComponent" />
   <searchComponent name="ensureModels" class="org.alfresco.solr.component.EnsureModelsComponent" />

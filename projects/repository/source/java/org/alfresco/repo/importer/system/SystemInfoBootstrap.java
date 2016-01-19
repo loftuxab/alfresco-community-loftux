@@ -52,7 +52,7 @@ public class SystemInfoBootstrap extends AbstractLifecycleBean
     /**
      * Sets the Transaction Service
      * 
-     * @param userTransaction the transaction service
+     * @param transactionService the transaction service
      */
     public void setTransactionService(TransactionService transactionService)
     {
@@ -72,7 +72,7 @@ public class SystemInfoBootstrap extends AbstractLifecycleBean
     /**
      * Set the authentication component
      * 
-     * @param authenticationContext
+     * @param authenticationContext AuthenticationContext
      */
     public void setAuthenticationContext(AuthenticationContext authenticationContext)
     {
@@ -82,7 +82,7 @@ public class SystemInfoBootstrap extends AbstractLifecycleBean
     /**
      * Set the System Importer
      * 
-     * @param systemImporter
+     * @param systemImporter SystemExporterImporter
      */
     public void setSystemImporter(SystemExporterImporter systemImporter)
     {
@@ -102,7 +102,7 @@ public class SystemInfoBootstrap extends AbstractLifecycleBean
     /**
      * Set the bootstrap view containing the system information
      * 
-     * @param bootstrapView
+     * @param bootstrapView String
      */
     public void setBootstrapView(String bootstrapView)
     {

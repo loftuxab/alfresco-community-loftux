@@ -79,7 +79,7 @@ import org.springframework.extensions.surf.util.AbstractLifecycleBean;
  * The home folders for internal users (such as {@code admin} and {@code
  * guest}) that use {@code guestHomeFolderProvider} or {@code
  * bootstrapHomeFolderProvider} are not moved, nor are any users that use
- * {@link HomeFolderProviders} create shared home folders (all user are
+ * HomeFolderProviders create shared home folders (all user are
  * given the same home folder).
  * 
  * It is also possible change the HomeFolderProvider used by all other
@@ -459,7 +459,8 @@ public class HomeFolderProviderSynchronizer extends AbstractLifecycleBean
     /**
      * Creates the new home folder structure, before we move home folders so that
      * we don't have race conditions that result in unnecessary retries.
-     * @param parentFolderStructure
+     * @param person person nodeRef
+     * @param overrideProviderName override provider name
      */
     private void createParentFolders(NodeRef person, String overrideProviderName)
     {

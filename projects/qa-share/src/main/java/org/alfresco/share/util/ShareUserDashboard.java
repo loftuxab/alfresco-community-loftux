@@ -642,7 +642,6 @@ public class ShareUserDashboard extends AbstractUtils
      * 
      * @param driver
      * @param dashlet
-     * @param siteName
      * @return
      */
     public static DashBoardPage removeDashletFromUserDashboard(WebDrone driver, Dashlets dashlet)

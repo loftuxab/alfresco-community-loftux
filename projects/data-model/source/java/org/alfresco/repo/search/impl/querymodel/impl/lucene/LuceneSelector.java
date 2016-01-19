@@ -35,8 +35,8 @@ public class LuceneSelector<Q, S, E extends Throwable> extends BaseSelector impl
 {
 
     /**
-     * @param alias
-     * @param type
+     * @param type QName
+     * @param alias String
      */
     public LuceneSelector(QName type, String alias)
     {

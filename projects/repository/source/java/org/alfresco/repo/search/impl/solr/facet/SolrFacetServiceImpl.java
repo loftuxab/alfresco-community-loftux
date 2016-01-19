@@ -258,7 +258,11 @@ public class SolrFacetServiceImpl extends AbstractLifecycleBean
         {
             for (ChildAssociationRef ref : nodeService.getChildAssocs(facetsRoot))
             {
-                result.add(getFacetProperties(ref.getChildRef()));
+	            // MNT-13812 Check that child has facetField type
+	            if (nodeService.getType(ref.getChildRef()).equals(SolrFacetModel.TYPE_FACET_FIELD))
+	            {
+	                result.add(getFacetProperties(ref.getChildRef()));
+				}	
             }
         }
 
@@ -725,8 +729,12 @@ public class SolrFacetServiceImpl extends AbstractLifecycleBean
 
         for (ChildAssociationRef associationRef : list)
         {
-            SolrFacetProperties fp = getFacetProperties(associationRef.getChildRef());
-            facets.put(fp.getFilterID(), fp);
+            // MNT-13812 Check that child has facetField type
+            if (nodeService.getType(associationRef.getChildRef()).equals(SolrFacetModel.TYPE_FACET_FIELD))
+            {
+                SolrFacetProperties fp = getFacetProperties(associationRef.getChildRef());
+                facets.put(fp.getFilterID(), fp);
+            }
         }
         return facets;
     }
@@ -784,7 +792,7 @@ public class SolrFacetServiceImpl extends AbstractLifecycleBean
     /**
      * Gets a map containing the facet's custom properties
      * 
-     * @return Map<QName, Serializable> map containing the custom properties of the facet
+     * @return map containing the custom properties of the facet
      */
     private Map<QName, Serializable> getFacetCustomProperties(Map<QName, Serializable> properties)
     {
@@ -970,28 +978,31 @@ public class SolrFacetServiceImpl extends AbstractLifecycleBean
             for (final Map.Entry<QName, PropertyDefinition> prop : propertyDefs.entrySet())
             {
                 final PropertyDefinition propDef = prop.getValue();
-                final Facetable propIsFacetable  = propDef.getFacetable();
-                
-                switch (propIsFacetable)
+                if (propDef.isIndexed()) //SHA-1308
                 {
-                case TRUE:
-                    result.add(propDef);
-                    break;
-                case FALSE:
-                    // The value is not facetable. Do nothing.
-                    break;
-                case UNSET:
-                    // These values may be facetable.
-                    final DataTypeDefinition datatype = propDef.getDataType();
-                    if (isNumeric(datatype) || isDateLike(datatype) || isFacetableText(datatype))
+                    final Facetable propIsFacetable = propDef.getFacetable();
+
+                    switch (propIsFacetable)
                     {
-                        result.add(propDef);
-                        break;
+                        case TRUE:
+                            result.add(propDef);
+                            break;
+                        case FALSE:
+                            // The value is not facetable. Do nothing.
+                            break;
+                        case UNSET:
+                            // These values may be facetable.
+                            final DataTypeDefinition datatype = propDef.getDataType();
+                            if (isNumeric(datatype) || isDateLike(datatype) || isFacetableText(datatype))
+                            {
+                                result.add(propDef);
+                                break;
+                            }
+                            break;
+                        default:
+                            // This should never happen. If it does, it's a programming error.
+                            throw new IllegalStateException("Failed to handle " + Facetable.class.getSimpleName() + " type: " + propIsFacetable);
                     }
-                    break;
-                default:
-                    // This should never happen. If it does, it's a programming error.
-                    throw new IllegalStateException("Failed to handle " + Facetable.class.getSimpleName() + " type: " + propIsFacetable);
                 }
             }
         }

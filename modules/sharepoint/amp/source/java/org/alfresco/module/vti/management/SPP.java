@@ -12,7 +12,7 @@ public interface SPP
 {
     /**
      * Is SPP/VTI/Sharepoint enabled
-     * @return
+     * @return boolean
      */
     boolean isEnabled();
     

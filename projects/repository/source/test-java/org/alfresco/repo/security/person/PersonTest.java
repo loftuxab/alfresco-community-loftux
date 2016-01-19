@@ -45,6 +45,10 @@ import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport.TxnReadState;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.repo.usage.RepoUsageComponent;
+import org.alfresco.repo.usage.RepoUsageComponentImpl;
+import org.alfresco.service.cmr.admin.RepoAdminService;
+import org.alfresco.service.cmr.admin.RepoUsage;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -104,9 +108,20 @@ public class PersonTest extends TestCase
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         authenticationDAO = (MutableAuthenticationDao) ctx.getBean("authenticationDao");
         policyBehaviourFilter = (BehaviourFilter) ctx.getBean("policyBehaviourFilter");
-        
+
         testTX = transactionService.getUserTransaction();
         testTX.begin();
+
+        //Set a max number of users.
+        RepoUsageComponentImpl repoUsageComponent = (RepoUsageComponentImpl) ctx.getBean("repoUsageComponent");
+        RepoUsage r = repoUsageComponent.getRestrictions();
+        repoUsageComponent.setRestrictions(
+                new RepoUsage(r.getLastUpdate(),
+                        10000l,
+                        r.getDocuments(),
+                        r.getLicenseMode(),
+                        r.getLicenseExpiryDate(),
+                        r.isReadOnly()));
         
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
@@ -391,6 +406,50 @@ public class PersonTest extends TestCase
         assertNull(personService.getPersonOrNull("andy"));
     }
 
+    public void testCreateAndThenDeleteWithNoderef()
+    {
+        personService.setCreateMissingPeople(false);
+        assertFalse(personService.createMissingPeople());
+
+        personService.setCreateMissingPeople(true);
+        assertTrue(personService.createMissingPeople());
+
+        personService.setCreateMissingPeople(false);
+        try
+        {
+            personService.getPerson("andreas");
+            fail("Getting andreas should fail");
+        }
+        catch (PersonException pe)
+        {
+
+        }
+        NodeRef andyRef = personService.createPerson(createDefaultProperties("andreas", "andreas", "Hind", "andreas@hind", "alfresco", rootNodeRef));
+        assertNotNull(andyRef);
+        PersonInfo andyInfo = personService.getPerson(andyRef);
+        assertTrue(personService.isEnabled(andyInfo.getUserName()));
+        assertNotNull(andyInfo);
+
+        personService.deletePerson(andyRef, true);
+        try
+        {
+            personService.getPerson(andyRef);
+            fail("Getting andreas should fail");
+        }
+        catch (PersonException pe)
+        {
+
+        }
+        //Just for .equals
+        assertTrue(personService.equals(personService));
+    }
+
+    public void testPersonServiceImpl()
+    {
+        PersonServiceImpl theImpl = (PersonServiceImpl) personService;
+        assertTrue("Tests the impl method. We should have at least 1 person.", theImpl.countPeople()>0);
+    }
+
     public void testCreateMissingPeople1()
     {
         personService.setCreateMissingPeople(false);
@@ -535,6 +594,26 @@ public class PersonTest extends TestCase
         assertEquals(0, personService.getPeopleFilteredByProperty(ContentModel.PROP_USERNAME, "glen", 10).size());
         assertEquals(0, personService.getPeopleFilteredByProperty(ContentModel.PROP_EMAIL, "gj@email.com", 10).size());
         assertEquals(0, personService.getPeopleFilteredByProperty(ContentModel.PROP_ORGID, "microsoft", 10).size());
+
+        try
+        {
+            personService.getPeopleFilteredByProperty(ContentModel.PROP_USERNAME, "derek", 1001);
+            fail("Should throw IllegalArgumentException, max is 1000");
+        }
+        catch (IllegalArgumentException iae)
+        {
+
+        }
+
+        try
+        {
+            personService.getPeopleFilteredByProperty(ContentModel.PROP_MODEL_AUTHOR, "derek", 10);
+            fail("Should throw AlfrescoRuntimeException,property must be in 'cm:person'");
+        }
+        catch (AlfrescoRuntimeException iae)
+        {
+
+        }
 
         personService.deletePerson("derek");
         assertEquals(2, getPeopleCount());
@@ -1494,6 +1573,7 @@ public class PersonTest extends TestCase
         
         authenticationDAO.setEnabled(userName, false);
         assertFalse("Person should be disabled.", authenticationDAO.getEnabled(userName));
+        assertFalse("Person should be disabled.", personService.isEnabled(userName));
         assertTrue("Person should be disabled.", nodeService.hasAspect(personNodeRef, ContentModel.ASPECT_PERSON_DISABLED));
     }
     
@@ -1677,6 +1757,17 @@ public class PersonTest extends TestCase
         assertEquals(1, result.size());
         assertEquals(jjFirstname, result.get(0).getFirstName());
         assertEquals(jjLastname, result.get(0).getLastName());
+
+        // test different firstname and lastname
+        filters.clear();
+        searchTerm = jjFirstname + " " + jjLastname;
+        filters.add(new Pair<QName, String>(ContentModel.PROP_USERNAME, searchTerm));
+        filters.add(new Pair<QName, String>(ContentModel.PROP_FIRSTNAME, jjFirstname));
+        filters.add(new Pair<QName, String>(ContentModel.PROP_LASTNAME, jjLastname));
+        result = personService.getPeople(filters, true, null, pr).getPage();
+        assertEquals(1, result.size());
+        assertEquals(jjFirstname, result.get(0).getFirstName());
+        assertEquals(jjLastname, result.get(0).getLastName());
     }
-    
+
 }

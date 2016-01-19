@@ -42,7 +42,7 @@ public abstract class AbstractAssociationsGet extends DictionaryWebServiceBase
 	private static final String REQ_URL_TEMPL_VAR_ASSOCIATION_FILTER = "af";
     
     /**
-     * @Override  method from DeclarativeWebScript 
+     * Override  method from DeclarativeWebScript
      */
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
@@ -120,7 +120,8 @@ public abstract class AbstractAssociationsGet extends DictionaryWebServiceBase
     protected abstract QName getClassQname(WebScriptRequest req);
     
     /**
-     * @param req - webscript request
+     * @param namespacePrefix - namespace prefix
+     * @param name - name
      * @return  qualified name for association
      */
     protected abstract QName getAssociationQname(String namespacePrefix, String name);

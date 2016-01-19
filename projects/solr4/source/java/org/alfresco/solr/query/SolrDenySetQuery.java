@@ -21,12 +21,14 @@ package org.alfresco.solr.query;
 import java.io.IOException;
 
 import org.alfresco.repo.search.adaptor.lucene.QueryConstants;
-import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
+import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
-import org.apache.lucene.util.Bits;
+import org.apache.solr.search.DelegatingCollector;
+import org.apache.solr.search.PostFilter;
 import org.apache.solr.search.SolrIndexSearcher;
 
 /**
@@ -34,11 +36,41 @@ import org.apache.solr.search.SolrIndexSearcher;
  * 
  * @author Matt Ward
  */
-public class SolrDenySetQuery extends AbstractAuthoritySetQuery
+public class SolrDenySetQuery extends AbstractAuthoritySetQuery implements PostFilter
 {
+    private int cost;
+    private boolean cache;
+    private boolean cacheSep;
     public SolrDenySetQuery(String authorities)
     {
         super(authorities);
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
+
+    public int getCost() {
+        return 200;
+    }
+
+    public boolean getCache() {
+        return false;
+    }
+
+    public void setCache(boolean cache)
+    {
+        this.cache = cache;
+    }
+
+    public boolean getCacheSep()
+    {
+        return false;
+    }
+
+    public void setCacheSep(boolean cacheSep)
+    {
+        this.cacheSep = cacheSep;
     }
     
     @Override
@@ -48,10 +80,27 @@ public class SolrDenySetQuery extends AbstractAuthoritySetQuery
         {
             throw new IllegalStateException("Must have a SolrIndexSearcher");
         }
-        return new SolrDenySetQueryWeight((SolrIndexSearcher)searcher, this);
+
+        String[] auths = authorities.substring(1).split(authorities.substring(0, 1));
+        BitsFilter denyFilter  = getACLFilter(auths, QueryConstants.FIELD_DENIED, (SolrIndexSearcher) searcher);
+        return new ConstantScoreQuery(denyFilter).createWeight(searcher);
     }
 
-    @Override
+    public DelegatingCollector getFilterCollector(IndexSearcher searcher)
+    {
+        String[] auths = authorities.substring(1).split(authorities.substring(0, 1));
+        try
+        {
+            HybridBitSet denySet = getACLSet(auths, QueryConstants.FIELD_DENIED, (SolrIndexSearcher) searcher);
+            return new AccessControlCollector(denySet);
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+        @Override
     public String toString()
     {
         StringBuilder stringBuilder = new StringBuilder();
@@ -60,19 +109,35 @@ public class SolrDenySetQuery extends AbstractAuthoritySetQuery
         return stringBuilder.toString();
     }
 
-    
-    private class SolrDenySetQueryWeight extends AbstractAuthorityQueryWeight
+    class AccessControlCollector extends DelegatingCollector
     {
-        public SolrDenySetQueryWeight(SolrIndexSearcher searcher, SolrDenySetQuery query) throws IOException 
+        private HybridBitSet aclIds;
+        private NumericDocValues fieldValues;
+
+        public AccessControlCollector(HybridBitSet aclIds)
         {
-            super(searcher, query, QueryConstants.FIELD_DENYSET, authorities);
+            this.aclIds=aclIds;
         }
 
-        @Override
-        public Scorer scorer(AtomicReaderContext context, Bits acceptDocs) throws IOException
-        {
-            AtomicReader reader = context.reader();
-            return SolrDenySetScorer2.createDenySetScorer(this, context, acceptDocs, searcher, authorities, reader);
+        public boolean acceptsDocsOutOfOrder() {
+            return false;
+        }
+
+        public void setNextReader(AtomicReaderContext context) throws IOException {
+            this.fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, context.reader());
+            delegate.setNextReader(context);
+        }
+
+        public void setScorer(Scorer scorer) throws IOException {
+            delegate.setScorer(scorer);
+        }
+
+        public void collect(int doc) throws IOException{
+            long aclId = this.fieldValues.get(doc);
+            if(!aclIds.get(aclId))
+            {
+                delegate.collect(doc);
+            }
         }
     }
 }

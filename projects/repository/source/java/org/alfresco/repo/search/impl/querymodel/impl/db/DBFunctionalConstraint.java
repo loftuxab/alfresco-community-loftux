@@ -41,8 +41,8 @@ public class DBFunctionalConstraint extends BaseFunctionalConstraint implements 
 {
 
     /**
-     * @param function
-     * @param arguments
+     * @param function Function
+     * @param arguments Map<String, Argument>
      */
     public DBFunctionalConstraint(Function function, Map<String, Argument> arguments)
     {
@@ -63,7 +63,7 @@ public class DBFunctionalConstraint extends BaseFunctionalConstraint implements 
      * @see org.alfresco.repo.search.impl.querymodel.impl.db.DBQueryBuilderComponent#prepare(org.alfresco.service.namespace.NamespaceService, org.alfresco.service.cmr.dictionary.DictionaryService, org.alfresco.repo.domain.qname.QNameDAO, org.alfresco.repo.domain.node.NodeDAO)
      */
     @Override
-    public void prepare(NamespaceService namespaceService, DictionaryService dictionaryService, QNameDAO qnameDAO, NodeDAO nodeDAO, TenantService tenantService, Set<String> selectors, Map<String, Argument> functionArgs,  FunctionEvaluationContext functionContext)
+    public void prepare(NamespaceService namespaceService, DictionaryService dictionaryService, QNameDAO qnameDAO, NodeDAO nodeDAO, TenantService tenantService, Set<String> selectors, Map<String, Argument> functionArgs,  FunctionEvaluationContext functionContext, boolean supportBooleanFloatAndDouble)
     {
         Function function = getFunction();
         if(function != null)
@@ -71,7 +71,7 @@ public class DBFunctionalConstraint extends BaseFunctionalConstraint implements 
             if(function instanceof DBQueryBuilderComponent)
             {
                 DBQueryBuilderComponent dbQueryBuilderComponent = (DBQueryBuilderComponent)function;
-                dbQueryBuilderComponent.prepare(namespaceService, dictionaryService, qnameDAO, nodeDAO, tenantService, selectors,  getFunctionArguments(), functionContext);
+                dbQueryBuilderComponent.prepare(namespaceService, dictionaryService, qnameDAO, nodeDAO, tenantService, selectors,  getFunctionArguments(), functionContext, supportBooleanFloatAndDouble);
             }
             else
             {

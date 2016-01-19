@@ -232,7 +232,7 @@ public class MSPowerPointTests extends AbstractUtils
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render();
 
         // 7. Locked document and working copy are present;
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9843 + fileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9843 + fileType).render();
         Assert.assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.");
         Map<String, Object> properties = detailsPage.getProperties();
         Assert.assertEquals(properties.get("Name"), pptxFileName_9843 + " (Working Copy)" + fileType);
@@ -410,7 +410,7 @@ public class MSPowerPointTests extends AbstractUtils
         ShareUser.login(drone, testUser, DEFAULT_PASSWORD);
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
         
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9847 + fileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9847 + fileType).render();
         Map<String, Object> properties = detailsPage.getProperties();
         Assert.assertEquals(properties.get("Name"), pptxFileName_9847 + " (Working Copy)" + fileType);
         String documentContent = detailsPage.getDocumentBody();
@@ -596,7 +596,7 @@ public class MSPowerPointTests extends AbstractUtils
         documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName);
 
         // 6. Navigate the document;
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9850 + fileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9850 + fileType).render();
 
         // 6. Changes are not applied to the original file; Version is not
         // increased to new major one.
@@ -819,7 +819,7 @@ public class MSPowerPointTests extends AbstractUtils
         DocumentLibraryPage documentLibPage = ShareUser.openSitesDocumentLibrary(drone, siteName).render(maxWaitTime);
 
         // 7. Excel Document is still checked out; Changes are not applied;
-        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9854 + fileType);
+        DocumentDetailsPage detailsPage = documentLibPage.selectFile(pptxFileName_9854 + fileType).render();
         assertEquals(detailsPage.getContentInfo(), "This document is locked by you for offline editing.", "File " + pptxFileName_9854 + " isn't locked");
 
         String documentContent = detailsPage.getDocumentBody();

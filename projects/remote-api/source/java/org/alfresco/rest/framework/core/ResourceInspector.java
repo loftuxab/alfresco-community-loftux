@@ -27,6 +27,8 @@ import org.alfresco.rest.framework.resource.RelationshipResource;
 import org.alfresco.rest.framework.resource.UniqueId;
 import org.alfresco.rest.framework.resource.actions.interfaces.BinaryResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction;
+import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartResourceAction;
+import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartRelationshipResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.ResourceAction;
 import org.alfresco.util.Pair;
@@ -58,13 +60,15 @@ public class ResourceInspector
         ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.Update.class);
         ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.Delete.class);
         ALL_ENTITY_RESOURCE_INTERFACES.add(BinaryResourceAction.Read.class);
-        
+        ALL_ENTITY_RESOURCE_INTERFACES.add(MultiPartResourceAction.Create.class);
+
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Create.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Read.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.ReadById.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Update.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Delete.class);
-        
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(MultiPartRelationshipResourceAction.Create.class);
+
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Read.class);
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Delete.class);
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Update.class);
@@ -73,8 +77,8 @@ public class ResourceInspector
     /**
      * Inspects the entity resource and returns meta data about it
      * 
-     * @param annot
-     * @param resource
+     * @param annot EntityResource
+     * @param resource Class<?>
      */
     private static List<ResourceMetadata> inspectEntity(EntityResource annot, Class<?> resource)
     {
@@ -90,6 +94,7 @@ public class ResourceInspector
         findOperation(EntityResourceAction.ReadById.class, HttpMethod.GET, helper);
         findOperation(EntityResourceAction.Update.class,   HttpMethod.PUT, helper);  
         findOperation(EntityResourceAction.Delete.class,   HttpMethod.DELETE, helper);
+        findOperation(MultiPartResourceAction.Create.class,   HttpMethod.POST, helper);
 
         if (resource.isAnnotationPresent(WebApiDeleted.class))
         {
@@ -112,7 +117,10 @@ public class ResourceInspector
 
     /**
      * Inspects the entity resource and returns meta data about any addresssed/binary properties
-     * @param api 
+     * @param api Api
+     * @param resource Class<?>
+     * @param entityPath String
+     * @param metainfo List<ResourceMetadata>
      */
     public static void inspectAddressedProperties(Api api, Class<?> resource, final String entityPath, List<ResourceMetadata> metainfo)
     {
@@ -172,8 +180,8 @@ public class ResourceInspector
     /**
      * Inspects the relationship resource and returns meta data about it
      * 
-     * @param annot
-     * @param resource
+     * @param annot RelationshipResource
+     * @param resource Class<?>
      */
     private static List<ResourceMetadata> inspectRelationship(RelationshipResource annot, Class<?> resource)
     {
@@ -186,7 +194,8 @@ public class ResourceInspector
         findOperation(RelationshipResourceAction.Read.class,     HttpMethod.GET, helper);
         findOperation(RelationshipResourceAction.ReadById.class, HttpMethod.GET, helper);
         findOperation(RelationshipResourceAction.Update.class,   HttpMethod.PUT, helper);  
-        findOperation(RelationshipResourceAction.Delete.class,   HttpMethod.DELETE, helper);   
+        findOperation(RelationshipResourceAction.Delete.class,   HttpMethod.DELETE, helper);
+        findOperation(MultiPartRelationshipResourceAction.Create.class, HttpMethod.POST, helper);
         
         if (resource.isAnnotationPresent(WebApiDeleted.class))
         {
@@ -202,7 +211,7 @@ public class ResourceInspector
     /**
      * Determines if the resources supports the resource action specified by resourceInterfaceWithOneMethod 
      * @param resourceInterfaceWithOneMethod The resource action
-     * @param method http method the action supports.
+     * @param httpMethod http method the action supports.
      * @param helper Holder of simple meta data
      */
     private static void findOperation(Class<? extends ResourceAction> resourceInterfaceWithOneMethod, HttpMethod httpMethod, MetaHelperCallback helper)
@@ -225,10 +234,9 @@ public class ResourceInspector
 
     /**
      * Inspects the method and returns meta data about its operations
-     * @param resource
-     * @param aMethod
-     * @param httpMethod
-     * @param defaultParams
+     * @param resource Class<?>
+     * @param aMethod Method
+     * @param httpMethod HttpMethod
      * @return ResourceOperation
      */
     public static ResourceOperation inspectOperation(Class<?> resource, Method aMethod, HttpMethod httpMethod)
@@ -254,7 +262,7 @@ public class ResourceInspector
      * Inspects the Method to find any @WebApiParameters and @WebApiParam
      * @param resource the class
      * @param aMethod the method
-     * @param httpMethod
+     * @param httpMethod HttpMethod
      * @return a List of parameters
      */
     private static List<ResourceParameter> inspectParameters(Class<?> resource, Method aMethod, HttpMethod httpMethod)
@@ -355,8 +363,8 @@ public class ResourceInspector
 
     /**
      * Indicates the number of params of the Kind specified
-     * @param params
-     * @param KIND kind of parameter eg. URL_PATH
+     * @param params List<ResourceParameter>
+     * @param kind kind of parameter eg. URL_PATH
      * @return int count
      */
     private static int paramsCount(List<ResourceParameter> params, KIND kind)
@@ -372,8 +380,10 @@ public class ResourceInspector
 
 
     /**
-     * @param paramAnot
-     * @return
+     * @param paramAnot Annotation
+     * @param resource Class<?>
+     * @param aMethod Method
+     * @return ResourceParameter
      */
     private static ResourceParameter findResourceParameter(Annotation paramAnot, Class<?> resource, Method aMethod)
     {
@@ -408,8 +418,8 @@ public class ResourceInspector
     
     /**
      * Returns the method for the interface
-     * @param resourceInterfaceWithOneMethod
-     * @param resource
+     * @param resourceInterfaceWithOneMethod Class<? extends ResourceAction>
+     * @param resource Class<?>
      * @return null or a Method
      */
     public static Method findMethod(Class<? extends ResourceAction> resourceInterfaceWithOneMethod, Class<?> resource)
@@ -426,7 +436,7 @@ public class ResourceInspector
     
     /**
      * Finds the name of the entity using its annotation.
-     * @param annotAttribs
+     * @param annotAttribs Map<String, Object>
      * @return the entity name/path
      */
     protected static String findEntityNameByAnnotationAttributes(Map<String, Object> annotAttribs)
@@ -438,7 +448,7 @@ public class ResourceInspector
     
     /**
      * Finds the name of the entity using its annotation.
-     * @param entityAnnot
+     * @param entityAnnot EntityResource
      * @return the entity name/path
      */
     protected static String findEntityName(EntityResource entityAnnot)
@@ -450,7 +460,7 @@ public class ResourceInspector
 
     /**
      * Finds the name of the entity collection using the meta information.
-     * @param entityAnnot
+     * @param meta ResourceMetadata
      * @return the entity name/path
      */
     public static String findEntityCollectionNameName(ResourceMetadata meta)
@@ -476,7 +486,7 @@ public class ResourceInspector
     /**
      * For a given class, looks for @EmbeddedEntityResource annotations, using the annotation produce
      * a Map of the property name key and the entity key
-     * @param anyClass
+     * @param anyClass Class<?>
      * @return A map of property key name and a value of the entity path name
      */
     public static Map<String,Pair<String,Method>> findEmbeddedResources(Class<?> anyClass)
@@ -505,7 +515,7 @@ public class ResourceInspector
      * Inspects the resource to determine what api it belongs to.
      * It does this by looking for the WebApi package annotation.
      * 
-     * @param resource
+     * @param resource Class<?>
      * @return Api
      */
     public static Api inspectApi(Class<?> resource)
@@ -527,7 +537,7 @@ public class ResourceInspector
     /**
      * Inspects the annotated resource to understand its capabilities
      * 
-     * @param resource
+     * @param resource Class
      */
     @SuppressWarnings("rawtypes")
     public static List<ResourceMetadata> inspect(Class resource)
@@ -570,7 +580,7 @@ public class ResourceInspector
     /**
      * Finds a single method with the @UniqueId annotation.
      * 
-     * @param obj any object
+     * @param objClass any object class
      * @return the Method
      * @throws IllegalArgumentException if there is is more than 1 method annotated with @UniqueId
      */
@@ -592,7 +602,7 @@ public class ResourceInspector
 
     /**
      * Finds the property name that is used as the unique id.
-     * @param Method uniqueIdMethod
+     * @param uniqueIdMethod Method
      * @return String the property name that is used as the unique id.
      */
     public static String findUniqueIdName(Method uniqueIdMethod)

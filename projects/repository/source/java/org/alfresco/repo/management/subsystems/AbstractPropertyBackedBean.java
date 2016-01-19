@@ -103,7 +103,14 @@ public abstract class AbstractPropertyBackedBean implements PropertyBackedBean, 
     
     /** Lock for concurrent access. */
     protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
+    
+    private Map<String, SubsystemEarlyPropertyChecker> earlyPropertyCheckers;
+    
+    public void setEarlyPropertyCheckers(Map<String, SubsystemEarlyPropertyChecker> earlyPropertyCheckers)
+    {
+        this.earlyPropertyCheckers = earlyPropertyCheckers;
+    }
+    
     /**
      * Used in conjunction with {@link #localSetProperties} to control setting of
      * properties from either a JMX client or by code in the local Alfresco
@@ -311,6 +318,67 @@ public abstract class AbstractPropertyBackedBean implements PropertyBackedBean, 
         this.saveSetProperty = saveSetProperty;
     }
 
+    /**
+     * Check properties for invalid values using {@link SubsystemEarlyPropertyChecker}s
+     * @param properties
+     * @return The complete error message in case of exceptions or empty string otherwise
+     */
+    public String performEarlyPropertyChecks(Map<String, String> properties)
+    {
+        if (properties != null && !properties.isEmpty() && earlyPropertyCheckers != null)
+        {
+            List<InvalidPropertyValueException> exceptions = new ArrayList<InvalidPropertyValueException>();
+
+            for (String property : properties.keySet())
+            {
+                if (earlyPropertyCheckers.containsKey(property))
+                {
+                    try
+                    {
+                        SubsystemEarlyPropertyChecker propertyChecker = earlyPropertyCheckers.get(property);
+
+                        if (propertyChecker != null)
+                        {
+                            if (propertyChecker.getPairedPropertyName() != null
+                                    && properties.containsKey(propertyChecker.getPairedPropertyName()))
+                            {
+                                propertyChecker.checkPropertyValue(property, properties.get(property),
+                                        properties.get(propertyChecker.getPairedPropertyName()));
+                            }
+                            else
+                            {
+                                propertyChecker.checkPropertyValue(property, properties.get(property), null);
+                            }
+                        }
+                    }
+                    catch (InvalidPropertyValueException ipve)
+                    {
+                        exceptions.add(ipve);
+                    }
+                }
+            }
+
+            if (exceptions.size() > 0)
+            {
+                String allExceptionsMessages = "";
+                
+                for (InvalidPropertyValueException ipve : exceptions)
+                {
+                    if (!allExceptionsMessages.equals(""))
+                    {
+                        allExceptionsMessages += " | ";
+                    }
+
+                    allExceptionsMessages += ipve.getLocalizedMessage();
+                }
+
+                return allExceptionsMessages;
+            }
+        }
+        
+        return "";
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -847,7 +915,7 @@ public abstract class AbstractPropertyBackedBean implements PropertyBackedBean, 
     /**
      * Removes a property added by code within the local node.
      *
-     * @param propertyNames to be removed.
+     * @param name to be removed.
      */
     public void removeProperty(String name)
     {
@@ -857,7 +925,7 @@ public abstract class AbstractPropertyBackedBean implements PropertyBackedBean, 
     /**
      * Removes properties added by code within the local node.
      *
-     * @param propertyNames to be removed.
+     * @param properties to be removed.
      */
     public void removeProperties(Collection<String> properties)
     {

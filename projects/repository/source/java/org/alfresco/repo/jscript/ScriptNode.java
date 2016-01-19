@@ -48,6 +48,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.UnimportantTransformException;
 import org.alfresco.repo.content.transform.UnsupportedTransformationException;
 import org.alfresco.repo.content.transform.magick.ImageTransformationOptions;
@@ -623,7 +624,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      *         
      * @deprecated API for review (subject to change prior to release)
      *
-     * @author janv
+     * <br>author janv
      * @since 4.0
      */
     public ScriptPagingNodes childFileFolders(boolean files, boolean folders, Object ignoreTypes, int maxItems)
@@ -651,7 +652,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      *         system folder types from the results.
      *         This is equivalent to @see FileFolderService.listFiles() and @see FileFolderService.listFolders()
      *         
-     * @author janv
+     * <br/><br/>author janv
      * @since 4.0
      */
     public ScriptPagingNodes childFileFolders(boolean files, boolean folders, Object ignoreTypes, int skipOffset, int maxItems, int requestTotalCountMax, String sortProp, Boolean sortAsc, String queryExecutionId)
@@ -943,7 +944,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     
     /**
      * Checks whether the {@link ScriptNode} exists in the repository.
-     * @return
+     * @return boolean
      */
     public boolean exists()
     {
@@ -1671,7 +1672,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Get the owner of the node.
      * 
-     * @return
+     * @return String
      */
     public String getOwner()
     {
@@ -1692,11 +1693,22 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         for (String key : this.properties.keySet())
         {
             Serializable value = (Serializable) this.properties.get(key);
+            QName qname= createQName(key);
+            
+            // MNT-8678
+            if (ContentModel.PROP_CONTENT.equals(qname) && (value instanceof ScriptContentData))
+            {
+                ScriptContentData contentData = (ScriptContentData) value;
+                if (contentData.getSize() == 0)
+                {
+                    continue;
+                }
+            }
             
             // perform the conversion from script wrapper object to repo serializable values
             value = getValueConverter().convertValueForRepo(value);
             
-            props.put(createQName(key), value);
+            props.put(qname, value);
         }
         this.nodeService.setProperties(this.nodeRef, props);
     }
@@ -1735,7 +1747,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * <p>
      * Once created the file should have content set using the <code>content</code> property.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param name Name of the file to create
      * 
@@ -1751,7 +1763,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * <p>
      * Once created the file should have content set using the <code>content</code> property.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      * 
      * @param name Name of the file to create
      * @param type Type of the file to create (if null, defaults to ContentModel.TYPE_CONTENT) 
@@ -1776,7 +1788,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Create a new folder (cm:folder) node as a child of this node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param name Name of the folder to create
      * 
@@ -1790,7 +1802,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Create a new folder (cm:folder) node as a child of this node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param name Name of the folder to create
      * @param type Type of the folder to create (if null, defaults to ContentModel.TYPE_FOLDER)
@@ -1853,7 +1865,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Create a new Node of the specified type as a child of this node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param name Name of the node to create (can be null for a node without a 'cm:name' property)
      * @param type QName type (fully qualified or short form such as 'cm:content')
@@ -1870,7 +1882,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Create a new Node of the specified type as a child of this node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param name Name of the node to create (can be null for a node without a 'cm:name' property)
      * @param type QName type (fully qualified or short form such as 'cm:content')
@@ -1922,7 +1934,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * Creates a new secondary association between the current node and the specified child node.   
      * The association is given the same name as the child node's primary association.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *     
      * @param node  node to add as a child of this node
      */
@@ -1942,7 +1954,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * The child node will be cascade deleted if one of the associations was the
      * primary association, i.e. the one with which the child node was created.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param node  child node to remove
      */
@@ -1956,7 +1968,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Create an association between this node and the specified target node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *     
      * @param target        Destination node for the association
      * @param assocType     Association type qname (short form or fully qualified)
@@ -1974,7 +1986,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Remove an association between this node and the specified target node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param target        Destination node on the end of the association
      * @param assocType     Association type qname (short form or fully qualified)
@@ -1991,7 +2003,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Remove this node. Any references to this Node or its NodeRef should be discarded!
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      */
     public boolean remove()
@@ -2068,7 +2080,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * This node must have the cm:versionable aspect. It will be checked out if required
      * but will be checked in after the call.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param history       Version history note
      * @param majorVersion  True to save as a major version increment, false for minor version.
@@ -2113,7 +2125,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Move this Node to a new parent destination.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param destination   Node
      * 
@@ -2135,7 +2147,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Move this Node from specified parent to a new parent destination.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param source Node
      * @param destination Node
@@ -2175,7 +2187,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Add an aspect to the Node. As no properties are provided in this call, it can only be used to add aspects that do not require any mandatory properties.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      * @param type    Type name of the aspect to add
      * 
      * @return true if the aspect was added successfully, false if an error occured.
@@ -2188,7 +2200,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Add an aspect to the Node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param type    Type name of the aspect to add
      * @param props   ScriptableObject (generally an assocative array) providing the named properties for the aspect
@@ -2272,7 +2284,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Remove aspect from the node.
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link save()} first.
+     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
      *    
      * @param type  the aspect type
      * 
@@ -2314,6 +2326,21 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         props.put(ContentModel.PROP_AUTO_VERSION_PROPS, autoVersionProps);
         
         this.services.getVersionService().ensureVersioningEnabled(nodeRef, props);
+    }
+    
+    /**
+     * Ensures that this document has the cm:versionable aspect applied to it,
+     *  and that it has the initial version in the version store.
+     * Calling this on a versioned node with a version store entry will have 
+     *  no effect.
+     * Calling this on a newly uploaded share node will have versioning enabled
+     *  for it (Share currently does lazy versioning to improve performance of
+     *  documents that are uploaded but never edited, and multi upload performance).
+     * 
+     */
+    public void ensureVersioningEnabled()
+    {
+        this.services.getVersionService().ensureVersioningEnabled(nodeRef, null);
     }
     
     /**
@@ -2410,7 +2437,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     /**
      * Performs a check-out of this document for the purposes of an upload
      * 
-     * @return
+     * @return ScriptNode
      */
     public ScriptNode checkoutForUpload()
     {
@@ -3444,7 +3471,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
      * Given a long-form QName, this method uses the namespace service to create a
      * short-form QName string.
      * 
-     * @param longQName
+     * @param longQName QName
      * @return the short form of the QName string, e.g. "cm:content"
      */
     protected String getShortQName(QName longQName)
@@ -3802,7 +3829,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         /**
          * Set the content stream from another input stream.
          *  
-         * @param inputStream
+         * @param inputStream InputStream
          */
         public void write(InputStream inputStream)
         {
@@ -3908,7 +3935,18 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         {
             ContentService contentService = services.getContentService();
             ContentReader reader = contentService.getReader(nodeRef, property); 
-            setMimetype(services.getMimetypeService().guessMimetype(filename, reader));
+            // MNT-12265 Browser sets a mimetype based on extension of file. But mimeType from browser can be
+            // different as mapped in Alfresco for current extension. Therefore we need to guess a mimetype based on
+            // map in Alfresco
+            String typeByExt = services.getMimetypeService().guessMimetype(filename);
+            if (reader != null && reader.getMimetype() != null && !typeByExt.equals(MimetypeMap.MIMETYPE_BINARY))
+            {
+                setMimetype(typeByExt);
+            }
+            else
+            {
+                setMimetype(services.getMimetypeService().guessMimetype(filename, reader));
+            }
         }
         
         /**

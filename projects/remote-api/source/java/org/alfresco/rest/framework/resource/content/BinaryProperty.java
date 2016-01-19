@@ -25,8 +25,8 @@ public class BinaryProperty implements ContentInfo, Serializable
     
     /**
      * Sets the content length to zero, Locale to null, no stream and no caching
-     * @param mimeType
-     * @param encoding
+     * @param mimeType String
+     * @param encoding String
      */
     public BinaryProperty(String mimeType, String encoding)
     {
@@ -39,7 +39,7 @@ public class BinaryProperty implements ContentInfo, Serializable
     
     /**
      * This is the preferred constructor to use. Takes the properties from content reader that it needs.
-     * @param ContentReader
+     * @param reader ContentReader
      */
     public BinaryProperty(ContentReader reader)
     {
@@ -52,10 +52,10 @@ public class BinaryProperty implements ContentInfo, Serializable
     
     /**
      * Sets no stream and no caching
-     * @param mimeType
-     * @param encoding
-     * @param length
-     * @param locale
+     * @param mimeType String
+     * @param encoding String
+     * @param length long
+     * @param locale Locale
      */
     public BinaryProperty(String mimeType, String encoding, long length, Locale locale)
     {

@@ -24,6 +24,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.content.transform.UnimportantTransformException;
+import org.alfresco.repo.content.transform.UnsupportedTransformationException;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -33,12 +35,12 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
+import org.alfresco.service.cmr.repository.CopyService.CopyInfo;
 import org.alfresco.service.cmr.repository.MimetypeService;
 import org.alfresco.service.cmr.repository.NoTransformerException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.TransformationOptions;
-import org.alfresco.service.cmr.repository.CopyService.CopyInfo;
 import org.alfresco.service.cmr.rule.RuleServiceException;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -84,6 +86,7 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
     /**
      * Properties (needed to avoid changing method signatures)
      */
+    @Deprecated
     protected TransformationOptions options;
     
     /**
@@ -148,7 +151,7 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
     }
 
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(
@@ -177,7 +180,7 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
             throw new RuleServiceException(CONTENT_READER_NOT_FOUND_MESSAGE);
         }
 
-        options = newTransformationOptions(ruleAction, actionedUponNodeRef);
+        TransformationOptions options = newTransformationOptions(ruleAction, actionedUponNodeRef);
         // getExecuteAsychronously() is not true for async convert content rules, so using Thread name
         //        options.setUse(ruleAction.getExecuteAsychronously() ? "asyncRule" :"syncRule");
         options.setUse(Thread.currentThread().getName().contains("Async") ? "asyncRule" :"syncRule");
@@ -283,7 +286,6 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
             // TODO: Check failure patterns for actions.
             try
             {
-                options.setTargetNodeRef(copyNodeRef);
                 doTransform(ruleAction, actionedUponNodeRef, contentReader, copyNodeRef, contentWriter);
                 ruleAction.setParameterValue(PARAM_RESULT, copyNodeRef);
             }
@@ -315,6 +317,8 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
 
     {
         // transform - will throw NoTransformerException if there are no transformers
+        TransformationOptions options = newTransformationOptions(ruleAction, sourceNodeRef);
+        options.setTargetNodeRef(destinationNodeRef);
         this.contentService.transform(contentReader, contentWriter, options);
     }
     
@@ -399,5 +403,22 @@ public class TransformActionExecuter extends ActionExecuterAbstractBase
     {
         return potentialExtensionString.length() > 0 && potentialExtensionString.indexOf(' ') == -1;
     }
+    
+    @Override
+    public boolean onLogException(Log logger, Throwable t, String message)
+    {
+        if (t instanceof UnimportantTransformException )
+        {
+            logger.debug(message);
+            return true;
+        }
+        else if (t instanceof UnsupportedTransformationException)
+        {
+            logger.error(message);
+            return true;
+        }
+        return false;
+    }
+    
     
 }

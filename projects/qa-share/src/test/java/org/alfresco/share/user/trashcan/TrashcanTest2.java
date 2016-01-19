@@ -1455,7 +1455,7 @@ public class TrashcanTest2 extends AbstractUtils
         // Creating 8 links
         for (int i = 0; i < linkIds.length; i++)
         {
-            LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage();
+            LinksPage linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
             linksPage.createLink(testName + "link" + i, linkUrl).render();
             linkIds[i] = LinkUtil.getLinkId(drone, siteName, testName + "link" + i);
         }
@@ -1473,7 +1473,7 @@ public class TrashcanTest2 extends AbstractUtils
 
         // User2 login
         ShareUser.login(drone, user2, DEFAULT_PASSWORD);
-        siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName);
+        siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
 
         // Creating link
         linksPage = siteDashboardPage.getSiteNav().selectLinksPage().render();
@@ -1510,13 +1510,13 @@ public class TrashcanTest2 extends AbstractUtils
             user1.toLowerCase()), String.format("Username displayed: %s, Username Expected: %s", itemInfo.getUserFullName(), user1));
 
         // Recover link0
-        ShareUserProfile.recoverTrashCanItem(drone, linkIds[0]);
+        ShareUserProfile.recoverTrashCanItem(drone, linkIds[0]).render();
 
         // Verify that the recovered item is not presented
         assertFalse(ShareUserProfile.isTrashCanItemPresent(drone, linkIds[0]), links[0] + " is presented in Trashcan");
 
         // Delete link1
-        ShareUserProfile.deleteTrashCanItem(drone, linkIds[1]);
+        ShareUserProfile.deleteTrashCanItem(drone, linkIds[1]).render();
 
         // Verify that the deleted item is not presented
         assertFalse(ShareUserProfile.isTrashCanItemPresent(drone, linkIds[1]), links[1] + "  is presented in Trashcan");
@@ -1644,7 +1644,7 @@ public class TrashcanTest2 extends AbstractUtils
 
         // User2 login
         ShareUser.login(drone, user2, DEFAULT_PASSWORD);
-        siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName);
+        siteDashboardPage = ShareUser.openSiteDashboard(drone, siteName).render();
         siteDashboardPage.getSiteNav().selectDataListPage().render();
 
         // Creating data list
@@ -1656,7 +1656,7 @@ public class TrashcanTest2 extends AbstractUtils
         dataListPage = siteDashboardPage.getSiteNav().selectDataListPage().render();
 
         // Delete  data list
-        dataListPage.deleteDataListWithConfirm(testName + "dataList8");
+        dataListPage.deleteDataListWithConfirm(testName + "dataList8").render();
         ShareUser.logout(drone);
 
         // Log in as User1
@@ -1681,7 +1681,7 @@ public class TrashcanTest2 extends AbstractUtils
             user1.toLowerCase()), String.format("Username displayed: %s, Username Expected: %s", itemInfo.getUserFullName(), user1));
 
         // Recover data list0
-        ShareUserProfile.recoverTrashCanItem(drone, listIds[0]);
+        ShareUserProfile.recoverTrashCanItem(drone, listIds[0]).render();
 
         // Verify that the recovered item is not presented
         assertFalse(ShareUserProfile.isTrashCanItemPresent(drone, listIds[0]), lists[0] + " is presented in Trashcan");

@@ -611,6 +611,7 @@
                 org.alfresco.service.cmr.lock.LockService.getLockType=ACL_NODE.0.sys:base.ReadProperties
                 org.alfresco.service.cmr.lock.LockService.checkForLock=ACL_NODE.0.sys:base.ReadProperties
                 org.alfresco.repo.lock.LockServiceImpl.getLocks=ACL_NODE.0.sys:base.ReadProperties
+                org.alfresco.service.cmr.lock.LockService.getLockState=ACL_NODE.0.sys:base.ReadProperties
                 org.alfresco.service.cmr.lock.LockService.*=ACL_DENY
             </value>
         </property>
@@ -939,6 +940,7 @@
       <property name="personService"><ref bean="personService"/></property>
       <property name="authorityService"><ref bean="authorityService"/></property>
       <property name="workflowService"><ref bean="workflowServiceImpl" /></property>
+      <property name="nodeService"><ref bean="nodeService"></ref></property>
     </bean>
 
     <!-- ============= -->
@@ -1011,6 +1013,7 @@
                org.alfresco.service.cmr.site.SiteService.listMembers=ACL_ALLOW
                org.alfresco.service.cmr.site.SiteService.listMembersInfo=ACL_ALLOW
                org.alfresco.service.cmr.site.SiteService.listMembersPaged=ACL_ALLOW
+               org.alfresco.service.cmr.site.SiteService.listSiteMemberships=ACL_ALLOW
                org.alfresco.service.cmr.site.SiteService.listSites=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties
                org.alfresco.service.cmr.site.SiteService.listSitesPaged=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties
                org.alfresco.service.cmr.site.SiteService.removeMembership=ACL_ALLOW
@@ -1110,34 +1113,6 @@
         <property name="methodName" value="listLinks" />
     </bean>
 
-
-    <!-- ==================== -->
-    <!-- The Wiki Services    -->
-    <!-- ==================== -->
-
-    <!-- The wiki service itself does not require any security restrictions, -->
-    <!--  they are imposed by the node and site services it uses to do its work. -->
-    <bean id="WikiService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
-    
-    <!-- The canned queries that the wiki services use do however need to check -->
-    <bean id="WikiService_CannedQuery_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
-        <property name="authenticationManager"><ref bean="authenticationManager"/></property>
-        <property name="accessDecisionManager"><ref local="accessDecisionManager"/></property>
-        <property name="afterInvocationManager"><ref local="afterInvocationManager"/></property>
-        <property name="objectDefinitionSource">
-            <value>
-               org.alfresco.service.cmr.wiki.WikiService.listWikiPages=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties
-            </value>
-        </property>
-    </bean>
-
-    <bean id="WikiService_security_listWikiPages" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityBean">
-        <property name="methodSecurityInterceptor" ref="WikiService_CannedQuery_security" />
-        <property name="service" value="org.alfresco.service.cmr.wiki.WikiService" />
-        <property name="methodName" value="listWikiPages" />
-    </bean>
-
-
     <!-- ========================= -->
     <!-- The Discussions Services  -->
     <!-- ========================= -->
@@ -1230,5 +1205,30 @@
         <property name="service" value="org.alfresco.repo.node.archive.NodeArchiveService" />
         <property name="methodName" value="listArchivedNodes" />
     </bean>
-    
+
+    <!-- ===================== -->
+    <!-- Document Link Service -->
+    <!-- ===================== -->
+
+    <bean id="DocumentLinkService_security"
+        class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref local="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref local="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                org.alfresco.service.cmr.repository.DocumentLinkService.createDocumentLink=ACL_NODE.0.sys:base.Read,ACL_NODE.1.sys:base.CreateChildren
+                org.alfresco.service.cmr.repository.DocumentLinkService.getLinkDestination=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.repository.DocumentLinkService.deleteLinksToDocument=ACL_NODE.0.sys:base.Read
+                org.alfresco.service.cmr.repository.DocumentLinkService.*=ACL_DENY
+            </value>
+        </property>
+    </bean>
+
 </beans>

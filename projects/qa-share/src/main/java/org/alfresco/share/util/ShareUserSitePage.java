@@ -36,6 +36,7 @@ import org.alfresco.po.share.site.document.TreeMenuNavigation.TreeMenu;
 import org.alfresco.webdrone.HtmlPage;
 import org.alfresco.webdrone.WebDrone;
 import org.alfresco.webdrone.exception.PageException;
+import org.alfresco.webdrone.exception.PageOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,7 +63,7 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param driver WebDrone Instance
      * @param folderPath: String folder path relative to DocumentLibrary e.g. DOCLIB + file.seperator + folderName1
-     * @throws SkipException if error in this API
+     * @throws Exception if error in this API
      */
     public static DocumentLibraryPage navigateToFolder(WebDrone driver, String folderPath) throws Exception
     {
@@ -236,9 +237,9 @@ public class ShareUserSitePage extends AbstractUtils
      * This method is used to edit the properties of a file/folder from document library page.
      * Assumes User is logged in and a specific Site is open.
      * 
-     * @param driver WebDrone Instance
+     * @param drone WebDrone Instance
      * @param siteName String Name of the Site to be accessed
-     * @param testFile String Name of the file/folder to be edited
+     * @param fileOrFolderName String Name of the file/folder to be edited
      * @return {@link DocumentLibraryPage}
      */
     public static DocumentLibraryPage editPropertiesFromDocLibPage(WebDrone drone, String siteName, String fileOrFolderName)
@@ -249,12 +250,12 @@ public class ShareUserSitePage extends AbstractUtils
     /**
      * This method does the copy or move the folder or document into another folder.
      * User should be on Document Library Page.
-     * 
+     *
+     * @param drone
      * @param siteName
+     * @param sourceFolder
+     * @param destinationFolders
      * @param isCopy
-     * @param testFolderName
-     * @param copyFolderName
-     * @param docLibPage
      * @return DocumentLibraryPage
      */
     public static DocumentLibraryPage copyOrMoveToFolder(WebDrone drone, String siteName, String sourceFolder, String[] destinationFolders, boolean isCopy)
@@ -279,7 +280,17 @@ public class ShareUserSitePage extends AbstractUtils
 
         if (isCopy)
         {
-            copyOrMoveContentPage = contentRow.selectCopyTo().render();
+            try
+            {
+                copyOrMoveContentPage = contentRow.selectCopyTo().render();
+            }
+            catch(PageOperationException po)
+            {
+                drone.refresh();
+                docLibPage = (DocumentLibraryPage) ShareUser.getSharePage(drone);
+                contentRow = docLibPage.getFileDirectoryInfo(sourceFolder);
+                copyOrMoveContentPage = contentRow.selectCopyToOnFolderCloud().render();
+            }
         }
         else
         {
@@ -366,7 +377,6 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param drone
      * @param contentName
-     * @param isFile
      * @param comment
      * @return
      */
@@ -381,7 +391,6 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param drone
      * @param contentName
-     * @param isFile
      * @return DetailsPage
      */
     public static DetailsPage getContentDetailsPage(WebDrone drone, String contentName)
@@ -405,7 +414,6 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param drone
      * @param contentName
-     * @param comment
      * @return
      */
     public static ManagePermissionsPage manageContentPermissions(WebDrone drone, String contentName)
@@ -795,7 +803,6 @@ public class ShareUserSitePage extends AbstractUtils
      * 
      * @param drone
      * @param fileName
-     * @param mimeType
      * @param details
      * @return
      */
@@ -1087,7 +1094,8 @@ public class ShareUserSitePage extends AbstractUtils
     /**
      * This method clicks on the given option in the Documents Tree menu on Document Library page.
      * 
-     * @param tagName
+     * @param drone
+     * @param docMenu
      * @return {@link HtmlPage}
      */
     public static HtmlPage clickOnDocumentsInTreeMenu(WebDrone drone, DocumentsMenu docMenu)
@@ -1099,8 +1107,8 @@ public class ShareUserSitePage extends AbstractUtils
     /**
      * This method clicks on the given option in the Documents Tree menu on Document Library page.
      * 
-     * @param tagName
-     * @return {@link HtmlPage}
+     * @param drone
+     * @return {@link TreeMenuNavigation}
      */
     public static TreeMenuNavigation getLeftTreeMenu(WebDrone drone)
     {

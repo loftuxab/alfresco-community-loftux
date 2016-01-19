@@ -64,8 +64,8 @@ public interface PeriodProvider
     
     /**
      * Get the next date - the provided date + period
-     * @param date
-     * @param expression
+     * @param date Date
+     * @param expression String
      * @return the next date in the period
      */
     public Date getNextDate(Date date, String expression);

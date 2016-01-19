@@ -323,7 +323,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
     /**
      * Set the cache that maintains the extended Store root node data
      * 
-     * @param cache                 the cache
+     * @param allRootNodesCache                 the cache
      */
     public void setAllRootNodesCache(SimpleCache<StoreRef, Set<NodeRef>> allRootNodesCache)
     {
@@ -486,7 +486,6 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
      * Get the ID of the current server, or <tt>null</tt> if there is no ID for the current
      * server and one can't be created.
      * 
-     * @see ServerIdCallback
      */
     protected Long getServerId()
     {
@@ -883,7 +882,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
         }
 
         /**
-         * @param key                   the store ID
+         * @param storeRef                   the store ID
          */
         public Pair<StoreRef, Node> findByKey(StoreRef storeRef)
         {
@@ -1067,7 +1066,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
 
     /**
      * Trigger a post transaction prune of any associations that point to this deleted one.
-     * @param nodeId
+     * @param nodeId Long
      */
     private void pruneDanglingAssocs(Long nodeId)
     {
@@ -1699,7 +1698,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
      * @param invalidateNodePropertiesCache <tt>true</tt> if the node's cached properties are unreliable
      * @param invalidateParentAssocsCache   <tt>true</tt> if the node's cached parent assocs are unreliable
      * 
-     * @see #updateNodeImpl(NodeEntity, NodeUpdateEntity)
+     * @see #updateNodeImpl(Node, NodeUpdateEntity, Set)
      */
     private boolean touchNode(
             Long nodeId, AuditablePropertiesEntity auditableProps, Set<QName> nodeAspects,
@@ -2547,7 +2546,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
     }
     
     /**
-     * Callback to cache node properties.  The DAO callback only does the simple {@link #findByKey(Long)}.
+     * Callback to cache node properties.  The DAO callback only does the simple {@link #findByKey(Serializable)}.
      * 
      * @author Derek Hulley
      * @since 3.4
@@ -2804,7 +2803,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
     }
     
     /**
-     * Callback to cache node aspects.  The DAO callback only does the simple {@link #findByKey(Long)}.
+     * Callback to cache node aspects.  The DAO callback only does the simple {@link #findByKey(Serializable)}.
      * 
      * @author Derek Hulley
      * @since 3.4
@@ -2995,6 +2994,67 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
         }
         List<NodeAssocEntity> nodeAssocEntities = selectNodeAssocsBySource(sourceNodeId, typeQNameId);
         List<Pair<Long, AssociationRef>> results = new ArrayList<Pair<Long,AssociationRef>>(nodeAssocEntities.size());
+        for (NodeAssocEntity nodeAssocEntity : nodeAssocEntities)
+        {
+            Long assocId = nodeAssocEntity.getId();
+            AssociationRef assocRef = nodeAssocEntity.getAssociationRef(qnameDAO);
+            results.add(new Pair<Long, AssociationRef>(assocId, assocRef));
+        }
+        return results;
+    }
+
+    @Override
+    public Collection<Pair<Long, AssociationRef>> getTargetAssocsByPropertyValue(Long sourceNodeId, QName typeQName, QName propertyQName, Serializable propertyValue)
+    {
+        Long typeQNameId = null;
+        if (typeQName != null)
+        {
+            Pair<Long, QName> typeQNamePair = qnameDAO.getQName(typeQName);
+            if (typeQNamePair == null)
+            {
+                // No such QName
+                return Collections.emptyList();
+            }
+            typeQNameId = typeQNamePair.getFirst();
+        }
+
+        Long propertyQNameId = null;
+        NodePropertyValue nodeValue = null;
+        if (propertyQName != null)
+        {
+
+            Pair<Long, QName> propQNamePair = qnameDAO.getQName(propertyQName);
+            if (propQNamePair == null)
+            {
+                // No such QName
+                return Collections.emptyList();
+            }
+
+            propertyQNameId = propQNamePair.getFirst();
+
+            PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
+
+            nodeValue = nodePropertyHelper.makeNodePropertyValue(propertyDef, propertyValue);
+            if (nodeValue != null)
+            {
+                switch (nodeValue.getPersistedType())
+                {
+                case 1: // Boolean
+                case 3: // long
+                case 5: // double
+                case 6: // string
+                    // no floats due to the range errors testing equality on a float.
+                    break;
+                default:
+                    throw new IllegalArgumentException("method not supported for persisted value type " + nodeValue.getPersistedType());
+                }
+            }
+        }
+
+        List<NodeAssocEntity> nodeAssocEntities = selectNodeAssocsBySourceAndPropertyValue(sourceNodeId, typeQNameId, propertyQNameId, nodeValue);
+
+        // Create custom result
+        List<Pair<Long, AssociationRef>> results = new ArrayList<Pair<Long, AssociationRef>>(nodeAssocEntities.size());
         for (NodeAssocEntity nodeAssocEntity : nodeAssocEntities)
         {
             Long assocId = nodeAssocEntity.getId();
@@ -4103,8 +4163,8 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
         private int parentCount;
         
         /**
-         * @param size
-         * @param limitFactor
+         * @param size int
+         * @param limitFactor int
          */
         public ParentAssocsCache(int size, int limitFactor)
         {
@@ -4872,6 +4932,7 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
     protected abstract int deleteNodeAssocs(List<Long> ids);
     protected abstract List<NodeAssocEntity> selectNodeAssocs(Long nodeId);
     protected abstract List<NodeAssocEntity> selectNodeAssocsBySource(Long sourceNodeId, Long typeQNameId);
+    protected abstract List<NodeAssocEntity> selectNodeAssocsBySourceAndPropertyValue(Long sourceNodeId, Long typeQNameId, Long propertyQNameId, NodePropertyValue nodeValue);
     protected abstract List<NodeAssocEntity> selectNodeAssocsByTarget(Long targetNodeId, Long typeQNameId);
     protected abstract NodeAssocEntity selectNodeAssocById(Long assocId);
     protected abstract int selectNodeAssocMaxIndex(Long sourceNodeId, Long assocTypeQNameId);

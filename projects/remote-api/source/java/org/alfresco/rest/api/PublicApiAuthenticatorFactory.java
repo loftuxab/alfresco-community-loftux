@@ -69,7 +69,7 @@ public class PublicApiAuthenticatorFactory extends RemoteUserAuthenticatorFactor
     /**
      * Set the headers passed to the gateway for authentication.
      * 
-     * @param outboundHeaders
+     * @param outboundHeaders Set<String>
      */
     public void setOutboundHeaders(Set<String> outboundHeaders)
     {
@@ -147,9 +147,9 @@ public class PublicApiAuthenticatorFactory extends RemoteUserAuthenticatorFactor
         /**
          * Construct
          * 
-         * @param authenticationService
-         * @param req
-         * @param res
+         * @param req WebScriptServletRequest
+         * @param res WebScriptServletResponse
+         * @param proxyListener ProxyListener
          */
         public PublicApiAuthenticator(WebScriptServletRequest req, WebScriptServletResponse res, ProxyListener proxyListener)
         {
@@ -242,7 +242,7 @@ public class PublicApiAuthenticatorFactory extends RemoteUserAuthenticatorFactor
             }
             else
             {
-                logger.error("Invalid authetnicator key:- " + authenticatorKey);
+                logger.error("Invalid authenticator key:- " + authenticatorKey);
                 proxyListener.authenticationFailed(new PublicApiCredentials(authenticatorKey, remoteUser, getOutboundHeaders(servletReq)));
                 return false;
             }

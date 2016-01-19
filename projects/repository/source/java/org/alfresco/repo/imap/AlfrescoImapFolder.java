@@ -141,12 +141,15 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     /**
      * Constructs {@link AlfrescoImapFolder} object.
      * 
-     * @param qualifiedMailboxName - name of the mailbox (e.g. "admin" for admin user).
      * @param folderInfo - reference to the {@link FileInfo} object representing the folder.
+     * @param userName - name of user (e.g. "admin" for admin user).
      * @param folderName - name of the folder.
-     * @param viewMode - defines view mode. Can be one of the following: {@link AlfrescoImapConst#MODE_ARCHIVE} or {@link AlfrescoImapConst#MODE_VIRTUAL}.
-     * @param rootNodeRef - reference to the root node of the store where folder is placed.
-     * @param mountPointName - name of the mount point.
+     * @param folderPath - path of the folder.
+     * @param viewMode - defines view mode. Can be one of the following: {@link ImapViewMode#ARCHIVE} or {@link ImapViewMode#VIRTUAL}.
+     * @param extractAttachmentsEnabled boolean
+     * @param imapService ImapService
+     * @param serviceRegistry ServiceRegistry
+     * @param mountPointId - id of the mount point.
      */
     public AlfrescoImapFolder(
             FileInfo folderInfo,
@@ -165,14 +168,16 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     /**
      * Constructs {@link AlfrescoImapFolder} object.
      * 
-     * @param qualifiedMailboxName - name of the mailbox (e.g. "admin" for admin user).
      * @param folderInfo - reference to the {@link FileInfo} object representing the folder.
+     * @param userName - name of the user (e.g. "admin" for admin user).
      * @param folderName - name of the folder.
-     * @param viewMode - defines view mode. Can be one of the following: {@link AlfrescoImapConst#MODE_ARCHIVE} or {@link AlfrescoImapConst#MODE_VIRTUAL}.
-     * @param rootNodeRef - reference to the root node of the store where folder is placed.
-     * @param mountPointName - name of the mount point.
+     * @param folderPath - path of the folder.
+     * @param viewMode - defines view mode. Can be one of the following: {@link ImapViewMode#ARCHIVE} or {@link ImapViewMode#VIRTUAL}.
      * @param imapService - the IMAP service.
+     * @param serviceRegistry ServiceRegistry
      * @param selectable - defines whether the folder is selectable or not.
+     * @param extractAttachmentsEnabled boolean
+     * @param mountPointId int
      */
     public AlfrescoImapFolder(
             FileInfo folderInfo,
@@ -329,10 +334,10 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
      * Moves the node <code>sourceNodeRef</code> extracted from the message id.
      * A part of a complex move operation.
      * 
-     * @param folderInfo
-     * @param message
-     * @param flags
-     * @param sourceNodeRef
+     * @param folderInfo FileInfo
+     * @param message MimeMessage
+     * @param flags Flags
+     * @param sourceNodeRef NodeRef
      * @return UUID of the moved node
      * @throws FileExistsException
      * @throws FileNotFoundException
@@ -373,7 +378,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
      * <br>Typical message id is "<74bad8aa-75a5-4063-8e46-9d1b5737f43b@alfresco.org>"
      * <br>See {@link AbstractMimeMessage#updateMessageID()}
      * 
-     * @param message
+     * @param message MimeMessage
      * @return null if nothing is found
      */
     private NodeRef extractNodeRef(MimeMessage message)
@@ -438,8 +443,8 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     /**
      * Determine if it is a complex move operation, which consists of a create superseded by a delete.
      * 
-     * @param sourceNodeRef
-     * @return 
+     * @param sourceNodeRef NodeRef
+     * @return boolean
      */
     @SuppressWarnings("deprecation")
     private boolean isMoveOperation(NodeRef sourceNodeRef)
@@ -500,7 +505,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
 
     /**
-     * Marks all messages in the folder as deleted using {@link Flags.Flag#DELETED} flag.
+     * Marks all messages in the folder as deleted using {@link javax.mail.Flags.Flag#DELETED} flag.
      */
     @Override
     public void deleteAllMessagesInternal() throws FolderException
@@ -519,7 +524,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
 
     /**
-     * Deletes messages marked with {@link Flags.Flag#DELETED}. Note that this message deletes all messages with this flag.
+     * Deletes messages marked with {@link javax.mail.Flags.Flag#DELETED}. Note that this message deletes all messages with this flag.
      */
     @Override
     protected void expungeInternal() throws FolderException
@@ -536,7 +541,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
     
     /**
-     * Deletes messages marked with {@link Flags.Flag#DELETED}. Note that this message deletes the message with current uid
+     * Deletes messages marked with {@link javax.mail.Flags.Flag#DELETED}. Note that this message deletes the message with current uid
      */
     @Override
     protected void expungeInternal(long uid) throws Exception
@@ -694,7 +699,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
 
     /**
-     * Returns the list of messages that have no {@link Flags.Flag#DELETED} flag set for current user.
+     * Returns the list of messages that have no {@link javax.mail.Flags.Flag#DELETED} flag set for current user.
      * 
      * @return the list of non-deleted messages.
      */
@@ -735,11 +740,11 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
 
     /**
-     * Returns count of messages with {@link Flags.Flag#RECENT} flag.
-     * If {@code reset} parameter is {@code true} - removes {@link Flags.Flag#RECENT} flag from
+     * Returns count of messages with {@link javax.mail.Flags.Flag#RECENT} flag.
+     * If {@code reset} parameter is {@code true} - removes {@link javax.mail.Flags.Flag#RECENT} flag from
      * the message for current user.
      * 
-     * @param reset - if true the {@link Flags.Flag#RECENT} will be deleted for current user if exists.
+     * @param reset - if true the {@link javax.mail.Flags.Flag#RECENT} will be deleted for current user if exists.
      * @return returns count of recent messages.
      */
     @Override
@@ -802,7 +807,7 @@ public class AlfrescoImapFolder extends AbstractImapFolder implements Serializab
     }
 
     /**
-     * Returns count of the messages with {@link Flags.Flag#SEEN} in the folder for the current user.
+     * Returns count of the messages with {@link javax.mail.Flags.Flag#SEEN} in the folder for the current user.
      * 
      * @return Count of the unseen messages for current user.
      */

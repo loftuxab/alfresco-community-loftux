@@ -1,30 +1,25 @@
 package org.alfresco.repo.module.tool;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
-
-import org.alfresco.repo.module.ModuleDetailsImpl;
-import org.alfresco.repo.module.ModuleVersionNumber;
-import org.alfresco.service.cmr.module.ModuleDetails;
-import org.alfresco.util.TempFileProvider;
-import org.alfresco.util.VersionNumber;
-import org.junit.Test;
-import org.springframework.util.FileCopyUtils;
-
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
+import org.alfresco.repo.module.ModuleDetailsImpl;
+import org.alfresco.repo.module.ModuleVersionNumber;
+import org.alfresco.service.cmr.module.ModuleDetails;
+import org.alfresco.service.cmr.module.ModuleInstallState;
+import org.alfresco.util.TempFileProvider;
+import org.alfresco.util.VersionNumber;
+import org.junit.Test;
+import org.springframework.util.FileCopyUtils;
+
+import java.io.*;
+import java.util.List;
+import java.util.Properties;
+import java.util.jar.Manifest;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests the war helper. 
@@ -84,7 +79,7 @@ public class WarHelperImplTest extends WarHelperImpl
         }
         catch (ModuleManagementToolException exception)
         {
-            assertTrue(exception.getMessage().contains("must be installed on a war version greater than 10.1"));
+            assertTrue(exception.getMessage().contains("must be installed on a war version equal to or greater than 10.1"));
         }
 
         installingModuleDetails.setRepoVersionMin(new VersionNumber("1.1"));
@@ -139,7 +134,7 @@ public class WarHelperImplTest extends WarHelperImpl
         }
         catch (ModuleManagementToolException exception)
         {
-            assertTrue(exception.getMessage().contains("must be installed on a war version greater than 10.1"));
+            assertTrue(exception.getMessage().contains("must be installed on a war version equal to or greater than 10.1"));
         }
 
         installingModuleDetails.setRepoVersionMin(new VersionNumber("1.1"));
@@ -295,7 +290,45 @@ public class WarHelperImplTest extends WarHelperImpl
 		}
         
     }
-    
+
+
+    @Test
+    public void testfindManifest() throws Exception {
+        //Now check the compatible versions using the manifest
+        TFile theWar = getFile(".war", "module/share-3.4.11.war");
+        Manifest manifest = this.findManifest(theWar);
+
+        assertNotNull(manifest);
+        assertEquals("Alfresco Share Enterprise", manifest.getMainAttributes().getValue(MANIFEST_IMPLEMENTATION_TITLE));
+        assertEquals("3.4.11", manifest.getMainAttributes().getValue(MANIFEST_SPECIFICATION_VERSION));
+
+        theWar = getFile(".war", "module/alfresco-4.2.a.war");
+        manifest = this.findManifest(theWar);
+
+        assertNotNull(manifest);
+        assertEquals("Alfresco Repository Community", manifest.getMainAttributes().getValue(MANIFEST_IMPLEMENTATION_TITLE));
+        assertEquals("4.2.a", manifest.getMainAttributes().getValue(MANIFEST_SPECIFICATION_VERSION));
+    }
+
+    @Test
+    public void testListModules() throws Exception
+    {
+        TFile theWar =  getFile(".war", "module/test.war");
+
+        List<ModuleDetails> details = this.listModules(theWar);
+        assertNotNull(details);
+        assertEquals(details.size(), 0);
+
+        theWar =  getFile(".war", "module/share-4.2.a.war");
+        details = this.listModules(theWar);
+        assertNotNull(details);
+        assertEquals(details.size(), 1);
+        ModuleDetails aModule = details.get(0);
+        assertEquals("alfresco-mm-share", aModule.getId());
+        assertEquals("0.1.5.6", aModule.getModuleVersionNumber().toString());
+        assertEquals(ModuleInstallState.INSTALLED, aModule.getInstallState());
+
+    }
 
 	private Properties dummyModuleProperties() {
 		Properties props = new Properties();
@@ -320,7 +353,6 @@ public class WarHelperImplTest extends WarHelperImpl
     
     /**
      * Tests to see if the war is a share war.
-     * @throws Exception
      */
     @Test
     public void testIsShareWar()

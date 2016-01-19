@@ -53,6 +53,10 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     protected FileInfo getNodeForPath(NodeRef rootNodeRef, String path) throws FileNotFoundException
     {
         FileInfo nodeInfo = pathHelper.resolvePathFileInfo(URLDecoder.decode(path));
+        if (nodeInfo == null)
+        {
+        	throw new FileNotFoundException(path);
+        }
         FileInfo workingCopy = getWorkingCopy(nodeInfo.getNodeRef());
         return workingCopy != null ? workingCopy : nodeInfo;
     }
@@ -84,7 +88,7 @@ public class PropPatchMethod extends org.alfresco.repo.webdav.PropPatchMethod
     }
 
     /**
-     * @see org.alfresco.repo.webdav.PropPatchMethod#persistDeadProperties()
+     * @see org.alfresco.repo.webdav.PropPatchMethod#persistDeadProperties(NodeRef, Map)
      */
     @Override
     protected void persistDeadProperties(NodeRef nodeRef, Map<QName, String> deadProperties) 

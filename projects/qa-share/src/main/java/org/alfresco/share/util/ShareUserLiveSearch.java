@@ -31,7 +31,6 @@ public class ShareUserLiveSearch extends AbstractUtils
      * 
      * @param driver
      * @param searchTerm
-     * @param searchFromMyDashBoard
      * @return
      */
     public static LiveSearchDropdown liveSearch(WebDrone driver, String searchTerm)

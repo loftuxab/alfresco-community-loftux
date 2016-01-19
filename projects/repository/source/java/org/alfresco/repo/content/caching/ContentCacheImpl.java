@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * The one and only implementation of the ContentCache class. Binary content data itself
- * is stored on disk in the location specified by {@link cacheRoot}.
+ * is stored on disk in the location specified by {@link #cacheRoot}.
  * <p>
  * The in-memory lookup table is provided by a SimpleCache implementation.
  * 
@@ -63,7 +63,7 @@ public class ContentCacheImpl implements ContentCache
     /**
      * Allows caller to perform lookup using a {@link Key}.
      * 
-     * @param key
+     * @param key Key
      * @return true if the cache contains, false otherwise.
      */
     public boolean contains(Key key)
@@ -74,8 +74,8 @@ public class ContentCacheImpl implements ContentCache
     /**
      * Put an item in the lookup table.
      * 
-     * @param key
-     * @param value
+     * @param key Key
+     * @param value String
      */
     public void putIntoLookup(Key key, String value)
     {
@@ -86,7 +86,7 @@ public class ContentCacheImpl implements ContentCache
      * Get the path of a cache file for the given content URL - will return null if there is no entry
      * in the cache for the specified URL.
      * 
-     * @param contentUrl
+     * @param contentUrl String
      * @return cache file path
      */
     public String getCacheFilePath(String contentUrl)
@@ -97,8 +97,8 @@ public class ContentCacheImpl implements ContentCache
     /**
      * Get a content URL from the cache - keyed by File.
      * 
-     * @param file
-     * @return
+     * @param file File
+     * @return String
      */
     public String getContentUrl(File file)
     {
@@ -155,7 +155,6 @@ public class ContentCacheImpl implements ContentCache
     /**
      * Create a File object and makes any intermediate directories in the path.
      * 
-     * @param contentUrl
      * @return File
      */
     private File createCacheFile()
@@ -304,7 +303,7 @@ public class ContentCacheImpl implements ContentCache
     /**
      * Specify the directory where cache files will be written.
      * 
-     * @param cacheRoot
+     * @param cacheRoot File
      */
     public void setCacheRoot(File cacheRoot)
     {
@@ -332,7 +331,7 @@ public class ContentCacheImpl implements ContentCache
 
     /**
      * Ask the ContentCacheImpl to visit all the content files in the cache.
-     * @param handler
+     * @param handler FileHandler
      */
     public void processFiles(FileHandler handler)
     {
@@ -343,8 +342,8 @@ public class ContentCacheImpl implements ContentCache
      * Recurse into a directory handling cache files (*.bin) with the supplied
      * {@link FileHandler}.
      * 
-     * @param dir
-     * @param handler
+     * @param dir File
+     * @param handler FileHandler
      */
     private void handleDir(File dir, FileHandler handler)
     {
@@ -378,8 +377,8 @@ public class ContentCacheImpl implements ContentCache
      * <p>
      * The returned array contains the (numerically sorted) directories first followed by the (unsorted) plain files.
      * 
-     * @param dir
-     * @return
+     * @param dir File
+     * @return File[]
      */
     private File[] sortFiles(File dir)
     {

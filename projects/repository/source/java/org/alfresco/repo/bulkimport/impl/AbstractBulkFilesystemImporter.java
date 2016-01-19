@@ -126,7 +126,7 @@ public abstract class AbstractBulkFilesystemImporter implements BulkFilesystemIm
 	}
     
     /**
-     * @see org.alfresco.extension.bulkfilesystemimport.BulkFilesystemImporter#getStatus()
+     * @see org.alfresco.repo.bulkimport.BulkFilesystemImporter#getStatus()
      */
     public final BulkImportStatus getStatus()
     {
@@ -164,11 +164,6 @@ public abstract class AbstractBulkFilesystemImporter implements BulkFilesystemIm
         }
     }
 
-    /**
-     * Attempts to get the lock. If it fails, the current transaction is marked for rollback.
-     * 
-     * @return Returns the lock token
-     */
     protected void refreshLock(String lockToken, long time)
     {
         if (lockToken == null)
@@ -360,7 +355,7 @@ public abstract class AbstractBulkFilesystemImporter implements BulkFilesystemIm
     }
     
     /**
-     * @see org.alfresco.extension.bulkfilesystemimport.BulkFilesystemImporter#bulkImport(java.io.File, org.alfresco.service.cmr.repository.NodeRef, boolean)
+     * @see org.alfresco.repo.bulkimport.BulkFilesystemImporter#bulkImport(org.alfresco.repo.bulkimport.BulkImportParameters, org.alfresco.repo.bulkimport.NodeImporter)
      */
     public void bulkImport(final BulkImportParameters bulkImportParameters, final NodeImporter nodeImporter)
     {

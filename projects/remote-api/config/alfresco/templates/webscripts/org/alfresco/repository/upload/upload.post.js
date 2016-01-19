@@ -55,6 +55,10 @@ function main()
          utils.setLocale(args["lang"]);
       }
 
+      var uploadConfig = new XML(config.script),
+          autoVersion = uploadConfig.autoVersion.toString() == "" ? null : uploadConfig.autoVersion.toString() == "true",
+          autoVersionProps = uploadConfig.autoVersionProps.toString() == "" ? null : uploadConfig.autoVersionProps.toString() == "true";
+
       // Parse file attributes
       for each (field in formdata.fields)
       {
@@ -229,8 +233,15 @@ function main()
 
          if (!workingcopy)
          {
-            // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
-            updateNode.ensureVersioningEnabled(true, false);
+            // Ensure the file is versionable (autoVersion and autoVersionProps read from config)
+            if (autoVersion != null && autoVersionProps != null)
+            {
+                updateNode.ensureVersioningEnabled(autoVersion, autoVersionProps);
+            }
+            else
+            {
+                updateNode.ensureVersioningEnabled();
+            }
 
             // It's not a working copy, do a check out to get the actual working copy
             updateNode = updateNode.checkoutForUpload();
@@ -361,9 +372,6 @@ function main()
          newFile.properties.content.write(content, false, true);
          newFile.save();
          
-         // TODO (THOR-175) - review
-         // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
-         newFile.ensureVersioningEnabled(true, false);
 
          // NOTE: Removal of first request for thumbnails to improve upload performance
          //       Thumbnails are still requested by Share on first render of the doclist image.
@@ -379,6 +387,17 @@ function main()
 
          // Extract the metadata
          extractMetadata(newFile);
+
+         // TODO (THOR-175) - review
+         // Ensure the file is versionable (autoVersion and autoVersionProps read from config)
+         if (autoVersion != null && autoVersionProps != null)
+         {
+             newFile.ensureVersioningEnabled(autoVersion, autoVersionProps);
+         }
+         else
+         {
+             newFile.ensureVersioningEnabled();
+         }
 
          // Record the file details ready for generating the response
          model.document = newFile;

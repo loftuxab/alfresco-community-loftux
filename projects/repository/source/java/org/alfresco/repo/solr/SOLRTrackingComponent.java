@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.repo.domain.node.Node;
+import org.alfresco.repo.index.shard.ShardRegistry;
+import org.alfresco.repo.index.shard.ShardState;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -77,7 +79,6 @@ public interface SOLRTrackingComponent
      * Get the nodes satisfying the constraints in nodeParameters
      * 
      * @param nodeParameters set of constraints for which nodes to return
-     * @param maxResults limit the results. 0 or Integer.MAX_VALUE does not limit the results
      * @param callback a callback to receive the results
      */
 	public void getNodes(NodeParameters nodeParameters, NodeQueryCallback callback);
@@ -85,8 +86,8 @@ public interface SOLRTrackingComponent
 	/**
 	 * Returns metadata for a set of node ids
 	 * 
-	 * @param nodeIds a set of nodeIds for which to return node metadata
-	 * @param maxResults limit the results. 0 or Integer.MAX_VALUE does not limit the results
+	 * @param nodeMetaDataParameters NodeMetaDataParameters
+	 * @param resultFilter MetaDataResultsFilter
 	 * @param callback a callback to receive the results
 	 */
 	public void getNodesMetadata(NodeMetaDataParameters nodeMetaDataParameters, MetaDataResultsFilter resultFilter, NodeMetaDataQueryCallback callback);
@@ -130,41 +131,62 @@ public interface SOLRTrackingComponent
         /**
          * Handle a node.
          * 
-         * @param node                      the node meta data
+         * @param nodeMetaData                      the node meta data
          * @return                          Return <tt>true</tt> to continue processing rows or <tt>false</tt> to stop
          */
         boolean handleNodeMetaData(NodeMetaData nodeMetaData);
     }
 
     /**
-     * @return
+     * @return boolean
      */
     boolean isEnabled();
 
     /**
-     * @param enabled
+     * @param enabled boolean
      */
     void setEnabled(boolean enabled);
     
     /**
      * Get the last transaction timestamp from the repo
-     * @return
+     * @return Long
      */
     public Long getMaxTxnCommitTime();
     
     /**
      * Get the last transaction id from the repo
-     * @return
+     * @return Long
      */
     public Long getMaxTxnId();
 
     /**
-     * @return
+     * @return Long
      */
     public Long getMaxChangeSetCommitTime();
 
     /**
-     * @return
+     * @return Long
      */
     public Long getMaxChangeSetId();
+    
+    /**
+     * Register and update a shard state 
+     * @param shardState
+     */
+    public void registerShardState(ShardState shardState); 
+    
+    /**
+     * Get the shard registry
+     * @return the shard registry or null if one is not registered.
+     * This is an optional feature.
+     */
+    public ShardRegistry getShardRegistry();
+    
+    /**
+     * Compute the CRC for the parent associations to this node that can cause its PATH to change
+     * - primary & secondary associations and virtual associations from categories.
+     * @param nodeId
+     * @return
+     */
+    public long getCRC(Long nodeId);
 }

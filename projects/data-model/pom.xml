@@ -4,8 +4,8 @@
     <name>Alfresco Data model classes</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>se.loftux.alfresco</groupId>
-        <version>LX81</version>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -103,9 +103,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <!--  
             | provided dependencies (are not transitive and not included in webapps)
@@ -241,6 +240,11 @@
             <groupId>org.antlr</groupId>
             <artifactId>gunit</artifactId>
             <version>${dependency.antlr.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -34,7 +34,7 @@ import org.alfresco.repo.bulkimport.ContentStoreMapProvider;
 import org.alfresco.repo.processor.BaseProcessorExtension;
 
 /**
- * Custom javascript root object to provide access to the {@link BulkFilesystemImporter} from scripts.
+ * Custom javascript root object to provide access to the {@link org.alfresco.repo.bulkimport.BulkFilesystemImporter} from scripts.
  * 
  * @since 4.0
  *
@@ -51,7 +51,7 @@ public class BulkImport extends BaseProcessorExtension
 
 	/**
 	 * Get a list of the currently registered content stores, from the configured {@link ContentStoreMapProvider}.
-	 * @return the {@link List<String>} of store names
+	 * @return the {@link List} of store names
 	 */
 	public List<String> getStoreNames()
 	{

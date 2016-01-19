@@ -27,28 +27,26 @@ import org.apache.lucene.index.AtomicReader;
 import org.apache.lucene.index.AtomicReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.Weight;
-import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.FixedBitSet;
-import org.apache.solr.schema.SchemaField;
 import org.apache.solr.search.BitDocSet;
 import org.apache.solr.search.DocIterator;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
 {
-
-    SolrReaderSetScorer2(Weight weight, DocSet in, AtomicReaderContext context, Bits acceptDocs, SolrIndexSearcher searcher)
+	SolrReaderSetScorer2(Weight weight, DocSet in, AtomicReaderContext context, Bits acceptDocs, SolrIndexSearcher searcher)
     {
         super(weight, in, context, acceptDocs, searcher);
     }
 
-    public static SolrReaderSetScorer2 createReaderSetScorer(Weight weight, AtomicReaderContext context, Bits acceptDocs, SolrIndexSearcher searcher, String authorities, AtomicReader reader) throws IOException
+    public static AbstractSolrCachingScorer createReaderSetScorer(Weight weight, AtomicReaderContext context, Bits acceptDocs, SolrIndexSearcher searcher, String authorities, AtomicReader reader) throws IOException
     {
         
         DocSet readableDocSet = (DocSet) searcher.cacheLookup(CacheConstants.ALFRESCO_READER_CACHE, authorities);
@@ -65,28 +63,41 @@ public class SolrReaderSetScorer2 extends AbstractSolrCachingScorer
             {
                 bQuery.add(new TermQuery(new Term(QueryConstants.FIELD_READER, current)), Occur.SHOULD);
             }
+            WrappedQuery wrapped = new WrappedQuery(bQuery);
+            wrapped.setCache(false);
 
-            DocSet aclDocs = searcher.getDocSet(bQuery);
+            DocSet aclDocs = searcher.getDocSet(wrapped);
             
             HashSet<Long> aclsFound = new HashSet<Long>(aclDocs.size());
             NumericDocValues aclDocValues = searcher.getAtomicReader().getNumericDocValues(QueryConstants.FIELD_ACLID);
-            
-            BooleanQuery aQuery = new BooleanQuery();
+           
             for (DocIterator it = aclDocs.iterator(); it.hasNext(); /**/)
             {
                 int docID = it.nextDoc();
                 // Obtain the ACL ID for this ACL doc.
                 long aclID = aclDocValues.get(docID);
-                aclsFound.add(Long.valueOf(aclID));
+                aclsFound.add(getLong(aclID));
             }
          
-            for(int i = 0; i < searcher.maxDoc(); i ++)
+            if(aclsFound.size() > 0)
             {
-                long aclID = aclDocValues.get(i);
-                Long key = Long.valueOf(aclID);
-                if(aclsFound.contains(key))
+                for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
                 {
-                    readableDocSet.add(i);
+                    int maxDoc = readerContext.reader().maxDoc();
+                    NumericDocValues fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, readerContext.reader());
+                    if(fieldValues != null)
+                    {
+                        for(int i = 0; i < maxDoc ; i++)
+                        {
+                            long aclID = fieldValues.get(i);
+                            Long key = getLong(aclID);
+                            if(aclsFound.contains(key))
+                            {
+                                readableDocSet.add(readerContext.docBase + i);
+                            }
+                        }
+                    }
+
                 }
             }
             

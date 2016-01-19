@@ -219,7 +219,7 @@ public class ManageDocLibItemsTest extends AbstractUtils
 
         assertTrue(documentLibraryPage.isFileVisible(testFile), String.format("File %s didn't uploaded", testFile));
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(testFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(testFile).render();
 
         Map<String, Object> properties = documentDetailsPage.getProperties();
         assertEquals(properties.get("Addressee"), "Alle Mitglieder von GMX <members@gmx.net>", "Metadata didn't extract.");
@@ -272,7 +272,7 @@ public class ManageDocLibItemsTest extends AbstractUtils
         FileDirectoryInfo fileDirectoryInfo = documentLibraryPage.getFileDirectoryInfo(testFile);
         String urlThumbnailAfterCreating = fileDirectoryInfo.getPreViewUrl();
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(testFile);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(testFile).render();
         Map<String, Object> properties = documentDetailsPage.getProperties();
         assertEquals(properties.get("Mimetype"), "EPS Type PostScript", "Wrong MimeType.");
         assertTrue(documentDetailsPage.isFlashPreviewDisplayed(), "Preview for eps file didn't display.");
@@ -531,7 +531,7 @@ public class ManageDocLibItemsTest extends AbstractUtils
             folderDetailsPage.getSiteNav().selectSiteDocumentLibrary();
             String[] fileInfo = { tempFileName };
             DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
-            DocumentDetailsPage documentDetailPage = documentLibraryPage.selectFile(tempFileName);
+            DocumentDetailsPage documentDetailPage = documentLibraryPage.selectFile(tempFileName).render();
             documentDetailPage.selectManageAspects();
             selectAspectsPage.add(aspects);
             documentDetailPage = selectAspectsPage.clickApplyChanges().render();

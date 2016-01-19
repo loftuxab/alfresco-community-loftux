@@ -51,7 +51,7 @@ public class JSR168PortletAuthenticatorFactory implements PortletAuthenticatorFa
     private TransactionService txnService;    
     
     /**
-     * @param authenticationService
+     * @param authenticationService AuthenticationService
      */
     public void setUnprotAuthenticationService(AuthenticationService authenticationService)
     {
@@ -59,7 +59,7 @@ public class JSR168PortletAuthenticatorFactory implements PortletAuthenticatorFa
     }
 
     /**
-     * @param transactionService
+     * @param transactionService TransactionService
      */
     public void setTransactionService(TransactionService transactionService)
     {
@@ -88,9 +88,8 @@ public class JSR168PortletAuthenticatorFactory implements PortletAuthenticatorFa
         /**
          * Construct
          * 
-         * @param authenticationService
-         * @param req
-         * @param res
+         * @param req RenderRequest
+         * @param res RenderResponse
          */
         public JSR168PortletAuthenticator(RenderRequest req, RenderResponse res)
         {

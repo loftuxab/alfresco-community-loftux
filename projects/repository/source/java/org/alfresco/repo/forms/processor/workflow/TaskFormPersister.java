@@ -60,13 +60,13 @@ public class TaskFormPersister extends ContentModelFormPersister<WorkflowTask>
     {
         super(itemData, namespaceService, dictionaryService, logger);
         WorkflowTask item = itemData.getItem();
-        
+
         // make sure that the task is not already completed
         if (item.getState().equals(WorkflowTaskState.COMPLETED))
         {
             throw new AlfrescoRuntimeException("workflowtask.already.done.error");
         }
-        
+
         // make sure the current user is able to edit the task
         if (!workflowService.isTaskEditable(item, authenticationService.getCurrentUserName()))
         {

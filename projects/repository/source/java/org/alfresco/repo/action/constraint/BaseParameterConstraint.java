@@ -67,7 +67,7 @@ public abstract class BaseParameterConstraint implements ParameterConstraint,
     /**
      * Determines whether the allowable values should be cached, default is true.
      * 
-     * @param cache
+     * @param cache boolean
      */
     public void setCacheAllowableValues(boolean cache)
     {
@@ -113,14 +113,14 @@ public abstract class BaseParameterConstraint implements ParameterConstraint,
     /**
      * Gets the list of allowable values, calculating them every time it is called.
      * 
-     * @return Map<String, String> map of allowable values
+     * @return map of allowable values
      */
     protected abstract Map<String, String> getAllowableValuesImpl();
     
     /**
      * Get the I18N display label for a particular key
      * 
-     * @param key 
+     * @param key String
      * @return String I18N value
      */
     protected String getI18NLabel(String key)
@@ -138,7 +138,7 @@ public abstract class BaseParameterConstraint implements ParameterConstraint,
     }
     
     /**
-     * @see org.alfresco.service.cmr.action.ParameterConstraint#getValueDisplayLabel(java.io.Serializable)
+     * @see org.alfresco.service.cmr.action.ParameterConstraint#getValueDisplayLabel(String)
      */
     public String getValueDisplayLabel(String value)
     {
@@ -146,7 +146,7 @@ public abstract class BaseParameterConstraint implements ParameterConstraint,
     }
 
     /**
-     * @see org.alfresco.service.cmr.action.ParameterConstraint#isValidValue(java.io.Serializable)
+     * @see org.alfresco.service.cmr.action.ParameterConstraint#isValidValue(String)
      */
     public boolean isValidValue(String value)
     {

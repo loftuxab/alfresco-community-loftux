@@ -60,7 +60,7 @@ public class ContentGet extends StreamContent implements ServletContextAware
     private ContentService contentService;
 
     /**
-     * @param 
+     * @param servletContext ServletContext
      */
     public void setServletContext(ServletContext servletContext)
     {
@@ -68,7 +68,7 @@ public class ContentGet extends StreamContent implements ServletContextAware
     }
 
     /**
-     * @param dictionaryService
+     * @param dictionaryService DictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -76,7 +76,7 @@ public class ContentGet extends StreamContent implements ServletContextAware
     }
 
     /**
-     * @param namespaceService
+     * @param namespaceService NamespaceService
      */
     public void setNamespaceService(NamespaceService namespaceService)
     {
@@ -84,7 +84,7 @@ public class ContentGet extends StreamContent implements ServletContextAware
     }
     
     /**
-     * @param contentService
+     * @param contentService ContentService
      */
     public void setContentService(ContentService contentService)
     {
@@ -92,7 +92,7 @@ public class ContentGet extends StreamContent implements ServletContextAware
     }
 
     /**
-     * @see org.alfresco.web.scripts.WebScript#execute(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
+     * @see org.springframework.extensions.webscripts.WebScript#execute(WebScriptRequest, WebScriptResponse)
      */
     public void execute(WebScriptRequest req, WebScriptResponse res)
         throws IOException
@@ -143,7 +143,11 @@ public class ContentGet extends StreamContent implements ServletContextAware
     {
         String userAgent = req.getHeader("User-Agent");
         userAgent = userAgent != null ? userAgent.toLowerCase() : "";
-        boolean rfc5987Supported = (userAgent.contains("msie") || userAgent.contains(" trident/") || userAgent.contains(" chrome/") || userAgent.contains(" firefox/"));
+        boolean rfc5987Supported = (userAgent.contains("msie") ||
+                userAgent.contains(" trident/") ||
+                userAgent.contains(" chrome/") ||
+                userAgent.contains(" firefox/") ||
+                userAgent.contains(" safari/"));
 
         if (attach && rfc5987Supported)
         {

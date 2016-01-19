@@ -150,7 +150,7 @@ public class VerbatimMLAnalayser extends Analyzer
     }
 
     /**
-     * @return
+     * @return Analyzer
      */
     private Analyzer getAnalyser()
     {

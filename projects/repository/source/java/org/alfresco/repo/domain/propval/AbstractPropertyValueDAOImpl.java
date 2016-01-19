@@ -276,7 +276,7 @@ public abstract class AbstractPropertyValueDAOImpl implements PropertyValueDAO
     /**
      * Set the cache to use for <b>alf_prop_root</b> lookups (optional).
      * 
-     * @param propertyValueCache     the cache of IDs to property values
+     * @param propertyCache     the cache of IDs to property values
      */
     public void setPropertyCache(SimpleCache<Serializable, Object> propertyCache)
     {
@@ -850,7 +850,7 @@ public abstract class AbstractPropertyValueDAOImpl implements PropertyValueDAO
 
     /**
      * {@inheritDoc}
-     * @see #createPropertyImpl(Serializable, int, int)
+     * @see #createPropertyImpl(Long, long, long, Long, Serializable)
      */
     public Long createProperty(Serializable value)
     {
@@ -1427,8 +1427,6 @@ public abstract class AbstractPropertyValueDAOImpl implements PropertyValueDAO
                 throw new DataIntegrityViolationException("No unique property context exists for id: " + id);
             }
             
-            Long propertyIdToDelete = entity.getPropertyId();
-            
             Long propertyId = null;
             if (propertyValue != null)
             {
@@ -1442,12 +1440,6 @@ public abstract class AbstractPropertyValueDAOImpl implements PropertyValueDAO
             
             // cache
             propertyUniqueContextCache.put(pucKey, entity);
-            
-            // Clean up the previous property, if present
-            if (propertyIdToDelete != null)
-            {
-                deleteProperty(propertyIdToDelete);
-            }
             
             // Done
             if (logger.isDebugEnabled())

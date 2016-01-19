@@ -5,7 +5,6 @@ import org.alfresco.po.share.site.document.CopyOrMoveContentPage;
 import org.alfresco.po.share.site.document.DocumentLibraryNavigation;
 import org.alfresco.po.share.site.document.DocumentLibraryPage;
 import org.alfresco.po.share.site.document.EditDocumentPropertiesPage;
-import org.alfresco.po.share.steps.SiteActions;
 import org.alfresco.po.share.user.CloudSignInPage;
 import org.alfresco.po.share.workflow.DestinationAndAssigneePage;
 import org.alfresco.share.util.AbstractWorkflow;
@@ -46,7 +45,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         testDomain1 = "negative1.test";
         testDomain2 = "negative2.test";
         testDomain = DOMAIN_HYBRID;
-        uniqueRun = "TS22";
+        uniqueRun = "TS23";
     }
 
     @Test(groups = "DataPrepHybrid")
@@ -1088,7 +1087,7 @@ public class HybridSyncNegativeTests2 extends AbstractWorkflow
         documentLibraryPage.getFileDirectoryInfo(opFileName).selectCheckbox();
         DocumentLibraryNavigation documentLibraryNavigation = new DocumentLibraryNavigation(drone);
         CloudSignInPage cloudSignInPage = documentLibraryNavigation.selectSyncToCloud().render();
-        cloudSignInPage.loginToCloud(cloudUserFake, DEFAULT_PASSWORD);
+        cloudSignInPage.loginAs(cloudUserFake, DEFAULT_PASSWORD);
         Assert.assertTrue(cloudSignInPage.isAccountNotRecognised());
         Assert.assertEquals(cloudSignInPage.getAccountNotRecognisedError(), "Email or password not recognised");
     }

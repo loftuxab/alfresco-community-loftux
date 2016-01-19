@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.RenditionModel;
 import org.alfresco.repo.action.RuntimeActionService;
@@ -419,12 +420,8 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
                         return null;
                     }
                 });
-        // Sleep to let the asynchronous action queue perform the updates to the renditions.
-        // TODO Is there a better way?
-        Thread.sleep(30000);
-        
-        // Get the renditions and check their content for the new title
-        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+
+        RetryingTransactionCallback<Void> checkRenditionCallback = new RetryingTransactionCallback<Void>()
                 {
                     public Void execute() throws Throwable
                     {
@@ -440,7 +437,51 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
 
                         return null;
                     }
+                };
+        // Sleep to let the asynchronous action queue perform the updates to the renditions.
+        int count = 0;
+        while (count < 60)
+        {
+            count++;
+            Thread.sleep(1000L);
+            // Get the renditions and check their content for the new title
+            try
+            {
+                transactionHelper.doInTransaction(checkRenditionCallback);
+                // Success
+                break;
+            }
+            catch (Exception e)
+            {
+                // Failure
+                if (count > 60)
+                {
+                    throw e;
+                }
+            }
+        }
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                renditionService.render(nodeWithDocContent, renditionName1, new RenderCallback()
+                {
+                    @Override
+                    public void handleSuccessfulRendition(ChildAssociationRef primaryParentOfNewRendition)
+                    {
+                        assertNotNull("The rendition association was null", primaryParentOfNewRendition);
+                    }
+
+                    @Override
+                    public void handleFailedRendition(Throwable t)
+                    {
+                        fail("No error should be thrown: "+t.getMessage());
+                    }
                 });
+                return null;
+            }
+        });
     }
 
     private void assertRenditionContainsTitle(final String titleValue, String output)
@@ -525,57 +566,6 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
                 return null;
             }
         });
-    }
-
-    /**
-     * This test method uses the RenditionService to render a test document (of
-     * type PDF) into a different format (of type
-     * application/x-shockwave-flash).
-     */
-    public void testRenderPdfDocumentToFlash() throws Exception
-    {
-        this.setComplete();
-        this.endTransaction();
-
-        this.renditionNode = transactionHelper
-                    .doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
-                    {
-                        public NodeRef execute() throws Throwable
-                        {
-                            // Initially the node that provides the content
-                            // should not have the rn:renditioned aspect on it.
-                            assertFalse("Source node has unexpected renditioned aspect.", nodeService.hasAspect(
-                                        nodeWithDocContent, RenditionModel.ASPECT_RENDITIONED));
-
-                            validateRenderingActionDefinition(ReformatRenderingEngine.NAME);
-
-                            RenditionDefinition action = makeReformatAction(null, MimetypeMap.MIMETYPE_FLASH);
-                            action.setParameterValue(ReformatRenderingEngine.PARAM_FLASH_VERSION, "9");
-
-                            // Render the content and put the result underneath
-                            // the content node
-                            ChildAssociationRef renditionAssoc = renditionService.render(nodeWithDocContent, action);
-
-                            assertEquals("The parent node was not correct", nodeWithDocContent, renditionAssoc
-                                        .getParentRef());
-                            validateRenditionAssociation(renditionAssoc, REFORMAT_RENDER_DEFN_NAME);
-
-                            // The rendition node should have no other
-                            // parent-associations - in this case
-                            assertEquals("Wrong value for rendition node parent count.", 1, nodeService
-                                        .getParentAssocs(renditionAssoc.getChildRef()).size());
-
-                            // Now the source content node should have the
-                            // renditioned aspect
-                            assertTrue("Source node is missing renditioned aspect.", nodeService.hasAspect(
-                                        nodeWithDocContent, RenditionModel.ASPECT_RENDITIONED));
-                            return renditionAssoc.getChildRef();
-                        }
-                    });
-
-        // Now in a separate transaction, we'll check that the reformatted
-        // content is actually there.
-        assertNotNull("The rendition node was null.", renditionNode);
     }
 
     /**

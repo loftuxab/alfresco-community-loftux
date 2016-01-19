@@ -33,7 +33,8 @@ public class BaseSelectorArgument  extends BaseStaticArgument implements Selecto
     private String selector;
 
     /**
-     * @param name
+     * @param name String
+     * @param selector String
      */
     public BaseSelectorArgument(String name, String selector)
     {

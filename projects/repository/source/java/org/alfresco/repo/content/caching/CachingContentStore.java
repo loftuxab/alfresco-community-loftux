@@ -27,6 +27,8 @@ import org.alfresco.repo.content.ContentContext;
 import org.alfresco.repo.content.ContentStore;
 import org.alfresco.repo.content.caching.quota.QuotaManagerStrategy;
 import org.alfresco.repo.content.caching.quota.UnlimitedQuotaStrategy;
+import org.alfresco.repo.content.filestore.FileContentStore;
+import org.alfresco.repo.content.filestore.SpoofedTextContentReader;
 import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentStreamListener;
@@ -45,8 +47,10 @@ import org.springframework.context.ApplicationEventPublisherAware;
  * CachingContentStore should only be used to wrap content stores that are significantly
  * slower that FileContentStore - otherwise performance may actually degrade from its use.
  * <p>
- * It is important that cacheOnInbound is set to true for exceptionally slow backing stores,
- * e.g. {@link org.alfresco.enterprise.repo.content.xam.XAMContentStore}
+ * It is important that cacheOnInbound is set to true for exceptionally slow backing stores.
+ * <p>
+ * This store handles the {@link FileContentStore#SPOOF_PROTOCOL} and can be used to wrap stores
+ * that do not handle the protocol out of the box e.g. the S3 connector's store.
  * 
  * @author Matt Ward
  */
@@ -122,15 +126,39 @@ public class CachingContentStore implements ContentStore, ApplicationEventPublis
         return backingStore.getRootLocation();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * For {@link #SPOOF_PROTOCOL spoofed} URLs, the URL always exists.
+     */
     @Override
     public boolean exists(String contentUrl)
     {
-        return backingStore.exists(contentUrl);
+        if (contentUrl.startsWith(FileContentStore.SPOOF_PROTOCOL))
+        {
+            return true;
+        }
+        else
+        {
+            return backingStore.exists(contentUrl);
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This store handles the {@link FileContentStore#SPOOF_PROTOCOL} so that underlying stores do not need
+     * to implement anything <a href="https://issues.alfresco.com/jira/browse/ACE-4516">related to spoofing</a>.
+     */
     @Override
     public ContentReader getReader(String contentUrl)
     {
+        // Handle the spoofed URL
+        if (contentUrl.startsWith(FileContentStore.SPOOF_PROTOCOL))
+        {
+            return new SpoofedTextContentReader(contentUrl);
+        }
+
         // Use pool of locks - which one is determined by a hash of the URL.
         // This will stop the content from being read/cached multiple times from the backing store
         // when it should only be read once - cached versions should be returned after that.
@@ -318,6 +346,12 @@ public class CachingContentStore implements ContentStore, ApplicationEventPublis
     @Override
     public boolean delete(String contentUrl)
     {
+        if (contentUrl.startsWith(FileContentStore.SPOOF_PROTOCOL))
+        {
+            // This is not a failure but the content can never actually be deleted
+            return false;
+        }
+
         ReentrantReadWriteLock readWriteLock = readWriteLock(contentUrl);
         ReadLock readLock = readWriteLock.readLock();
         readLock.lock();
@@ -358,8 +392,8 @@ public class CachingContentStore implements ContentStore, ApplicationEventPublis
      * Get a ReentrantReadWriteLock for a given URL. The lock is from a pool rather than
      * per URL, so some contention is expected.
      *  
-     * @param url
-     * @return
+     * @param url String
+     * @return ReentrantReadWriteLock
      */
     public ReentrantReadWriteLock readWriteLock(String url)
     {
@@ -421,7 +455,7 @@ public class CachingContentStore implements ContentStore, ApplicationEventPublis
     /**
      * Sets the QuotaManagerStrategy that will be used.
      * 
-     * @param quota
+     * @param quota QuotaManagerStrategy
      */
     @Required
     public void setQuota(QuotaManagerStrategy quota)

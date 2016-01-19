@@ -40,7 +40,6 @@ public interface ContentAccessor
     /**
      * Use this method to register any interest in events against underlying
      * content streams. 
-     * {@link #getContentOutputStream() output stream}.
      * <p>
      * This method can only be used before the content stream has been retrieved.
      * <p>
@@ -58,7 +57,7 @@ public interface ContentAccessor
      * Gets the size of the content that this reader references.
      * 
      * @return Returns the document byte length, or <code>OL</code> if the
-     *      content doesn't {@link #exists() exist}.
+     *      content doesn't exist.
      */
     public long getSize();
     

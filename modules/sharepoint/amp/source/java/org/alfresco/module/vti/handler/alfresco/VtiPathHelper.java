@@ -494,8 +494,8 @@ public class VtiPathHelper extends AbstractLifecycleBean
      *   /mysite/documentLibrary/folder1/file1.txt
      * </pre>
      * (assuming that the context-path/servletpath is /alfresco)
-     * @param urlPath
-     * @return
+     * @param urlPath String
+     * @return String
      */
     public String getPathForURL(String urlPath)
     {
@@ -512,8 +512,8 @@ public class VtiPathHelper extends AbstractLifecycleBean
      * prefix "/red", the method will return "green/blue" - note that this is now a relative path.
      * If the path does not begin with the supplied prefix then the path is returned unprocessed.
      * 
-     * @param prefix
-     * @param path
+     * @param prefix String
+     * @param path String
      * @return path without prefix
      */
     public String stripPathPrefix(final String prefix, String path)

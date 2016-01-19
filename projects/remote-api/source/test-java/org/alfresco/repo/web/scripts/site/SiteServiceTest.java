@@ -34,6 +34,8 @@ import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -75,6 +77,7 @@ public class SiteServiceTest extends BaseWebScriptTest
     private NodeService nodeService;
     private PermissionService permissionService;
     private AuthorityService authorityService;
+    private FileFolderService fileFolderService;
     
     private static final String USER_ONE = "SiteTestOne";
     private static final String USER_TWO = "SiteTestTwo";
@@ -101,6 +104,8 @@ public class SiteServiceTest extends BaseWebScriptTest
         this.nodeService = (NodeService)getServer().getApplicationContext().getBean("NodeService");
         this.permissionService = (PermissionService)getServer().getApplicationContext().getBean("PermissionService");
         this.authorityService = (AuthorityService)getServer().getApplicationContext().getBean("AuthorityService");
+        this.fileFolderService = (FileFolderService)getServer().getApplicationContext().getBean("FileFolderService");
+
         // sets the testMode property to true via spring injection. This will prevent emails
         // from being sent from within this test case.
         this.authenticationComponent.setSystemUserAsCurrentUser();
@@ -778,35 +783,14 @@ public class SiteServiceTest extends BaseWebScriptTest
     
     private NodeRef copyToSite(NodeRef fileRef, NodeRef destRef) throws Exception
     {
-        String copyUrl = "/slingshot/doclib/action/copy-to/node/workspace/SpacesStore/" + destRef.getId();
-        return copyMoveRequest(fileRef, destRef, copyUrl);
+        FileInfo copiedFileInfo = fileFolderService.copy(fileRef, destRef, null);
+        return copiedFileInfo.getNodeRef();
     }
     
     private NodeRef moveToSite(NodeRef fileRef, NodeRef destRef) throws Exception
     {
-        String moveUrl = "/slingshot/doclib/action/move-to/node/workspace/SpacesStore/" + destRef.getId();
-        return copyMoveRequest(fileRef, destRef, moveUrl);
-    }
-    
-    private NodeRef copyMoveRequest(NodeRef fileRef, NodeRef destRef, String actionUrl) throws Exception
-    {
-        JSONObject copyRequest = new JSONObject();
-        JSONArray nodesToCopy = new JSONArray();
-        nodesToCopy.put(fileRef.toString());
-        copyRequest.put("nodeRefs", nodesToCopy);
-        copyRequest.put("parentId", nodeService.getPrimaryParent(fileRef).getChildRef());
-        
-        Response response = sendRequest(new PostRequest(actionUrl,  copyRequest.toString(), "application/json"), Status.STATUS_OK);
-        
-        JSONObject result = new JSONObject(response.getContentAsString());
-        String failures = result.getString("failureCount");
-        if (Integer.parseInt(failures) != 0)
-        {
-            fail("Failure at copy action");
-        }
-        JSONArray resList = result.getJSONArray("results");
-        String resNodeRefStr = resList.getJSONObject(0).getString("nodeRef");
-        return new NodeRef(resNodeRefStr);
+        FileInfo movedFileInfo = fileFolderService.move(fileRef, destRef, null);
+        return movedFileInfo.getNodeRef();
     }
 
     private void checkPermissions(NodeRef nodeRef, String necessatyAuth, String expectedPermission, String actionInfo)
@@ -883,12 +867,6 @@ public class SiteServiceTest extends BaseWebScriptTest
         String acceptURL = "page/accept-invite";
         String rejectURL = "page/reject-invite";
         
-        // Create a nominated invitation
-        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL, 201);
-        
-        // Get the nominated invitation
-        sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations/" + nominatedId), 200);  
-        
         //Create a new moderated invitation
         String moderatedId = createModeratedInvitation(shortName, inviteComments, userName, roleName);
         
@@ -897,12 +875,12 @@ public class SiteServiceTest extends BaseWebScriptTest
         
         // search for the moderated invitation 
         sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations?inviteeUserName=" + userName), 200);
-          
+        
+        // Create a nominated invitation
+        String nominatedId = createNominatedInvitation(shortName, inviteeFirstName, inviteeLastName, inviteeEmail, inviteeUserName, roleName, serverPath, acceptURL, rejectURL, 201);
+        
         // Search for all invitations on this site
         sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations"), 200);
-        
-        // cancel the nominated invitation
-        sendRequest(new DeleteRequest(URL_SITES + "/" + shortName + "/invitations/" + nominatedId), 200);
         
         // cancel the moderated invitation
         sendRequest(new DeleteRequest(URL_SITES + "/" + shortName + "/invitations/" + moderatedId), 200);   
@@ -1092,18 +1070,16 @@ public class SiteServiceTest extends BaseWebScriptTest
             
         }
         /**
-         * search by user - find USER_TWO's two invitations 
+         * search by user - find USER_TWO's invitation
          */
         {
             Response response = sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations?inviteeUserName=" + USER_TWO), 200);
             JSONObject top = new JSONObject(response.getContentAsString());
             //System.out.println(response.getContentAsString());
             JSONArray data = top.getJSONArray("data");
-            assertEquals("user two invitation not found", data.length(), 2);
+            assertEquals("user two invitation not found", 1, data.length());
             JSONObject first = data.getJSONObject(0);
-            assertEquals("first userid is wrong", first.getString("inviteeUserName"), USER_TWO);
-            JSONObject second = data.getJSONObject(0);
-            assertEquals("second userid is wrong", second.getString("inviteeUserName"), USER_TWO);
+            assertEquals("userid is wrong", first.getString("inviteeUserName"), USER_TWO);
             
         }
         
@@ -1117,14 +1093,6 @@ public class SiteServiceTest extends BaseWebScriptTest
             //System.out.println(response.getContentAsString());
             JSONArray data = top.getJSONArray("data");
             assertEquals("two moderated invitations not found", data.length(), 2);
-        }
-        
-        {
-            Response response = sendRequest(new GetRequest(URL_SITES + "/" + shortName + "/invitations?invitationType=NOMINATED"), 200);
-            JSONObject top = new JSONObject(response.getContentAsString());
-            //System.out.println(response.getContentAsString());
-            JSONArray data = top.getJSONArray("data");
-            assertEquals("one nominated invitation not found", data.length(), 1);
         }
         
         // negative test - unknown invitationType

@@ -55,6 +55,9 @@
 		init-method="init">
 		<property name="contentService" ref="ContentService" />
 		<property name="nodeService" ref="NodeService" />
+                <property name="isAuthenticationPreemptive">
+                    <value>true</value>
+                </property>
 	</bean>
 	
     <bean id="transferVersionChecker" class="org.alfresco.repo.transfer.TransferVersionCheckerImpl">
@@ -155,6 +158,14 @@
 		<property name="alienProcessor" ref="alienProcessor" />
 		<property name="categoryService" ref="CategoryService" />
 	    <property name="taggingService" ref="TaggingService" />  
+        <property name="searchService" ref="SearchService" />
+        <property name="transferSummaryReportLocation">
+                <value>${spaces.transfer_summary_report.location}</value>
+        </property>
+        <property name="properties">
+            <ref bean="global-properties" />
+        </property>
+        <property name="fileFolderService" ref="FileFolderService"/>
 	</bean>
 
 	<bean id="transferNodeResolverFactory"

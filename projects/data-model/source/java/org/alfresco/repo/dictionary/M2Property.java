@@ -21,6 +21,7 @@ package org.alfresco.repo.dictionary;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -48,6 +49,7 @@ public class M2Property
     private IndexTokenisationMode indexTokenisationMode = null;
     private String  analyserResourceBundleName;
     private List<M2Constraint> constraints = new ArrayList<M2Constraint>();
+    private Properties configProperties = new Properties();
 
     /*package*/ M2Property()
     {
@@ -163,7 +165,17 @@ public class M2Property
     
     public String getDefaultValue()
     {
-        return defaultValue;
+        if (defaultValue != null && M2Class.PROPERTY_PLACEHOLDER.matcher(defaultValue).matches())
+        {
+            String key = defaultValue.substring(defaultValue.indexOf("${") + 2, defaultValue.indexOf("}"));
+            String value = defaultValue.substring(defaultValue.indexOf("|") + 1);
+            
+            return configProperties.getProperty(key, value);
+        }
+        else
+        {
+            return defaultValue;
+        }
     }
     
     
@@ -256,8 +268,16 @@ public class M2Property
         constraints.add(constraint);
         return constraint;
     }
-    
-    
+
+    public M2Constraint addConstraint(String name, String type)
+    {
+        M2Constraint constraint = new M2Constraint();
+        constraint.setName(name);
+        constraint.setType(type);
+        constraints.add(constraint);
+        return constraint;
+    }
+
     public void removeConstraintRef(String refName)
     {
         List<M2Constraint> cons = new ArrayList<M2Constraint>(getConstraints());
@@ -270,9 +290,24 @@ public class M2Property
         }
     }
 
+    public void removeConstraint(String name)
+    {
+        if(name == null)
+        {
+            return;
+        }
+        List<M2Constraint> cons = new ArrayList<M2Constraint>(getConstraints());
+        for (M2Constraint con : cons)
+        {
+            if (name.equals(con.getName()))
+            {
+                constraints.remove(con);
+            }
+        }
+    }
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {
@@ -285,5 +320,8 @@ public class M2Property
         this.analyserResourceBundleName = analyserResourceBundleName;
     }
     
-    
+    public void setConfigProperties(Properties configProperties)
+    {
+        this.configProperties = configProperties;
+    }
 }

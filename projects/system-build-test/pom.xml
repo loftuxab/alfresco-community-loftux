@@ -4,8 +4,8 @@
     <name>Alfresco System Build Test</name>
     <parent>
         <artifactId>alfresco-parent</artifactId>
-        <groupId>se.loftux.alfresco</groupId>
-        <version>LX81</version>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,19 +15,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
             <classifier>classes</classifier>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-solr4</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-solrclient</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
@@ -48,18 +48,19 @@
             <version>8.1.10.v20130312</version>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-remote-api</artifactId>
             <version>${project.version}</version>
             <classifier>tests</classifier>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
-            <artifactId>alfresco</artifactId>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-platform</artifactId>
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
@@ -67,7 +68,12 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency>		
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+        </dependency>		
     </dependencies>
 
   <build>
@@ -80,7 +86,10 @@
     </resources>
     <testResources>
       <testResource>
-        <directory>keystore</directory>
+        <directory>source/test-resources</directory> 
+      </testResource>
+      <testResource>
+        <directory>keystore</directory> 
       </testResource>
     </testResources>
     <plugins>
@@ -107,23 +116,21 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>se.loftux.alfresco</groupId>
-                  <artifactId>alfresco</artifactId>
+                  <groupId>org.alfresco</groupId>
+                  <artifactId>alfresco-platform</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>alfresco.war</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>se.loftux.alfresco</groupId>
+                  <groupId>org.alfresco</groupId>
                   <artifactId>alfresco-solr4</artifactId>
                   <version>${project.version}</version>
-                  <classifier>ssl</classifier>
                   <type>war</type>
-                  <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                   <destFileName>solr.war</destFileName>
-                </artifactItem>
+                </artifactItem>	
               </artifactItems>
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
             </configuration>
           </execution>
 
@@ -136,17 +143,27 @@
             <configuration>
                 <artifactItems>
                 <artifactItem>
-                  <groupId>se.loftux.alfresco</groupId>
+                  <groupId>org.alfresco</groupId>
                   <artifactId>alfresco-solr4</artifactId>
                   <version>${project.version}</version>
                   <classifier>config-ssl</classifier>
                   <type>zip</type>
                   <outputDirectory>${solr.config.folder}</outputDirectory>
-                </artifactItem>
+                </artifactItem>	
               </artifactItems>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Excludes wars from artifacts -->
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+            <excludes>
+                <exclude>*.war</exclude>
+            </excludes>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -203,6 +220,23 @@
     								<ignore></ignore>
     							</action>
     						</pluginExecution>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>
+    									com.google.code.maven-replacer-plugin
+    								</groupId>
+    								<artifactId>replacer</artifactId>
+    								<versionRange>
+    									[1.5.3,)
+    								</versionRange>
+    								<goals>
+    									<goal>replace</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
     					</pluginExecutions>
     				</lifecycleMappingMetadata>
     			</configuration>
@@ -219,43 +253,17 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- Wipe the database before starting tests -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>sql-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>wipe-database</id>
-                                <phase>pre-clean</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <sqlCommand>${db.drop.command}</sqlCommand>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>create-database</id>
-                                <phase>pre-clean</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <sqlCommand>${db.create.command}</sqlCommand>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <forkMode>always</forkMode>
                             <includes>
                                 <include>**/MiscSystemTestSuite.*</include>
+                                <include>**/SolrClientTestSuite.*</include>
                             </includes>
                             <systemPropertyVariables>
                                 <solr.solr.home>${solr.config.folder}</solr.solr.home>
-                                <solr.solr.model.dir>${solr.config.folder}/models</solr.solr.model.dir>
+                                <solr.solr.model.dir>${solr.config.folder}/alfrescoModels</solr.solr.model.dir>
                                 <solr.solr.content.dir>${solr.config.folder}/content</solr.solr.content.dir>
                             </systemPropertyVariables>
                         </configuration>

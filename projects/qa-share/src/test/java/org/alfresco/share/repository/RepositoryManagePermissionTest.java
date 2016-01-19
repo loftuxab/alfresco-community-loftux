@@ -897,11 +897,10 @@ public class RepositoryManagePermissionTest extends AbstractUtils
 
         ShareUser.returnManagePermissionPage(drone, folderName);
 
-        // ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1,
-        // true, UserRole.EDITOR, true);
+         ShareUserMembers.addUserOrGroupIntoInheritedPermissions(drone, user1,true, UserRole.COLLABORATOR, true);
         // Assert.assertEquals(UserRole.EDITOR,
         // ShareUserMembers.getContentPermission(drone, folderName, user1));
-        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.EDITOR, true);
+        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.COLLABORATOR, true);
 
         ShareUser.logout(drone);
 
@@ -1571,11 +1570,11 @@ public class RepositoryManagePermissionTest extends AbstractUtils
 
         repoPage = repoPage.selectFolder(DOCLIB_CONTAINER).render();
 
-        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.CONSUMER, false);
+        ShareUserMembers.managePermissionsOnContent(drone, user1, folderName, UserRole.SITECONSUMER, false);
         ManagePermissionsPage manPermPage = ShareUser.returnManagePermissionPage(drone, folderName);
 
         Assert.assertFalse(manPermPage.isInheritPermissionEnabled());
-        Assert.assertEquals(manPermPage.getExistingPermission(user1), UserRole.CONSUMER);
+        Assert.assertEquals(manPermPage.getExistingPermission(user1), UserRole.SITECONSUMER);
 
         ShareUser.logout(drone);
 

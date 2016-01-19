@@ -354,7 +354,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
      * Execute a Lucene search (sorted)
      * 
      * @param search   Lucene search string to execute
-     * @param sortKey  property name to sort on
+     * @param sortColumn  column to sort on
      * @param asc      true => ascending sort
      * 
      * @return JavaScript array of Node results from the search - can be empty but not null
@@ -379,7 +379,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
      * 
      * @param store    Store reference to search against i.e. workspace://SpacesStore
      * @param search   Lucene search string to execute
-     * @param sortKey  property name to sort on
+     * @param sortColumn  column to sort on
      * @param asc      true => ascending sort
      * 
      * @return JavaScript array of Node results from the search - can be empty but not null
@@ -539,7 +539,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
      * 
      * Note that only some query languages support custom query templates, such as 'fts-alfresco'. 
      * See the following documentation for more details:
-     * {@link http://wiki.alfresco.com/wiki/Full_Text_Search_Query_Syntax#Templates}
+     * <a href="http://wiki.alfresco.com/wiki/Full_Text_Search_Query_Syntax#Templates">Templates</a>
      * </pre>
      * 
      * @param search    Search definition object as above
@@ -578,6 +578,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 List<Map<Serializable, Serializable>> sort = (List<Map<Serializable, Serializable>>)def.get("sort");
                 Map<Serializable, Serializable> page = (Map<Serializable, Serializable>)def.get("page");
                 List<String> facets = (List<String>)def.get("fieldFacets");
+                List<String> filterQueries = (List<String>)def.get("filterQueries");
                 String namespace = (String)def.get("namespace");
                 String onerror = (String)def.get("onerror");
                 String defaultField = (String)def.get("defaultField");
@@ -714,6 +715,10 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                     SolrFacetHelper solrFacetHelper = services.getSolrFacetHelper();
                     for (String field: facets)
                     {
+                        if (field.isEmpty())
+                        {
+                            continue;
+                        }
                         final String modifiedField = "@" + field;
                         if (solrFacetHelper.hasFacetQueries(modifiedField))
                         {
@@ -733,6 +738,13 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                             }
                             sp.addFieldFacet(fieldFacet);
                         }
+                    }
+                }
+                if (filterQueries != null)
+                {
+                    for (String filter: filterQueries)
+                    {
+                        sp.addFilterQuery(filter);
                     }
                 }
 

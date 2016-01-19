@@ -205,7 +205,7 @@ public class AlfrescoMeetingServiceHandler implements MeetingServiceHandler
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.MeetingServiceHandler#setWorkspaceTitle(String, String)
+     * @see org.alfresco.module.vti.handler.MeetingServiceHandler#updateWorkspaceTitle(String, String)
      */
     public void updateWorkspaceTitle(String siteName, String newTitle)
     {
@@ -656,7 +656,7 @@ public class AlfrescoMeetingServiceHandler implements MeetingServiceHandler
     }
 
     /**
-     * @see MeetingServiceHandler#updateAttendeeResponse(String, String, AttendeeStatus, String, String, int, Date)
+     * @see MeetingServiceHandler#updateAttendeeResponse(String, String, AttendeeStatus, String, int, int, Date)
      */
     @Override
     public void updateAttendeeResponse(String siteName, String attendeeEmail, AttendeeStatus status, String uid,

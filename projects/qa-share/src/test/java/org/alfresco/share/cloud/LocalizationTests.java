@@ -538,8 +538,9 @@ public class LocalizationTests extends AbstractUtils
         String siteName = testName + loginLanguage.getLanguageValue().replace("_", "") + "12745011";
         String taskName = "Task " + loginLanguage.getLanguageValue().replace("_", "");
 
-        ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(5000);
-        DocumentLibraryPage.selectDocumentLibrary(drone).render();
+        SiteDashboardPage siteDashboard=ShareUser.createSite(drone, siteName, AbstractUtils.SITE_VISIBILITY_PUBLIC).render(5000);
+        DocumentLibraryPage docLibPage=siteDashboard.getSiteNav().selectSiteDocumentLibrary().render(); 
+        docLibPage.selectDocumentLibrary(drone).render();
 
         ShareUserSitePage.uploadFile(drone, file1).render();
 

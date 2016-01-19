@@ -28,6 +28,7 @@
                 <property name="filter" value="\..*" />
                 <property name="visibility" value="webdav,nfs,ftp" />
                 <property name="hiddenAttribute" value="cifs" />
+                <property name="cmisDisableHideConfig" value="${cmis.disable.hidden.leading.period.files}" />
             </bean>
             <bean class="org.alfresco.repo.model.filefolder.HiddenFileFilter">
                 <property name="filter" value="Thumbs\.db" />
@@ -91,6 +92,13 @@
       <property name="cannedQueryDAO" ref="cannedQueryDAO"/>
       <property name="methodSecurity" ref="FileFolderService_security_list"/>
       <property name="hiddenAspect" ref="hiddenAspect"/>
+   </bean>
+
+   <bean name="documentLinkService" class="org.alfresco.repo.doclink.DocumentLinkServiceImpl">
+   	   <property name="nodeService" ref="NodeService"/>
+   	   <property name="dictionaryService" ref="dictionaryService"/>
+   	   <property name="searchService" ref="admSearchService"/>
+   	   <property name="namespaceService" ref="namespaceService"/>
    </bean>
 
    <bean id="mlTranslationInterceptor" class="org.alfresco.repo.model.filefolder.MLTranslationInterceptor" >

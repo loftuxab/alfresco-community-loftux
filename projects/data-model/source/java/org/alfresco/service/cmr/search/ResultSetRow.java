@@ -48,7 +48,7 @@ public interface ResultSetRow
 
     /**
      * Get the data for a single column
-     * @param columnName
+     * @param columnName String
      * @return the value
      */
     public Serializable getValue(String columnName);
@@ -78,7 +78,7 @@ public interface ResultSetRow
 
     /**
      * Gets the node ref related to the named selector
-     * @param selectorName
+     * @param selectorName String
      * @return the node ref
      */
     public NodeRef getNodeRef(String selectorName);
@@ -99,7 +99,7 @@ public interface ResultSetRow
     
     /**
      * Get the score related to the named selector.
-     * @param selectorName
+     * @param selectorName String
      * @return - the score.
      */
     public float getScore(String selectorName);
@@ -121,7 +121,7 @@ public interface ResultSetRow
     /**
      * Get the index of this result set in the result set 
      * If you want the overall position in paged reults you have to add the skipCount fo the result set. 
-     * @return
+     * @return int
      */
     public int getIndex();
     

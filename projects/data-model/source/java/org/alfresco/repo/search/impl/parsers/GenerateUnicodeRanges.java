@@ -26,7 +26,7 @@ public class GenerateUnicodeRanges
 {
 
     /**
-     * @param args
+     * @param args String[]
      */
     public static void main(String[] args)
     {

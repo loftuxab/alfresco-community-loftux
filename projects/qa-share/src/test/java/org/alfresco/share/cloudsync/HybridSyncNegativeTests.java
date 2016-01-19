@@ -247,7 +247,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         contentPage.selectPath(folderName).selectOkButton().render();
         documentLibraryPage = documentLibraryPage.selectFolder(folderName).render();
         Assert.assertTrue(documentLibraryPage.isFileVisible(fileName), "File is not visible");
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         ShareUser.editTextDocument(drone, fileName, "", contentEdited);
 
         documentLibraryPage = ShareUser.openSitesDocumentLibrary(drone, opSiteName).render();
@@ -264,7 +264,7 @@ public class HybridSyncNegativeTests extends AbstractWorkflow
         ContentDetails contentDetailsOp = ShareUserSitePage.getInLineEditContentDetails(drone, fileName);
         String contentOp = contentDetailsOp.getContent();
         Assert.assertTrue(contentOp.equals(contentEdited), "Content is not modified");
-        detailsPage = documentLibraryPage.selectFile(fileName).render();
+        detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         VersionDetails versionDetails = detailsPage.getCurrentVersionDetails();
         Assert.assertTrue(versionDetails.getVersionNumber().equals("1.1"), "Version is not updated");
         ShareUser.logout(drone);

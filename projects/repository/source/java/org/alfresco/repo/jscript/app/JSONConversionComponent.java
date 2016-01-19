@@ -171,7 +171,7 @@ public class JSONConversionComponent
     /**
      * Register a property decorator;
      * 
-     * @param propertyDecorator
+     * @param propertyDecorator PropertyDecorator
      */
     public void registerPropertyDecorator(PropertyDecorator propertyDecorator)
     {
@@ -187,6 +187,16 @@ public class JSONConversionComponent
      */
     @SuppressWarnings("unchecked")
     public String toJSON(final NodeRef nodeRef, final boolean useShortQNames)
+    {
+        return toJSONObject(nodeRef, useShortQNames).toJSONString();
+    }
+    
+    /**
+     * Convert a node reference to a JSON object.  Selects the correct converter based on selection
+     * implementation.
+     */
+    @SuppressWarnings("unchecked")
+    public JSONObject toJSONObject(final NodeRef nodeRef, final boolean useShortQNames)
     {
         final JSONObject json = new JSONObject();
         
@@ -214,15 +224,14 @@ public class JSONConversionComponent
             }
         }    
         
-        return json.toJSONString();
+        return json;
     }
     
     /**
      * 
-     * @param nodeInfo
-     * @param rootJSONObject
-     * @param useShortQNames
-     * @throws JSONException
+     * @param nodeInfo FileInfo
+     * @param rootJSONObject JSONObject
+     * @param useShortQNames boolean
      */
     @SuppressWarnings("unchecked")
     protected void setRootValues(final FileInfo nodeInfo, final JSONObject rootJSONObject, final boolean useShortQNames)
@@ -240,7 +249,7 @@ public class JSONConversionComponent
             NodeRef targetNodeRef = nodeInfo.getLinkNodeRef();
             if (targetNodeRef != null)
             {
-                rootJSONObject.put("linkedNode", toJSON(targetNodeRef, useShortQNames));
+                rootJSONObject.put("linkedNode", toJSONObject(targetNodeRef, useShortQNames));
             }
         }    
         
@@ -277,9 +286,8 @@ public class JSONConversionComponent
     /**
      * Handles the work of converting node permissions to JSON.
      *  
-     * @param nodeRef
-     * @return
-     * @throws JSONException
+     * @param nodeRef NodeRef
+     * @return JSONObject
      */
     @SuppressWarnings("unchecked")
     protected JSONObject permissionsToJSON(final NodeRef nodeRef)
@@ -297,8 +305,8 @@ public class JSONConversionComponent
     /**
      * Handles the work of converting user permissions to JSON.
      * 
-     * @param nodeRef
-     * @return
+     * @param nodeRef NodeRef
+     * @return JSONObject
      */
     @SuppressWarnings("unchecked")
     protected JSONObject userPermissionsToJSON(final NodeRef nodeRef)
@@ -315,10 +323,10 @@ public class JSONConversionComponent
     /**
      * Handles the work of converting values to JSON.
      * 
-     * @param nodeRef
-     * @param propertyName
-     * @param key
-     * @param value
+     * @param nodeRef NodeRef
+     * @param propertyName QName
+     * @param key String
+     * @param value Serializable
      * @return the JSON value
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -374,11 +382,10 @@ public class JSONConversionComponent
     
     /**
      * 
-     * @param nodeRef
-     * @param map 
-     * @param useShortQNames
-     * @return
-     * @throws JSONException
+     * @param nodeRef NodeRef
+     * @param properties Map<QName, Serializable>
+     * @param useShortQNames boolean
+     * @return JSONObject
      */
     @SuppressWarnings("unchecked")
     protected JSONObject propertiesToJSON(NodeRef nodeRef, Map<QName, Serializable> properties, boolean useShortQNames)
@@ -408,10 +415,9 @@ public class JSONConversionComponent
     /**
      * Handles the work of converting aspects to JSON.
      * 
-     * @param nodeRef
-     * @param useShortQNames
-     * @return
-     * @throws JSONException
+     * @param nodeRef NodeRef
+     * @param useShortQNames boolean
+     * @return JSONArray
      */
     @SuppressWarnings("unchecked")
     protected JSONArray apsectsToJSON(NodeRef nodeRef, boolean useShortQNames)
@@ -430,8 +436,8 @@ public class JSONConversionComponent
     /**
      * Handles the work of converting all set permissions to JSON.
      * 
-     * @param nodeRef
-     * @return
+     * @param nodeRef NodeRef
+     * @return JSONArray
      */
     @SuppressWarnings("unchecked")
     protected JSONArray allSetPermissionsToJSON(NodeRef nodeRef)
@@ -455,8 +461,8 @@ public class JSONConversionComponent
     /**
      * Convert a qname to a string - either full or short prefixed named.
      * 
-     * @param qname
-     * @param isShortName
+     * @param qname QName
+     * @param isShortName boolean
      * @return qname string.
      */
     private String nameToString(final QName qname, final boolean isShortName)
@@ -485,8 +491,8 @@ public class JSONConversionComponent
     /**
      * Return true if the node is locked.
      * 
-     * @param nodeRef
-     * @return
+     * @param nodeRef NodeRef
+     * @return boolean
      */
     private boolean isLocked(final NodeRef nodeRef)
     {

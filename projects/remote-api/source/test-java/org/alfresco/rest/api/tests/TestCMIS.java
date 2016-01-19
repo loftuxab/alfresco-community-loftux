@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
@@ -61,6 +62,7 @@ import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.repo.version.VersionableAspectTest;
 import org.alfresco.rest.api.tests.RepoService.SiteInformation;
 import org.alfresco.rest.api.tests.RepoService.TestNetwork;
 import org.alfresco.rest.api.tests.RepoService.TestPerson;
@@ -122,9 +124,11 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisUpdateConflictExcept
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.extensions.surf.util.URLEncoder;
 
 public class TestCMIS extends EnterpriseTestApi
 {
@@ -154,6 +158,7 @@ public class TestCMIS extends EnterpriseTestApi
     private CMISStrictDictionaryService cmisDictionary;
     private QNameFilter cmisTypeExclusions;
 	private NodeService nodeService;
+	private Properties globalProperties;
 
     @Before
     public void before() throws Exception
@@ -165,6 +170,15 @@ public class TestCMIS extends EnterpriseTestApi
         this.cmisDictionary = (CMISStrictDictionaryService)ctx.getBean("OpenCMISDictionaryService");
         this.cmisTypeExclusions = (QNameFilter)ctx.getBean("cmisTypeExclusions");
 		this.nodeService = (NodeService) ctx.getBean("NodeService");
+        
+		this.globalProperties = (Properties) ctx.getBean("global-properties");
+		this.globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "true");
+    }
+    
+    @After
+    public void after()
+    {
+        this.globalProperties.setProperty(VersionableAspectTest.AUTO_VERSION_PROPS_KEY, "false");
     }
 
     private void checkSecondaryTypes(Document doc, Set<String> expectedSecondaryTypes, Set<String> expectedMissingSecondaryTypes)
@@ -569,7 +583,7 @@ public class TestCMIS extends EnterpriseTestApi
                         return autoVersion;
                     }
                 }, personId, network1.getId());
-                assertEquals(Boolean.FALSE, autoVersion);
+                assertEquals(Boolean.TRUE, autoVersion);
             }
 
             // https://issues.alfresco.com/jira/browse/PUBLICAPI-92
@@ -1049,7 +1063,6 @@ public class TestCMIS extends EnterpriseTestApi
                 String siteName = "site" + System.currentTimeMillis();
                 SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
                 TestSite site = repoService.createSite(null, siteInfo);
-
                 String name = GUID.generate();
 				NodeRef folderNodeRef = repoService.createFolder(site.getContainerNodeRef(DOCUMENT_LIBRARY_CONTAINER_NAME), name);
                 folders.add(folderNodeRef);
@@ -1462,9 +1475,10 @@ public class TestCMIS extends EnterpriseTestApi
             properties.put(PropertyIds.DESCRIPTION, GUID.generate());
         }
         AlfrescoDocument doc1 = (AlfrescoDocument)doc.updateProperties(properties);
+        doc1 = (AlfrescoDocument)doc1.getObjectOfLatestVersion(false);
         String versionLabel1 = doc1.getVersionLabel();
 
-		assertEquals(versionLabel, versionLabel1);
+        assertTrue(Float.parseFloat(versionLabel) < Float.parseFloat(versionLabel1));
 
 		// ...and check that updating its content creates a new version
         fileContent = new ContentStreamImpl();
@@ -1481,7 +1495,7 @@ public class TestCMIS extends EnterpriseTestApi
         @SuppressWarnings("unused")
         String versionLabel2 = doc2.getVersionLabel();
 
-		assertEquals("Set content stream shouldn't create a new version automatically", versionLabel1, versionLabel2);
+        assertTrue("Set content stream should create a new version automatically", Float.parseFloat(versionLabel1) < Float.parseFloat(versionLabel2));
 	}
 	
 	/**
@@ -2069,6 +2083,70 @@ public class TestCMIS extends EnterpriseTestApi
     }
     
     @Test
+    public void testMNT_13057() throws Exception
+    {
+        final TestNetwork network1 = getTestFixture().getRandomNetwork();
+
+        String username = "user" + System.currentTimeMillis();
+        PersonInfo personInfo = new PersonInfo(username, username, username, TEST_PASSWORD, null, null, null, null, null, null, null);
+        TestPerson person1 = network1.createUser(personInfo);
+        String person1Id = person1.getId();
+        
+        String guid = GUID.generate();
+        String name = guid + "_KRUIS_LOGO_100%_PMS.txt";
+        String urlFileName = guid + "_KRUIS_LOGO_100%25_PMS.txt";
+        
+        final String siteName = "site" + System.currentTimeMillis();
+
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<NodeRef>()
+        {
+            @Override
+            public NodeRef doWork() throws Exception
+            {
+                SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
+                TestSite site = repoService.createSite(null, siteInfo);
+
+                String name = GUID.generate();
+                NodeRef folderNodeRef = repoService.createFolder(site.getContainerNodeRef(DOCUMENT_LIBRARY_CONTAINER_NAME), name);
+                return folderNodeRef;
+            }
+        }, person1Id, network1.getId());
+        
+        // Create a document...
+        publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
+        CmisSession cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_11);
+        Folder docLibrary = (Folder)cmisSession.getObjectByPath("/Sites/" + siteName + "/documentLibrary");
+        
+        Map<String, Object> properties = new HashMap<String, Object>();
+        {
+            properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+            properties.put(PropertyIds.NAME, name);
+        }
+        
+        ContentStreamImpl fileContent = new ContentStreamImpl();
+        {
+            ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".txt"));
+            writer.putContent("Ipsum");
+            ContentReader reader = writer.getReader();
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            fileContent.setStream(reader.getContentInputStream());
+        }
+
+        /* Create document */
+        Document doc = docLibrary.createDocument(properties, fileContent, VersioningState.MAJOR);
+        
+        String id = doc.getId();
+        assertNotNull(id);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("id", URLEncoder.encode(id));
+        
+        urlFileName += "?id=" + URLEncoder.encode(id);
+
+        HttpResponse response = publicApiClient.get(network1.getId() + "/public/cmis/versions/1.1/atom/content/" + urlFileName, null);
+        assertEquals(200, response.getStatusCode());
+    }
+    
+    @Test
     public void testMNT10430() throws Exception
     {
         final TestNetwork network1 = getTestFixture().getRandomNetwork();
@@ -2332,5 +2410,53 @@ public class TestCMIS extends EnterpriseTestApi
                 // ok
             }
         }
+    }
+    
+    @Test
+    public void testDoNotShowCheckedOutedNodeInFolder() throws Exception
+    {
+        final TestNetwork network = getTestFixture().getRandomNetwork();
+
+        String username = String.format(TEST_USER_NAME_PATTERN, System.currentTimeMillis());
+        PersonInfo personInfo = new PersonInfo(username, username, username, TEST_PASSWORD, null, null, null, null, null, null, null);
+        TestPerson person = network.createUser(personInfo);
+        String personId = person.getId();
+
+        final String siteName = String.format(TEST_SITE_NAME_PATTERN, System.currentTimeMillis());
+
+        TenantUtil.runAsUserTenant(new TenantRunAsWork<TestSite>()
+        {
+            @Override
+            public TestSite doWork() throws Exception
+            {
+                SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
+                return repoService.createSite(null, siteInfo);
+            }
+        }, personId, network.getId());
+
+        publicApiClient.setRequestContext(new RequestContext(network.getId(), personId));
+        CmisSession cmisSession = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_11);
+        Folder docLibrary = (Folder) cmisSession.getObjectByPath(String.format(DOCUMENT_LIBRARY_PATH_PATTERN, siteName));
+        
+        assertEquals(0, docLibrary.getChildren().getTotalNumItems());
+        
+        String name = String.format(TEST_DOCUMENT_NAME_PATTERN, GUID.generate());
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+        properties.put(PropertyIds.NAME, name);
+
+        ContentStreamImpl fileContent = new ContentStreamImpl();
+        ByteArrayInputStream stream = new ByteArrayInputStream(GUID.generate().getBytes());
+        fileContent.setMimeType(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        fileContent.setStream(stream);
+
+        docLibrary.createDocument(properties, fileContent, VersioningState.CHECKEDOUT);
+        // there should be only one document
+        assertEquals(1, docLibrary.getChildren().getTotalNumItems());
+        
+        Document obj = (Document)docLibrary.getChildren().iterator().next();
+        // and it should be a PWC
+        assertTrue(obj.isPrivateWorkingCopy());
     }
 }

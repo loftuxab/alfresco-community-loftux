@@ -28,6 +28,7 @@ import org.alfresco.repo.web.scripts.admin.AdminWebScriptTest;
 import org.alfresco.repo.web.scripts.audit.AuditWebScriptTest;
 import org.alfresco.repo.web.scripts.blogs.BlogServiceTest;
 import org.alfresco.repo.web.scripts.comment.CommentsApiTest;
+import org.alfresco.repo.web.scripts.custommodel.CustomModelImportTest;
 import org.alfresco.repo.web.scripts.dictionary.DictionaryRestApiTest;
 import org.alfresco.repo.web.scripts.discussion.DiscussionRestApiTest;
 import org.alfresco.repo.web.scripts.facet.FacetRestApiTest;
@@ -52,10 +53,7 @@ import org.alfresco.repo.web.scripts.tagging.TaggingServiceTest;
 import org.alfresco.repo.web.scripts.thumbnail.ThumbnailServiceTest;
 import org.alfresco.repo.web.scripts.transfer.TransferWebScriptTest;
 import org.alfresco.repo.web.scripts.workflow.ActivitiWorkflowRestApiTest;
-import org.alfresco.repo.web.scripts.workflow.JBPMWorkflowRestApiTest;
 import org.alfresco.repo.web.scripts.workflow.WorkflowModelBuilderTest;
-import org.alfresco.slingshot.documentlibrary.FolderTemplateTest;
-import org.alfresco.slingshot.web.scripts.SlingshotContentGetTest;
 
 /**
  * Web Scripts test suite
@@ -97,18 +95,17 @@ public class WebScriptTestSuite extends TestSuite
         suite.addTestSuite( TransferWebScriptTest.class );
         suite.addTestSuite( WorkflowModelBuilderTest.class );
         suite.addTestSuite( ActivitiWorkflowRestApiTest.class );
-        suite.addTestSuite( JBPMWorkflowRestApiTest.class );
         suite.addTestSuite( PublishingRestApiTest.class );
         suite.addTestSuite( SOLRWebScriptTest.class );
         suite.addTestSuite( SubscriptionServiceRestApiTest.class );
         suite.addTestSuite( FacetRestApiTest.class );
-        suite.addTestSuite( CommentsApiTest.class );		
-        suite.addTestSuite( FolderTemplateTest.class );
+        suite.addTestSuite( CommentsApiTest.class );
         suite.addTestSuite( DeclarativeSpreadsheetWebScriptTest.class );
-        suite.addTestSuite( SlingshotContentGetTest.class);
         suite.addTestSuite( XssVulnerabilityTest.class );
         suite.addTestSuite( LinksRestApiTest.class );
         suite.addTestSuite( RemoteFileFolderLoaderTest.class );
+        suite.addTestSuite( ReadOnlyTransactionInGetRestApiTest.class );
+        suite.addTestSuite( CustomModelImportTest.class );
         // This uses a slightly different context
         // As such, we can't run it in the same suite as the others,
         //  due to finalisers closing caches when we're not looking

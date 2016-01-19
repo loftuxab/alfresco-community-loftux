@@ -1,5 +1,14 @@
 package org.alfresco.repo.module.tool;
 
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.module.ModuleDetailsImpl;
+import org.alfresco.service.cmr.module.ModuleDependency;
+import org.alfresco.service.cmr.module.ModuleDetails;
+import org.alfresco.util.VersionNumber;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,14 +16,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import org.alfresco.repo.module.ModuleDetailsImpl;
-import org.alfresco.service.cmr.module.ModuleDependency;
-import org.alfresco.service.cmr.module.ModuleDetails;
-import org.alfresco.util.VersionNumber;
-
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
 
 
 /**
@@ -68,8 +69,8 @@ public class WarHelperImpl implements WarHelper
     /**
      * Checks if the module is compatible using the entry in the manifest. This is more accurate and works for both alfresco.war and share.war, however
      * valid manifest entries weren't added until 3.4.11, 4.1.1 and Community 4.2 
-     * @param war
-     * @param installingModuleDetails
+     * @param war TFile
+     * @param installingModuleDetails ModuleDetails
      */
     protected void checkCompatibleVersionUsingManifest(TFile war, ModuleDetails installingModuleDetails)
     {
@@ -110,20 +111,33 @@ public class WarHelperImpl implements WarHelper
      * @throws ModuleManagementToolException
      */
 	protected String findManifestArtibute(TFile war, String attributeName) throws ModuleManagementToolException {
-		
-		InputStream is = null;
-		
-		try 
-		{
-			is = new TFileInputStream(war+MANIFEST_FILE);
-			Manifest manifest = new Manifest(is);
-			Attributes attribs = manifest.getMainAttributes();
-			return attribs.getValue(attributeName);
-		} 
-			catch (IOException e) 
-		{
-            throw new ModuleManagementToolException("Unabled to read a manifest for the war file: "+ war);     
-		}
+
+        Manifest manifest = findManifest(war);
+        Attributes attribs = manifest.getMainAttributes();
+        return attribs.getValue(attributeName);
+	}
+
+    /**
+     * Finds a single attribute from a war manifest file.
+     * @param war the war
+     * @return Manifest
+     * @throws ModuleManagementToolException
+     */
+    @Override
+    public Manifest findManifest(TFile war) throws ModuleManagementToolException {
+
+        InputStream is = null;
+
+        try
+        {
+            is = new TFileInputStream(war+MANIFEST_FILE);
+            Manifest manifest = new Manifest(is);
+            return manifest;
+        }
+        catch (IOException e)
+        {
+            throw new ModuleManagementToolException("Unabled to read a manifest for the war file: "+ war);
+        }
         finally
         {
             if (is != null)
@@ -131,24 +145,23 @@ public class WarHelperImpl implements WarHelper
                 try { is.close(); } catch (Throwable e ) {}
             }
         }
-	}
-
+    }
 
 	/**
 	 * Compares the version information with the module details to see if their valid.  If they are invalid then it throws an exception.
-	 * @param warVersion
-	 * @param installingModuleDetails
+	 * @param warVersion VersionNumber
+	 * @param installingModuleDetails ModuleDetails
 	 * @throws ModuleManagementToolException
 	 */
 	private void checkVersions(VersionNumber warVersion, ModuleDetails installingModuleDetails) throws ModuleManagementToolException
 	{
 		if(warVersion.compareTo(installingModuleDetails.getRepoVersionMin())==-1) {
-		    throw new ModuleManagementToolException("The module ("+installingModuleDetails.getTitle()+") must be installed on a war version greater than "
-		                +installingModuleDetails.getRepoVersionMin()+". This war is version:"+warVersion+".");
+		    throw new ModuleManagementToolException("The module ("+installingModuleDetails.getTitle()+") must be installed on a war version equal to or greater than "
+		                +installingModuleDetails.getRepoVersionMin()+". This war is version: "+warVersion+".");
 		}
 		if(warVersion.compareTo(installingModuleDetails.getRepoVersionMax())==1) {
 		    throw new ModuleManagementToolException("The module ("+installingModuleDetails.getTitle()+") cannot be installed on a war version greater than "
-		                +installingModuleDetails.getRepoVersionMax()+". This war is version:"+warVersion+".");
+		                +installingModuleDetails.getRepoVersionMax()+". This war is version: "+warVersion+".");
 		}
 	}
 
@@ -185,8 +198,8 @@ public class WarHelperImpl implements WarHelper
      * Checks to see if the module that is being installed is compatible with the war, (using the entry in the manifest).
      * This is more accurate and works for both alfresco.war and share.war, however
      * valid manifest entries weren't added until 3.4.11, 4.1.1 and Community 4.2 
-     * @param war
-     * @param installingModuleDetails
+     * @param war TFile
+     * @param installingModuleDetails ModuleDetails
      */
     public void checkCompatibleEditionUsingManifest(TFile war, ModuleDetails installingModuleDetails)
     {
@@ -276,11 +289,100 @@ public class WarHelperImpl implements WarHelper
         return false; //default
     }
 
+
+    /**
+     * Lists all the currently installed modules in the WAR
+     *
+     * @param war the war
+     * @throws ModuleManagementToolException
+     */
+    @Override
+    public List<ModuleDetails> listModules(TFile war)
+    {
+        List<ModuleDetails> moduleDetails = new ArrayList<>();
+        boolean moduleFound = false;
+
+        TFile moduleDir = new TFile(war, WarHelper.MODULE_NAMESPACE_DIR);
+        if (moduleDir.exists() == false)
+        {
+            return moduleDetails; //empty
+        }
+
+        java.io.File[] dirs = moduleDir.listFiles();
+        if (dirs != null && dirs.length != 0)
+        {
+            for (java.io.File dir : dirs)
+            {
+                if (dir.isDirectory() == true)
+                {
+                    TFile moduleProperties = new TFile(dir.getPath() + WarHelper.MODULE_CONFIG_IN_WAR);
+                    if (moduleProperties.exists() == true)
+                    {
+                        InputStream is = null;
+                        try
+                        {
+                            moduleFound = true;
+                            is = new TFileInputStream(moduleProperties);
+                            moduleDetails.add(ModuleDetailsHelper.createModuleDetailsFromPropertiesStream(is));
+                        }
+                        catch (AlfrescoRuntimeException exception)
+                        {
+                            throw new ModuleManagementToolException("Unable to open module properties file '" + moduleProperties.getPath() + "' " + exception.getMessage(), exception);
+                        }
+                        catch (IOException exception)
+                        {
+                            throw new ModuleManagementToolException("Unable to open module properties file '" + moduleProperties.getPath() + "'", exception);
+                        }
+                        finally
+                        {
+                            if (is != null)
+                            {
+                                try { is.close(); } catch (Throwable e ) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return moduleDetails;
+    }
+
+    /**
+     * Backs up a given file or directory.
+     *
+     * @param file   the file to backup
+     * @return the absolute path to the backup file.
+     */
+    @Override
+    public String backup(TFile file) throws IOException
+    {
+
+        String backupLocation = file.getAbsolutePath()+"-" + System.currentTimeMillis() + ".bak";
+
+        if (file.isArchive())
+        {
+            log.info("Backing up file...");
+            TFile source = new TFile(file.getAbsolutePath(), TArchiveDetector.NULL);
+            TFile backup = new TFile(backupLocation, TArchiveDetector.NULL);
+            source.cp_rp(backup);   //Just copy the file
+        }
+        else
+        {
+            log.info("Backing up DIRECTORY...");
+            TFile backup = new TFile(backupLocation);
+            file.cp_rp(backup);   //Copy the directory
+        }
+        log.info("The back up is at '" + backupLocation + "'");
+
+        return backupLocation;
+    }
+
     /**
      * Gets the module details for the specified module from the war.
      * @param war   a valid war file or exploded directory from a war
-     * @param moduleId
-     * @return
+     * @param moduleId String
+     * @return ModuleDetails
      */
     protected ModuleDetails getModuleDetails(TFile war, String moduleId)
     {
@@ -295,7 +397,7 @@ public class WarHelperImpl implements WarHelper
     
     /**
      * Reads a .properites file from the war and returns it as a Properties object
-     * @param propertiesPath Path to the properties file (including .properties)
+     * @param propertiesFile Path to the properties file (including .properties)
      * @return Properties object or null
      */
     private Properties loadProperties(TFile propertiesFile)

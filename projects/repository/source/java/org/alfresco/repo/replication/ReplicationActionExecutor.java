@@ -35,6 +35,7 @@ import org.alfresco.repo.transfer.ContentClassFilter;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionTrackingService;
 import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.replication.DisabledReplicationJobException;
 import org.alfresco.service.cmr.replication.ReplicationDefinition;
 import org.alfresco.service.cmr.replication.ReplicationServiceException;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -155,7 +156,7 @@ public class ReplicationActionExecutor extends ActionExecuterAbstractBase {
 
    /**
     * Injects the ReplicationDefinitionPersister bean.
-    * @param replicationDefinitionPersister
+    * @param replicationDefinitionPersister ReplicationDefinitionPersisterImpl
     */
    public void setReplicationDefinitionPersister(ReplicationDefinitionPersisterImpl replicationDefinitionPersister)
    {
@@ -270,7 +271,7 @@ public class ReplicationActionExecutor extends ActionExecuterAbstractBase {
       }
       if(!replicationDef.isEnabled())
       {
-         throw new ReplicationServiceException(I18NUtil.getMessage(MSG_ERR_REPLICATION_DEF_DISABLED));
+         throw new DisabledReplicationJobException(I18NUtil.getMessage(MSG_ERR_REPLICATION_DEF_DISABLED));
       }
       if(!replicationParams.isEnabled())
       {
@@ -368,6 +369,17 @@ public class ReplicationActionExecutor extends ActionExecuterAbstractBase {
                    }
                }, false, true);
        }
+   }
+
+   @Override
+   public boolean onLogException(Log logger, Throwable t, String message)
+   {
+       if(t instanceof ActionCancelledException || t instanceof DisabledReplicationJobException)
+       {
+           logger.debug(message);
+           return true;
+       }
+       return false;
    }
 
    /**
@@ -531,7 +543,7 @@ public class ReplicationActionExecutor extends ActionExecuterAbstractBase {
 
       /**
        * Job Lock Refresh
-       * @return
+       * @return boolean
        */
       @Override
       public boolean isActive()

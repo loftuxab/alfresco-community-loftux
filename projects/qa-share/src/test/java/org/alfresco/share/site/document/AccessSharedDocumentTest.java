@@ -702,7 +702,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         String[] fileInfo = { fileName, DOCLIB };
         DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(testName + "modifed");
         contentDetails.setName(fileName);
@@ -826,7 +826,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         String[] fileInfo = { fileName, DOCLIB };
         DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(testName + "modifed");
         contentDetails.setName(fileName);
@@ -947,7 +947,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         String[] fileInfo = { fileName, DOCLIB };
         DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(testName + "modifed");
         contentDetails.setName(fileName);
@@ -1006,7 +1006,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
         DocumentDetailsPage detailsPage = viewPublicLinkPage.clickOnDocumentDetailsButton().render();
         List<String> documentActionsList = detailsPage.getDocumentActionList();
         List<String> expectedActions = new ArrayList<String>();
-
+        
         if (!ShareUser.isAlfrescoVersionCloud(drone))
         {
             expectedActions.add("Download");
@@ -1021,6 +1021,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
             expectedActions.add("Edit in Google Docs™");
             expectedActions.add("Manage Aspects");
             expectedActions.add("Change Type");
+            expectedActions.add("Email as link");
 
             if (ShareUser.isHybridEnabled())
             {
@@ -1060,7 +1061,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
 
         // edit offline document
         fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
-        detailsPage = docLib.selectFile(fileName);
+        detailsPage = docLib.selectFile(fileName).render();
 
         assertTrue(detailsPage.isViewOriginalLinkPresent());
         detailsPage.selectViewOriginalDocument().render();
@@ -1095,7 +1096,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
 
         DocumentLibraryPage documentLibraryPage = ShareUser.uploadFileInFolder(drone, fileInfo);
 
-        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName);
+        DocumentDetailsPage documentDetailsPage = documentLibraryPage.selectFile(fileName).render();
         ContentDetails contentDetails = new ContentDetails();
         contentDetails.setContent(testName + "modifed");
         contentDetails.setName(fileName);
@@ -1216,7 +1217,7 @@ public class AccessSharedDocumentTest extends AbstractUtils
 
         // edit offline document
         fileInfoDir.selectEditOfflineAndCloseFileWindow().render();
-        detailsPage = docLib.selectFile(fileName);
+        detailsPage = docLib.selectFile(fileName).render();
 
         assertTrue(detailsPage.isViewOriginalLinkPresent());
         detailsPage.selectViewOriginalDocument().render();

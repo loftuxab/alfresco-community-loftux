@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -57,10 +57,12 @@ import org.json.JSONObject;
 import org.springframework.extensions.surf.util.Base64;
 
 import freemarker.cache.URLTemplateLoader;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import freemarker.template.Version;
 
 /**
  * Responsible for processing the individual task
@@ -386,6 +388,15 @@ public abstract class FeedTaskProcessor
         {
             for (String followerUser : followerUsers)
             {
+                // MNT-13234
+                // avoid duplicate activities in activities feed
+                boolean caseSensitive = ctx.isUserNamesAreCaseSensitive();
+                if ((caseSensitive && recipients.contains(followerUser))
+                        || (!caseSensitive && (recipients.contains(followerUser) || recipients.contains(followerUser.toLowerCase()))))
+                {
+                    continue;
+                }
+                
                 Pair<String, String> userSiteKey = new Pair<String, String>(followerUser, siteId);
                 Boolean canRead = canUserReadSite.get(userSiteKey);
                 if (canRead == null)
@@ -610,6 +621,8 @@ public abstract class FeedTaskProcessor
 
         // TODO review i18n
         cfg.setLocalizedLookup(false);
+        cfg.setIncompatibleImprovements(new Version(2, 3, 20));
+        cfg.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
 
         return cfg;
     }

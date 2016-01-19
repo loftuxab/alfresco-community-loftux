@@ -21,6 +21,7 @@ package org.alfresco.service.cmr.activities;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.api.AlfrescoPublicApi;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.domain.activities.ActivityFeedEntity;
@@ -30,6 +31,7 @@ import org.alfresco.service.NotAuditable;
 /**
  * The activity service
  */
+@AlfrescoPublicApi
 public interface ActivityService extends ActivityPostService
 {
     /*
@@ -62,7 +64,7 @@ public interface ActivityService extends ActivityPostService
      * @param userId     - required
      * @param siteId     - optional, if set then will filter by given siteId else return all sites
      * @param excludeThisUser    - if TRUE then will exclude activities for this user   (hence returning other users only)
-     * @param excludeOthersUsers - if TRUE then will exclude activities for other users (hence returning this user only)
+     * @param excludeOtherUsers - if TRUE then will exclude activities for other users (hence returning this user only)
      * @return list of JSON feed entries
      */
     @NotAuditable
@@ -83,7 +85,7 @@ public interface ActivityService extends ActivityPostService
      * @param userId     - required
      * @param siteId     - optional, if set then will filter by given siteId else return all sites
      * @param excludeThisUser    - if TRUE then will exclude activities for this user   (hence returning other users only)
-     * @param excludeOthersUsers - if TRUE then will exclude activities for other users (hence returning this user only)
+     * @param excludeOtherUsers - if TRUE then will exclude activities for other users (hence returning this user only)
      * @param userFilter         - if not NULL then will only return activities of users in this set
      * @param actvityFilter      - if not NULL then will only return activities that are in this set
      * @return list of JSON feed entries
@@ -102,11 +104,10 @@ public interface ActivityService extends ActivityPostService
      * - my user activities    (excludeThisUser = false, excludeOtherUsers = true)
      * note: if both excludes are true then no activities will be returned.
      * 
-     * @param userId     - required
+     * @param feedUserId     - required
      * @param siteId     - optional, if set then will filter by given siteId else return all sites
      * @param excludeThisUser    - if TRUE then will exclude activities for this user   (hence returning other users only)
-     * @param excludeOthersUsers - if TRUE then will exclude activities for other users (hence returning this user only)
-     * @param onlyFollowing      - if TRUE then will only return activities of users this user follows
+     * @param excludeOtherUsers - if TRUE then will exclude activities for other users (hence returning this user only)
      * @param minFeedId - inclusive from min feed DB id, if -1 then return all available
      * @return list of JSON feed entries
      */
@@ -124,11 +125,10 @@ public interface ActivityService extends ActivityPostService
      * - my user activities    (excludeThisUser = false, excludeOtherUsers = true)
      * note: if both excludes are true then no activities will be returned.
      * 
-     * @param userId     - required
+     * @param feedUserId     - required
      * @param siteId     - optional, if set then will filter by given siteId else return all sites
      * @param excludeThisUser    - if TRUE then will exclude activities for this user   (hence returning other users only)
-     * @param excludeOthersUsers - if TRUE then will exclude activities for other users (hence returning this user only)
-     * @param onlyFollowing      - if TRUE then will only return activities of users this user follows
+     * @param excludeOtherUsers - if TRUE then will exclude activities for other users (hence returning this user only)
      * @param userFilter         - if not NULL then will only return activities of users in this set
      * @param actvityFilter      - if not NULL then will only return activities that are in this set
      * @param minFeedId - inclusive from min feed DB id, if -1 then return all available
@@ -143,7 +143,7 @@ public interface ActivityService extends ActivityPostService
     /**
      * Retrieve site feed
      *
-     * @param activityType - required
+     * @param siteId - required
      * @return list of JSON feed entries
      */
     @NotAuditable
@@ -153,7 +153,7 @@ public interface ActivityService extends ActivityPostService
     /**
      * Return maximum configured item entries (per feed)
      * 
-     * @return
+     * @return int
      */
     @NotAuditable
     public int getMaxFeedItems();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -448,18 +448,20 @@ ftsTest
                 ->
                         ^(PROXIMITY ftsFieldGroupProximity)
         |
-           ftsTermOrPhrase
-        |
-           ftsExactTermOrPhrase
-        | 
-           ftsTokenisedTermOrPhrase
-        |
-           ftsRange
+           (ftsRange) => ftsRange
                 ->
                         ^(RANGE ftsRange)
         |  
-           ftsFieldGroup
+           (ftsFieldGroup) => ftsFieldGroup
                 -> ftsFieldGroup
+        |
+           (ftsTermOrPhrase) => ftsTermOrPhrase
+        |
+           (ftsExactTermOrPhrase) => ftsExactTermOrPhrase
+        | 
+           (ftsTokenisedTermOrPhrase) => ftsTokenisedTermOrPhrase
+        
+        
         |  LPAREN ftsDisjunction RPAREN
                 -> ftsDisjunction
         |  template
@@ -659,25 +661,25 @@ ftsFieldGroupTest
         (ftsFieldGroupProximity) => ftsFieldGroupProximity
                 ->
                         ^(FG_PROXIMITY ftsFieldGroupProximity)
-        | ftsFieldGroupTerm ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupTerm) => ftsFieldGroupTerm ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_TERM ftsFieldGroupTerm fuzzy?)
-        | ftsFieldGroupExactTerm ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupExactTerm) => ftsFieldGroupExactTerm ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_EXACT_TERM ftsFieldGroupExactTerm fuzzy?)
-        | ftsFieldGroupPhrase ( (slop) => slop)?
+        | (ftsFieldGroupPhrase) => ftsFieldGroupPhrase ( (slop) => slop)?
                 ->
                         ^(FG_PHRASE ftsFieldGroupPhrase slop?)
-        | ftsFieldGroupExactPhrase ( (slop) => slop)?
+        | (ftsFieldGroupExactPhrase) => ftsFieldGroupExactPhrase ( (slop) => slop)?
                 ->
                         ^(FG_EXACT_PHRASE ftsFieldGroupExactPhrase slop?)
-        | ftsFieldGroupTokenisedPhrase ( (slop) => slop)?
+        | (ftsFieldGroupTokenisedPhrase) => ftsFieldGroupTokenisedPhrase ( (slop) => slop)?
                 ->
                         ^(FG_PHRASE ftsFieldGroupTokenisedPhrase slop?)
-        | ftsFieldGroupSynonym ( (fuzzy) => fuzzy)?
+        | (ftsFieldGroupSynonym) => ftsFieldGroupSynonym ( (fuzzy) => fuzzy)?
                 ->
                         ^(FG_SYNONYM ftsFieldGroupSynonym fuzzy?)
-        | ftsFieldGroupRange
+        | (ftsFieldGroupRange) => ftsFieldGroupRange
                 ->
                         ^(FG_RANGE ftsFieldGroupRange)
         | LPAREN ftsFieldGroupDisjunction RPAREN
@@ -734,6 +736,9 @@ ftsFieldGroupProximityTerm
         | TO
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
+        | DATETIME
+        | STAR
+        | URI identifier
         ;
 
 proximityGroup
@@ -864,6 +869,7 @@ ftsWord
         | (DOT|COMMA) ftsWordBase 
         | ftsWordBase 
         ;
+
         
 ftsWordBase
         :
@@ -877,6 +883,8 @@ ftsWordBase
         | FLOATING_POINT_LITERAL
         | STAR
         | QUESTION_MARK
+        | DATETIME
+        | URI identifier
         ;
 
 number
@@ -894,6 +902,9 @@ ftsRangeWord
         | FTSPHRASE
         | DECIMAL_INTEGER_LITERAL
         | FLOATING_POINT_LITERAL
+        | DATETIME
+        | STAR
+        | URI identifier
         ;
 
 //
@@ -1058,6 +1069,76 @@ F_URI_OTHER
         | ';'
         | '='
         ;
+        
+        
+        
+ /**
+ * DATE literal
+ */
+ 
+DATETIME
+        :
+         (SPECIFICDATETIME | NOW) (FS UNIT)? ( (PLUS|MINUS) DIGIT+ UNIT)*
+        ; 
+
+fragment UNIT 
+        :
+        (YEAR | MONTH | DAY | HOUR | MINUTE | SECOND | MILLIS)
+        ;
+ 
+fragment SPECIFICDATETIME
+        :
+           DIGIT DIGIT DIGIT DIGIT 
+              ( '-' DIGIT DIGIT ( '-' DIGIT DIGIT ( 'T' (DIGIT DIGIT ( ':' DIGIT DIGIT ( ':' DIGIT DIGIT ( '.' DIGIT DIGIT DIGIT ( 'Z' | (( '+' | '-') DIGIT DIGIT ( ':' DIGIT DIGIT)? ) )? )? )? )? )? )? )? )?
+        ;
+        
+fragment NOW
+        :
+           ('N'|'n') ('O'|'o') ('W'|'w')
+        ;
+        
+fragment YEAR
+        :
+          ('Y'|'y') ('E'|'e') ('A'|'a') ('R'|'r') ('S'|'s')? 
+        ; 
+        
+fragment MONTH
+        :
+          ('M'|'m') ('O'|'o') ('N'|'n') ('T'|'t') ('H'|'h') ('S'|'s')? 
+        ;
+
+fragment DAY
+        :
+          ('D'|'d') ('A'|'a') ('Y'|'y') ('S'|'s')?
+        | ('D'|'d') ('A'|'a') ('T'|'t') ('E'|'e')
+        ; 
+        
+fragment HOUR
+        :
+          ('H'|'h') ('O'|'o') ('U'|'u') ('R'|'r') ('S'|'s')? 
+        ; 
+        
+fragment MINUTE
+        :
+          ('M'|'m') ('I'|'i') ('N'|'n') ('U'|'u') ('T'|'t') ('E'|'e') ('S'|'s')? 
+        ; 
+        
+fragment SECOND
+        :
+          ('S'|'s') ('E'|'e') ('C'|'c') ('O'|'o') ('N'|'n') ('D'|'d') ('S'|'s')? 
+        ;
+        
+fragment MILLIS
+        :
+          ('M'|'m') ('I'|'i') ('L'|'l') ('L'|'l') ('I'|'i') ('S'|'s') ('E'|'e') ('C'|'c') ('O'|'o') ('N'|'n') ('D'|'d') ('S'|'s')?
+        | ('M'|'m') ('I'|'i') ('L'|'l') ('L'|'l') ('I'|'i') ('S'|'s')?
+        ;         
+        
+fragment FS
+        :
+        '/'
+        ;
+        
 /*
  * Simple tokens, note all are case insensitive
  */
@@ -1246,6 +1327,7 @@ PERCENT
         '%'
         ;
 
+
 /**
  * ID
  * _x????_ encoding is supported for invalid sql characters but requires nothing here, they are handled in the code 
@@ -1268,6 +1350,9 @@ ID
                 | F_ESC
         )*
         ;
+
+
+
 
 // This is handled sa part for FLOATING_POINT_LITERAL to reduce lexer complexity 
 fragment DECIMAL_INTEGER_LITERAL

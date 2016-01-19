@@ -157,6 +157,22 @@
         <constructor-arg index="0"><value>256</value></constructor-arg>
     </bean>
 
+	<bean id="compositePasswordEncoder" class="org.alfresco.repo.security.authentication.CompositePasswordEncoder" init-method="init">
+		<property name="encoders">
+			<map>
+				<entry key="md4">
+					<bean class="org.alfresco.repo.security.authentication.MD4PasswordEncoderImpl" />
+				</entry>
+				<entry key="sha256" value-ref="sha256PasswordEncoder" />
+				<entry key="bcrypt10">
+					<bean class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+						<constructor-arg value="10" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="preferredEncoding" value="${system.preferred.password.encoding}" />
+	</bean>
 
     <!-- The Authentication Service implementation. -->
     <!-- -->
@@ -673,5 +689,42 @@
             <value>${alfresco_user_store.guestusername}</value>
         </property>
     </bean>
+   
+   <!-- UpgradePasswordHashWorker -->
+   <bean id="upgradePasswordHashWorker" class="org.alfresco.repo.security.authentication.UpgradePasswordHashWorker">
+      <property name="jobLockService">
+         <ref bean="jobLockService" />
+      </property> 
+      <property name="transactionService">
+         <ref bean="transactionService" />
+      </property>
+      <property name="authenticationDao">
+         <ref bean="authenticationDao" />
+      </property>
+      <property name="compositePasswordEncoder">
+         <ref bean="compositePasswordEncoder" />
+      </property>
+      <property name="behaviourFilter">
+         <ref bean="policyBehaviourFilter" />
+      </property>
+      <property name="patchDAO">
+         <ref bean="patchDAO"/>
+      </property>
+      <property name="nodeDAO">
+         <ref bean="nodeDAO"/>
+      </property>
+      <property name="qnameDAO">
+         <ref bean="qnameDAO"/>
+      </property>
+      <property name="queryRange">
+         <value>${system.upgradePasswordHash.jobQueryRange}</value>
+      </property>
+      <property name="threadCount">
+         <value>${system.upgradePasswordHash.jobThreadCount}</value>
+      </property>
+      <property name="batchSize">
+         <value>${system.upgradePasswordHash.jobBatchSize}</value>
+      </property>
+   </bean>
 
 </beans>

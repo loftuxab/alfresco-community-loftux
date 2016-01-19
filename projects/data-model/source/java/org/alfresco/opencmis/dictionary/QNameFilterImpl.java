@@ -60,8 +60,7 @@ public class QNameFilterImpl implements QNameFilter
     /**
      * Processes the user-defined list of types into valid QNames & models, it validates them
      * against the dictionary and also supports wildcards
-     * @param excludeTypeNames
-     * @return Set<QName> Valid type QNames
+     * @param excludeTypeNames List<String>
      */
     protected void preprocessExcludedTypes(List<String> excludeTypeNames)
     {
@@ -89,7 +88,7 @@ public class QNameFilterImpl implements QNameFilter
 
     /**
      * Indicates that this QName should be excluded.
-     * @param typeQName
+     * @param typeQName QName
      * @return boolean true if it is excluded
      */
     public boolean isExcluded(QName typeQName)
@@ -117,7 +116,7 @@ public class QNameFilterImpl implements QNameFilter
      * I don't like hard code values, but have been persuaded its less pain
      * than having to keep a config file in sync with both sides of SOLR.
      * 
-     * @return
+     * @return List<String>
      */
     public static List<String> listOfHardCodedExcludedTypes() {
         List<String> hardCodeListOfTypes = new ArrayList<String>();

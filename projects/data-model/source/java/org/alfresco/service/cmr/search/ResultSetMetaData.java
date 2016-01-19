@@ -36,27 +36,27 @@ public interface ResultSetMetaData
      * If a limit of 100 were requested and there were 100 or less actual results
      * this will report LimitBy.UNLIMITED.
      * 
-     * @return
+     * @return LimitBy
      */
     public LimitBy getLimitedBy();
     
     /**
      * Return how permission evaluations are being made.
      * 
-     * @return
+     * @return PermissionEvaluationMode
      */
     public PermissionEvaluationMode getPermissionEvaluationMode();
     
     /**
      * Get the parameters that were specified to define this search.
      * 
-     * @return
+     * @return SearchParameters
      */
     public SearchParameters getSearchParameters();
     
     /**
      * Get the result set type
-     * @return
+     * @return ResultSetType
      */
     public ResultSetType getResultSetType();
     
@@ -87,14 +87,14 @@ public interface ResultSetMetaData
     
     /**
      * Get the selector meta-data by name.
-     * @param name
+     * @param name String
      * @return - the selector meta-data.
      */
     public ResultSetSelector getSelector(String name);
     
     /**
      * Get the column meta-data by column name.
-     * @param name
+     * @param name String
      * @return - the column meta-data.
      */
     public ResultSetColumn getColumn(String name);

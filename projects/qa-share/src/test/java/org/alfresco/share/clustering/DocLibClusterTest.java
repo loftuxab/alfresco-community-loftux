@@ -156,7 +156,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible");
 
         // The document ("testFile") is presented on server B, opened successfully, it contains text ("testText");
-        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         contentDetails = inlineEditPage.getDetails();
@@ -832,7 +832,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible");
 
         // Add comments to file
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1);
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render();
         AddCommentForm addCommentForm = detailsPage.clickAddCommentButton();
 
         // Type any text
@@ -868,7 +868,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(folderName), "Folder " + folderName + " isn't visible");
 
         // Verify that comments are presented on server B
-        detailsPage = docLibPage.selectFile(fileName1);
+        detailsPage = docLibPage.selectFile(fileName1).render();
         assertTrue(detailsPage.isCommentCorrect(fileComment), "The comment for content wasn't displayed successfully");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName);
@@ -909,7 +909,7 @@ public class DocLibClusterTest extends AbstractUtils
         ShareUser.createContent(drone, contentDetails, ContentType.PLAINTEXT);
 
         // Edit content created in pre-condition on server A
-        docLibPage.selectFile(fileName1).render();
+        docLibPage.selectFile(fileName1).render().render();
         ShareUser.editTextDocument(drone, fileNewName, fileNewDescription, fileNewContent);
 
         docLibPage = ShareUser.openDocumentLibrary(drone);
@@ -976,7 +976,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible");
 
         // Add comments to file
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1);
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render();
         AddCommentForm addCommentForm = detailsPage.clickAddCommentButton();
 
         // Type any text
@@ -1012,7 +1012,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(folderName), "Folder " + folderName + " isn't visible");
 
         // Verify that comments are presented on server B
-        detailsPage = docLibPage.selectFile(fileName1);
+        detailsPage = docLibPage.selectFile(fileName1).render();
         assertTrue(detailsPage.isCommentCorrect(fileComment), "The comment for content wasn't displayed successfully");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName);
@@ -1076,7 +1076,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(folderName), "Folder " + folderName + " isn't visible");
 
         // Verify that comments are presented on server B
-        detailsPage = docLibPage.selectFile(fileName1);
+        detailsPage = docLibPage.selectFile(fileName1).render();
         assertTrue(detailsPage.isCommentCorrect(newFileComment), "The comment for content wasn't displayed correctly");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName);
@@ -1121,7 +1121,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible");
 
         // Add comments to file
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1);
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render();
         AddCommentForm addCommentForm = detailsPage.clickAddCommentButton();
 
         // Type any text
@@ -1157,7 +1157,7 @@ public class DocLibClusterTest extends AbstractUtils
         Assert.assertTrue(docLibPage.isFileVisible(folderName), "Folder " + folderName + " isn't visible");
 
         // Verify that comments are presented on server B
-        detailsPage = docLibPage.selectFile(fileName1);
+        detailsPage = docLibPage.selectFile(fileName1).render();
         assertTrue(detailsPage.isCommentCorrect(fileComment), "The comment for content wasn't displayed successfully");
 
         ShareUser.openSitesDocumentLibrary(drone, siteName);

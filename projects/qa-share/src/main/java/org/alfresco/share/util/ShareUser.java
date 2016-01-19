@@ -799,8 +799,8 @@ public class ShareUser extends AbstractUtils
         }
 
         DocumentLibraryPage docLibraryPage = getSharePage(driver).render();
-        DocumentDetailsPage docDetailsPage = docLibraryPage.selectFile(contentName);
-        return docDetailsPage.render();
+        DocumentDetailsPage docDetailsPage = docLibraryPage.selectFile(contentName).render();
+        return docDetailsPage;
     }
 
     /**
@@ -1523,12 +1523,13 @@ public class ShareUser extends AbstractUtils
     /**
      * Checks the checkbox for a content if not selected on the document library
      * page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @param contentName
      * @return DocumentLibraryPage
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open.
      */
     public static DocumentLibraryPage selectContentCheckBox(WebDrone drone, String contentName)
     {
@@ -1543,12 +1544,13 @@ public class ShareUser extends AbstractUtils
     /**
      * UnChecks the checkbox for a content if already selected on the document
      * library page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @param contentName
      * @return DocumentLibraryPage
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open
      */
     public static DocumentLibraryPage unSelectContentCheckBox(WebDrone drone, String contentName)
     {
@@ -1563,11 +1565,12 @@ public class ShareUser extends AbstractUtils
     /**
      * Mimics the process of deleting selected content on a document library
      * page.
+     * <br>
+     * Note: Expects the user is logged in and document library page within
+     *      the selected site is open.
      * 
      * @param drone
      * @return
-     * @IMP Note: Expects the user is logged in and document library page within
-     *      the selected site is open
      */
     public static DocumentLibraryPage deleteSelectedContent(WebDrone drone)
     {
@@ -1881,7 +1884,7 @@ public class ShareUser extends AbstractUtils
     public static DocumentLibraryPage addComment(WebDrone drone, String fileName, String comment)
     {
         DocumentLibraryPage documentLibraryPage = getSharePage(drone).render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         detailsPage = detailsPage.addComment(comment).render();
         return detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
     }
@@ -1897,7 +1900,7 @@ public class ShareUser extends AbstractUtils
     public static DocumentLibraryPage setAuthor(WebDrone drone, String fileName, String author)
     {
         DocumentLibraryPage documentLibraryPage = getSharePage(drone).render();
-        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render();
+        DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render();
         EditDocumentPropertiesPage propertiesPage = detailsPage.selectEditProperties().render();
         propertiesPage.setAuthor(author);
         detailsPage = propertiesPage.selectSave().render();
@@ -2062,7 +2065,7 @@ public class ShareUser extends AbstractUtils
 
         DetailsPage detailsPage = ShareUserSitePage.openDetailsPage(drone, contentName);
         SelectAspectsPage selectAspectsPage = detailsPage.selectManageAspects().render();
-        Set<DocumentAspect> selectedAspects = selectAspectsPage.getSelectedAspects();
+        Set<DocumentAspect> selectedAspects = selectAspectsPage.getSelectedSystemAspects();
         selectAspectsPage.clickCancel().render();
         return selectedAspects;
     }

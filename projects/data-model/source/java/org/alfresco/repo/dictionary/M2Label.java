@@ -38,12 +38,13 @@ public class M2Label
     /**
      * Get label for data dictionary item given specified locale
      * 
-     * @param locale
-     * @param model
-     * @param type
-     * @param item
-     * @param label
-     * @return
+     * @param locale Locale
+     * @param model ModelDefinition
+     * @param messageLookup MessageLookup
+     * @param type String
+     * @param item QName
+     * @param label String
+     * @return String
      */
     public static String getLabel(Locale locale, ModelDefinition model, MessageLookup messageLookup, String type, QName item, String label)
     {
@@ -68,11 +69,12 @@ public class M2Label
     /**
      * Get label for data dictionary item
      * 
-     * @param model
-     * @param type
-     * @param item
-     * @param label
-     * @return
+     * @param model ModelDefinition
+     * @param messageLookup MessageLookup
+     * @param type String
+     * @param item QName
+     * @param label String
+     * @return String
      */
     public static String getLabel(ModelDefinition model, MessageLookup messageLookup, String type, QName item, String label)
     {

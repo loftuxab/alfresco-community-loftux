@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -97,7 +97,10 @@ public abstract class AbstractServerConfigurationBean extends ServerConfiguratio
   // Default FTP server port
   
   protected static final int DefaultFTPServerPort = 21;
-  
+
+  // Default FTP server session timeout
+  protected static final int DefaultFTPSrvSessionTimeout = 5000;
+
   // Default FTP anonymous account name
   
   protected static final String DefaultFTPAnonymousAccount = "anonymous";
@@ -489,25 +492,7 @@ public abstract class AbstractServerConfigurationBean extends ServerConfiguratio
           // Configuration error
         
           logger.error("FTP server configuration error, " + ex.getMessage(), ex);
-      }           
-
-      // Initialize the NFS server
-
-      try
-      {
-          // Process the NFS server configuration
-          processNFSServerConfig();
-          
-          // Log the successful startup
-          
-          logger.info("NFS server " + (isNFSServerEnabled() ? "" : "NOT ") + "started");
-      }
-      catch (Exception ex)
-      {
-          // Configuration error
-        
-          logger.error("NFS server configuration error, " + ex.getMessage(), ex);
-      }           
+      }                 
   }
 
   protected abstract void processCoreServerConfig() throws InvalidConfigurationException;
@@ -517,8 +502,6 @@ public abstract class AbstractServerConfigurationBean extends ServerConfiguratio
   protected abstract void processFilesystemsConfig();
 
   protected abstract void processCIFSServerConfig();
-
-  protected abstract void processNFSServerConfig();
 
   protected abstract void processFTPServerConfig();
   

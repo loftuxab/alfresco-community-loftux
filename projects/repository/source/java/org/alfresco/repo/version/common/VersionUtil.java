@@ -66,8 +66,7 @@ public class VersionUtil
      * Checks that the names of the additional version properties are valid and that they do not clash
      * with the reserved properties.
      *
-     * @param versionProperties  the property names
-     * @return                   true is the names are considered valid, false otherwise
+     * @param names  the property names
      * @throws                   ReservedVersionNameException
      */
     public static void checkVersionPropertyNames(Collection<String> names)
@@ -85,7 +84,7 @@ public class VersionUtil
     /**
      * Create Version Store Ref
      * 
-     * @param  store ref
+     * @param  storeRef ref
      * @return  store ref for version store
      */
     public static StoreRef convertStoreRef(StoreRef storeRef)

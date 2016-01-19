@@ -38,7 +38,7 @@ public class ContentStreamMimetypeLuceneBuilder extends AbstractSimpleLuceneBuil
     /**
      * Construct
      * 
-     * @param serviceRegistry
+     * @param dictionaryService DictionaryService
      */
     public ContentStreamMimetypeLuceneBuilder(DictionaryService dictionaryService)
     {

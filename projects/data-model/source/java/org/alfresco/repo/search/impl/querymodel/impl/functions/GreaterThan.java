@@ -34,11 +34,6 @@ public class GreaterThan extends BaseComparison
 {
     public final static String NAME = "GreaterThan";
     
-    /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
-     */
     public GreaterThan()
     {
         super(NAME, DataTypeDefinition.BOOLEAN, ARGS);   

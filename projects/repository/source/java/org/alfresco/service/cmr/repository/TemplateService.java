@@ -110,9 +110,8 @@ public interface TemplateService
      * Process a template using the supplied locale against the supplied data model and write to the out.
      * 
      * @param engine       Name of the template engine to use
-     * @param template     Template (qualified classpath name or noderef)
+     * @param templateRef     Template ref (qualified classpath name or noderef)
      * @param model        Object model to process template against
-     * @param out          Writer object to send output too
      * @param locale	   Locale to process the template as
      */
     @Auditable(parameters = {"engine", "template", "model", "out", "locale"})
@@ -177,7 +176,7 @@ public interface TemplateService
      * @param userHome      the user home node reference
      * @param template      the node ref for the template (optional)
      * @param imageResolver the image resolver (optional)
-     * @return
+     * @return Map
      */
     @Auditable(parameters = {"person", "companyHome", "userHome", "template", "imageResolver"})
     public Map<String, Object> buildDefaultModel(

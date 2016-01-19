@@ -104,21 +104,19 @@ public interface DataTypeDefinition
     
     /**
      * Get the default analyser class - used when no resource bundles can be found and no repository default is set.
-     * @return
+     * @return String
      */
     public String getDefaultAnalyserClassName();
 
     /**
-     * @param defaultAnalyserResourceBundleName
      * @param locale
-     * @param resourceBundleClassLoader
-     * @return
+     * @return String
      */
     public String resolveAnalyserClassName(Locale locale);
     
     /**
      * 
-     * @return
+     * @return String
      */
     public String resolveAnalyserClassName();
     

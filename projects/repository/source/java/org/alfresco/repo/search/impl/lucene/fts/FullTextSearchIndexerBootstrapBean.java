@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -39,8 +39,11 @@ public class FullTextSearchIndexerBootstrapBean extends AbstractLifecycleBean
     @Override
     protected void onBootstrap(ApplicationEvent event)
     {
+        String majorVersion = I18NUtil.getMessage("version.major");
+        String minorVersion = I18NUtil.getMessage("version.minor");
+        
         // Internationalizes the message
-        String errorMsg = I18NUtil.getMessage("system.err.lucene_not_supported");
+        String errorMsg = I18NUtil.getMessage("system.err.lucene_not_supported", majorVersion + "." + minorVersion);
         log.error(errorMsg);
 
         List<StoreRef> storeRefs = nodeService.getStores();

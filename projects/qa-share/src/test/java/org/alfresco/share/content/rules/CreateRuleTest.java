@@ -157,7 +157,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Classifiable'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
 
     }
 
@@ -254,7 +254,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Effectivity'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.EFFECTIVITY), "'EFFECTIVITY'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EFFECTIVITY), "'EFFECTIVITY'' aspect hasn't been removed)");
 
     }
 
@@ -343,7 +343,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Templatable'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.TEMPLATABLE), "'TEMPLATABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.TEMPLATABLE), "'TEMPLATABLE'' aspect hasn't been removed)");
 
     }
 
@@ -439,7 +439,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Emailed" aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.EMAILED), "'EMAILED'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EMAILED), "'EMAILED'' aspect hasn't been removed)");
 
     }
 
@@ -529,7 +529,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Aliasable (Email)'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.ALIASABLE_EMAIL), "'ALIASABLE_EMAIL'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.ALIASABLE_EMAIL), "'ALIASABLE_EMAIL'' aspect hasn't been removed)");
 
     }
 
@@ -625,7 +625,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Classifiable'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.SUMMARIZABLE), "'SUMMARIZABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.SUMMARIZABLE), "'SUMMARIZABLE'' aspect hasn't been removed)");
 
     }
 
@@ -721,7 +721,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Dublin Core'' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.DUBLIN_CORE), "'DUBLIN_CORE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.DUBLIN_CORE), "'DUBLIN_CORE'' aspect hasn't been removed)");
 
     }
 
@@ -817,7 +817,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Complianceable" aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.COMPLIANCEABLE), "'COMPLIANCEABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.COMPLIANCEABLE), "'COMPLIANCEABLE'' aspect hasn't been removed)");
 
     }
 
@@ -906,7 +906,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Versionable" aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE), "'VERSIONABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE), "'VERSIONABLE'' aspect hasn't been removed)");
     }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
@@ -994,7 +994,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Inline Editable" aspect has been removed
-        Assert.assertTrue(aspectsPage.getAvailableAspects().contains(DocumentAspect.INLINE_EDITABLE), "'INLINE_EDITABLE'' aspect hasn't been removed)");
+        Assert.assertTrue(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.INLINE_EDITABLE), "'INLINE_EDITABLE'' aspect hasn't been removed)");
     }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
@@ -1082,7 +1082,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Taggeble" aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.TAGGABLE), "'TAGGABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.TAGGABLE), "'TAGGABLE'' aspect hasn't been removed)");
     }
 
     @Test(groups = { "DataPrepEnterpriseOnly" })
@@ -1177,7 +1177,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "EXIF' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.EXIF), "'EXIF'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.EXIF), "'EXIF'' aspect hasn't been removed)");
 
     }
 
@@ -1273,7 +1273,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "GEOGRAPHIC' aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.GEOGRAPHIC), "'GEOGRAPHIC'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.GEOGRAPHIC), "'GEOGRAPHIC'' aspect hasn't been removed)");
 
     }
 
@@ -1917,7 +1917,7 @@ public class CreateRuleTest extends AbstractUtils
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // "Versionable" aspect has been removed
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.VERSIONABLE), "'VERSIONABLE'' aspect hasn't been removed)");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.VERSIONABLE), "'VERSIONABLE'' aspect hasn't been removed)");
 
     }
 

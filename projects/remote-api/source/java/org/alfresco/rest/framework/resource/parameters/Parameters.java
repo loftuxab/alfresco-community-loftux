@@ -7,6 +7,7 @@ import org.alfresco.rest.framework.jacksonextensions.BeanPropertiesFilter;
 import org.alfresco.rest.framework.resource.content.BasicContentInfo;
 import org.alfresco.rest.framework.resource.parameters.where.Query;
 import org.apache.poi.ss.formula.functions.T;
+import org.springframework.extensions.webscripts.Status;
 
 
 /**
@@ -19,7 +20,7 @@ public interface Parameters
     /**
      * Gets a single request parameter passed in by the user.
      * Currently doesn't support multiple values.
-     * @param parameterName
+     * @param parameterName String
      * @return String The Parameter value
      */
     public String getParameter(String parameterName);
@@ -29,7 +30,7 @@ public interface Parameters
      * Attempts to convert the parameter to the specified type.
      * If unable to convert the parameter to the specified type then throws an InvalidArgumentException.
      * Currently doesn't support multiple values.
-     * @param parameterName
+     * @param parameterName String
      * @param clazz - type to use for conversion.
      * @return The Parameter value
      * @throws InvalidArgumentException
@@ -90,5 +91,12 @@ public interface Parameters
      * Gets the basic information about content, typically taken from a HTTPServletRequest.
      * @return BasicContentInfo the content info
      */
-	BasicContentInfo getContentInfo();
+    BasicContentInfo getContentInfo();
+
+    /**
+     * Gets Web Script status
+     * 
+     * @return {@link Status}
+     */
+    public Status getStatus();
 }

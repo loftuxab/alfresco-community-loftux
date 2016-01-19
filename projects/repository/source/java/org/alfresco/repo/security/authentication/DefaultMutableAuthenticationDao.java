@@ -41,7 +41,7 @@ import org.springframework.dao.DataAccessException;
  * getMD4HashedPassword(String userName)
  * loadUserByUsername(String arg0) 
  * getSalt(UserDetails user)
- * 
+ *
  * @author Andy Hind
  */
 public class DefaultMutableAuthenticationDao implements MutableAuthenticationDao
@@ -86,6 +86,19 @@ public class DefaultMutableAuthenticationDao implements MutableAuthenticationDao
      * @throws AlfrescoRuntimeException if the the operation is not allowed
      */
     public void createUser(String userName, char[] rawPassword) throws AuthenticationException
+    {
+        createUser(userName, null, rawPassword);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * If enabled does nothing
+     *
+     * @throws AlfrescoRuntimeException if the the operation is not allowed
+     */
+    @Override
+    public void createUser(String caseSensitiveUserName, String hashedpassword, char[] rawPassword) throws AuthenticationException
     {
         if (!allowCreateUser)
         {
@@ -385,7 +398,6 @@ public class DefaultMutableAuthenticationDao implements MutableAuthenticationDao
         throw new AlfrescoRuntimeException("Not implemented");
     }
 
-    
     // -------- //
     // Bean IOC //
     // -------- //

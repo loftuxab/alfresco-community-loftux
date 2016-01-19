@@ -40,7 +40,7 @@
     <readyToInstallActionList>
         <setInstallerVariable name="component(script).parameter(ctlscript_allow_root).value" value="0">
             <ruleList>
-                <compareText text="${installer_root_install}" logic="does_not_equal" value="1"/>
+                <isFalse value="${installer_root_install}"/>
             </ruleList>
         </setInstallerVariable>
     </readyToInstallActionList>
@@ -67,7 +67,7 @@
                             <value>#!/bin/sh
 
 # Avoid root execution
-if [ `id|sed -e s/uid=//g -e s/\(.*//g` -eq 0 ]; then
+if [ `id|sed -e s/uid=//g -e s/\(.*//g` -eq 0 ] &amp;&amp; [ $2 != "stop" ]; then
     echo "Execution by root not allowed"
     exit 1
 fi
@@ -161,22 +161,6 @@ fi
                 <platformTest type="unix"/>
             </ruleList>
         </actionGroup>
-
-<!--<actionGroup>
-	    <actionList>
-		<runProgram>
-			<program>${installdir}/${ctlscript_unix}</program>
-			<programArguments>start tomcat &amp; &gt; /dev/null</programArguments>
-		</runProgram>
-		<waitForPort>
-		        <port>${application_server_port}</port>
-			<timeout>30000</timeout>
-		</waitForPort>
-	    </actionList>
-	    <ruleList>
-		    <platformTest type="unix" />
-	    </ruleList>
-	</actionGroup>-->
     </postInstallationActionList>
 </component>
 

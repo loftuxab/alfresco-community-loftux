@@ -121,7 +121,7 @@ public abstract class AbstractContentTransformerTest extends TestCase
      * Helper method to load one of the "The quick brown fox" files from the
      * classpath.
      * 
-     * @param the file required, eg <b>quick.txt</b>
+     * @param quickname file required, eg <b>quick.txt</b>
      * @return Returns a test resource loaded from the classpath or <tt>null</tt> if
      *      no resource could be found.
      * @throws IOException
@@ -158,7 +158,7 @@ public abstract class AbstractContentTransformerTest extends TestCase
      * Helper method to load one of the "The quick brown fox" files from the
      * classpath.
      * 
-     * @param the file extension required, eg <b>txt</b> for the file quick.txt
+     * @param extension file extension required, eg <b>txt</b> for the file quick.txt
      * @return Returns a test resource loaded from the classpath or <tt>null</tt> if
      *      no resource could be found.
      * @throws IOException
@@ -404,9 +404,9 @@ public abstract class AbstractContentTransformerTest extends TestCase
      * This method is an extension point for excluding certain transformations in a subclass.
      * The default implementation returns <code>false</code> for all mime type pairs.
      * 
-     * @param sourceExtension
-     * @param targetExtension
-     * @return
+     * @param sourceExtension String
+     * @param targetExtension String
+     * @return boolean
      */
     protected boolean isTransformationExcluded(String sourceExtension, String targetExtension)
     {

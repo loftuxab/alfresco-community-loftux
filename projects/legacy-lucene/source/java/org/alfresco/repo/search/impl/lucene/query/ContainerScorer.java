@@ -77,14 +77,13 @@ public class ContainerScorer extends Scorer
      * 
      * @param weight -
      *            curently unsued
-     * @param tps -
-     *            the term positions for the terms we are trying to find
      * @param root -
      *            the term positions for documents with multiple entries - this
      *            may be null, or contain no matches - it specifies those things
      *            that appear under multiple categories etc.
      * @param positions -
      *            the structured field positions - where terms should appear
+     * @param containers TermPositions
      * @param similarity -
      *            used in the abstract scorer implementation
      * @param norms -
@@ -177,7 +176,7 @@ public class ContainerScorer extends Scorer
      * Are we looking for all containers?
      * If there are no positions we must have a better filter
      *  
-     * @return
+     * @return boolean
      */
     private boolean allContainers()
     {
@@ -196,7 +195,7 @@ public class ContainerScorer extends Scorer
     }
 
     /**
-     * @return
+     * @return boolean
      * @throws IOException
      */
     private boolean findNext() throws IOException
@@ -220,7 +219,7 @@ public class ContainerScorer extends Scorer
     /**
      * Check if we have found a match
      * 
-     * @return
+     * @return boolean
      * @throws IOException
      */
 
@@ -311,11 +310,11 @@ public class ContainerScorer extends Scorer
      * For // type pattern matches we need to test patterns of variable greedyness.
      *
      * 
-     * @param start
-     * @param end
-     * @param currentPosition
-     * @param currentOffset
-     * @return
+     * @param start int
+     * @param end int
+     * @param currentPosition int
+     * @param currentOffset int
+     * @return int
      * @throws IOException
      */
     private int checkTail(int start, int end, int currentPosition, int currentOffset) throws IOException

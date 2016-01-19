@@ -160,6 +160,7 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
     private int filterCacheSize;
     private int pathCacheSize;
     private boolean transformContent = true;
+    private boolean recordUnindexedNodes = true;
     private long lag;
     private long holeRetention;
 
@@ -179,6 +180,7 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
         authorityCacheSize = Integer.parseInt(p.getProperty("solr.authorityCache.size", "64"));
         filterCacheSize = Integer.parseInt(p.getProperty("solr.filterCache.size", "64"));
         pathCacheSize = Integer.parseInt(p.getProperty("solr.pathCache.size", "64"));
+        recordUnindexedNodes = Boolean.parseBoolean(p.getProperty("alfresco.recordUnindexedNodes", "true"));
         transformContent = Boolean.parseBoolean(p.getProperty("alfresco.index.transformContent", "true"));
         lag = Integer.parseInt(p.getProperty("alfresco.lag", "1000"));
         holeRetention = Integer.parseInt(p.getProperty("alfresco.hole.retention", "3600000"));
@@ -888,7 +890,7 @@ public class LegacySolrInformationServer implements CloseHook, InformationServer
                                 leafDocCmd.doc = toDocument(leafDocCmd.getSolrInputDocument(), core.getSchema(),
                                             dataModel);
 
-                                if (leafDocCmd.doc != null)
+                                if (leafDocCmd.doc != null && recordUnindexedNodes)
                                 {
                                     core.getUpdateHandler().addDoc(leafDocCmd);
                                 }

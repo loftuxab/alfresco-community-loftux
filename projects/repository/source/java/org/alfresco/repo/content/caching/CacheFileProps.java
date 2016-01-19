@@ -47,7 +47,7 @@ public class CacheFileProps
     /**
      * Construct a CacheFileProps specifying which cache file the properties belong to.
      * 
-     * @param cachedFile
+     * @param cacheFile - cache file
      */
     public CacheFileProps(File cacheFile)
     {
@@ -148,7 +148,7 @@ public class CacheFileProps
     /**
      * Set the value of the contentUrl property.
      * 
-     * @param url
+     * @param url String
      */
     public void setContentUrl(String url)
     {
@@ -168,7 +168,7 @@ public class CacheFileProps
     /**
      * Set the value of the deleteWatchCount property.
      * 
-     * @param watchCount
+     * @param watchCount Integer
      */
     public void setDeleteWatchCount(Integer watchCount)
     {

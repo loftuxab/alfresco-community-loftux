@@ -62,7 +62,7 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#getChildren()
+     * @see ConfigElement#getChildren()
      */
     public List<ConfigElement> getChildren()
     {
@@ -70,7 +70,7 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
+     * @see ConfigElement#combine(ConfigElement)
      */
     public ConfigElement combine(ConfigElement configElement)
     {
@@ -102,7 +102,7 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
     /**
      * Sets the proxy configuration
      * 
-     * @param proxyConfig
+     * @param proxyConfig ProxyConfig
      */
     /*package*/ void setProxy(ProxyConfig proxyConfig)
     {
@@ -139,7 +139,7 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
     /**
      * Adds an engine
      * 
-     * @param pluginConfig  A pre-configured engine config object
+     * @param engineConfig  A pre-configured engine config object
      */
     /*package*/ void addEngine(EngineConfig engineConfig)
     {
@@ -168,8 +168,8 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
         /**
          * Construct
          * 
-         * @param label
-         * @param labelId
+         * @param label String
+         * @param labelId String
          */
         public EngineConfig(String label, String labelId)
         {
@@ -184,9 +184,9 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
         /**
          * Construct
          * 
-         * @param label
-         * @param labelId
-         * @param proxy
+         * @param label String
+         * @param labelId String
+         * @param proxy String
          */
         public EngineConfig(String label, String labelId, String proxy)
         {
@@ -231,7 +231,8 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
         /**
          * Adds a url
          * 
-         * @param pluginConfig  A pre-configured plugin config object
+         * @param mimetype  mime type
+         * @param uri  uri
          */
         /*package*/ void addUrl(String mimetype, String uri)
         {
@@ -253,7 +254,7 @@ public class OpenSearchConfigElement extends ConfigElementAdapter
         /**
          * Construct
          * 
-         * @param url
+         * @param url String
          */
         public ProxyConfig(String url)
         {

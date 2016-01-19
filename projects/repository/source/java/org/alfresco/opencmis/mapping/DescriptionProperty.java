@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -37,8 +37,8 @@ public class DescriptionProperty extends AbstractProperty
     /**
      * Construct
      * 
-     * @param serviceRegistry
-     * @param connector
+     * @param serviceRegistry ServiceRegistry
+     * @param connector CMISConnector
      */
     public DescriptionProperty(ServiceRegistry serviceRegistry, CMISConnector connector)
     {
@@ -50,9 +50,7 @@ public class DescriptionProperty extends AbstractProperty
     {
         if (nodeInfo.getNodeRef() != null)
         {
-            return getServiceRegistry().getNodeService().getProperty(
-                    nodeInfo.getNodeRef(), 
-                    ContentModel.PROP_DESCRIPTION);
+            return nodeInfo.getNodeProps().get(ContentModel.PROP_DESCRIPTION);
         }
         else if (nodeInfo.getAssociationRef() != null)
         {

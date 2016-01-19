@@ -232,7 +232,7 @@ public class QNameTest extends TestCase
     }
 
     
-    private static class MockNamespacePrefixResolver
+    public static class MockNamespacePrefixResolver
         implements NamespacePrefixResolver
     {
 

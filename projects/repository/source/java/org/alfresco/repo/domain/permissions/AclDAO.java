@@ -160,19 +160,19 @@ public interface AclDAO
     public void deleteAclForNode(long aclId);
 
     /**
-     * @param inheritedAclId
-     * @param aclId
+     * @param shared Long
+     * @param defining Long
      */
     public void fixSharedAcl(Long shared, Long defining);
 
     /**
-     * @return
+     * @return Long
      */
     public Long getMaxChangeSetCommitTime();
 
     /**
-     * @param maxCommitTime
-     * @return
+     * @param maxCommitTime long
+     * @return Long
      */
     public Long getMaxChangeSetIdByCommitTime(long maxCommitTime);
 }

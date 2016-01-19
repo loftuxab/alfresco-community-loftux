@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.CRC32;
 
 import org.alfresco.service.cmr.dictionary.DictionaryException;
@@ -44,6 +45,9 @@ import org.jibx.runtime.JiBXException;
  */
 public class M2Model
 {
+    private static final String ERR_PARSE_FAILURE = "d_dictionary.model.err.parse.failure";
+    private static final String ERR_CREATE_M2MODEL_FAILURE = "d_dictionary.model.err.create_m2model.failure";
+
     private String name = null;
     private String description = null;
     private String author = null;
@@ -99,7 +103,7 @@ public class M2Model
         }
         catch(JiBXException e)
         {
-            throw new DictionaryException("Failed to parse model", e);
+            throw new DictionaryException(ERR_PARSE_FAILURE, e);
         }        
     }
 
@@ -132,7 +136,7 @@ public class M2Model
         }
         catch(JiBXException e)
         {
-            throw new DictionaryException("Failed to create M2 Model", e);
+            throw new DictionaryException(ERR_CREATE_M2MODEL_FAILURE, e);
         }
     }
 
@@ -460,7 +464,7 @@ public class M2Model
 
 
     /**
-     * @return
+     * @return String
      */
     public String getAnalyserResourceBundleName()
     {
@@ -471,6 +475,24 @@ public class M2Model
     public void setAnalyserResourceBundleName(String analyserResourceBundleName)
     {
         this.analyserResourceBundleName = analyserResourceBundleName;
+    }
+
+    public void setConfigProperties(Properties configProperties)
+    {
+        if (types != null)
+        {
+            for (M2Class type : types)
+            {
+                type.setConfigProperties(configProperties);
+            }
+        }
+        if (aspects != null)
+        {
+            for (M2Class aspect : aspects)
+            {
+                aspect.setConfigProperties(configProperties);
+            }
+        }
     }
 
 }

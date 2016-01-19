@@ -95,7 +95,8 @@ public class MLTokenDuplicator extends TokenStream
     }
 
     /**
-     * @param locale2
+     *
+     * @param locale
      * @param mlAnalysisMode
      */
     public MLTokenDuplicator(Locale locale, MLAnalysisMode mlAnalysisMode)

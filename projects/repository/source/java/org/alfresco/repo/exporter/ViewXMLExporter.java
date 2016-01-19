@@ -800,7 +800,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
     /**
      * Get the prefix for the specified URI
-     * @param uri  the URI
+     * @param qname  the QName
      * @return  the prefix (or null, if one is not registered)
      */
     private String toPrefixString(QName qname)
@@ -913,9 +913,9 @@ import org.xml.sax.helpers.AttributesImpl;
     /**
      * Helper to convert a path into an indexed path which uniquely identifies a node
      * 
-     * @param nodeRef
-     * @param path
-     * @return
+     * @param nodeRef NodeRef
+     * @param path Path
+     * @return Path
      */
     private Path createIndexedPath(NodeRef nodeRef, Path path)
     {

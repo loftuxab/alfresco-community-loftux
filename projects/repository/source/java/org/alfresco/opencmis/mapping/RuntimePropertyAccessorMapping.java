@@ -62,8 +62,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     private Map<BaseTypeId, Map<Action, CMISActionEvaluator>> actionEvaluators = new HashMap<BaseTypeId, Map<Action, CMISActionEvaluator>>();
 
     /**
-     * @param service
-     *            registry
+     * @param serviceRegistry ServiceRegistry
      */
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
@@ -71,8 +70,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     }
 
     /**
-     * @param cmis
-     *            connector
+     * @param cmisConnector CMISConnector
      */
     public void setCmisConnector(CMISConnector cmisConnector)
     {
@@ -80,8 +78,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     }
 
     /**
-     * @param cmis
-     *            mapping
+     * @param cmisMapping CMISMapping
      */
     public void setCmisMapping(CMISMapping cmisMapping)
     {
@@ -89,8 +86,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     }
 
     /**
-     * @param cmis
-     *            mapping
+     * @param cmisDictionaryService CMISDictionaryService
      */
     public void setCmisDictionaryService(CMISDictionaryService cmisDictionaryService)
     {
@@ -140,9 +136,9 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
         registerPropertyAccessor(new AllowedChildObjectTypeIdsProperty(serviceRegistry, cmisConnector, cmisMapping));
         registerPropertyAccessor(new SourceIdProperty(serviceRegistry, cmisConnector));
         registerPropertyAccessor(new TargetIdProperty(serviceRegistry, cmisConnector));
+        registerPropertyAccessor(new DescriptionProperty(serviceRegistry, cmisConnector));
         if(cmisMapping.getCmisVersion().equals(CmisVersion.CMIS_1_1))
         {
-            registerPropertyAccessor(new DescriptionProperty(serviceRegistry, cmisConnector));
             registerPropertyAccessor(new SecondaryTypesProperty(serviceRegistry, cmisConnector, cmisMapping));
 
             // MNT-11631: 'cmis:isPrivateWorkingCopy' property accessor
@@ -334,7 +330,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     /**
      * Register pre-defined Property Accessor
      * 
-     * @param propertyAccessor
+     * @param propertyAccessor AbstractProperty
      */
     private void registerPropertyAccessor(AbstractProperty propertyAccessor)
     {
@@ -344,7 +340,7 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     /**
      * Gets the Action Evaluators applicable for the given CMIS Scope
      * 
-     * @param scope
+     * @param scope BaseTypeId
      */
     public Map<Action, CMISActionEvaluator> getActionEvaluators(BaseTypeId scope)
     {
@@ -359,8 +355,8 @@ public class RuntimePropertyAccessorMapping implements PropertyAccessorMapping, 
     /**
      * Register an Action Evaluator
      * 
-     * @param scope
-     * @param evaluator
+     * @param scope BaseTypeId
+     * @param evaluator CMISActionEvaluator
      */
     private void registerEvaluator(BaseTypeId scope, CMISActionEvaluator evaluator)
     {

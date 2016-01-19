@@ -55,7 +55,7 @@ import org.springframework.core.OrderComparator;
  * 
  * <p>
  * Implementing ApplicationEventMulticaster's actual {@link #multicastEvent}
- * method is left to subclasses. {@link SimpleApplicationEventMulticaster}
+ * method is left to subclasses. {@link org.springframework.context.event.SimpleApplicationEventMulticaster}
  * simply multicasts all events to all registered listeners, invoking them in
  * the calling thread. Alternative implementations could be more sophisticated
  * in those respects.
@@ -63,7 +63,7 @@ import org.springframework.core.OrderComparator;
  * @author Juergen Hoeller
  * @since 1.2.3
  * @see #getApplicationListeners(ApplicationEvent)
- * @see SimpleApplicationEventMulticaster
+ * @see org.springframework.context.event.SimpleApplicationEventMulticaster
  */
 public class SafeApplicationEventMulticaster implements ApplicationEventMulticaster, ApplicationContextAware
 {
@@ -94,8 +94,6 @@ public class SafeApplicationEventMulticaster implements ApplicationEventMulticas
      * context (class loader, transaction association) unless the TaskExecutor
      * explicitly supports this.
      * 
-     * @see org.springframework.core.task.SyncTaskExecutor
-     * @see org.springframework.core.task.SimpleAsyncTaskExecutor
      */
     public void setTaskExecutor(Executor taskExecutor)
     {

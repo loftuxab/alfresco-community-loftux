@@ -73,8 +73,8 @@ public class AlfrescoFieldType extends FieldType
         
         // TODO: Wire up localised analysis driven from the schema
         // for now we do something basic
-        setIndexAnalyzer(new AlfrescoAnalyzerWrapper(schema));
-        setQueryAnalyzer(new AlfrescoAnalyzerWrapper(schema));
+        setIndexAnalyzer(new AlfrescoAnalyzerWrapper(schema, AlfrescoAnalyzerWrapper.Mode.INDEX));
+        setQueryAnalyzer(new AlfrescoAnalyzerWrapper(schema, AlfrescoAnalyzerWrapper.Mode.QUERY));
         AlfrescoSolrDataModel.getInstance().setAlfrescoFieldType(this);
     }
 
@@ -261,10 +261,7 @@ public class AlfrescoFieldType extends FieldType
         {
             return null;
         }
-        BytesRef spare = new BytesRef();
-        String stringVal = (String) value;
-        UnicodeUtil.UTF16toUTF8(stringVal, 0, stringVal.length(), spare);
-        return spare;
+        return new BytesRef((String) value);
     }
     
     protected boolean supportsAnalyzers() 

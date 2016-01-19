@@ -66,7 +66,6 @@ public class SitesAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param params
-     * @param siteId
      * @return ListResponse populated with {@link Site}
      * @throws PublicApiException
      */
@@ -85,8 +84,7 @@ public class SitesAPI extends PublicAPIAbstract
      * @param authUser
      * @param domain
      * @param siteId
-     * @param siteId
-     * @param memberId 
+     * @param memberId
      * @return ListResponse populated with {@link SiteMember}
      * @throws PublicApiException
      */
@@ -196,7 +194,7 @@ public class SitesAPI extends PublicAPIAbstract
      * 
      * @param authUser
      * @param domain
-     * @param params
+     * @param containerId
      * @param siteId
      * @return {@link SiteContainer}
      * @throws PublicApiException

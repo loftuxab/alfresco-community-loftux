@@ -97,6 +97,7 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
     private ContentService contentService;
 
     private NodeService nodeService;
+    private boolean isAuthenticationPreemptive = false;
 
     public HttpClientTransmitterImpl()
     {
@@ -113,12 +114,13 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
     public void init()
     {
         PropertyCheck.mandatory(this, "contentService", contentService);
+        httpClient.getParams().setAuthenticationPreemptive(isAuthenticationPreemptive);
     }
 
     /**
      * By default this class uses the standard SSLProtocolSocketFactory, but this method allows this to be overridden.
      * Useful if, for example, one wishes to permit support of self-signed certificates on the target.
-     * @param socketFactory
+     * @param socketFactory ProtocolSocketFactory
      */
     public void setHttpsSocketFactory(ProtocolSocketFactory socketFactory)
     {
@@ -129,13 +131,22 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
      * By default, this class uses a plain HttpClient instance with the only non-default
      * option being the multi-threaded connection manager.
      * Use this method to replace this with your own HttpClient instance configured how you wish
-     * @param httpClient
+     * @param httpClient HttpClient
      */
     public void setHttpClient(HttpClient httpClient)
     {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Whether httpClient will use preemptive authentication or not.
+     * @param isAuthenticationPreemptive boolean
+     */
+    public void setIsAuthenticationPreemptive(boolean isAuthenticationPreemptive)
+    {
+        this.isAuthenticationPreemptive = isAuthenticationPreemptive;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.transfer.Transmitter#verifyTarget(org.alfresco.service.cmr.transfer.TransferTarget)
      */
@@ -171,7 +182,10 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
     }
 
     /**
-     * @param response
+     *
+     * @param methodName String
+     * @param response int
+     * @param method HttpMethod
      */
     private void checkResponseStatus(String methodName, int response, HttpMethod method)
     {
@@ -202,8 +216,8 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
 
     /**
      * Get the HTTPState for a transfer target
-     * @param target
-     * @return
+     * @param target TransferTarget
+     * @return HttpState
      */
     protected HttpState getHttpState(TransferTarget target)
     {
@@ -215,8 +229,8 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
     }
 
     /**
-     * @param target
-     * @return
+     * @param target TransferTarget
+     * @return HostConfiguration
      */
     private HostConfiguration getHostConfig(TransferTarget target)
     {
@@ -731,7 +745,7 @@ public class HttpClientTransmitterImpl implements TransferTransmitter
      * the error message ("errorMessage"), and, optionally, the Alfresco message id ("alfrescoErrorId")
      * and Alfresco message parameters ("alfrescoErrorParams").
      * @return The rehydrated error object, or null if errorJSON is null.
-     * @throws JSONException if an error occurs while parsing the supplied JSON object
+     * Throws {@code JSONException} if an error occurs while parsing the supplied JSON object
      */
     private Throwable rehydrateError(JSONObject errorJSON)
     {

@@ -4,8 +4,8 @@
     <name>Alfresco File Transfer Receiver Distribution</name>
     <parent>
         <artifactId>alfresco-packaging</artifactId>
-        <groupId>se.loftux.alfresco</groupId>
-        <version>LX81</version>
+        <groupId>org.alfresco</groupId>
+        <version>5.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -46,14 +46,14 @@
 
         <!-- Provided dependencies, for inclusion in assembly -->
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-file-transfer-receiver</artifactId>
             <version>${project.version}</version>
             <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>se.loftux.alfresco</groupId>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-repository</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -92,8 +92,8 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>se.loftux.alfresco</groupId>
-                                    <artifactId>alfresco</artifactId>
+                                    <groupId>org.alfresco</groupId>
+                                    <artifactId>alfresco-platform</artifactId>
                                     <version>${project.version}</version>
                                     <type>war</type>
                                     <includes>WEB-INF/classes/alfresco/version.properties</includes>

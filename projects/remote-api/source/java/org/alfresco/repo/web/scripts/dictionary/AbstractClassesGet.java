@@ -55,7 +55,7 @@ public abstract class AbstractClassesGet extends DictionaryWebServiceBase
     private static final String REQ_URL_TEMPL_VAR_NAME = "n";
 
     /**
-     * @Override method from DeclarativeWebScript
+     * Override method from DeclarativeWebScript
      */
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
@@ -177,7 +177,8 @@ public abstract class AbstractClassesGet extends DictionaryWebServiceBase
     protected abstract QName getQNameForModel(String namespacePrefix, String name);
 
     /**
-     * @param req - webscript request
+     * @param namespacePrefix namespace prefix
+     * @param name name
      * @return  qualified name for class
      */
     protected abstract QName getClassQname(String namespacePrefix, String name);

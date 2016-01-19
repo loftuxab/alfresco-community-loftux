@@ -28,6 +28,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.httpclient.AuthenticationException;
+import org.alfresco.repo.index.shard.ShardMethodEnum;
+import org.alfresco.repo.index.shard.ShardState;
+import org.alfresco.repo.index.shard.ShardStateBuilder;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.BoundedDeque;
 import org.alfresco.solr.InformationServer;
@@ -40,6 +43,7 @@ import org.alfresco.solr.client.Node.SolrApiNodeStatus;
 import org.alfresco.solr.client.SOLRAPIClient;
 import org.alfresco.solr.client.Transaction;
 import org.alfresco.solr.client.Transactions;
+import org.apache.commons.codec.EncoderException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +65,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     private ConcurrentLinkedQueue<Long> nodesToReindex = new ConcurrentLinkedQueue<Long>();
     private ConcurrentLinkedQueue<Long> nodesToIndex = new ConcurrentLinkedQueue<Long>();
     private ConcurrentLinkedQueue<Long> nodesToPurge = new ConcurrentLinkedQueue<Long>();
+    private ConcurrentLinkedQueue<String> queriesToReindex = new ConcurrentLinkedQueue<String>();
 
 
     public MetadataTracker(Properties p, SOLRAPIClient client, String coreName,
@@ -79,7 +84,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     @Override
-    protected void doTrack() throws AuthenticationException, IOException, JSONException
+    protected void doTrack() throws AuthenticationException, IOException, JSONException, EncoderException
     {
         // MetadataTracker must wait until ModelTracker has run
         ModelTracker modelTracker = this.infoSrv.getAdminHandler().getTrackerRegistry().getModelTracker();
@@ -90,6 +95,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
             reindexTransactions();
             reindexNodes();
+            reindexNodesByQuery();
 
             indexTransactions();
             indexNodes();
@@ -99,7 +105,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
 
-    private void trackRepository() throws IOException, AuthenticationException, JSONException
+    private void trackRepository() throws IOException, AuthenticationException, JSONException, EncoderException
     {
         // Is the InformationServer ready to update
         int registeredSearcherCount = this.infoSrv.getRegisteredSearcherCount();
@@ -111,18 +117,56 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
         checkShutdown();
         
+        
         if(!isMaster && isSlave)
         {
+            // Dynamic registration
+            
+            ShardState shardstate = getShardState();
+            client.getTransactions(0L, null, 0L, null, 0, shardstate);
             return;
         }
 
-        TrackerState state = super.getTrackerState();
-
         // Check we are tracking the correct repository
+        TrackerState state = super.getTrackerState();
         checkRepoAndIndexConsistency(state);
 
         checkShutdown();
         trackTransactions();
+    }
+
+    /**
+     * @param state 
+     * @return
+     */
+    private ShardState getShardState()
+    {
+        TrackerState state = super.getTrackerState();
+       
+        ShardState shardstate =  ShardStateBuilder.shardState()
+                .withMaster(isMaster)
+                .withLastUpdated(System.currentTimeMillis())
+                .withLastIndexedChangeSetCommitTime(state.getLastIndexedChangeSetCommitTime())
+                .withLastIndexedChangeSetId(state.getLastIndexedChangeSetId())
+                .withLastIndexedTxCommitTime(state.getLastIndexedTxCommitTime())
+                .withLastIndexedTxId(state.getLastIndexedTxId())
+                .withShardInstance()
+                    .withBaseUrl(infoSrv.getBaseUrl())
+                    .withPort(infoSrv.getPort())
+                    .withHostName(infoSrv.getHostName())
+                    .withShard()
+                        .withInstance(shardInstance)
+                        .withFloc()
+                            .withNumberOfShards(shardCount)
+                            .withAddedStoreRef(storeRef)
+                            .withTemplate(shardTemplate)
+                            .withHasContent(transformContent)
+                            .withShardMethod(ShardMethodEnum.MOD_ACL_ID)
+                            .endFloc()
+                        .endShard()
+                     .endShardInstance()
+                .build();
+        return shardstate;
     }
 
     /**
@@ -400,6 +444,27 @@ public class MetadataTracker extends AbstractTracker implements Tracker
             this.infoSrv.commit();
         }
     }
+    
+    private void reindexNodesByQuery() throws IOException, AuthenticationException, JSONException
+    {
+        boolean requiresCommit = false;
+        while (queriesToReindex.peek() != null)
+        {
+            String query = queriesToReindex.poll();
+            if (query != null)
+            {
+                this.infoSrv.reindexNodeByQuery(query);
+                requiresCommit = true;
+            }
+            checkShutdown();
+        }
+
+        if(requiresCommit)
+        {
+            checkShutdown();
+            this.infoSrv.commit();
+        }
+    }
 
 
     private void purgeTransactions() throws IOException, AuthenticationException, JSONException
@@ -478,19 +543,21 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     protected Transactions getSomeTransactions(BoundedDeque<Transaction> txnsFound, Long fromCommitTime, long timeStep,
-                int maxResults, long endTime) throws AuthenticationException, IOException, JSONException
+                int maxResults, long endTime) throws AuthenticationException, IOException, JSONException, EncoderException
     {
         long actualTimeStep = timeStep;
 
+        ShardState shardstate = getShardState();
+        
         Transactions transactions;
         // step forward in time until we find something or hit the time bound
         // max id unbounded
         Long startTime = fromCommitTime == null ? Long.valueOf(0L) : fromCommitTime;
         do
         {
-            transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults);
+            transactions = client.getTransactions(startTime, null, startTime + actualTimeStep, null, maxResults, shardstate);
             startTime += actualTimeStep;
-            actualTimeStep *= 2;
+            //actualTimeStep *= 2; 
             if (actualTimeStep > TIME_STEP_32_DAYS_IN_MS)
             {
                 actualTimeStep = TIME_STEP_32_DAYS_IN_MS;
@@ -501,7 +568,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         return transactions;
     }
 
-    protected void trackTransactions() throws AuthenticationException, IOException, JSONException
+    protected void trackTransactions() throws AuthenticationException, IOException, JSONException, EncoderException
     {
         long startElapsed = System.nanoTime();
         
@@ -707,7 +774,6 @@ public class MetadataTracker extends AbstractTracker implements Tracker
         return nodeCount;
     }
 
-
     class NodeIndexWorkerRunnable extends AbstractWorkerRunnable
     {
         InformationServer infoServer;
@@ -722,10 +788,57 @@ public class MetadataTracker extends AbstractTracker implements Tracker
 
         @Override
         protected void doWork() throws IOException, AuthenticationException, JSONException
+        { 
+            List<Node> filteredNodes = filterNodes(nodes);
+            if(filteredNodes.size() > 0)
+            {
+                this.infoServer.indexNodes(filteredNodes, true);
+            }
+        }
+        
+        private List<Node> filterNodes(List<Node> nodes)
         {
-            this.infoServer.indexNodes(nodes, true);
+            ArrayList<Node> filteredList = new ArrayList<Node>(nodes.size());
+            for(Node node : nodes)
+            {
+                if(isInAclShard(node.getAclId()))
+                {
+                    filteredList.add(node);
+                }
+                else
+                {
+                    // Cascade update children of this node if they are in this shard
+                    if(node.getStatus() == SolrApiNodeStatus.UPDATED)
+                    {
+                        Node doCascade = new Node();
+                        doCascade.setAclId(node.getAclId());
+                        doCascade.setId(node.getId());
+                        doCascade.setNodeRef(node.getNodeRef());
+                        doCascade.setStatus(SolrApiNodeStatus.NON_SHARD_UPDATED);
+                        doCascade.setTenant(node.getTenant());
+                        doCascade.setTxnId(node.getTxnId());
+                        filteredList.add(doCascade);
+                    }
+                    else // DELETED & UNKNOWN
+                    {
+                        // Make sure anything no longer relevant to this shard is deleted. 
+                        Node doDelete = new Node();
+                        doDelete.setAclId(node.getAclId());
+                        doDelete.setId(node.getId());
+                        doDelete.setNodeRef(node.getNodeRef());
+                        doDelete.setStatus(SolrApiNodeStatus.NON_SHARD_DELETED);
+                        doDelete.setTenant(node.getTenant());
+                        doDelete.setTxnId(node.getTxnId());
+                        filteredList.add(doDelete);
+                    }
+                   
+                    
+                }
+            }
+            return filteredList;
         }
     }
+    
     
     public NodeReport checkNode(Long dbid)
     {
@@ -814,7 +927,7 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     }
 
     public IndexHealthReport checkIndex(Long toTx, Long toAclTx, Long fromTime, Long toTime)
-                throws IOException, AuthenticationException, JSONException
+                throws IOException, AuthenticationException, JSONException, EncoderException
     {
         // DB TX Count
         long firstTransactionCommitTime = 0;
@@ -906,6 +1019,14 @@ public class MetadataTracker extends AbstractTracker implements Tracker
     public void addNodeToIndex(Long nodeId)
     {
         this.nodesToIndex.offer(nodeId);
+    }
+
+    /**
+     * @param query
+     */
+    public void addQueryToReindex(String query)
+    {
+        this.queriesToReindex.offer(query);
     }
 
 }

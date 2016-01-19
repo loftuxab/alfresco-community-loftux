@@ -107,8 +107,8 @@ public class NodeListConverter extends SerializableToByteArrayConverter
     }
     
     /**
-     * @param nodeRefs
-     * @return
+     * @param value Object
+     * @return JBPMNodeList
      */
     @SuppressWarnings("unchecked")
     private JBPMNodeList revertNodes(Object value)

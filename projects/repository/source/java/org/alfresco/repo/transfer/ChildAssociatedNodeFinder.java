@@ -48,7 +48,7 @@ import org.alfresco.service.namespace.RegexQNamePattern;
       crawler.setNodeFinders(new ChildAssociatedNodeFinder(ContentModel.ASSOC_CONTAINS));
       Set<NodeRef> crawledNodes = crawler.crawl(rootNode);
  </pre> 
- * @see NodeCrawlerFactory
+ * @see org.alfresco.service.cmr.transfer.NodeCrawlerFactory
  * 
  */
 public class ChildAssociatedNodeFinder extends AbstractNodeFinder
@@ -121,9 +121,8 @@ public class ChildAssociatedNodeFinder extends AbstractNodeFinder
     }
 
     /**
-     * @param thisNode
-     * @param serviceRegistry
-     * @return
+     * @param thisNode NodeRef
+     * @return Set<NodeRef>
      */
     private Set<NodeRef> processExcludedSet(NodeRef thisNode)
     {

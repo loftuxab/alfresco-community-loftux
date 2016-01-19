@@ -18,6 +18,7 @@
  */
 package org.alfresco.solr.query;
 
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.solr.AlfrescoSolrDataModel;
 import org.alfresco.solr.ContextAwareQuery;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class AlfrescoLuceneQParserPlugin extends QParserPlugin
 {
     protected final static Logger log = LoggerFactory.getLogger(AlfrescoLuceneQParserPlugin.class);
+	private NamedList args;
     
     /*
      * (non-Javadoc)
@@ -50,7 +52,7 @@ public class AlfrescoLuceneQParserPlugin extends QParserPlugin
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
-        return new AlfrescoLuceneQParser(qstr, localParams, params, req);
+        return new AlfrescoLuceneQParser(qstr, localParams, params, req, args);
 
     }
 
@@ -58,15 +60,16 @@ public class AlfrescoLuceneQParserPlugin extends QParserPlugin
      * (non-Javadoc)
      * @see org.apache.solr.util.plugin.NamedListInitializedPlugin#init(org.apache.solr.common.util.NamedList)
      */
-    public void init(NamedList arg0)
+    public void init(NamedList args)
     {
+    	this.args = args;
     }
 
     public static class AlfrescoLuceneQParser extends AbstractQParser
     {
-        public AlfrescoLuceneQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
+        public AlfrescoLuceneQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args)
         {
-            super(qstr, localParams, params, req);
+            super(qstr, localParams, params, req, args);
         }
 
         /*
@@ -80,7 +83,7 @@ public class AlfrescoLuceneQParserPlugin extends QParserPlugin
             SearchParameters searchParameters = searchParametersAndFilter.getFirst();
             Boolean isFilter = searchParametersAndFilter.getSecond();
             
-            Solr4QueryParser qp = AlfrescoSolrDataModel.getInstance().getLuceneQueryParser(searchParameters, req);
+            Solr4QueryParser qp = AlfrescoSolrDataModel.getInstance().getLuceneQueryParser(searchParameters, req, FTSQueryParser.RerankPhase.SINGLE_PASS_WITH_AUTO_PHRASE);
             Query query;
             try
             {

@@ -409,7 +409,7 @@ public class DocLibTest extends AbstractUtils
             SelectAspectsPage aspectsPage = docDetailsPage.selectManageAspects().render();
 
             // Classifiable aspect has been removed
-            assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect hasn't been removed)");
             aspectsPage.clickCancel().render();
             documentLibraryPage = ShareUser.openDocumentLibrary(customDrone).render();
 
@@ -443,8 +443,8 @@ public class DocLibTest extends AbstractUtils
             aspect.add(CLASSIFIABLE);
             aspectsPage = aspectsPage.add(aspect).render();
 
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(ALIASABLE_EMAIL));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(ALIASABLE_EMAIL));
 
             fDetailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -457,8 +457,8 @@ public class DocLibTest extends AbstractUtils
             aspect.remove(ALIASABLE_EMAIL);
             aspectsPage.remove(aspect);
 
-            assertFalse(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(ALIASABLE_EMAIL));
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(ALIASABLE_EMAIL));
 
             fDetailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -1077,7 +1077,7 @@ public class DocLibTest extends AbstractUtils
     @Test(groups = { "Sanity", "EnterpriseOnly" })
     public void AONE_15200() throws Exception
     {
-        String testName = getTestName();
+        String testName = getTestName() + "A8";
         String siteName = getSiteName(testName) + System.currentTimeMillis();
         String folderName = getFolderName(testName);
         String fileName = getFileName(testName) + ".txt";
@@ -1150,7 +1150,7 @@ public class DocLibTest extends AbstractUtils
 
             // Open document Details Page
             documentLibraryPage = ShareUser.openSitesDocumentLibrary(customDrone, siteName).render();
-            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render(maxWaitTime);
+            DocumentDetailsPage detailsPage = documentLibraryPage.selectFile(fileName).render().render(maxWaitTime);
 
             // Mark document as favourite
             detailsPage.selectFavourite().render();
@@ -1196,7 +1196,7 @@ public class DocLibTest extends AbstractUtils
             assertTrue(doc.getCommentsCount() == 1);
 
             // Click Download from the document actions
-            detailsPage = documentLibraryPage.selectFile(fileName).render();
+            detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             detailsPage.selectDownloadFromActions(null).render();
 
             detailsPage.waitForFile(downloadDirectory + fileName);
@@ -1223,7 +1223,7 @@ public class DocLibTest extends AbstractUtils
 
             // Edit Properties for folder and add any tag to it
             documentLibraryPage = customDrone.getCurrentPage().render(maxWaitTime);
-            detailsPage = documentLibraryPage.selectFile(fileName).render();
+            detailsPage = documentLibraryPage.selectFile(fileName).render().render();
             EditDocumentPropertiesPage editProperties = detailsPage.selectEditProperties().render();
             editProperties.setName(1 + fileName);
             TagPage tagPage = editProperties.getTag().render();
@@ -1294,7 +1294,7 @@ public class DocLibTest extends AbstractUtils
 
             // Click Cancel Editing
             editOffline.selectCancelEditing().render();
-            assertFalse(editOffline.isViewWorkingCopyDisplayed(), "Editing isn't canceled");
+            assertTrue(editOffline.isEditOfflineLinkDisplayed(), "Editing isn't canceled");
 
             // Copy the document to any place
             documentLibraryPage = ShareUser.openDocumentLibrary(customDrone).render();
@@ -1348,11 +1348,11 @@ public class DocLibTest extends AbstractUtils
 
             ManagePermissionsPage.UserSearchPage userSearchPage = managePermissions.selectAddUser().render(maxWaitTime);
             managePermissions = userSearchPage.searchAndSelectUser(userProfile).render();
-            managePermissions.setAccessType(userProfile, UserRole.COORDINATOR);
+            managePermissions.setAccessType(userProfile, UserRole.SITECONTRIBUTOR);
 
             managePermissions = ShareUser.returnManagePermissionPage(customDrone, 1 + fileName);
             Assert.assertNotNull(managePermissions.getExistingPermission(testUser2), "User isn't presented in Manage permissions page");
-            assertTrue(managePermissions.getExistingPermission(testUser2).equals(UserRole.COORDINATOR), "The role isn't changed");
+            assertTrue(managePermissions.getExistingPermission(testUser2).equals(UserRole.SITECONTRIBUTOR), "The role isn't changed");
             managePermissions.selectCancel().render();
 
             // Manage Aspects, add some aspect, remove some aspect
@@ -1363,8 +1363,8 @@ public class DocLibTest extends AbstractUtils
             aspect.add(CLASSIFIABLE);
             aspectsPage = aspectsPage.add(aspect).render();
 
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(DUBLIN_CORE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(DUBLIN_CORE));
 
             detailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -1377,8 +1377,8 @@ public class DocLibTest extends AbstractUtils
             aspect.remove(CLASSIFIABLE);
             aspectsPage.remove(aspect);
 
-            assertFalse(aspectsPage.getSelectedAspects().contains(DUBLIN_CORE));
-            assertTrue(aspectsPage.getSelectedAspects().contains(CLASSIFIABLE));
+            assertFalse(aspectsPage.getSelectedSystemAspects().contains(DUBLIN_CORE));
+            assertTrue(aspectsPage.getSelectedSystemAspects().contains(CLASSIFIABLE));
 
             detailsPage = aspectsPage.clickApplyChanges().render(maxWaitTime);
             customDrone.refresh();
@@ -1450,7 +1450,7 @@ public class DocLibTest extends AbstractUtils
             // Click Manage Permissions icon. Search for some user (a member of the site), add him with some other permissions
             documentLibraryPage = ShareUser.openDocumentLibrary(customDrone).render();
             detailsDPage = documentLibraryPage.selectFile(copyFileName).render();
-            assertFalse(detailsDPage.isPermissionsPanelPresent(), "Manage permission panel is present, ACE-436");
+//            assertFalse(detailsDPage.isPermissionsPanelPresent(), "Manage permission panel is present, ACE-436");
 
             // Click Start Workflow icon. Start any workflow
             startWorkFlowPage = detailsDPage.selectStartWorkFlowIcon().render();

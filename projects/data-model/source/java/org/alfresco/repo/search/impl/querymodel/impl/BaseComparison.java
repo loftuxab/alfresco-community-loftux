@@ -76,9 +76,9 @@ public abstract class BaseComparison extends BaseFunction
     }
 
     /**
-     * @param name
-     * @param returnType
-     * @param argumentDefinitions
+     * @param name String
+     * @param returnType QName
+     * @param argumentDefinitions LinkedHashMap<String, ArgumentDefinition>
      */
     public BaseComparison(String name, QName returnType, LinkedHashMap<String, ArgumentDefinition> argumentDefinitions)
     {

@@ -39,7 +39,7 @@ import org.springframework.extensions.surf.util.URLDecoder;
 /**
  * Abstract base class for all the Vti method handling classes.
  * Base realization of {@link VtiMethod}.
- *
+ * 
  * @author Michael Shavnev
  */
 public abstract class AbstractMethod implements VtiMethod
@@ -82,8 +82,8 @@ public abstract class AbstractMethod implements VtiMethod
     {
         this.urlHelper = urlHelper;
     }
-
-    /**
+    
+    /** 
      * @see org.alfresco.module.vti.web.fp.VtiMethod#execute(org.alfresco.module.vti.web.fp.VtiFpRequest, org.alfresco.module.vti.web.fp.VtiFpResponse)
      */
     public final void execute(VtiFpRequest request, VtiFpResponse response)
@@ -96,7 +96,7 @@ public abstract class AbstractMethod implements VtiMethod
                 {
                     getLockService().setCurrentSession(request.getSession());
                 }
-
+                
                 response.setContentType(VtiFilter.CONTENT_TYPE_HTML);
 
                 doExecute(request, response);
@@ -133,23 +133,23 @@ public abstract class AbstractMethod implements VtiMethod
             throw new RuntimeException(e);
         }
     }
-
+    
     /**
-     * Target method that will be executed in child classes
-     *
+     * Target method that will be executed in child classes  
+     * 
      * @param request Vti Frontpage request ({@link VtiFpRequest})
      * @param response Vti Frontpage response ({@link VtiFpResponse})
-     */
+     */    
     protected abstract void doExecute(VtiFpRequest request, VtiFpResponse response) throws VtiMethodException, IOException;
 
-
+    
     /**
-     * Create response for DocMetaInfo
-     *
+     * Create response for DocMetaInfo 
+     * 
      * @param docMetaInfo Document Meta Information
      * @param request Vti Frontpage request
      * @param response Vti Frontpage response
-     */
+     */  
     protected void processDocMetaInfo(DocMetaInfo docMetaInfo, VtiFpRequest request, VtiFpResponse response) throws VtiMethodException, IOException
     {
         response.writeMetaDictionary(VtiProperty.FILE_THICKETDIR, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getThicketdir());
@@ -170,7 +170,7 @@ public abstract class AbstractMethod implements VtiMethod
             response.writeMetaDictionary(VtiProperty.FOLDER_ISCHILDWEB, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getIschildweb());
             response.writeMetaDictionary(VtiProperty.FOLDER_ISEXECUTABLE, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getIsexecutable());
             response.writeMetaDictionary(VtiProperty.FOLDER_ISSCRIPTABLE, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getIsscriptable());
-
+            
             response.writeMetaDictionary(VtiProperty.FOLDER_LISTBASETYPE, VtiType.INT, VtiConstraint.R, docMetaInfo.getListbasetype());
             response.writeMetaDictionary(VtiProperty.FOLDER_LISTENABLEMINORVERSIONS, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getListEnableMinorVersions());
             response.writeMetaDictionary(VtiProperty.FOLDER_LISTSERVERTEMPLATE, VtiType.INT, VtiConstraint.R, docMetaInfo.getListServerTemplate());
@@ -212,7 +212,7 @@ public abstract class AbstractMethod implements VtiMethod
     }
     /**
      * Access to the WebDAVLockService.
-     *
+     * 
      * @return the lockService
      */
     protected WebDAVLockService getLockService()
@@ -222,7 +222,7 @@ public abstract class AbstractMethod implements VtiMethod
 
     /**
      * Provides instances of this class with the WebDAVLockService.
-     *
+     * 
      * @param lockService the lockService to set
      */
     public void setLockService(WebDAVLockService lockService)

@@ -641,10 +641,16 @@ public class CmisFolderAspectUtils extends AbstractCmisSecondaryTypeIDTests
         Assert.assertEquals(getPropertyValue(folderProperties, "isoSpeedRatings"), isoSpeedRatings);
         Assert.assertEquals(getPropertyValue(folderProperties, "fNumber"), String.valueOf(fNumber));
         Assert.assertEquals(getPropertyValue(folderProperties, "exposureTime"), String.valueOf(exposureTime));
-
-        DetailsPage detailsPage = ShareUser.getCurrentPage(drone).render();
-        detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
-
+        
+        if(alfrescoVersion.isCloud())
+        {
+            ShareUser.openSitesDocumentLibrary(drone, siteName).render();
+        }
+        else
+        {
+            DetailsPage detailsPage = ShareUser.getCurrentPage(drone).render();
+            detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
+        }
         Assert.assertTrue(ShareUserSitePage.getFileDirectoryInfo(drone, folderName).isEXIFIconDisplayed(), "Verifying \"EXIF Metadata icon\" is displayed");
 
         ShareUser.logout(drone);
@@ -679,12 +685,17 @@ public class CmisFolderAspectUtils extends AbstractCmisSecondaryTypeIDTests
         Assert.assertNull(getPropertyValue(folderProperties, "isoSpeedRatings"));
         Assert.assertNull(getPropertyValue(folderProperties, "fNumber"));
         Assert.assertNull(getPropertyValue(folderProperties, "exposureTime"));
-
-        DetailsPage detailsPage = ShareUser.getCurrentPage(drone).render();
-        detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
-
+        
+        if(alfrescoVersion.isCloud())
+        {
+            ShareUser.openSitesDocumentLibrary(drone, siteName);
+        }
+        else
+        {
+            DetailsPage detailsPage = ShareUser.getCurrentPage(drone).render();
+            detailsPage.getSiteNav().selectSiteDocumentLibrary().render();
+        }
         Assert.assertFalse(ShareUserSitePage.getFileDirectoryInfo(drone, folderName).isEXIFIconDisplayed(), "Verifying \"EXIF Metadata icon\" is NOT displayed");
-
         ShareUser.logout(drone);
     }
 

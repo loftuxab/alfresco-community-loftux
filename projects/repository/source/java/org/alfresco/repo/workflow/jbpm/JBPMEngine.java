@@ -230,7 +230,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * Sets the JBPM Template used for accessing JBoss JBPM in the correct
      * context
      * 
-     * @param jbpmTemplate
+     * @param jbpmTemplate JbpmTemplate
      */
     public void setJBPMTemplate(JbpmTemplate jbpmTemplate)
     {
@@ -240,7 +240,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Node Service
      * 
-     * @param nodeService
+     * @param nodeService NodeService
      */
     public void setNodeService(NodeService nodeService)
     {
@@ -250,7 +250,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Person Service
      * 
-     * @param personService
+     * @param personService PersonService
      */
     public void setPersonService(PersonService personService)
     {
@@ -260,7 +260,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Authority DAO
      * 
-     * @param authorityDAO
+     * @param authorityDAO AuthorityDAO
      */
     public void setAuthorityDAO(AuthorityDAO authorityDAO)
     {
@@ -270,7 +270,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Service Registry
      *  
-     * @param serviceRegistry
+     * @param serviceRegistry ServiceRegistry
      */
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
@@ -280,7 +280,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Company Home Path
      * 
-     * @param companyHomePath
+     * @param companyHomePath String
      */
     public void setCompanyHomePath(String companyHomePath)
     {
@@ -290,7 +290,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Sets the Company Home Store
      * 
-     * @param companyHomeStore
+     * @param companyHomeStore String
      */
     public void setCompanyHomeStore(String companyHomeStore)
     {
@@ -302,7 +302,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * company home when folk do not have read access to company home TODO:
      * review use with DC
      * 
-     * @param unprotectedSearchService
+     * @param unprotectedSearchService SearchService
      */
     public void setUnprotectedSearchService(SearchService unprotectedSearchService)
     {
@@ -2041,8 +2041,8 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Construct a JBPM Hibernate query based on the Task Query provided
      * 
-     * @param session
-     * @param query
+     * @param session Session
+     * @param query WorkflowTaskQuery
      * @return  jbpm hiberate query criteria
      */
     private Criteria createTaskQueryCriteria(Session session, WorkflowTaskQuery query)
@@ -2207,8 +2207,8 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     }
 
     /**
-     * @param variables
-     * @return
+     * @param variables Criteria
+     * @return Disjunction
      */
     private Disjunction createProcessIdCriteria(Criteria variables)
     {
@@ -2264,9 +2264,9 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Create process-specific query criteria
      * 
-     * @param root
-     * @param query
-     * @return
+     * @param root Criteria
+     * @param query WorkflowTaskQuery
+     * @return Criteria
      */
     private Criteria createProcessCriteria(Criteria root, WorkflowTaskQuery query)
     {
@@ -2725,7 +2725,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * Construct a Process Definition from the provided Process Definition
      * stream
      * 
-     * @param workflowDefinition
+     * @param definitionStream
      *            stream to create process definition from
      * @param mimetype
      *            mimetype of stream
@@ -2858,7 +2858,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * Gets Properties of Task
      * 
      * @param instance task instance
-     * @param properties properties to set
+     * @param localProperties properties to set
      */
     protected Map<QName, Serializable> getTaskProperties(TaskInstance instance, boolean localProperties)
     {
@@ -2869,7 +2869,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * Gets Properties of Task
      * 
      * @param instance task instance
-     * @param properties properties to set
+     * @param localProperties properties to set
      * @param variablesCache cahce of context instance variables if any exists
      */
     @SuppressWarnings("unchecked")
@@ -3361,7 +3361,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * Attempts to convert a JBPM Object to the correct Alfresco data type
      * @param propDef PropertyDefinition
      * @param value any Value
-     * @return 
+     * @return Serializable
      */
     private Serializable convertValue(PropertyDefinition propDef, Object value)
     {
@@ -3466,7 +3466,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Convert person name to an Alfresco Person
      * 
-     * @param names
+     * @param name
      *            the person name to convert
      * @return  the Alfresco person
      */
@@ -3487,7 +3487,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Convert authority name to an Alfresco Authority
      * 
-     * @param names
+     * @param name
      *            the authority names to convert
      * @return  the Alfresco authorities
      */
@@ -3508,7 +3508,7 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     /**
      * Convert Alfresco authority to actor id
      *  
-     * @param authority
+     * @param authority NodeRef
      * @return  actor id
      */
     private String mapAuthorityToName(NodeRef authority)
@@ -3589,8 +3589,6 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * 
      * @param token
      *            JBoss JBPM Token
-     * @param wfInstance 
-     * @param node 
      * @return  Workflow Path
      */
     protected WorkflowPath createWorkflowPath(Token token)
@@ -3607,8 +3605,8 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * 
      * @param token
      *            JBoss JBPM Token
-     * @param wfInstance
-     * @param node
+     * @param wfInstance WorkflowInstance
+     * @param node WorkflowNode
      * @return Workflow Path
      */
     protected WorkflowPath createWorkflowPath(Token token, WorkflowInstance wfInstance, WorkflowNode node)
@@ -3705,8 +3703,9 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * 
      * @param instance
      *            JBoss JBPM Process Instance
-     * @param endDate
-     * @param variables 
+     * @param definition WorkflowDefinition
+     * @param endDate Date
+     * @param variables Map<String, Object>
      * @return  Workflow instance
      */
     protected WorkflowInstance createWorkflowInstance(ProcessInstance instance, WorkflowDefinition definition, Date endDate, Map<String, Object> variables)
@@ -3759,8 +3758,8 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
     
     /**
      *      * Creates a Workflow Task
-     * @param task
-     * @return
+     * @param task TaskInstance
+     * @return WorkflowTask
      */
     protected WorkflowTask createWorkflowTask(TaskInstance task)
     {
@@ -3775,9 +3774,9 @@ public class JBPMEngine extends AlfrescoBpmEngine implements WorkflowEngine
      * 
      * @param task
      *            JBoss Task Instance
-     * @param taskDef 
-     * @param path 
-     * @param properties 
+     * @param definition task definition
+     * @param path WorkflowPath
+     * @param properties Map<QName, Serializable>
      * @return  Workflow Task
      */
     private WorkflowTask createWorkflowTask(TaskInstance task, WorkflowTaskDefinition definition, WorkflowPath path, Map<QName, Serializable> properties)

@@ -28,9 +28,6 @@ import org.alfresco.service.cmr.dictionary.DictionaryException;
  * Constraint implementation that defers to constraints registered with the
  * static instance of the {@link ConstraintRegistry}.
  * 
- * @see #setAllowedValues(List)
- * @see #setCaseSensitive(boolean)
- * 
  * @author Derek Hulley
  */
 public final class RegisteredConstraint implements Constraint

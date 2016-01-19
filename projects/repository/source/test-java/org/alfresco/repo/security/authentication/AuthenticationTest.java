@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
+ * Copyright (C) 2005-2014 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,13 +18,19 @@
  */
 package org.alfresco.repo.security.authentication;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
@@ -39,11 +45,12 @@ import net.sf.acegisecurity.DisabledException;
 import net.sf.acegisecurity.LockedException;
 import net.sf.acegisecurity.UserDetails;
 import net.sf.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import net.sf.acegisecurity.providers.encoding.PasswordEncoder;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.admin.SysAdminParamsImpl;
 import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.management.subsystems.ChildApplicationContextFactory;
 import org.alfresco.repo.management.subsystems.ChildApplicationContextManager;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -53,6 +60,7 @@ import org.alfresco.repo.security.authentication.InMemoryTicketComponentImpl.Tic
 import org.alfresco.repo.security.authentication.RepositoryAuthenticationDao.CacheEntry;
 import org.alfresco.repo.tenant.TenantAdminService;
 import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport.TxnReadState;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -60,6 +68,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
@@ -86,8 +95,7 @@ public class AuthenticationTest extends TestCase
     private AuthorityService authorityService;
     private TenantService tenantService;
     private TenantAdminService tenantAdminService;
-    private MD4PasswordEncoder passwordEncoder;
-    private PasswordEncoder sha256PasswordEncoder;
+    private CompositePasswordEncoder compositePasswordEncoder;
     private MutableAuthenticationDao dao;
     private AuthenticationManager authenticationManager;
     private TicketComponent ticketComponent;
@@ -99,12 +107,15 @@ public class AuthenticationTest extends TestCase
     private TransactionService transactionService;
     private PersonService pubPersonService;
     private PersonService personService;
+    private SysAdminParamsImpl sysAdminParams;
 
     private UserTransaction userTransaction;
     private NodeRef rootNodeRef;
     private NodeRef systemNodeRef;
     private NodeRef typesNodeRef;
     private NodeRef personAndyNodeRef;
+
+    private static char[] DONT_CARE_PASSWORD = "1 really don't care".toCharArray();
 
     // TODO: pending replacement
     private Dialect dialect;
@@ -114,6 +125,11 @@ public class AuthenticationTest extends TestCase
 
     private SimpleCache<String, CacheEntry> authenticationCache;    
     private SimpleCache<String, NodeRef> immutableSingletonCache;
+
+    private static final String TEST_RUN = System.currentTimeMillis()+"";
+    private static final String TEST_TENANT_DOMAIN = TEST_RUN+".my.test";
+    private static final String DEFAULT_ADMIN_PW = "admin";
+    private static final String TENANT_ADMIN_PW = DEFAULT_ADMIN_PW + TEST_TENANT_DOMAIN;
 
     public AuthenticationTest()
     {
@@ -135,13 +151,11 @@ public class AuthenticationTest extends TestCase
         }
         
         dialect = (Dialect) ctx.getBean("dialect");
-        
         nodeService = (NodeService) ctx.getBean("nodeService");
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         tenantService = (TenantService) ctx.getBean("tenantService");
         tenantAdminService = (TenantAdminService) ctx.getBean("tenantAdminService");
-        passwordEncoder = (MD4PasswordEncoder) ctx.getBean("passwordEncoder");
-        sha256PasswordEncoder = (PasswordEncoder) ctx.getBean("sha256PasswordEncoder");
+        compositePasswordEncoder = (CompositePasswordEncoder) ctx.getBean("compositePasswordEncoder");
         ticketComponent = (TicketComponent) ctx.getBean("ticketComponent");
         authenticationService = (MutableAuthenticationService) ctx.getBean("authenticationService");
         pubAuthenticationService = (MutableAuthenticationService) ctx.getBean("AuthenticationService");
@@ -156,6 +170,11 @@ public class AuthenticationTest extends TestCase
         // permissionServiceSPI = (PermissionServiceSPI)
         // ctx.getBean("permissionService");
         ticketsCache = (SimpleCache<String, Ticket>) ctx.getBean("ticketsCache");
+
+        ChildApplicationContextFactory sysAdminSubsystem = (ChildApplicationContextFactory) ctx.getBean("sysAdmin");
+        assertNotNull("sysAdminSubsystem", sysAdminSubsystem);
+        ApplicationContext sysAdminCtx  = sysAdminSubsystem.getApplicationContext();
+        sysAdminParams = (SysAdminParamsImpl) sysAdminCtx.getBean("sysAdminParams");
 
         dao = (MutableAuthenticationDao) ctx.getBean("authenticationDao");
         
@@ -215,8 +234,7 @@ public class AuthenticationTest extends TestCase
         dao.setTenantService(tenantService);
         dao.setNodeService(nodeService);
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
-        dao.setPasswordEncoder(passwordEncoder);
-        dao.setSha256PasswordEncoder(sha256PasswordEncoder);
+        dao.setCompositePasswordEncoder(compositePasswordEncoder);
         dao.setPolicyComponent(policyComponent);
         dao.setAuthenticationCache(authenticationCache);
         dao.setSingletonCache(immutableSingletonCache);
@@ -254,7 +272,7 @@ public class AuthenticationTest extends TestCase
     private Map<QName, Serializable> createPersonProperties(String userName)
     {
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
-        properties.put(ContentModel.PROP_USERNAME, "Andy");
+        properties.put(ContentModel.PROP_USERNAME, userName);
         return properties;
     }
 
@@ -376,23 +394,26 @@ public class AuthenticationTest extends TestCase
     public void testGuest()
     {
         authenticationService.authenticate(AuthenticationUtil.getGuestUserName(), "".toCharArray());
+        Set<String> guestUsers = authenticationService.getDefaultGuestUserNames();
+        assertNotNull(guestUsers);
+        assertTrue(guestUsers.contains(AuthenticationUtil.getGuestUserName()));
     }
 
     public void testCreateUsers()
     {
-        authenticationService.createAuthentication(AuthenticationUtil.getGuestUserName(), "".toCharArray());
-        authenticationService.authenticate(AuthenticationUtil.getGuestUserName(), "".toCharArray());
+        authenticationService.createAuthentication(AuthenticationUtil.getGuestUserName(), DONT_CARE_PASSWORD);
+        authenticationService.authenticate(AuthenticationUtil.getGuestUserName(),DONT_CARE_PASSWORD);
         // Guest is treated like any other user
         assertEquals(AuthenticationUtil.getGuestUserName(), authenticationService.getCurrentUserName());
 
-        authenticationService.createAuthentication("Andy", "".toCharArray());
-        authenticationService.authenticate("Andy", "".toCharArray());
+        authenticationService.createAuthentication("Andy", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("Andy", DONT_CARE_PASSWORD);
         assertEquals("Andy", authenticationService.getCurrentUserName());
 
         if (! tenantService.isEnabled())
         {
-            authenticationService.createAuthentication("Mr.Woof.Banana@chocolate.chip.cookie.com", "".toCharArray());
-            authenticationService.authenticate("Mr.Woof.Banana@chocolate.chip.cookie.com", "".toCharArray());
+            authenticationService.createAuthentication("Mr.Woof.Banana@chocolate.chip.cookie.com", DONT_CARE_PASSWORD);
+            authenticationService.authenticate("Mr.Woof.Banana@chocolate.chip.cookie.com", DONT_CARE_PASSWORD);
             assertEquals("Mr.Woof.Banana@chocolate.chip.cookie.com", authenticationService.getCurrentUserName());
         }
         else
@@ -400,12 +421,12 @@ public class AuthenticationTest extends TestCase
             // TODO - could create tenant domain 'chocolate.chip.cookie.com'
         }
 
-        authenticationService.createAuthentication("Andy_Woof/Domain", "".toCharArray());
-        authenticationService.authenticate("Andy_Woof/Domain", "".toCharArray());
+        authenticationService.createAuthentication("Andy_Woof/Domain", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("Andy_Woof/Domain", DONT_CARE_PASSWORD);
         assertEquals("Andy_Woof/Domain", authenticationService.getCurrentUserName());
 
-        authenticationService.createAuthentication("Andy_ Woof/Domain", "".toCharArray());
-        authenticationService.authenticate("Andy_ Woof/Domain", "".toCharArray());
+        authenticationService.createAuthentication("Andy_ Woof/Domain", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("Andy_ Woof/Domain", DONT_CARE_PASSWORD);
         assertEquals("Andy_ Woof/Domain", authenticationService.getCurrentUserName());
 
         if (! tenantService.isEnabled())
@@ -418,8 +439,8 @@ public class AuthenticationTest extends TestCase
                 un = "Andy `\u00ac\u00a6!\u00a3$%^&*()-_=+\t\n[]{};'#:@~,./<>?|";
             }
             
-            authenticationService.createAuthentication(un, "".toCharArray());
-            authenticationService.authenticate(un, "".toCharArray());
+            authenticationService.createAuthentication(un, DONT_CARE_PASSWORD);
+            authenticationService.authenticate(un, DONT_CARE_PASSWORD);
             assertEquals(un, authenticationService.getCurrentUserName());
         }
         else
@@ -436,12 +457,78 @@ public class AuthenticationTest extends TestCase
         dao.setNodeService(nodeService);
         dao.setAuthorityService(authorityService);
         dao.setNamespaceService(getNamespacePrefixReolsver(""));
-        dao.setPasswordEncoder(passwordEncoder);
-        dao.setSha256PasswordEncoder(sha256PasswordEncoder);
+        dao.setCompositePasswordEncoder(compositePasswordEncoder);
         dao.setPolicyComponent(policyComponent);
         dao.setAuthenticationCache(authenticationCache);
         dao.setSingletonCache(immutableSingletonCache);
         return dao;
+    }
+
+    /**
+     * Test for ALF-20680
+     * Test of the {@link RepositoryAuthenticationDao#getUserFolderLocation(String)} in multitenancy
+     */
+    public void testAuthenticateMultiTenant()
+    {
+        // Create a tenant domain
+        TenantUtil.runAsSystemTenant(new TenantUtil.TenantRunAsWork<Object>()
+        {
+            public Object doWork() throws Exception
+            {
+                if (!tenantAdminService.existsTenant(TEST_TENANT_DOMAIN))
+                {
+                    tenantAdminService.createTenant(TEST_TENANT_DOMAIN, TENANT_ADMIN_PW.toCharArray(), null);
+                }
+                return null;
+            }
+        }, TenantService.DEFAULT_DOMAIN);
+
+        // Use default admin
+        authenticateMultiTenantWork(AuthenticationUtil.getAdminUserName(), DEFAULT_ADMIN_PW);
+
+        // Use tenant admin
+        authenticateMultiTenantWork(AuthenticationUtil.getAdminUserName() + TenantService.SEPARATOR + TEST_TENANT_DOMAIN, TENANT_ADMIN_PW);
+    }
+
+    private void authenticateMultiTenantWork(String userName, String password)
+    {
+        String hashedPassword = dao.getMD4HashedPassword(userName);
+        assertNotNull(hashedPassword);
+        assertEquals(compositePasswordEncoder.encode("md4",password, null), hashedPassword);
+    }
+
+    /**
+     * Test for ACE-4909
+     */
+    public void testCheckUserDisabledTenant()
+    {
+        AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
+        String domainName = "ace4909.domain";
+        String userName = "ace4909" + TenantService.SEPARATOR + domainName;
+        Map<QName, Serializable> props = createPersonProperties(userName);
+        NodeRef userNodeRef = personService.createPerson(props);
+        assertNotNull(userNodeRef);
+        authenticationService.createAuthentication(userName, "passwd".toCharArray());
+        tenantAdminService.createTenant(domainName, TENANT_ADMIN_PW.toCharArray(), null);
+        tenantAdminService.disableTenant(domainName);
+        assertTrue("The user should exist", dao.userExists(userName));
+    }
+
+    /**
+     * Test for ACE-4909
+     */
+    public void testCheckUserDeletedTenant()
+    {
+        AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
+        String domainName = "ace4909.domain";
+        String userName = "ace4909" + TenantService.SEPARATOR + domainName;
+        Map<QName, Serializable> props = createPersonProperties(userName);
+        NodeRef userNodeRef = personService.createPerson(props);
+        assertNotNull(userNodeRef);
+        authenticationService.createAuthentication(userName, "passwd".toCharArray());
+        tenantAdminService.createTenant(domainName, TENANT_ADMIN_PW.toCharArray(), null);
+        tenantAdminService.deleteTenant(domainName);
+        assertTrue("The user should exist", dao.userExists(userName));
     }
 
     public void testCreateAndyUserAndOtherCRUD() throws NoSuchAlgorithmException, UnsupportedEncodingException
@@ -450,10 +537,6 @@ public class AuthenticationTest extends TestCase
         
         dao.createUser("Andy", "cabbage".toCharArray());
         assertNotNull(dao.getUserOrNull("Andy"));
-
-        byte[] decodedHash = passwordEncoder.decodeHash(dao.getMD4HashedPassword("Andy"));
-        byte[] testHash = MessageDigest.getInstance("MD4").digest("cabbage".getBytes("UnicodeLittleUnmarked"));
-        assertEquals(new String(decodedHash), new String(testHash));
 
         UserDetails AndyDetails = (UserDetails) dao.loadUserByUsername("Andy");
         assertNotNull(AndyDetails);
@@ -464,7 +547,7 @@ public class AuthenticationTest extends TestCase
         assertTrue(AndyDetails.isCredentialsNonExpired());
         assertTrue(AndyDetails.isEnabled());
         assertNotSame("cabbage", AndyDetails.getPassword());
-        assertEquals(AndyDetails.getPassword(), passwordEncoder.encodePassword("cabbage", dao.getSalt(AndyDetails)));
+        assertTrue(compositePasswordEncoder.matches(compositePasswordEncoder.getPreferredEncoding(),"cabbage", AndyDetails.getPassword(), null));
         assertEquals(1, AndyDetails.getAuthorities().length);
 
         // Object oldSalt = dao.getSalt(AndyDetails);
@@ -481,24 +564,21 @@ public class AuthenticationTest extends TestCase
         assertEquals(1, newDetails.getAuthorities().length);
 
         assertNotSame(AndyDetails.getPassword(), newDetails.getPassword());
+        RepositoryAuthenticatedUser rau = (RepositoryAuthenticatedUser) newDetails;
+        assertTrue(compositePasswordEncoder.matchesPassword("carrot", newDetails.getPassword(), null, rau.getHashIndicator()));
         // assertNotSame(oldSalt, dao.getSalt(newDetails));
+
+        //Update again
+        dao.updateUser("Andy", "potato".toCharArray());
+        newDetails = (UserDetails) dao.loadUserByUsername("Andy");
+        assertNotNull(newDetails);
+        assertEquals("Andy", newDetails.getUsername());
+        rau = (RepositoryAuthenticatedUser) newDetails;
+        assertTrue(compositePasswordEncoder.matchesPassword("potato", newDetails.getPassword(), null, rau.getHashIndicator()));
 
         dao.deleteUser("Andy");
         assertFalse("Should not be a cache entry for 'Andy'.", authenticationCache.contains("Andy"));
         assertNull("DAO should report that 'Andy' does not exist.", dao.getUserOrNull("Andy"));
-
-        MessageDigest digester;
-        try
-        {
-            digester = MessageDigest.getInstance("MD4");
-            System.out.println("Digester from " + digester.getProvider());
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            System.out.println("No digester");
-        }
     }
     
     /** 
@@ -544,9 +624,9 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthentication()
     {
-        dao.createUser("GUEST", "".toCharArray());
+        dao.createUser("GUEST", DONT_CARE_PASSWORD);
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("GUEST", "");
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("GUEST", new String(DONT_CARE_PASSWORD));
         token.setAuthenticated(false);
 
         Authentication result = authenticationManager.authenticate(token);
@@ -1097,8 +1177,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationServiceGetNewTicket()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1130,8 +1210,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService1()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1166,8 +1246,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService2()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1202,8 +1282,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService3()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1249,8 +1329,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService4()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1306,8 +1386,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1366,8 +1446,8 @@ public class AuthenticationTest extends TestCase
 
     public void testAuthenticationService0()
     {
-        authenticationService.createAuthentication("GUEST", "".toCharArray());
-        authenticationService.authenticate("GUEST", "".toCharArray());
+        authenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
+        authenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
         authenticationService.createAuthentication("Andy", "auth1".toCharArray());
@@ -1423,10 +1503,10 @@ public class AuthenticationTest extends TestCase
     public void testPubAuthenticationService1()
     {
         authenticationComponent.setSystemUserAsCurrentUser();
-        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
 
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
 
@@ -1471,10 +1551,10 @@ public class AuthenticationTest extends TestCase
     public void testPubAuthenticationService2()
     {
         authenticationComponent.setSystemUserAsCurrentUser();
-        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
 
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
 
@@ -1518,10 +1598,10 @@ public class AuthenticationTest extends TestCase
     public void testPubAuthenticationService3()
     {
         authenticationComponent.setSystemUserAsCurrentUser();
-        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
 
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
 
         // create an authentication object e.g. the user
 
@@ -1583,12 +1663,12 @@ public class AuthenticationTest extends TestCase
 
         assertNull(authenticationComponent.getCurrentAuthentication());
         authenticationComponent.setSystemUserAsCurrentUser();
-        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
 
         assertNull(authenticationComponent.getCurrentAuthentication());
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
         assertNull(authenticationComponent.getCurrentAuthentication());
 
@@ -1644,12 +1724,12 @@ public class AuthenticationTest extends TestCase
 
         assertNull(authenticationComponent.getCurrentAuthentication());
         authenticationComponent.setSystemUserAsCurrentUser();
-        pubAuthenticationService.createAuthentication("GUEST", "".toCharArray());
+        pubAuthenticationService.createAuthentication("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
 
         assertNull(authenticationComponent.getCurrentAuthentication());
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
-        pubAuthenticationService.authenticate("GUEST", "".toCharArray());
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
+        pubAuthenticationService.authenticate("GUEST", DONT_CARE_PASSWORD);
         authenticationComponent.clearCurrentSecurityContext();
         assertNull(authenticationComponent.getCurrentAuthentication());
 
@@ -1729,6 +1809,61 @@ public class AuthenticationTest extends TestCase
 
         // authenticationService.deleteAuthentication("andy");
     }
+    public void testAuthenticationServiceImpl()
+    {
+        Set<String> domains = authenticationService.getDomains();
+        assertNotNull(domains);
+        domains = authenticationService.getDomainsThatAllowUserCreation();
+        assertNotNull(domains);
+        domains = authenticationService.getDomiansThatAllowUserPasswordChanges();
+        assertNotNull(domains);
+        domains = authenticationService.getDomainsThatAllowUserDeletion();
+        assertNotNull(domains);
+
+        List<AuthenticationService> services = ((AbstractChainingAuthenticationService) authenticationService).getUsableAuthenticationServices();
+        for (AuthenticationService service : services)
+        {
+            if (service instanceof AuthenticationServiceImpl)
+            {
+                AuthenticationServiceImpl impl = (AuthenticationServiceImpl) service;
+
+                assertFalse("Not just anyone", impl.authenticationExists("anyone"));
+                assertFalse("Hardcoded to true", impl.getAuthenticationEnabled("anyone"));
+                authenticationService.invalidateUserSession("anyone");
+
+                impl.setDomain("mydomain");
+                String domain = impl.getDomain();
+                assertEquals("mydomain", domain);
+                Set<TicketComponent> ticketComponents = impl.getTicketComponents();
+                assertNotNull(ticketComponents);
+
+                boolean allows = impl.getAllowsUserPasswordChange();
+                impl.setAllowsUserPasswordChange(allows);
+                assertEquals(allows, impl.getAllowsUserPasswordChange());
+
+                allows = impl.getAllowsUserDeletion();
+                impl.setAllowsUserDeletion(allows);
+                assertEquals(allows, impl.getAllowsUserDeletion());
+
+                allows = impl.getAllowsUserCreation();
+                impl.setAllowsUserCreation(allows);
+                assertEquals(allows, impl.getAllowsUserCreation());
+
+                assertFalse(impl.isCurrentUserTheSystemUser());
+
+                Set<String> users = impl.getUsersWithTickets(true);
+                assertNotNull(users);
+                int tickets = impl.countTickets(true);
+                assertFalse(tickets < users.size());
+
+                tickets = impl.invalidateTickets(true);
+
+                assertTrue(impl.guestUserAuthenticationAllowed());
+
+                break;
+            }
+        }
+    }
 
     public void testLoginNotExistingTenant()
     {
@@ -1758,7 +1893,240 @@ public class AuthenticationTest extends TestCase
             AuthenticationUtil.setMtEnabled(wasEnabled);
         }
     }
+
+    /**
+     * ACE-3542: test that "server.maxusers" setting limits the number of unique logins to that number.
+     */
+    public void testMaxUsers()
+    {
+        final String user1 = GUID.generate();
+        final String user2 = GUID.generate();
+
+        AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+        {
+            @Override
+            public Void doWork() throws Exception
+            {
+                authenticationService.createAuthentication(user1, "password".toCharArray());
+                authenticationService.createAuthentication(user2, "password".toCharArray());
+                ticketComponent.invalidateTickets(false);
+                return null;
+            }
+        });
+
+        int maxUsers = sysAdminParams.getMaxUsers();
+
+        try
+        {
+            sysAdminParams.setMaxUsers(1);
+
+            authenticationService.authenticate(user1, "password".toCharArray());
+
+            try
+            {
+                authenticationService.authenticate(user2, "password".toCharArray());
+                fail("Number of logins should not exceed maxUsers setting");
+            }
+            catch (AuthenticationException e)
+            {
+                // it is expected exception
+            }
+        }
+        finally
+        {
+            sysAdminParams.setMaxUsers(maxUsers);
+        }
+    }
+
     
+    /**
+     * Tests the scenario where a user logs in after the system has been upgraded.
+     * Their password should get re-hashed using the preferred encoding.
+     */
+    public void testRehashedPasswordOnAuthentication() throws Exception
+    {
+        // create the Andy authentication
+        assertNull(authenticationComponent.getCurrentAuthentication());
+        authenticationComponent.setSystemUserAsCurrentUser();
+        pubAuthenticationService.createAuthentication("Andy", "auth1".toCharArray());
+        
+        // find the node representing the Andy user and it's properties
+        NodeRef andyUserNodeRef = getRepositoryAuthenticationDao(). getUserOrNull("Andy");
+        assertNotNull(andyUserNodeRef);
+        
+        // ensure the properties are in the state we're expecting
+        Map<QName, Serializable> userProps = nodeService.getProperties(andyUserNodeRef);
+        String passwordProp = (String)userProps.get(ContentModel.PROP_PASSWORD);
+        assertNull("Expected the password property to be null", passwordProp);
+        String password2Prop = (String)userProps.get(ContentModel.PROP_PASSWORD_SHA256);
+        assertNull("Expected the password2 property to be null", password2Prop);
+        String passwordHashProp = (String)userProps.get(ContentModel.PROP_PASSWORD_HASH);
+        assertNotNull("Expected the passwordHash property to be populated", passwordHashProp);
+        List<String> hashIndicatorProp = (List<String>)userProps.get(ContentModel.PROP_HASH_INDICATOR);
+        assertNotNull("Expected the hashIndicator property to be populated", hashIndicatorProp);
+     
+        // re-generate an md4 hashed password
+        MD4PasswordEncoderImpl md4PasswordEncoder = new MD4PasswordEncoderImpl();
+        String md4Password = md4PasswordEncoder.encodePassword("auth1", null);
+        
+        // re-generate a sha256 hashed password
+        String salt = (String)userProps.get(ContentModel.PROP_SALT);
+        ShaPasswordEncoderImpl sha256PasswordEncoder = new ShaPasswordEncoderImpl(256);
+        String sha256Password = sha256PasswordEncoder.encodePassword("auth1", salt);
+        
+        // change the underlying user object to represent state in previous release
+        userProps.put(ContentModel.PROP_PASSWORD, md4Password);
+        userProps.put(ContentModel.PROP_PASSWORD_SHA256, sha256Password);
+        userProps.remove(ContentModel.PROP_PASSWORD_HASH);
+        userProps.remove(ContentModel.PROP_HASH_INDICATOR);
+        nodeService.setProperties(andyUserNodeRef, userProps);
+        
+        // make sure the changes took effect
+        Map<QName, Serializable> updatedProps = nodeService.getProperties(andyUserNodeRef);
+        String usernameProp = (String)updatedProps.get(ContentModel.PROP_USER_USERNAME);
+        assertEquals("Expected the username property to be 'Andy'", "Andy", usernameProp);
+        passwordProp = (String)updatedProps.get(ContentModel.PROP_PASSWORD);
+        assertNotNull("Expected the password property to be populated", passwordProp);
+        password2Prop = (String)updatedProps.get(ContentModel.PROP_PASSWORD_SHA256);
+        assertNotNull("Expected the password2 property to be populated", password2Prop);
+        passwordHashProp = (String)updatedProps.get(ContentModel.PROP_PASSWORD_HASH);
+        assertNull("Expected the passwordHash property to be null", passwordHashProp);
+        hashIndicatorProp = (List<String>)updatedProps.get(ContentModel.PROP_HASH_INDICATOR);
+        assertNull("Expected the hashIndicator property to be null", hashIndicatorProp);
+        
+        // authenticate the user
+        authenticationComponent.clearCurrentSecurityContext();
+        pubAuthenticationService.authenticate("Andy", "auth1".toCharArray());
+        assertEquals("Andy", authenticationService.getCurrentUserName());
+        
+        // commit the transaction to invoke the password hashing of the user
+        userTransaction.commit();
+        
+        // start another transaction and change to system user
+        userTransaction = transactionService.getUserTransaction();
+        userTransaction.begin();
+        authenticationComponent.setSystemUserAsCurrentUser();
+        
+        // verify that the new properties are populated and the old ones are cleaned up
+        Map<QName, Serializable> upgradedProps = nodeService.getProperties(andyUserNodeRef);
+        passwordProp = (String)upgradedProps.get(ContentModel.PROP_PASSWORD);
+        assertNull("Expected the password property to be null", passwordProp);
+        password2Prop = (String)upgradedProps.get(ContentModel.PROP_PASSWORD_SHA256);
+        assertNull("Expected the password2 property to be null", password2Prop);
+        passwordHashProp = (String)upgradedProps.get(ContentModel.PROP_PASSWORD_HASH);
+        assertNotNull("Expected the passwordHash property to be populated", passwordHashProp);
+        hashIndicatorProp = (List<String>)upgradedProps.get(ContentModel.PROP_HASH_INDICATOR);
+        assertNotNull("Expected the hashIndicator property to be populated", hashIndicatorProp);
+        assertTrue("Expected there to be a single hash indicator entry", (hashIndicatorProp.size() == 1));
+        String preferredEncoding = compositePasswordEncoder.getPreferredEncoding();
+        String hashEncoding = (String)hashIndicatorProp.get(0);
+        assertEquals("Expected hash indicator to be '" + preferredEncoding + "' but it was: " + hashEncoding, 
+                    preferredEncoding, hashEncoding);
+        
+        // delete the user and clear the security context
+        this.deleteAndy();
+        authenticationComponent.clearCurrentSecurityContext();
+    }
+
+    /**
+     * For on premise the default is MD4, for cloud BCRYPT10
+     *
+     * @throws Exception
+     */
+    public void testDefaultEncodingIsMD4() throws Exception
+    {
+        assertNotNull(compositePasswordEncoder);
+        assertEquals("md4", compositePasswordEncoder.getPreferredEncoding());
+    }
+
+    /**
+     * For on premise the default is MD4, get it
+     *
+     * @throws Exception
+     */
+    public void testGetsMD4Password() throws Exception
+    {
+        String user = "mduzer";
+        String rawPass = "roarPazzw0rd";
+        assertEquals("md4", compositePasswordEncoder.getPreferredEncoding());
+        dao.createUser(user, null, rawPass.toCharArray());
+        NodeRef userNodeRef = getRepositoryAuthenticationDao().getUserOrNull(user);
+        assertNotNull(userNodeRef);
+        String pass = dao.getMD4HashedPassword(user);
+        assertNotNull(pass);
+        assertTrue(compositePasswordEncoder.matches("md4", rawPass, pass, null));
+
+        Map<QName, Serializable> properties = nodeService.getProperties(userNodeRef);
+        properties.remove(ContentModel.PROP_PASSWORD_HASH);
+        properties.remove(ContentModel.PROP_HASH_INDICATOR);
+        properties.remove(ContentModel.PROP_PASSWORD);
+        properties.remove(ContentModel.PROP_PASSWORD_SHA256);
+        String encoded =  compositePasswordEncoder.encode("md4",new String(rawPass), null);
+        properties.put(ContentModel.PROP_PASSWORD, encoded);
+        nodeService.setProperties(userNodeRef, properties);
+        pass = dao.getMD4HashedPassword(user);
+        assertNotNull(pass);
+        assertEquals(encoded, pass);
+        dao.deleteUser(user);
+    }
+
+    /**
+     * Tests creating a user with a Hashed password
+     */
+    public void testCreateUserWithHashedPassword() throws Exception
+    {
+        String SOME_PASSWORD = "1 passw0rd";
+        String defaultencoding = compositePasswordEncoder.getPreferredEncoding();
+        String user1 = "uzer"+GUID.generate();
+        String user2 = "uzer"+GUID.generate();
+        List<String> encs = Arrays.asList("bcrypt10", "md4");
+
+        final String myTestDomain = TEST_TENANT_DOMAIN+"my.test";
+
+        TenantUtil.runAsSystemTenant(new TenantUtil.TenantRunAsWork<Object>() {
+            public Object doWork() throws Exception {
+                if (!tenantAdminService.existsTenant(myTestDomain)) {
+                    tenantAdminService.createTenant(myTestDomain, TENANT_ADMIN_PW.toCharArray(), null);
+                }
+                return null;
+            }
+        }, TenantService.DEFAULT_DOMAIN);
+
+        for (String enc : encs)
+        {
+            compositePasswordEncoder.setPreferredEncoding(enc);
+            String hash = compositePasswordEncoder.encodePreferred(SOME_PASSWORD,null);
+            assertCreateHashed(SOME_PASSWORD, hash, null, user1+ TenantService.SEPARATOR + myTestDomain);
+            assertCreateHashed(SOME_PASSWORD, null, SOME_PASSWORD.toCharArray(), user2+ TenantService.SEPARATOR + myTestDomain);
+        }
+        compositePasswordEncoder.setPreferredEncoding(defaultencoding);
+    }
+
+    private void assertCreateHashed(String rawString, String hash, char[] rawPassword, String user)
+    {
+        dao.createUser(user, hash, rawPassword);
+        UserDetails userDetails = (UserDetails) dao.loadUserByUsername(user);
+        assertNotNull(userDetails);
+        assertNotNull(userDetails.getPassword());
+        assertTrue(compositePasswordEncoder.matches(compositePasswordEncoder.getPreferredEncoding(), rawString, userDetails.getPassword(), null));
+        dao.deleteUser(user);
+    }
+
+    private RepositoryAuthenticationDao getRepositoryAuthenticationDao()
+    {
+        RepositoryAuthenticationDao dao = new RepositoryAuthenticationDao();
+        dao.setTransactionService(transactionService);
+        dao.setAuthorityService(authorityService);
+        dao.setTenantService(tenantService);
+        dao.setNodeService(nodeService);
+        dao.setNamespaceService(getNamespacePrefixReolsver(""));
+        dao.setCompositePasswordEncoder(compositePasswordEncoder);
+        dao.setPolicyComponent(policyComponent);
+        dao.setAuthenticationCache(authenticationCache);
+        dao.setSingletonCache(immutableSingletonCache);
+        return dao;
+    }
+
     private String getUserName(Authentication authentication)
     {
         String username = authentication.getPrincipal().toString();

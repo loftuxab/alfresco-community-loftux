@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -19,8 +19,7 @@
 package org.alfresco.repo.action;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.extensions.surf.util.I18NUtil;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -50,15 +49,17 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	protected static final String DISPLAY_LABEL = "display-label";
 	
 	/**
-	 * Action service
-	 */
-	protected RuntimeActionService runtimeActionService;
-    
-	/**
 	 * Indicates whether or not ad-hoc properties can be provided. Default so false. 
 	 */
 	protected boolean adhocPropertiesAllowed = false;
 	
+    /**
+     * Action service
+     */
+    protected RuntimeActionService runtimeActionService;
+
+    private Set<Locale> locales = new HashSet<Locale>();
+
     /**
      * @return Return a short title and description string
      */
@@ -71,35 +72,72 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
           .append("]");
         return sb.toString();
     }
-	
-	/**
-	 * Gets a list containing the parameter definitions for this rule item.
-	 * 
-	 * @return  the list of parameter definitions
-	 */
-	protected List<ParameterDefinition> getParameterDefintions() 
-	{
-		List<ParameterDefinition> result = new ArrayList<ParameterDefinition>();		
-		addParameterDefinitions(result);
-		return result;
-	}
-	
-	/**
-	 * Adds the parameter definitions to the list
-	 * 
-	 * @param paramList		the parameter definitions list
-	 */
-	protected abstract void addParameterDefinitions(List<ParameterDefinition> paramList);
 
-	/**
-	 * Sets the action service 
-	 * 
-	 * @param actionRegistration the action service
-	 */
-	public void setRuntimeActionService(RuntimeActionService runtimeActionService)
-	{
-		this.runtimeActionService = runtimeActionService;
-	}
+    public void setLocales(Set<Locale> locales)
+    {
+        this.locales = locales;
+    }
+
+    /**
+     * Gets a list containing the parameter definitions for this rule item.
+     * 
+     * @return  the list of parameter definitions
+     */
+    protected List<ParameterDefinition> getParameterDefintions()
+    {
+        List<ParameterDefinition> result = new ArrayList<ParameterDefinition>();
+        addParameterDefinitions(result);
+        return result;
+    }
+    
+    /**
+     * Adds the parameter definitions to the list
+     * 
+     * @param paramList     the parameter definitions list
+     */
+    protected abstract void addParameterDefinitions(List<ParameterDefinition> paramList);
+
+    /**
+     * Gets a list containing the parameter definitions for this rule item.
+     *
+     * @return  the map of parameter definitions with locales
+     */
+    protected Map<Locale, List<ParameterDefinition>> getLocalizedParameterDefinitions()
+    {
+        List<ParameterDefinition> paramList = new LinkedList<ParameterDefinition>();
+        addParameterDefinitions(paramList);
+        Map<Locale, List<ParameterDefinition>> result = new HashMap<Locale, List<ParameterDefinition>>();
+        result.put(Locale.ROOT, paramList);
+
+        for (Locale locale : locales)
+        {
+            List<ParameterDefinition> definitions = new LinkedList<ParameterDefinition>();
+            result.put(locale, definitions);
+            for (ParameterDefinition definition : paramList)
+            {
+                String paramDisplayLabel = getParamDisplayLabel(definition.getName(), locale);
+                definitions.add(
+                        new ParameterDefinitionImpl(
+                                definition.getName(),
+                                definition.getType(),
+                                definition.isMandatory(),
+                                paramDisplayLabel,
+                                definition.isMultiValued()
+                        ));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Sets the action service 
+     * 
+	 * @param runtimeActionService the action service
+     */
+    public void setRuntimeActionService(RuntimeActionService runtimeActionService)
+    {
+        this.runtimeActionService = runtimeActionService;
+    }
 
 	/**
 	 * Gets the title I18N key
@@ -124,7 +162,7 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	/**
 	 * Setter for Spring injection of adhocPropertiesAllowed property
 	 * 
-	 * @param allowed
+	 * @param allowed boolean
 	 */
 	public void setAdhocPropertiesAllowed(boolean allowed)
 	{
@@ -148,11 +186,22 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	 * @param paramName  the name of the parameter
 	 * @return			 the diaplay label of the parameter
 	 */
-	protected String getParamDisplayLabel(String paramName) 
+	protected String getParamDisplayLabel(String paramName)
 	{
 		return I18NUtil.getMessage(this.name + "." + paramName + "." + DISPLAY_LABEL);
 	}
-	
+
+    /**
+     * Gets the parameter definition display label from the properties file.
+     *
+     * @param paramName  the name of the parameter
+     * @param locale  the name of the locale
+     * @return	the display label of the parameter
+     */
+    protected String getParamDisplayLabel(String paramName, Locale locale)
+    {
+        return I18NUtil.getMessage(this.name + "." + paramName + "." + DISPLAY_LABEL, locale);
+    }
 	/**
 	 * Checked whether all the mandatory parameters for the rule item have been assigned.
 	 * 
@@ -162,19 +211,23 @@ public abstract class ParameterizedItemAbstractBase extends CommonResourceAbstra
 	protected void checkMandatoryProperties(ParameterizedItem ruleItem, ParameterizedItemDefinition ruleItemDefinition)
 	{
         List<ParameterDefinition> definitions = ruleItemDefinition.getParameterDefinitions();
-        for (ParameterDefinition definition : definitions)
+        if (definitions!= null && definitions.size()>0)
         {
-            if (definition.isMandatory() == true)
+            for (ParameterDefinition definition : definitions)
             {
-                // Check that a value has been set for the mandatory parameter
-                if (ruleItem.getParameterValue(definition.getName()) == null)
+                if (definition.isMandatory() == true)
                 {
-                    // Error since a mandatory parameter has a null value
-                   throw new RuleServiceException(
-                          MessageFormat.format(ERR_MAND_PROP, new Object[]{definition.getName(), ruleItemDefinition.getName()}));
+                    // Check that a value has been set for the mandatory parameter
+                    if (ruleItem.getParameterValue(definition.getName()) == null)
+                    {
+                        // Error since a mandatory parameter has a null value
+                        throw new RuleServiceException(
+                                MessageFormat.format(ERR_MAND_PROP, new Object[]{definition.getName(), ruleItemDefinition.getName()}));
+                    }
                 }
             }
         }
+
         
 	}
 }

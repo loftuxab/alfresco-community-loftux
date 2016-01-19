@@ -2,6 +2,7 @@
 
    <imports>
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
    </imports>
    
    <namespaces>
@@ -11,6 +12,7 @@
    <types>
       
       <type name="test:base">
+         <parent>sys:base</parent>
          <properties>
             <property name="test:base_a">
                <type>d:text</type>
@@ -57,7 +59,33 @@
             </association>
          </associations>            
       </type>
-      
+
+      <type name="test:a_type">
+         <parent>sys:base</parent>
+         <properties>
+            <property name="test:a_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="test:b_type">
+         <parent>test:a_type</parent>
+         <properties>
+            <property name="test:b_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="test:c_type">
+         <parent>test:b_type</parent>
+         <properties>
+            <property name="test:c_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
    </types>
    
    <aspects>

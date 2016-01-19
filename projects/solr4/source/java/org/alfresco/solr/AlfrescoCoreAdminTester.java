@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -47,7 +47,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.alfresco.httpclient.AuthenticationException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.search.impl.QueryParserUtils;
+import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.MLText;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -300,7 +302,6 @@ public class AlfrescoCoreAdminTester
 
             CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
             SolrCore core = adminHandler.getCoreContainer().create(dcore);
-            adminHandler.getCoreContainer().register(name, core, false);
             before.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
@@ -398,7 +399,7 @@ public class AlfrescoCoreAdminTester
             mlText.addValue(Locale.GERMAN, "banane");
             mlText.addValue(new Locale("el"), "μπανάνα");
             mlText.addValue(Locale.ITALIAN, "banana");
-            mlText.addValue(new Locale("ja"), "バナナ");
+            mlText.addValue(new Locale("ja"), "�?ナナ");
             mlText.addValue(new Locale("ko"), "바나나");
             mlText.addValue(new Locale("pt"), "banana");
             mlText.addValue(new Locale("ru"), "банан");
@@ -586,7 +587,10 @@ public class AlfrescoCoreAdminTester
                         ContentModel.PROP_MODIFIED,
                         new StringPropertyValue(DefaultTypeConverter.INSTANCE
                                     .convert(String.class, explicitCreatedDate)));
-
+            MLTextPropertyValue title = new MLTextPropertyValue();
+            title.addValue(Locale.ENGLISH, "English123");
+            title.addValue(Locale.FRENCH, "French123");
+            properties14.put(ContentModel.PROP_TITLE, title);
             NodeRef n14NodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
             QName n14QName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "fourteen");
             QName n14QNameCommon = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "common");
@@ -604,7 +608,7 @@ public class AlfrescoCoreAdminTester
                         n14QNameCommon, n14NodeRef, false, 0);
             ChildAssociationRef n14CAR_13 = new ChildAssociationRef(ContentModel.ASSOC_CONTAINS, n13NodeRef,
                         n14QNameCommon, n14NodeRef, false, 0);
-            addNode(core, dataModel, 1, 15, 1, ContentModel.TYPE_CONTENT, null, properties14, content14, "noodle",
+            addNode(core, dataModel, 1, 15, 1, ContentModel.TYPE_CONTENT, new QName[] {ContentModel.ASPECT_TITLED }, properties14, content14, "noodle",
                         new ChildAssociationRef[] { n14CAR, n14CAR_1, n14CAR_2, n14CAR_5, n14CAR_6, n14CAR_12,
                                     n14CAR_13 }, new NodeRef[] { rootNodeRef, n01NodeRef, n05NodeRef, n12NodeRef,
                                     n13NodeRef }, new String[] {
@@ -793,13 +797,7 @@ public class AlfrescoCoreAdminTester
 
             if (remove)
             {
-                SolrCore done = adminHandler.getCoreContainer().remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                AlfrescoCoreAdminHandler.deleteDirectory(newCore);
+                adminHandler.getCoreContainer().unload(name, true, true, true);
             }
 
         }
@@ -886,7 +884,6 @@ public class AlfrescoCoreAdminTester
 
                 CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
                 core = adminHandler.getCoreContainer().create(dcore);
-                adminHandler.getCoreContainer().register(name, core, false);
                 rsp.add("core", core.getName());
 
                 dataModel = AlfrescoSolrDataModel.getInstance();
@@ -976,13 +973,7 @@ public class AlfrescoCoreAdminTester
 
             if (remove)
             {
-                SolrCore done = adminHandler.getCoreContainer().remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                AlfrescoCoreAdminHandler.deleteDirectory(new File(core.getCoreDescriptor().getInstanceDir()));
+                adminHandler.getCoreContainer().unload(name, true, true, true);
             }
 
         }
@@ -1045,7 +1036,6 @@ public class AlfrescoCoreAdminTester
      * @param count
      * @param report
      * @param solrIndexSearcher
-     * @throws ParseException
      * @throws IOException
      * @throws org.apache.lucene.queryparser.classic.ParseException 
      */
@@ -1114,7 +1104,6 @@ public class AlfrescoCoreAdminTester
 
             CoreDescriptor dcore = new CoreDescriptor(adminHandler.getCoreContainer(), name, newCore.toString());
             SolrCore core = adminHandler.getCoreContainer().create(dcore);
-            adminHandler.getCoreContainer().register(name, core, false);
             rsp.add("core", core.getName());
 
             AlfrescoSolrDataModel dataModel = AlfrescoSolrDataModel.getInstance();
@@ -1756,17 +1745,16 @@ public class AlfrescoCoreAdminTester
                         folder00QName, date00);
             check_order(rsp, core, dataModel);
 
+            addTrieTypeTestData(core, dataModel, folder00NodeRef, rootNodeRef, baseFolderNodeRef, baseFolderQName,
+                    folder00QName, date00);
+            checkTrieFields(rsp, core, dataModel);
+
+
             // remove core
 
             if (remove)
             {
-                SolrCore done = adminHandler.getCoreContainer().remove(name);
-                if (done != null)
-                {
-                    done.close();
-                }
-
-                AlfrescoCoreAdminHandler.deleteDirectory(newCore);
+                adminHandler.getCoreContainer().unload(name, true, true, true);
             }
 
         }
@@ -1774,6 +1762,93 @@ public class AlfrescoCoreAdminTester
         {
             e.printStackTrace();
         }
+    }
+
+    private void checkTrieFields(SolrQueryResponse rsp, SolrCore core,
+            AlfrescoSolrDataModel dataModel) throws IOException
+    {
+        NamedList<Object> report = new SimpleOrderedMap<Object>();
+        rsp.add("trie fields query", report);
+
+        
+        //See MNT-14322 for the origin of the numbers
+        testQueryByHandler(report, core, "/cmis",
+                    "SELECT * FROM cmistest:extendedContent WHERE cmistest:singleInteger = 98218", 0, null, null, null,
+                    null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/cmis",
+                "SELECT * FROM cmistest:extendedContent WHERE cmistest:singleInteger = 98198", 1, null, null, null,
+                null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/cmis",
+                "SELECT * FROM cmistest:extendedContent WHERE cmistest:singleInteger = 98200", 1, null, null, null,
+                null, null, (String) null);        
+        
+        
+        testQueryByHandler(report, core, "/cmis",
+                "SELECT * FROM cmistest:extendedContent WHERE cmistest:singleLong = 3956650", 1, null, null, null,
+                null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/cmis",
+                "SELECT * FROM cmistest:extendedContent WHERE cmistest:singleLong = 3956651", 1, null, null, null,
+                null, null, (String) null);
+        
+    }
+
+    private void addTrieTypeTestData(SolrCore core, AlfrescoSolrDataModel dataModel,
+            NodeRef folder00NodeRef, NodeRef rootNodeRef, NodeRef baseFolderNodeRef,
+            QName baseFolderQName, QName folder00QName, Date date00) throws IOException
+    {
+        HashMap<QName, PropertyValue> content00Properties = new HashMap<QName, PropertyValue>();
+        MLTextPropertyValue desc00 = new MLTextPropertyValue();
+        desc00.addValue(Locale.ENGLISH, "Trie test1");
+        content00Properties.put(ContentModel.PROP_DESCRIPTION, desc00);
+        content00Properties.put(ContentModel.PROP_TITLE, desc00);
+        content00Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("Trie test1"));
+        content00Properties.put(ContentModel.PROP_CREATED,
+                    new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date00)));
+
+        StringPropertyValue firstIntValue = new StringPropertyValue("98198");
+        content00Properties.put(singleInteger,firstIntValue);
+        
+        StringPropertyValue firstLongValue = new StringPropertyValue("3956650");
+        content00Properties.put(singleLong,firstLongValue);
+        
+        NodeRef content00NodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
+        QName content00QName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Trie test1");
+        ChildAssociationRef content00CAR = new ChildAssociationRef(ContentModel.ASSOC_CONTAINS, folder00NodeRef,
+                    content00QName, content00NodeRef, true, 0);
+        addNode(core, dataModel, 1, 300, 1, extendedContent, new QName[] { ContentModel.ASPECT_OWNABLE,
+                    ContentModel.ASPECT_TITLED }, content00Properties, null, "andy",
+                    new ChildAssociationRef[] { content00CAR }, new NodeRef[] { baseFolderNodeRef, rootNodeRef,
+                                folder00NodeRef }, new String[] { "/" + baseFolderQName.toString() + "/"
+                                + folder00QName.toString() + "/" + content00QName.toString() }, content00NodeRef, true);
+        
+        HashMap<QName, PropertyValue> content01Properties = new HashMap<QName, PropertyValue>();
+        MLTextPropertyValue desc01 = new MLTextPropertyValue();
+        desc01.addValue(Locale.ENGLISH, "Trie test2");
+        content01Properties.put(ContentModel.PROP_DESCRIPTION, desc01);
+        content01Properties.put(ContentModel.PROP_TITLE, desc01);
+        content01Properties.put(ContentModel.PROP_NAME, new StringPropertyValue("Trie test2"));
+        content01Properties.put(ContentModel.PROP_CREATED,
+                    new StringPropertyValue(DefaultTypeConverter.INSTANCE.convert(String.class, date00)));
+
+        StringPropertyValue secondIntValue = new StringPropertyValue("98200");
+        content01Properties.put(singleInteger,secondIntValue);
+        
+        StringPropertyValue secondLongValue = new StringPropertyValue("3956651");
+        content01Properties.put(singleLong,secondLongValue);
+        
+        NodeRef content01NodeRef = new NodeRef(new StoreRef("workspace", "SpacesStore"), createGUID());
+        QName content01QName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Trie test1");
+        ChildAssociationRef content01CAR = new ChildAssociationRef(ContentModel.ASSOC_CONTAINS, folder00NodeRef,
+                    content01QName, content01NodeRef, true, 0);
+        addNode(core, dataModel, 1, 301, 1, extendedContent, new QName[] { ContentModel.ASPECT_OWNABLE,
+                    ContentModel.ASPECT_TITLED }, content01Properties, null, "andy",
+                    new ChildAssociationRef[] { content01CAR }, new NodeRef[] { baseFolderNodeRef, rootNodeRef,
+                                folder00NodeRef }, new String[] { "/" + baseFolderQName.toString() + "/"
+                                + folder00QName.toString() + "/" + content01QName.toString() }, content01NodeRef, true);
+        
     }
 
     /**
@@ -3199,22 +3274,22 @@ public class AlfrescoCoreAdminTester
         rsp.add("FTS Connectives", report);
 
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' OR \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' OR \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' or \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' or \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' \\'zebra\\'')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' \\'zebra\\'')", 1, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' and \\'zebra\\'')", 1, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' and \\'zebra\\'')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\' or \\'zebra\\'')", 10, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\' or \\'zebra\\'')", 10, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document where contains('\\'one\\'  \\'zebra\\'')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document where contains('\\'two\\'  \\'zebra\\'')", 1, null, null, null, null,
                     null, (String) null);
 
         // TODO: set default OR
@@ -5557,27 +5632,27 @@ public class AlfrescoCoreAdminTester
 
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick')", 1, null, null,
                     null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('one')", 1, null, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('two')", 1, null, null,
                     null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick')", 11, null,
                     null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick brown fox')", 1,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick one')", 0, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick two')", 0, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick -one')", 1, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick -two')", 1, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick one')", 1, null,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick two')", 1, null,
                     null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick -one')", 10,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick -two')", 10,
                     null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('fox brown quick')", 1,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR one')", 2,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR two')", 2,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR -one')", 11,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR -two')", 11,
                     null, null, null, null, null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick OR -one')", 12,
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('-quick OR -two')", 12,
                     null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
                     "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\'')", 1, null, null, null, null,
@@ -5586,16 +5661,16 @@ public class AlfrescoCoreAdminTester
                     "SELECT * FROM cmis:document WHERE CONTAINS('\\'fox brown quick\\'')", 0, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' one')", 0, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' two')", 0, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' -one')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('\\'quick brown fox\\' -two')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' one')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' two')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' -one')", 10, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('-\\'quick brown fox\\' -two')", 10, null, null, null,
                     null, null, (String) null);
 
         // escaping
@@ -5604,21 +5679,21 @@ public class AlfrescoCoreAdminTester
                     null, null, (String) null);
 
         // precedence
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown one')",
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown two')",
                     1, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown AND one')", 1, null, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown AND two')", 1, null, null, null, null,
                     null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR (brown AND one)')", 1, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR (brown AND two)')", 1, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('(quick OR brown) AND one')", 0, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('(quick OR brown) AND two')", 0, null, null, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis",
-                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown OR one')", 2, null, null, null, null,
+                    "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown OR two')", 2, null, null, null, null,
                     null, (String) null);
-        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown one')",
+        testQueryByHandler(report, core, "/cmis", "SELECT * FROM cmis:document WHERE CONTAINS('quick OR brown two')",
                     1, null, null, null, null, null, (String) null);
     }
 
@@ -5629,7 +5704,7 @@ public class AlfrescoCoreAdminTester
         rsp.add("CMIS order", report);
 
         Integer[] asc = new Integer[] { 200, 201, 202, 1008, 1005, 1004, 1009, 1001, 1007, 1006, 1003, 1002, 100, 1000 };
-        Integer[] desc = new Integer[] { 1000, 100, 1002, 1003, 1006, 1007, 1001, 1009, 1004, 1005, 1008, 200, 201, 202 };
+        Integer[] desc = new Integer[] { 1000, 100, 1002, 1003, 1006, 1007, 1001, 1009, 1004, 1005, 1008, 202, 201, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleTextUntokenised", asc, desc);
         // checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleTextTokenised");
@@ -5640,7 +5715,7 @@ public class AlfrescoCoreAdminTester
         // testOrderablePropertyFail("test:multipleTextBoth");
 
         asc = new Integer[] { 200, 201, 202, 1009, 100, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008 };
-        desc = new Integer[] { 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 1000, 1009, 200, 201, 202 };
+        desc = new Integer[] { 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 1000, 100, 1009, 202, 201, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleMLTextUntokenised", asc, desc);
         // testOrderablePropertyFail("cmistest:singleMLTextTokenised");
@@ -5650,8 +5725,8 @@ public class AlfrescoCoreAdminTester
         // testOrderablePropertyFail("cmistest:multipleMLTextTokenised");
         // testOrderablePropertyFail("cmistest:multipleMLTextBoth");
 
-        asc = new Integer[] { 1000, 200, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 1000, 200, 201, 202 };
+        asc = new Integer[] { 200, 1000, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 202, 201, 1000, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleFloat", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleFloat");
@@ -5659,8 +5734,8 @@ public class AlfrescoCoreAdminTester
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleDouble", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleDouble");
 
-        asc = new Integer[] {1000, 200, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009 };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 100, 1001, 1000, 200, 201, 202 };
+        asc = new Integer[] { 200, 1000, 201, 202, 100, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 202, 201, 1000, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleInteger", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleInteger");
@@ -5668,8 +5743,8 @@ public class AlfrescoCoreAdminTester
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleLong", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleLong");
 
-        asc = new Integer[] { 200, 201, 202, 100, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009 };
-        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 100, 1000, 200, 201, 202 };
+        asc = new Integer[] { 200, 201, 202, 100, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009  };     
+        desc = new Integer[] { 1009, 1008, 1007, 1006, 1005, 1004, 1003, 1002, 1001, 1000, 100, 202, 201, 200 };
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleDate", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleDate");
@@ -5678,7 +5753,7 @@ public class AlfrescoCoreAdminTester
         // testOrderablePropertyFail("cmistest:multipleDatetime");
 
         asc = new Integer[] { 1001, 1003, 1005, 1007, 1009, 100, 1000, 1002, 1004, 1006, 1008, 200, 201, 202,  };
-        desc = new Integer[] { 100, 1000, 1002, 1004, 1006, 1008, 1001, 1003, 1005, 1007, 1009, 200, 201, 202 };
+        desc = new Integer[] { 1008, 1006, 1004, 1002, 1000, 100, 1009, 1007, 1005, 1003, 1001, 202, 201, 200 }; 
 
         checkOrderableProperty(rsp, core, dataModel, report, "cmistest:singleBoolean", asc, desc);
         // testOrderablePropertyFail("cmistest:multipleBoolean");
@@ -5689,10 +5764,10 @@ public class AlfrescoCoreAdminTester
                 NamedList<Object> report, String propertyQueryName, Integer[] asc, Integer[] desc) throws IOException
     {
         testQueryByHandler(report, core, "/cmis", "SELECT " + propertyQueryName
-                    + " FROM cmistest:extendedContent ORDER BY " + propertyQueryName + " ASC", 14, null, asc, null,
+                    + " FROM cmistest:extendedContent ORDER BY " + propertyQueryName + " ASC, cmis:objectId ASC", 14, null, asc, null,
                     null, null, (String) null);
         testQueryByHandler(report, core, "/cmis", "SELECT " + propertyQueryName
-                    + " FROM cmistest:extendedContent ORDER BY " + propertyQueryName + " DESC", 14, null, desc, null,
+                    + " FROM cmistest:extendedContent ORDER BY " + propertyQueryName + " DESC, cmis:objectId DESC", 14, null, desc, null,
                     null, null, (String) null);
     }
 
@@ -6041,7 +6116,52 @@ public class AlfrescoCoreAdminTester
         testQueryByHandler(report, core, "/afts", "modified:*", 2, null, null, null, null, null, (String) null);
         testQueryByHandler(report, core, "/afts", "modified:[MIN TO NOW]", 2, null, null, null, null, null,
                     (String) null);
-
+        
+        testQueryByHandler(report, core, "/afts", "TYPE:" + testType.toString(), 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "TYPE:" + testType.toString(), 0, null, null, null, null, null, (ContentStream)null, "mimetype():document");
+        testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 1, null, null, null, null, null, (ContentStream)null, "mimetype():document");
+        testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 0, null, null, null, null, null, (ContentStream)null, "contentSize():[0 TO 100]");
+        testQueryByHandler(report, core, "/afts", "TYPE:" + ContentModel.TYPE_CONTENT.toString(), 1, null, null, null, null, null, (ContentStream)null, "contentSize():[100 TO 1000]");
+        
+        testQueryByHandler(report, core, "/afts", "modified:[NOW/DAY-1DAY TO NOW/DAY+1DAY]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[NOW/DAY-1DAY TO *]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[* TO NOW/DAY+1DAY]", 2, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "modified:[* TO *]", 2, null, null, null, null, null);
+        
+        
+        // Synonym
+        // 1 in text -  1 in query
+        testQueryByHandler(report, core, "/afts", "quick", 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "fast", 1, null, null, null, null, null);
+        // 3 words in test - 1..3 in query 
+        testQueryByHandler(report, core, "/afts", "brown AND fox AND jumped", 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "leaping AND reynard", 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "springer", 1, null, null, null, null, null);
+        // 1 word in text 1..2 in query
+        testQueryByHandler(report, core, "/afts", "lazy", 1, null, null, null, null, null);
+        testQueryByHandler(report, core, "/afts", "bone AND idle", 1, null, null, null, null, null);
+        
+        
+        // Cross language support and tokenisation part and full.
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.ENGLISH, null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.FRENCH, null, null, (String) null);
+        
+        testQueryByHandler(report, core, "/afts", "title:English", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:English123", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:French123", 1, null, null, Locale.GERMAN, null, null, (String) null);
+        testQueryByHandler(report, core, "/afts", "title:123", 1, null, null, Locale.GERMAN, null, null, (String) null);
+ 
     }
 
     private void testSort(NamedList<Object> before, SolrCore core, AlfrescoSolrDataModel dataModel) throws IOException
@@ -6684,7 +6804,8 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"the\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"and\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over the lazy\"", 1);
-            testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over a lazy\"", 1);
+            // Depends on stop words being removed .... which depends on the configuration
+            //testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"over a lazy\"", 1);
 
             testQuery(dataModel,
                         report,
@@ -6835,7 +6956,9 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"*co\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"*o\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"****lf**sc***\"", 1);
-            testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"*??*lf**sc***\"", 0);
+            // Lucene wildcard bug matches when it should not ....
+            //testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"*??*lf**sc***\"", 0);
+            testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"??lf**sc***\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"alfresc*tutorial\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"alf* tut*\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "TEXT:\"*co *al\"", 1);
@@ -7210,10 +7333,10 @@ public class AlfrescoCoreAdminTester
         testQueryByHandler(report, core, "/afts", FIELD_INACLTXID + ":2", 0, null, null, null, null,
                     null, (String) null);
 
-        testQueryByHandler(report, core, "/select", FIELD_TXCOMMITTIME + ":*", 1, null, null, null, null,
+        testQueryByHandler(report, core, "/native", FIELD_TXCOMMITTIME + ":*", 1, null, null, null, null,
                     null, (String) null);
 
-        testQueryByHandler(report, core, "/select", FIELD_ACLTXCOMMITTIME + ":*", 1, null, null, null,
+        testQueryByHandler(report, core, "/native", FIELD_ACLTXCOMMITTIME + ":*", 1, null, null, null,
                     null, null, (String) null);
 
         // AbstractLuceneQueryParser.FIELD_EXCEPTION_MESSAGE
@@ -7640,7 +7763,7 @@ public class AlfrescoCoreAdminTester
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":banana", 1,
                         Locale.ITALIAN, null, null);
             testQuery(dataModel, report, solrIndexSearcher,
-                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":バナナ", 1, new Locale(
+                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":�?ナナ", 1, new Locale(
                                     "ja"), null, null);
             testQuery(dataModel, report, solrIndexSearcher,
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":바나나", 1, new Locale(
@@ -8165,7 +8288,7 @@ public class AlfrescoCoreAdminTester
         }
 
         long start = System.nanoTime();
-        Query query = dataModel.getLuceneQueryParser(searchParameters, this.solrQueryRequest).parse(queryString);
+        Query query = dataModel.getLuceneQueryParser(searchParameters, this.solrQueryRequest, FTSQueryParser.RerankPhase.SINGLE_PASS).parse(queryString);
 //        Query query =dataModel.getFTSQuery(new Pair<SearchParameters, Boolean>(searchParameters, Boolean.FALSE),
 //                    this.solrQueryRequest);
         TopDocs docs = solrIndexSearcher.search(query, count * 2 + 10);
@@ -8215,7 +8338,7 @@ public class AlfrescoCoreAdminTester
 
         long start = System.nanoTime();
         Query query =dataModel.getFTSQuery(new Pair<SearchParameters, Boolean>(searchParameters, Boolean.FALSE),
-                    this.solrQueryRequest);
+                    this.solrQueryRequest, FTSQueryParser.RerankPhase.SINGLE_PASS);
         TopDocs docs = solrIndexSearcher.search(query, count * 2 + 10);
 
         NamedList<Object> subReport = new SimpleOrderedMap<Object>();

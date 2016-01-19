@@ -115,7 +115,7 @@ public class WebDAVHelper
     private ActivityPoster poster;
     
     // pattern is tested against full path after it has been lower cased.
-    private Pattern m_renameShufflePattern = Pattern.compile("(.*/\\..*)|(.*[a-f0-9]{8}+$)|(.*\\.tmp$)|(.*\\.wbk$)|(.*\\.bak$)|(.*\\~$)|(.*backup.*\\.do[ct]{1}[x]?[m]?$)|(.*\\.sb\\-\\w{8}\\-\\w{6}$)");
+    private Pattern m_renameShufflePattern = Pattern.compile("(.*/\\..*)|(.*[a-f0-9]{8}+$)|(.*\\.tmp$)|(.*atmp[0-9]+$)|(.*\\.wbk$)|(.*\\.bak$)|(.*\\~$)|(.*backup.*\\.do[ct]{1}[x]?[m]?$)|(.*\\.sb\\-\\w{8}\\-\\w{6}$)");
     
     //  Empty XML attribute list
     
@@ -338,7 +338,7 @@ public class WebDAVHelper
     
 
     /**
-     * @param poster
+     * @param poster ActivityPoster
      */
     public void setPoster(ActivityPoster poster)
     {
@@ -780,7 +780,7 @@ public class WebDAVHelper
      * ALF-5333: Microsoft clients use ISO-8859-1 to decode WebDAV responses
      * so this method should only be used for Microsoft user agents.
      * 
-     * @param string
+     * @param string String
      * @return The encoded string for Microsoft clients
      * @throws UnsupportedEncodingException
      */
@@ -1092,11 +1092,11 @@ public class WebDAVHelper
     
     /**
      * Notifies listeners that a read has taken place
-     * @param nodeRef
-     * @param propertyQName
-     * @param attach
-     * @param mimetype
-     * @param size
+     * @param realNodeInfo FileInfo
+     * @param mimetype String
+     * @param size Long
+     * @param contentEncoding String
+     * @param range String
      */
     protected void publishReadEvent(final FileInfo realNodeInfo, final String mimetype, final Long size, final String contentEncoding, final String range)
     {
@@ -1182,7 +1182,7 @@ public class WebDAVHelper
     /**
      * Indicates if the node is unlocked or the current user has a WRITE_LOCK<p>
      * 
-     * @see LockService#isLockedAndReadOnly(NodeRef)
+     * @see LockUtils#isLockedAndReadOnly(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.lock.LockService)
      * 
      * @param nodeRef    the node reference
      */

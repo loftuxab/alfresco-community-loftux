@@ -102,12 +102,14 @@
        <property name="schemaReferenceUrls">
           <list>
              <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-ALF.xml</value>
-             <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-JBPM.xml</value>
              <value>classpath:alfresco/dbscripts/create/${db.script.dialect}/Schema-Reference-ACT.xml</value>
           </list>
        </property>
     </bean>
 
+    <bean id="unserializerValidatorBootstrap" class="org.alfresco.repo.admin.UnserializerValidatorBootstrap">
+    </bean>
+    
     <bean id="encryptionChecker" class="org.alfresco.encryption.EncryptionChecker">
        <property name="transactionService" ref="transactionService"/>
        <property name="keyStoreChecker" ref="keyStoreChecker"/>
@@ -119,32 +121,6 @@
             <value>${index.tracking.disableInTransactionIndexing}</value>
         </property>
     </bean>
-
-    <!-- Load models -->
-    <bean id="dictionaryRepositoryBootstrap" class="org.alfresco.repo.dictionary.DictionaryRepositoryBootstrap">
-
-      <property name="dictionaryDAO" ref="dictionaryDAO"/>
-      <property name="contentService" ref="ContentService"/>
-      <property name="transactionService" ref="transactionService"/>
-      <property name="namespaceService" ref="namespaceService"/>
-      <property name="nodeService" ref="nodeService"/>
-      <property name="messageService" ref="messageService"/>
-      <property name="tenantAdminService" ref="tenantAdminService"/>
-      <property name="policyComponent" ref="policyComponent"/>
-
-      <property name="repositoryModelsLocations">
-         <list>
-            <ref bean="customModelsRepositoryLocation" />
-         </list>
-      </property>
-
-      <property name="repositoryMessagesLocations">
-         <list>
-            <ref bean="customMessagesRepositoryLocation" />
-         </list>
-      </property>
-
-   </bean>
 
     <bean id="bootstrapReEncryptor" class="org.alfresco.encryption.BootstrapReEncryptor">
         <property name="enabled" value="${encryption.bootstrap.reencrypt}"/>
@@ -173,56 +149,6 @@
     <bean id="workflowBootstrap" parent="workflowDeployer">
         <property name="workflowDefinitions">
             <list>
-                <!-- Adhoc workflow definition -->
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/adhoc_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-
-                <!-- Review and Approve workflow definitions -->
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/review_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/review_pooled_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/parallelreview_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/parallelreview_group_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-
-                <!-- Invitation service workflow definition -->
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/invitation-nominated_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-
-                <!-- Invitation service workflow definition -->
-                <props>
-                    <prop key="engineId">jbpm</prop>
-                    <prop key="location">alfresco/workflow/invitation-moderated_processdefinition.xml</prop>
-                    <prop key="mimetype">text/xml</prop>
-                    <prop key="redeploy">false</prop>
-                </props>
-
                 <!-- Activiti Adhoc workflow definition -->
                 <props>
                     <prop key="engineId">activiti</prop>
@@ -278,6 +204,14 @@
                     <prop key="mimetype">text/xml</prop>
                     <prop key="redeploy">false</prop>
                 </props>
+                
+                <!-- Activiti add site users service workflow definition -->
+                <props>
+                    <prop key="engineId">activiti</prop>
+                    <prop key="location">alfresco/workflow/invitation-add-direct.bpmn20.xml</prop>
+                    <prop key="mimetype">text/xml</prop>
+                    <prop key="redeploy">false</prop>
+                </props>
             </list>
         </property>
         <property name="models">
@@ -298,6 +232,32 @@
         <property name="repositoryWorkflowDefsLocations" ref="customWorkflowDefsRepositoryLocation"/>
     </bean>
 
+    <!-- Load models -->
+    <bean id="dictionaryRepositoryBootstrap" class="org.alfresco.repo.dictionary.DictionaryRepositoryBootstrap">
+
+      <property name="dictionaryDAO" ref="dictionaryDAO"/>
+      <property name="contentService" ref="ContentService"/>
+      <property name="transactionService" ref="transactionService"/>
+      <property name="namespaceService" ref="namespaceService"/>
+      <property name="nodeService" ref="nodeService"/>
+      <property name="messageService" ref="messageService"/>
+      <property name="tenantAdminService" ref="tenantAdminService"/>
+      <property name="policyComponent" ref="policyComponent"/>
+      
+      <property name="repositoryModelsLocations">
+         <list>
+            <ref bean="customModelsRepositoryLocation" />
+         </list>
+      </property>
+      
+      <property name="repositoryMessagesLocations">
+         <list>
+            <ref bean="customMessagesRepositoryLocation" />
+         </list>
+      </property>
+      
+   </bean>
+    
     <!-- Descriptor Service -->
     <bean id="descriptorComponent" class="org.alfresco.repo.descriptor.DescriptorServiceImpl">
        <property name="serverDescriptorDAO">
@@ -407,6 +367,18 @@
             <ref bean="patch.db-V4.2-metadata-query-indexes" />
         </property>
     </bean>
+    
+     <bean id="metadataQueryIndexesCheck2" class="org.alfresco.repo.admin.patch.OptionalPatchApplicationCheckBootstrapBean">
+        <property name="patchService">
+            <ref bean="PatchService" />
+        </property>
+        <property name="descriptorService">
+            <ref bean="descriptorComponent" />
+        </property>
+        <property name="patch">
+            <ref bean="patch.db-V5.1-metadata-query-indexes" />
+        </property>
+    </bean>
 
     <!-- Import other Alfresco bootstrap components -->
     <import resource="classpath*:alfresco/alfresco-*-bootstrap-context.xml" />
@@ -423,8 +395,19 @@
     </bean>
 
     <!--  System Administration Parameters -->
-    <bean id="sysAdmin" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean"/>
-
+    <bean id="sysAdmin" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="share.port" value-ref="sharePortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="sharePortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="Share" />
+        <constructor-arg value="false" />
+        <constructor-arg value="false" />
+    </bean>    
+  
     <!--  File Servers Subsystem -->
     <bean id="fileServers" class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory" parent="abstractPropertyBackedBean">
         <property name="autoStart">
@@ -432,9 +415,6 @@
         </property>
         <property name="compositePropertyTypes">
             <map>
-                <entry key="nfs.user.mappings">
-                    <value>org.alfresco.filesys.auth.nfs.UserMapping</value>
-                </entry>
                 <entry key="filesystem.acl.global.domainAccessControls">
                     <value>org.alfresco.filesys.config.acl.DomainAccessControlBean</value>
                 </entry>
@@ -452,6 +432,16 @@
         <property name="persister">
         	<bean class="org.alfresco.config.AlfrescoPropertiesPersister"/>
         </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="ftp.port" value-ref="ftpPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="ftpPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="FTP" />
+        <constructor-arg value="false" />
+        <constructor-arg value="true" />
     </bean>
 
    <bean id="fileServerConfiguration" class="org.alfresco.repo.management.subsystems.SubsystemProxyFactory">
@@ -498,6 +488,24 @@
                </entry>
             </map>
         </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="imap.server.port" value-ref="imapPortEarlyChecker" />
+                <entry key="imap.server.imaps.port" value-ref="imapsPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="imapPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="IMAP" />
+        <constructor-arg value="imap.server.host" />
+        <constructor-arg value="false" />
+        <constructor-arg value="true" />
+    </bean>
+    <bean id="imapsPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="IMAPS" />
+        <constructor-arg value="imap.server.host" />
+        <constructor-arg value="false" />
+        <constructor-arg value="true" />
     </bean>
 
     <!-- Outbound Email subsystem -->
@@ -534,6 +542,16 @@
         <property name="autoStart">
             <value>true</value>
         </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="email.server.port" value-ref="smtpPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
+    <bean id="smtpPortEarlyChecker" class="org.alfresco.repo.management.subsystems.PortEarlyPropertyChecker">
+        <constructor-arg value="SMTP" />
+        <constructor-arg value="false" />
+        <constructor-arg value="true" />
     </bean>
 
     <!--  Subscription Service subsystem -->
@@ -639,14 +657,6 @@
         <property name="autoStart">
             <value>true</value>
         </property>
-    </bean>
-
-    <!-- Workflow Scheduler -->
-    <bean id="workflowScheduler" class="org.alfresco.repo.workflow.jbpm.JBPMScheduler">
-       <property name="JBPMTemplate" ref="jbpm_template" />
-       <property name="JBPMEngineEnabled">
-       		<value>${system.workflow.engine.jbpm.enabled}</value>
-       </property>
     </bean>
 
     <!--  Start Auditing -->

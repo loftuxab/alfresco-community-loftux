@@ -59,7 +59,7 @@ public interface SiteService
     	
     	/**
     	 * Return true to break out of the loop early.
-    	 * @return
+    	 * @return boolean
     	 */
     	public boolean isDone();
     }
@@ -223,6 +223,16 @@ public interface SiteService
     PagingResults<SiteInfo> listSites(List<FilterProp> filterProps, List<Pair<QName, Boolean>> sortProps, PagingRequest pagingRequest);
     
     /**
+     * Lists all the memberships in sites that the specified user is in.
+     * 
+     * @param userName String
+     * @param size list maximum size or zero for all
+     * @return a list of SiteMembership objects
+     */
+    @NotAuditable
+    List<SiteMembership> listSiteMemberships (String userName, int size);
+    
+    /**
      * List all the sites that the specified user has a explicit membership to.
      *
      * @param userName          user name
@@ -314,7 +324,7 @@ public interface SiteService
      * @param nameFilter    name filter
      * @param roleFilter    role filter
      * @param size          max results size crop if >0
-     * @return Map<String, String>  the authority name and their role
+     * @return the authority name and their role
      */
     @NotAuditable
     Map<String, String> listMembers(String shortName, String nameFilter, String roleFilter, int size);
@@ -328,7 +338,7 @@ public interface SiteService
      * @param roleFilter        role filter
      * @param size          max results size crop if >0
      * @param collapseGroups    true if collapse member groups into user list, false otherwise
-     * @return Map<String, String>  the authority name and their role
+     * @return the authority name and their role
      */
     @NotAuditable
     Map<String, String> listMembers(String shortName, String nameFilter, String roleFilter, int size, boolean collapseGroups);
@@ -357,7 +367,7 @@ public interface SiteService
      * @param collapseGroups    true if collapse member groups into user list, false otherwise
      * @param pagingRequest     the paging request
      *
-     * @return Map<String, String>  the authority name and their role
+     * @return the authority name and their role
      */
     @NotAuditable
 	PagingResults<SiteMembership> listMembersPaged(String shortName, boolean collapseGroups, List<Pair<SiteService.SortFields, Boolean>> sortProps, PagingRequest pagingRequest);
@@ -425,7 +435,6 @@ public interface SiteService
      *
      * @param shortName  short name of site
      * @param componentId  component id
-     * @param folderType  type of folder to create (if null, creates standard folder)
      * @return  noderef of container
      */
     @NotAuditable
@@ -504,8 +513,8 @@ public interface SiteService
      * node is moved or copied from one site to another. Permissions relating to the former site are
      * removed and the node is given the default permissions for its new site.
      * 
-     * @param relocatedNode
-     * @param containingSite
+     * @param relocatedNode NodeRef
+     * @param containingSite SiteInfo
      * @since 3.4.2
      */
     public void cleanSitePermissions(NodeRef relocatedNode, SiteInfo containingSite);

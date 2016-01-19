@@ -37,6 +37,7 @@ import org.apache.solr.search.BitDocSet;
 import org.apache.solr.search.DocIterator;
 import org.apache.solr.search.DocSet;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.search.WrappedQuery;
 
 public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
 {
@@ -62,8 +63,10 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
             {
                 bQuery.add(new TermQuery(new Term(QueryConstants.FIELD_DENIED, current)), Occur.SHOULD);
             }
+            WrappedQuery wrapped = new WrappedQuery(bQuery);
+            wrapped.setCache(false);
 
-            DocSet aclDocs = searcher.getDocSet(bQuery);
+            DocSet aclDocs = searcher.getDocSet(wrapped);
             
             HashSet<Long> aclsFound = new HashSet<Long>(aclDocs.size());
             NumericDocValues aclDocValues = searcher.getAtomicReader().getNumericDocValues(QueryConstants.FIELD_ACLID);
@@ -74,19 +77,31 @@ public class SolrDenySetScorer2 extends AbstractSolrCachingScorer
                 int docID = it.nextDoc();
                 // Obtain the ACL ID for this ACL doc.
                 long aclID = aclDocValues.get(docID);
-                aclsFound.add(Long.valueOf(aclID));
+                aclsFound.add(getLong(aclID));
             }
          
-            for(int i = 0; i < searcher.maxDoc(); i ++)
+            if(aclsFound.size() > 0)
             {
-                long aclID = aclDocValues.get(i);
-                Long key = Long.valueOf(aclID);
-                if(aclsFound.contains(key))
+                for(AtomicReaderContext readerContext : searcher.getTopReaderContext().leaves() )
                 {
-                    deniedDocSet.add(i);
-                }
+                    int maxDoc = readerContext.reader().maxDoc();
+                    NumericDocValues fieldValues = DocValuesCache.getNumericDocValues(QueryConstants.FIELD_ACLID, readerContext.reader());
+                    if(fieldValues != null)
+                    {
+                        for(int i = 0; i < maxDoc; i++)
+                        {
+                            long aclID = fieldValues.get(i);
+                            Long key = getLong(aclID);
+                            if(aclsFound.contains(key))
+                            {
+                                deniedDocSet.add(readerContext.docBase + i);
+                            }
+                        }
+                    }
+
+            	}
             }
-            
+
             // Exclude the ACL docs from the results, we only want real docs that match.
             // Probably not very efficient, what we really want is remove(docID)
             deniedDocSet = deniedDocSet.andNot(aclDocs);

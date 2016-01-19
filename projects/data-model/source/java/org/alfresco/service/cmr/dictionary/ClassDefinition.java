@@ -151,7 +151,7 @@ public interface ClassDefinition
     /**
      * Get the parent class definition
      * 
-     * @return
+     * @return ClassDefinition
      */
     public ClassDefinition getParentClassDefinition();
     

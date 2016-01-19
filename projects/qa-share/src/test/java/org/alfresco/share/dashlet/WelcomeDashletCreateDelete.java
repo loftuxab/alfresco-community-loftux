@@ -187,7 +187,7 @@ public class WelcomeDashletCreateDelete extends AbstractUtils
     }
     
     
-    // TEST REMOVED - SEE ACE-3485
+    @Test(groups = { "AlfrescoOne" })
     public void AONE_15837()
     {
         // test user (site creator) logs in

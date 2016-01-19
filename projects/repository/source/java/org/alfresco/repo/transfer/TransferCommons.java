@@ -43,6 +43,14 @@ public class TransferCommons
     public final static String PARAM_ALLOW_TRANSFER_TO_SELF = "allowTransferToSelf";
 
     /**
+     *  If this returns true, then the transfer service reports should only contain entries about:
+     *  Create, Update, Delete items ; see MNT-14059
+     * 
+     */
+    public static final String TS_SIMPLE_REPORT = "transferservice.simple-report";
+    
+    
+    /**
      * TransferId
      */
     public final static String PARAM_TRANSFER_ID = "transferId";
@@ -76,7 +84,7 @@ public class TransferCommons
     /**
      * Mapping between contentUrl and part name.
      *
-     * @param URL
+     * @param contentUrl String
      * @return the part name
      */
     public final static String URLToPartName(String contentUrl)

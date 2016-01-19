@@ -263,7 +263,7 @@ public class AuthenticationUtil implements InitializingBean
     /**
      * <b>WARN: Advanced usage only.</b><br/>
      * Switch to the given user for all authenticated operations.  The original, authenticated user
-     * can still be found using {@link #getAuthenticatedUser()}.
+     * can still be found using {@link #getFullyAuthenticatedUser()}.
      * 
      * @param userName          the user to run as
      * @return                  the new authentication

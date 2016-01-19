@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2015 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -18,9 +18,9 @@
  */
 package org.alfresco;
 
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import junit.framework.JUnit4TestAdapter;
 
 /**
  * All Repository project test classes and test suites as a sequence of Repository&lt;NN>TestSuite
@@ -52,6 +52,7 @@ public class Repository01TestSuite extends TestSuite
     static void tests3(TestSuite suite) // tests="76" time="82.566"
     {
         suite.addTestSuite(org.alfresco.email.server.EmailServiceImplTest.class);
+        suite.addTestSuite(org.alfresco.email.server.EmailServerTest.class);
         suite.addTestSuite(org.alfresco.filesys.FTPServerTest.class);
         suite.addTestSuite(org.alfresco.filesys.repo.CifsIntegrationTest.class);
         suite.addTestSuite(org.alfresco.filesys.repo.ContentDiskDriverTest.class);
@@ -138,6 +139,8 @@ public class Repository01TestSuite extends TestSuite
         suite.addTestSuite(org.alfresco.repo.descriptor.DescriptorServiceTest.class);
         suite.addTestSuite(org.alfresco.repo.dictionary.DictionaryModelTypeTest.class);
         suite.addTestSuite(org.alfresco.repo.dictionary.DictionaryRepositoryBootstrapTest.class);
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.dictionary.CustomModelServiceImplTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.dictionary.ValueDataTypeValidatorImplTest.class));
         suite.addTestSuite(org.alfresco.repo.dictionary.types.period.PeriodTest.class);
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.discussion.DiscussionServiceImplTest.class));
     }
@@ -383,11 +386,6 @@ public class Repository01TestSuite extends TestSuite
         suite.addTest(org.alfresco.repo.version.VersionTestSuite.suite());
     }
     
-    static void tests60(TestSuite suite)
-    {
-        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.wiki.WikiServiceImplTest.class));
-    }
-    
     static void tests61(TestSuite suite)
     {
         suite.addTest(org.alfresco.repo.workflow.WorkflowTestSuite.suite());
@@ -415,12 +413,35 @@ public class Repository01TestSuite extends TestSuite
     {
         suite.addTestSuite(org.alfresco.repo.content.transform.DifferrentMimeTypeTest.class);
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.attributes.PropTablesCleanupJobIntegrationTest.class));
-        suite.addTestSuite(org.alfresco.repo.dictionary.DictionaryModelTypeTest.class);
         suite.addTestSuite(org.alfresco.repo.tagging.UpdateTagScopesActionExecuterTest.class);
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.service.ServiceRegistryTest.class));
     }
 
     static void tests66(TestSuite suite)
     {
-        suite.addTest(org.alfresco.repo.search.impl.solr.facet.SolrFacetTestSuite.suite());
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.facet.SolrFacetQueriesDisplayHandlersTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.facet.SolrFacetServiceImplTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.search.impl.solr.facet.SolrFacetConfigTest.class));
+    }
+
+    static void tests67(TestSuite suite)
+    {
+        suite.addTestSuite(org.alfresco.repo.doclink.DocumentLinkServiceImplTest.class);
+    }
+
+    static void tests68(TestSuite suite)
+    {
+        // This test opens, closes and again opens the alfresco application context.
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.dictionary.CustomModelRepoRestartTest.class));
+    }
+
+    static void tests69(TestSuite suite)
+    {
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.policy.annotation.QNameTypeEditorTest.class));
+    }
+
+    static void tests70(TestSuite suite)
+    {
+        suite.addTest(org.alfresco.repo.virtual.VirtualizationIntegrationTestSuite.suite());
     }
 }

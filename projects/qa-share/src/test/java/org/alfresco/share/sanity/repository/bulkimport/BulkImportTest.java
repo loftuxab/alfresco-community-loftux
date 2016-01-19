@@ -277,7 +277,7 @@ public class BulkImportTest extends AbstractUtils
         // Verify Bulk Import dir contains all files from filesystem that were specified
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible. Bulk Import isn't created");
 
-        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage documentDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         EditTextDocumentPage inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         contentDetails = inlineEditPage.getDetails();
@@ -302,7 +302,7 @@ public class BulkImportTest extends AbstractUtils
         // Verify Bulk Import dir contains all files from filesystem that were specified
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible. Bulk Import isn't created");
 
-        documentDetailsPage = docLibPage.selectFile(fileName1).render();
+        documentDetailsPage = docLibPage.selectFile(fileName1).render().render();
 
         inlineEditPage = documentDetailsPage.selectInlineEdit().render();
         contentDetails = inlineEditPage.getDetails();
@@ -416,13 +416,13 @@ public class BulkImportTest extends AbstractUtils
         // Verify Bulk Import dir contains all files from filesystem that were specified
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible. Bulk Import isn't created");
 
-        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render();
+        DocumentDetailsPage detailsPage = docLibPage.selectFile(fileName1).render().render();
 
         // View 'Manage Aspects' page for the added item
         SelectAspectsPage aspectsPage = detailsPage.selectManageAspects().render();
 
         // Verify the rule isn't applied
-        Assert.assertFalse(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect is applied");
+        Assert.assertFalse(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE), "'Classifiable'' aspect is applied");
 
         aspectsPage.clickCancel();
 
@@ -461,11 +461,11 @@ public class BulkImportTest extends AbstractUtils
         // verify the file are imported and the rule is applied to them
         Assert.assertTrue(docLibPage.isFileVisible(fileName1), "File " + fileName1 + " isn't visible. Bulk Import isn't created");
 
-        detailsPage = docLibPage.selectFile(fileName1).render();
+        detailsPage = docLibPage.selectFile(fileName1).render().render();
 
         aspectsPage = detailsPage.selectManageAspects().render();
 
-        Assert.assertTrue(aspectsPage.getSelectedAspects().contains(DocumentAspect.CLASSIFIABLE),
+        Assert.assertTrue(aspectsPage.getSelectedSystemAspects().contains(DocumentAspect.CLASSIFIABLE),
                 "'Classifiable'' aspect isn't appeared. The rule isn't applied to file");
     }
 

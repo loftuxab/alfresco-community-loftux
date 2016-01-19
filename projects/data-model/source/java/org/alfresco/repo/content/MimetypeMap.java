@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import org.alfresco.repo.content.encoding.ContentCharsetFinder;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -75,6 +76,8 @@ public class MimetypeMap implements MimetypeService
     public static final String PREFIX_VIDEO = "video/";
 
     public static final String EXTENSION_BINARY = "bin";
+
+    public static final String MIMETYPE_MULTIPART_ALTERNATIVE = "multipart/alternative";
 
     public static final String MIMETYPE_TEXT_PLAIN = "text/plain";
 
@@ -191,6 +194,9 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_APPLICATION_ILLUSTRATOR = "application/illustrator";
 
     public static final String MIMETYPE_APPLICATION_PHOTOSHOP = "image/vnd.adobe.photoshop";
+    
+    //Encrypted office document
+    public static final String MIMETYPE_ENCRYPTED_OFFICE = "application/x-tika-ooxml-protected";
 
     // Open Document
     public static final String MIMETYPE_OPENDOCUMENT_TEXT = "application/vnd.oasis.opendocument.text";
@@ -348,9 +354,6 @@ public class MimetypeMap implements MimetypeService
         this.configService = configService;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public ConfigService getConfigService()
     {
         return configService;
@@ -412,7 +415,7 @@ public class MimetypeMap implements MimetypeService
         this.mimetypes = new ArrayList<String>(40);
         this.extensionsByMimetype = new HashMap<String, String>(59);
         this.mimetypesByExtension = new HashMap<String, String>(59);
-        this.displaysByMimetype = new HashMap<String, String>(59);
+        this.displaysByMimetype = new TreeMap<String, String>();
         this.displaysByExtension = new HashMap<String, String>(59);
         this.textMimetypes = new HashSet<String>(23);
 
@@ -793,8 +796,8 @@ public class MimetypeMap implements MimetypeService
         MediaType type = detectType(filename, input);
         String filenameGuess = guessMimetype(filename);
 
-        // If Tika doesn't know what the type is, go with the filename one
-        if (type == null || MediaType.OCTET_STREAM.equals(type)) { return filenameGuess; }
+        // If Tika doesn't know what the type is, or file is password protected, go with the filename one
+        if (type == null || MediaType.OCTET_STREAM.equals(type) || MIMETYPE_ENCRYPTED_OFFICE.equals(type.toString())) { return filenameGuess; }
 
         // If Tika has supplied a very generic type, go with the filename one,
         // as it's probably a custom Text or XML format known only to Alfresco

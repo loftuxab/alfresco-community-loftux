@@ -936,7 +936,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     }
     
     /**
-     * @see org.alfresco.module.vti.handler.DwsServiceHandler#updateDwsData(org.alfresco.module.vti.metadata.model.LinkBean, CAMLMethod, java.lang.String))
+     * @see org.alfresco.module.vti.handler.DwsServiceHandler#updateDwsData(org.alfresco.module.vti.metadata.model.LinkBean, CAMLMethod, java.lang.String)
      */
     public LinkBean updateDwsData(LinkBean linkBean, CAMLMethod method, String dws)
     {
