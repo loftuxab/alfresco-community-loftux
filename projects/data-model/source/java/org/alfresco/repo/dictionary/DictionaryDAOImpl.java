@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2016 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -226,6 +226,7 @@ public class DictionaryDAOImpl implements DictionaryDAO, NamespaceDAO,
 
         // TODO Should be reworked when ACE-2001 will be implemented
         dictionaryRegistryCache.remove(tenant);
+        dictionaryRegistryCache.refresh(tenant);
 
         if (logger.isDebugEnabled())
         {
