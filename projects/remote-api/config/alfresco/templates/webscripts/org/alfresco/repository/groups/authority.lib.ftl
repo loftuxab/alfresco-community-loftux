@@ -5,7 +5,12 @@
 		   "authorityType": "${authority.authorityType}",
 		   "shortName": "${authority.shortName}",
 		   "fullName": "${authority.fullName}",
+           <#-- If authority is Site group, use a more informative display name -->
+           <#if authority.fullName?index_of("GROUP_site")=0>
+		   "displayName": "${authority.fullName?substring(11)?replace("_"," ")}",
+           <#else>
 		   "displayName": "${authority.displayName}",
+           </#if>
 		   <#if authority.authorityType = "GROUP">
 		   "url": "/api/groups/${authority.shortName?url}"
 		   </#if>
