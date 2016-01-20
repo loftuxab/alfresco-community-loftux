@@ -19,11 +19,10 @@
 
 package org.alfresco.repo.content.transform;
 
-import java.io.File;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -31,13 +30,13 @@ import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import com.sun.mail.util.BASE64DecoderStream;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.repo.content.transform.AbstractContentTransformer2;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.TransformationOptions;
-import org.alfresco.util.TempFileProvider;
-
+import org.apache.tika.io.TikaInputStream;
 
 /**
  * Uses javax.mail.MimeMessage to generate plain text versions of RFC822 email
@@ -48,24 +47,32 @@ import org.alfresco.util.TempFileProvider;
  * related parsers.
  */
 public class EMLTransformer extends AbstractContentTransformer2
-
 {
-    private static final String CHARSET = "charset";
-    private static final String DEFAULT_ENCODING = "UTF-8";
+
+    private String transformTo = "text";
+
+    public void setTransformTo(String transformTo) {
+        this.transformTo = transformTo;
+    }
 
     @Override
     public boolean isTransformableMimetype(String sourceMimetype, String targetMimetype, TransformationOptions options)
     {
-        if (!MimetypeMap.MIMETYPE_RFC822.equals(sourceMimetype)
-                || !MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(targetMimetype))
-        {
-            // only support RFC822 -> TEXT
+        if (!MimetypeMap.MIMETYPE_RFC822.equals(sourceMimetype) ){
             return false;
         }
-        else
-        {
-            return true;
+        if(transformTo.equalsIgnoreCase("text")) {
+            if(!(MimetypeMap.MIMETYPE_TEXT_PLAIN.equals(targetMimetype))){
+                return false;
+            }
         }
+        if(transformTo.equalsIgnoreCase("html")) {
+            if(!(MimetypeMap.MIMETYPE_HTML.equals(targetMimetype))){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -75,156 +82,138 @@ public class EMLTransformer extends AbstractContentTransformer2
     }
 
     @Override
-    protected void transformInternal(ContentReader reader, ContentWriter writer, TransformationOptions options) throws Exception
+    protected void transformInternal(ContentReader reader, ContentWriter writer, TransformationOptions options)
+            throws Exception
     {
-        InputStream contentInputStream = null;
-        try{
-            contentInputStream = reader.getContentInputStream();
-            MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(new Properties()), contentInputStream);
+        TikaInputStream tikaInputStream = null;
+        try
+        {
+            // wrap the given stream to a TikaInputStream instance
+            tikaInputStream = TikaInputStream.get(reader.getContentInputStream());
+
+            MimeMessage mimeMessage = new MimeMessage(Session.getDefaultInstance(new Properties()), tikaInputStream);
 
             final StringBuilder sb = new StringBuilder();
             Object content = mimeMessage.getContent();
-            if (content instanceof Multipart)
-            {
-                processMultiPart((Multipart) content,sb);
+            if (content instanceof Multipart) {
+                sb.append(processMultiPart((Multipart) content));
             }
             else
             {
-                sb.append(content.toString());
+                // Check if the mail is actually multipart, if so throw an error
+                if(content.toString().contains("multipart/")) {
+                    throw new Exception("RFC822 Multipart detection error: Email is multipart but ");
+                }
+
+                String emailContent;
+                if(content instanceof BASE64DecoderStream) {
+                    // Probably an MS Exchange email with winmail.dat only. Ignore for now
+                    emailContent = "";
+                } else {
+                    emailContent = (String)content;
+                }
+
+                if (transformTo.equalsIgnoreCase("html")) {
+                    StringBuilder sbhtml = new StringBuilder();
+                    // If not wrapped with html tag, add that.
+                    if(!emailContent.toLowerCase().contains("<html>")){
+                        sbhtml.append("<html><body>");
+                        sbhtml.append(emailContent.replace("\n", "<br>"));
+                        sbhtml.append("</body></html>");
+                    } else {
+                        sbhtml.append(emailContent);
+                    }
+
+                    sb.append(sbhtml.toString());
+                } else {
+                    // Clean out any html. Note: Side effect, any legitimate html that sender intended to be may ba removed.
+
+                    if(emailContent.toLowerCase().contains("<html>")) {
+                        // We have the start tag, so lets assume we have html email without multipart and strip all html tags
+                        // Keep the breaks
+                        emailContent = emailContent.replaceAll("<[bB][rR].?\\/?>","\n");
+                        Pattern p = Pattern.compile("<[^>]*>");
+                        Matcher m = p.matcher(emailContent);
+                        emailContent = m.replaceAll("");
+
+                    }
+                    sb.append(emailContent);
+                }
             }
+
             writer.putContent(sb.toString());
         }
         finally
         {
-            if (contentInputStream != null)
+            if (tikaInputStream != null)
             {
                 try
                 {
-                contentInputStream.close();
+                    // it closes any other resources associated with it
+                    tikaInputStream.close();
                 }
-                catch ( IOException e)
+                catch (IOException e)
                 {
-                    //stop exception propagation
+                    e.printStackTrace();
                 }
             }
         }
     }
 
     /**
-     * Find "text" parts of message recursively and appends it to sb StringBuilder
-     * 
+     * Find "text" parts of message recursively
+     *
      * @param multipart Multipart to process
-     * @param sb StringBuilder 
+     * @return "text" parts of message
      * @throws MessagingException
      * @throws IOException
      */
-    private void processMultiPart(Multipart multipart, StringBuilder sb) throws MessagingException, IOException
+    private StringBuilder processMultiPart(Multipart multipart) throws MessagingException, IOException
     {
-        boolean isAlternativeMultipart = multipart.getContentType().contains(MimetypeMap.MIMETYPE_MULTIPART_ALTERNATIVE);
-        if (isAlternativeMultipart)
-        {
-            processAlternativeMultipart(multipart, sb);
-        }
-        else
-        {
-            for (int i = 0, n = multipart.getCount(); i < n; i++)
-            {
-                Part part = multipart.getBodyPart(i);
-                if (part.getContent() instanceof Multipart)
-                {
-                    processMultiPart((Multipart) part.getContent(), sb);
-                }
-                else
-                {
-                    processPart(part, sb);
-                }
-            }
-        }
-    }
-    
-    
-    /**
-     * Finds the suitable part from an multipart/alternative and appends it's text content to StringBuilder sb
-     * 
-     * @param multipart
-     * @param sb
-     * @throws IOException
-     * @throws MessagingException
-     */
-    private void processAlternativeMultipart(Multipart multipart, StringBuilder sb) throws IOException, MessagingException
-    {
-        Part partToUse = null;
-        for (int i = 0, n = multipart.getCount(); i < n; i++)
-        {
-            Part part = multipart.getBodyPart(i);
-            if (part.getContentType().contains(MimetypeMap.MIMETYPE_TEXT_PLAIN))
-            {
-                partToUse = part;
-                break;
-            }
-            else if  (part.getContentType().contains(MimetypeMap.MIMETYPE_HTML)){
-                partToUse = part;
-            }
-        }
-        if (partToUse != null)
-        {
-            processPart(partToUse, sb);
-        }
-    }
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sbhtml = new StringBuilder();
 
-    /**
-     * Finds text on a given mail part. Accepted parts types are text/html and text/plain.
-     * Attachments are ignored
-     * 
-     * @param part
-     * @param sb
-     * @throws IOException
-     * @throws MessagingException
-     */
-    private void processPart(Part part, StringBuilder sb) throws IOException, MessagingException
-    {
-        boolean isAttachment = Part.ATTACHMENT.equalsIgnoreCase(part.getDisposition());
-        if (isAttachment)
-        {
-            return;
+        for (int i = 0, n = multipart.getCount(); i < n; i++) {
+            Part part = multipart.getBodyPart(i);
+            if (part.getContent() instanceof Multipart) {
+                sb.append(processMultiPart((Multipart) part.getContent()));
+
+            } else if (part.getContentType().contains("text")) {
+                //Ignore the html part
+                if (!part.getContentType().contains("html")) {
+                    sb.append(part.getContent().toString()).append("\n");
+                } else {
+                    sbhtml.append(part.getContent().toString()).append("\n");
+                }
+
+            }
+
         }
-        if (part.getContentType().contains(MimetypeMap.MIMETYPE_TEXT_PLAIN))
-        {
-            sb.append(part.getContent().toString());
+
+        if (transformTo.equalsIgnoreCase("text")) {
+            if (sb.length() > 0) {
+                return sb;
+            } else if (sbhtml.length() > 0) {
+                Pattern p = Pattern.compile("<[^>]*>");
+                Matcher m = p.matcher(sbhtml);
+                return new StringBuilder().append(m.replaceAll(""));
+            }
+        } else if (transformTo.equalsIgnoreCase("html")) {
+            {
+                if (sbhtml.length() > 0) {
+                    return sbhtml;
+                } else if (sb.length() > 0) {
+                    StringBuilder sbhtml2 = new StringBuilder();
+                    sbhtml2.append("<html><body>");
+                    sbhtml2.append(sb.toString().replace("\n","<br>"));
+                    sbhtml2.append("</body></html>");
+                    return sbhtml2;
+                }
+            }
+
+
         }
-        else if (part.getContentType().contains(MimetypeMap.MIMETYPE_HTML))
-        {
-            String mailPartContent = part.getContent().toString();
-            
-            //create a temporary html file with same mail part content and encoding
-            File tempHtmlFile = TempFileProvider.createTempFile("EMLTransformer_", ".html");
-            ContentWriter contentWriter = new FileContentWriter(tempHtmlFile);
-            contentWriter.setEncoding(getMailPartContentEncoding(part));
-            contentWriter.setMimetype(MimetypeMap.MIMETYPE_HTML);
-            contentWriter.putContent(mailPartContent);
-            
-            //transform html file's content to plain text
-            EncodingAwareStringBean extractor = new EncodingAwareStringBean();
-            extractor.setCollapse(false);
-            extractor.setLinks(false);
-            extractor.setReplaceNonBreakingSpaces(false);
-            extractor.setURL(tempHtmlFile, contentWriter.getEncoding());
-            sb.append(extractor.getStrings());
-            
-            tempHtmlFile.delete();
-        }
-    }
-    
-    private String getMailPartContentEncoding(Part part) throws MessagingException
-    {
-        String encoding = DEFAULT_ENCODING;
-        String contentType = part.getContentType();
-        int startIndex = contentType.indexOf(CHARSET);
-        if (startIndex > 0)
-        {
-            encoding = contentType.substring(startIndex + CHARSET.length() + 1).replaceAll("\"", "");
-        }
-        return encoding;
+        return sb;
     }
 
 }
