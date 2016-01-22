@@ -139,8 +139,10 @@ public abstract class AbstractAuthoritySetQuery extends Query
                 while(doc >= ceil);
             }
 
-            long aclId = aclValues.get(doc-base);
-            hybridBitSet.set(aclId);
+            if(aclValues != null) {
+                long aclId = aclValues.get(doc - base);
+                hybridBitSet.set(aclId);
+            }
         }
 
         return hybridBitSet;
