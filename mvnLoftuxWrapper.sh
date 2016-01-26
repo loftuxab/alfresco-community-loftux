@@ -30,7 +30,7 @@ read KEY
 
 install() {
     echo "Starting local install build..."
-    mvn clean source:jar $1 -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+    mvn clean source:jar install -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
 }
 
 deploy() {
