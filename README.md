@@ -1,6 +1,7 @@
 # Loftux AB - Alfresco Community edition
 This is a Github fork of the official Alfresco Community edition. This fork will not contain any major feature additions, those will be released as separate addons.  
 What you will find here is  
+
  * Bugfixes
  * Enhancement of existing features.  
 
@@ -16,18 +17,18 @@ The loftux branch is the one we commit our changes to, and this is the branch yo
 The result of build is found in  
 
     projects/web-client/target/alfresco.war  
-    projects/slingshot/target/share.war  
     projects/solr4/target/solr4.war  
     projects/solr4/target/solr4-config-ssl.zip
 
-The entire project us built (except installer), look for other components in target folders.
+The entire project is built (except installer), look for other components in target folders.
 
 ## Issues
 We use the issue tracker to record the changes we have made to code. The changes we make are on behalf of Loftux AB customers. If you are not a Loftux AB customer, please file issues only if you are sure that the issue is due to a change that was made by us. All other issues should be filed in the official Alfresco issue tracker https://issues.alfresco.com. Before you do that, make sure that the issue can be reproduced by an Alfresco official build.
 We will be somewhat restrictive with accepting issues from non-customers, since we do not have the resources to research the issues and fix them. But if you already have a patch or a proposed fix, then we will try to incorporate them.
 
 ## Should I use this source?
-A build from this source is not guaranteed to be more or less stable. That may vary from time to time. So if you want to use a build from this source, make sure that you understand the consequences and that you may have to upgrade more frequently. We do not have resources for extensive testing.  
+A build from this source is not guaranteed to be more or less stable. That may vary from time to time. So if you want to use a build from this source, make sure that you understand the consequences and that you may have to upgrade more frequently.  
+
 That said, at Loftux AB we use builds that are from source that are not from an official release revision and with good results. Have an understanding though that our clients are mostly smaller companies that can allow for some downtime in order to upgrade should that be needed.  
 
 ## Can I switch back to Alfresco official?
