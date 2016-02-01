@@ -37,16 +37,23 @@ public final class CMISDictionaryReload extends AbstractLifecycleBean
 {
     private static final Log log = LogFactory.getLog(CMISDictionaryReload.class);
     private final CMISAbstractDictionaryService cmisDictService;
+    private final boolean enabled;
     
-    public CMISDictionaryReload(CMISAbstractDictionaryService cmisDictService)
+    public CMISDictionaryReload(CMISAbstractDictionaryService cmisDictService, boolean enabled)
     {
         this.cmisDictService = cmisDictService;
+        this.enabled = enabled;
     }
     
     public void reload()
     {
-        log.debug("Reloading CMIS dictionary.");
-        cmisDictService.afterDictionaryInit();
+        if (enabled)
+        {
+            // Avoid deadlock by making sure we already have a registry present.
+            cmisDictService.getRegistry();
+            log.debug("Reloading CMIS dictionary.");
+            cmisDictService.afterDictionaryInit();
+        }
     }
 
     @Override
