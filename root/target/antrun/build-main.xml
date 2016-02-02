@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <property name="db.driver" value="org.postgresql.Driver"/>
+  <property name="db.name" value="alfresco"/>
+  <property name="db.url" value="jdbc:postgresql:${db.name}"/>
+  <property name="db.master.url" value="jdbc:postgresql:template1"/>
+  <property name="db.username" value="alfresco"/>
+  <property name="db.password" value="alfresco"/>
+  <property name="db.master.username" value="alfresco"/>
+  <property name="db.master.password" value="alfresco"/>
+  <property name="db.drop.command" value="drop database if exists ${db.name}"/>
+  <property name="db.create.command" value="create database ${db.name}"/>
+</target>
+</project>
