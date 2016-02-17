@@ -1,0 +1,72 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Dashlet Tests for Sprint BY" thread-count="3">
+
+    <groups>
+        <run>
+            <exclude name="DataPrep.*"/>
+            <exclude name="Download"/>
+            <exclude name="NonGrid"/>
+            <exclude name=".*Bug.*"/>
+        </run>
+    </groups>
+
+    <listeners>
+        <listener class-name="org.alfresco.webdrone.testng.listener.ScreenshotHTMLReporter"/>
+    </listeners>
+
+  <!--  <test name="RecentlyModifiedDashletTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.RecentlyModifiedDashletTest">
+                <methods>
+                    <include name="AONE_3418"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="MyDashboardMyCalendarTests" verbose="1" time-out="600000">
+        <classes>
+            <class
+                    name="org.alfresco.share.dashlet.MyDashboardMyCalendarTests" />
+        </classes>
+    </test>
+    <test name="MyDashboardMyDiscussionTests" verbose="1" parallel="classes" thread-count="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.MyDashboardMyDiscussionTests" />
+        </classes>
+    </test>-->
+
+    <test name="SiteSearchMyDashboardTest2" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SiteSearchMyDashboardTest2" >
+                <methods>
+                    <include name="AONE_14838"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="SavedSearchMyDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchMyDashboardAdvancedTest">
+                <methods>
+                    <include name="AONE_14688"/>
+                    <include name="AONE_14691"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+    <test name="SavedSearchSiteDashboardAdvancedTest" verbose="1">
+        <classes>
+            <class name="org.alfresco.share.dashlet.SavedSearchSiteDashboardAdvancedTest">
+                <methods>
+                    <include name="AONE_14732"/>
+                    <include name="AONE_14735"/>
+                    <exclude name=".*"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

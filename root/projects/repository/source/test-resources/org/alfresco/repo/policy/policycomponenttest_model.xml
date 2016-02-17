@@ -1,0 +1,101 @@
+<model name="test:policycomponenttest" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/test/policycomponenttest/1.0" prefix="test"/>
+   </namespaces>
+
+   <types>
+      
+      <type name="test:base">
+         <parent>sys:base</parent>
+         <properties>
+            <property name="test:base_a">
+               <type>d:text</type>
+            </property>
+         </properties>
+         <associations>
+            <association name="test:base_assoc_a">
+               <target>
+                  <class>test:base</class>
+               </target>
+            </association>
+         </associations>
+      </type>
+   
+      <type name="test:file">
+         <parent>test:base</parent>
+         <properties>
+            <property name="test:file_b">
+               <type>d:text</type>
+            </property>
+            <property name="test:file_c">
+               <type>d:text</type>
+            </property>
+         </properties>
+         <overrides>
+            <property name="test:base_a">
+               <default>an overriden default value</default>
+            </property>
+         </overrides>
+      </type>
+
+      <type name="test:folder">
+         <parent>test:base</parent>
+         <properties>
+            <property name="test:folder_d">
+               <type>d:text</type>
+            </property>
+         </properties>
+         <associations>
+            <association name="test:folder_assoc_d">
+               <target>
+                  <class>test:folder</class>
+               </target>
+            </association>
+         </associations>            
+      </type>
+
+      <type name="test:a_type">
+         <parent>sys:base</parent>
+         <properties>
+            <property name="test:a_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="test:b_type">
+         <parent>test:a_type</parent>
+         <properties>
+            <property name="test:b_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+
+      <type name="test:c_type">
+         <parent>test:b_type</parent>
+         <properties>
+            <property name="test:c_type">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </type>
+   </types>
+   
+   <aspects>
+      <aspect name="test:aspect">
+         <properties>
+            <property name="test:aspect_a">
+               <type>d:int</type>
+            </property>
+         </properties>
+      </aspect>
+   </aspects>
+   
+</model>
