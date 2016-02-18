@@ -2,7 +2,7 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="LX90-SNAPSHOT"
+buildnumber="LX90"
 buildAlfresco="5.1-SNAPSHOT"
 
 # SCM Revision number -Fetch automatically
