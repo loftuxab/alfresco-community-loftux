@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>alfresco-mmt</artifactId>
@@ -59,7 +59,7 @@
                             <include>org.alfresco:alfresco-repository</include>
                             <include>org.apache.commons:commons-compress</include>
                             <include>org.safehaus.jug:jug</include>
-                            <include>org.springframework.extensions.surf:spring-surf-core</include>
+                            <include>org.alfresco.surf:spring-surf-core</include>
                             <include>org.tukaani:xz</include>
                             <include>org.apache.maven:maven-artifact</include>
                         </includes>
@@ -89,7 +89,7 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.springframework.extensions.surf:spring-surf-core</artifact>
+                            <artifact>org.alfresco.surf:spring-surf-core</artifact>
                             <includes>
                                 <include>org/springframework/extensions/surf/util/I18NUtil.class</include>
                                 <include>org/springframework/extensions/surf/util/ISO8601DateFormat.class</include>
