@@ -19,14 +19,60 @@
 package org.alfresco.repo.dictionary;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import junit.framework.TestCase;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.tenant.SingleTServiceImpl;
+import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
+import org.alfresco.util.TraceableThreadFactory;
+import org.alfresco.util.cache.DefaultAsynchronouslyRefreshedCacheRegistry;
 
 public class DiffModelTest extends AbstractModelTest
 {
 
+    public static final String MODEL1_DUPLICATED_XML = 
+            "<model name=\"test1:model11\" xmlns=\"http://www.alfresco.org/model/dictionary/1.0\">" +
+            
+            "   <description>Another description</description>" +
+            "   <author>Alfresco</author>" +
+            "   <published>2007-08-01</published>" +
+            "   <version>1.0</version>" +
+            
+            "   <imports>" +
+            "      <import uri=\"http://www.alfresco.org/model/dictionary/1.0\" prefix=\"d\"/>" +
+            "   </imports>" +
+            
+            "   <namespaces>" +
+            "      <namespace uri=\"http://www.alfresco.org/model/test1/1.0\" prefix=\"test1\"/>" +
+            "   </namespaces>" +
+            
+            "   <aspects>" +
+            
+            "      <aspect name=\"test1:aspect1\">" +
+            "        <title>Base</title>" +
+            "        <description>The Base Aspect 1</description>" +
+            "        <properties>" +
+            "           <property name=\"test1:prop9\">" +
+            "              <type>d:text</type>" +
+            "           </property>" +
+            "           <property name=\"test1:prop10\">" +
+            "              <type>d:int</type>" +
+            "           </property>" +        
+            "        </properties>" +
+            "      </aspect>" +
+                  
+            "   </aspects>" +        
+            
+            "</model>";
     public void testDeleteModel()
     {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(AbstractModelTest.MODEL1_XML.getBytes());
@@ -100,6 +146,27 @@ public class DiffModelTest extends AbstractModelTest
         
         assertEquals(3, countDiffs(modelDiffs, M2ModelDiff.TYPE_TYPE, M2ModelDiff.DIFF_CREATED));
         assertEquals(3, countDiffs(modelDiffs, M2ModelDiff.TYPE_ASPECT, M2ModelDiff.DIFF_CREATED));
+    }
+    
+    public void testDuplicateModels()
+    {
+        ByteArrayInputStream byteArrayInputStream1 = new ByteArrayInputStream(AbstractModelTest.MODEL1_XML.getBytes());
+        ByteArrayInputStream byteArrayInputStream2 = new ByteArrayInputStream(MODEL1_DUPLICATED_XML.getBytes());
+
+        M2Model model1 = M2Model.createModel(byteArrayInputStream1);
+        dictionaryDAO.putModel(model1);
+
+        M2Model model2 = M2Model.createModel(byteArrayInputStream2);
+
+        try
+        {
+            dictionaryDAO.putModel(model2);
+            fail("This model with this URI has already been defined");
+        }
+        catch (NamespaceException exception)
+        {
+            // Ignore since we where expecting this
+        }
     }
     
     public void testNonIncUpdateModel()

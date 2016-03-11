@@ -218,16 +218,8 @@ public abstract class AbstractDictionaryRegistry implements DictionaryRegistry
         M2Model m2Model = model.getM2Model();
         for (M2Namespace namespace : m2Model.getNamespaces())
         {
-        	urisCacheRWLock.writeLock().lock();
-        	try
-        	{
-        		urisCache.add(namespace.getUri());
-	        }
-	        finally
-	        {
-	        	urisCacheRWLock.writeLock().unlock();
-	        }
-        	prefixesCache.put(namespace.getPrefix(), namespace.getUri());
+        	addURI(namespace.getUri());
+        	addPrefix(namespace.getPrefix(), namespace.getUri());
         	mapUriToModel(namespace.getUri(), model);
         }
 
