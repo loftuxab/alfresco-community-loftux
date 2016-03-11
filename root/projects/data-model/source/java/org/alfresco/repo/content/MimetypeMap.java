@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
+ * Copyright (C) 2005-2016 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -76,6 +76,8 @@ public class MimetypeMap implements MimetypeService
     public static final String PREFIX_VIDEO = "video/";
 
     public static final String EXTENSION_BINARY = "bin";
+    
+    public static final String MACOS_RESOURCE_FORK_FILE_NAME_PREFIX = "._";
 
     public static final String MIMETYPE_MULTIPART_ALTERNATIVE = "multipart/alternative";
 
@@ -285,6 +287,9 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_IWORK_NUMBERS = "application/vnd.apple.numbers";
 
     public static final String MIMETYPE_IWORK_PAGES = "application/vnd.apple.pages";
+
+    //MACOS
+    public static final String MIMETYPE_APPLEFILE = "application/applefile";
 
     // WordPerfect
     public static final String MIMETYPE_WORDPERFECT = "application/wordperfect";
