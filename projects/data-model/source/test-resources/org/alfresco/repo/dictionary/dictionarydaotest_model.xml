@@ -61,6 +61,7 @@
                  <value>ABC</value>
                  <value>DEF</value>
                  <value>VALUE WITH SPACES</value>
+                 <value>VALUE WITH TRAILING SPACE </value>
              </list>
          </parameter>
          <parameter name="caseSensitive"><value>true</value></parameter>
