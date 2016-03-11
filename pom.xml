@@ -1227,9 +1227,9 @@
                     </configuration>
                     <dependencies>
                         <dependency>
-                            <groupId>com.oracle.ojdbc6</groupId>
-                            <artifactId>ojdbc6</artifactId>
-                            <version>11.2.0.1.0</version>
+                            <groupId>com.oracle.jdbc</groupId>
+                            <artifactId>ojdbc7</artifactId>
+                            <version>12.1.0.1.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1238,9 +1238,9 @@
                     <artifactId>sql-maven-plugin</artifactId>
                     <dependencies>
                         <dependency>
-                            <groupId>com.oracle.ojdbc6</groupId>
-                            <artifactId>ojdbc6</artifactId>
-                            <version>11.2.0.1.0</version>
+                            <groupId>com.oracle.jdbc</groupId>
+                            <artifactId>ojdbc7</artifactId>
+                            <version>12.1.0.1.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -1248,9 +1248,9 @@
         </build>
         <dependencies>
             <dependency>
-                <groupId>com.oracle.ojdbc6</groupId>
-                <artifactId>ojdbc6</artifactId>
-                <version>11.2.0.1.0</version>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc7</artifactId>
+                <version>12.1.0.1.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
