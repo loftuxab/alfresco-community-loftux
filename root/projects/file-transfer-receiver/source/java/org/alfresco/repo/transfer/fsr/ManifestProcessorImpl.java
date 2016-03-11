@@ -152,7 +152,7 @@ public class ManifestProcessorImpl extends AbstractManifestProcessorBase
         Collection<NodeContext> filesToReplace = new ArrayList<NodeContext>(existingFilesToReplace.values());
         for (NodeContext fileToReplace : filesToReplace)
         {
-            if (switchFile(fileToReplace.nodeId, fileToReplace.newParentId, fileToReplace.tempName, pathPrefix))
+            if (switchFile(fileToReplace.nodeId, fileToReplace.newParentId, fileToReplace.tempName, fileToReplace.newContentUrl, pathPrefix))
             {
                 //Record this node in the list of temp files to be renamed
                 tempFilesToRename.put(fileToReplace.nodeId, fileToReplace);
@@ -358,7 +358,7 @@ public class ManifestProcessorImpl extends AbstractManifestProcessorBase
         return successful;
     }
 
-    private boolean switchFile(String nodeId, String newParentId, String targetFileName, String pathPrefix)
+    private boolean switchFile(String nodeId, String newParentId, String targetFileName, String newContentUrl, String pathPrefix)
     {
         boolean successful = false;
         
@@ -378,6 +378,7 @@ public class ManifestProcessorImpl extends AbstractManifestProcessorBase
             nodeEntity.setContentName(targetFileName);
             nodeEntity.setParent(newParentId);
             nodeEntity.setPath(newParentPath);
+            nodeEntity.setContentUrl(newContentUrl);
             dbHelper.updateFileTransferInfoByNodeRef(nodeEntity);
             if (isDebugEnabled)
             {

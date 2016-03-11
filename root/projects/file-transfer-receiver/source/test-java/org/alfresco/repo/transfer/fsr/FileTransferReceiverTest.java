@@ -334,41 +334,15 @@ public class FileTransferReceiverTest extends TestCase
         }
     }
 
-
-
     public void testBasicCommitContent() throws Exception
     {
         TransferManifestNormalNode node = null;
 
-        try
-        {
-            String transferId = ftTransferReceiver.start("1234", true, ftTransferReceiver.getVersion());
-
-            try
-            {
-                node = createContentNode(companytHome,"firstNode.txt");
-                staticNodes.add(node);
-                // set the root
-                NodeRef parentRef = node.getPrimaryParentAssoc().getParentRef();
-
-
-                String snapshot = createSnapshot(staticNodes,false);
-                assertEquals(parentRef, this.companytHome);
-                ftTransferReceiver.setTransferRootNode(parentRef.toString());
-                ftTransferReceiver.saveSnapshot(transferId, new ByteArrayInputStream(snapshot.getBytes("UTF-8")));
-                ftTransferReceiver.saveContent(transferId, node.getUuid(), new ByteArrayInputStream(dummyContentBytes));
-                ftTransferReceiver.commit(transferId);
-
-            }
-            catch (Exception ex)
-            {
-                ftTransferReceiver.end(transferId);
-                throw ex;
-            }
-        }
-        finally
-        {
-        }
+        node = createContentNode(companytHome,"firstNode.txt");
+        staticNodes.add(node);
+        
+        runFileTransferReceiverToTestBasicCommitContent(node.getUuid(), true);
+        
         // check that the temporary folder where orphan are put in do not exist anymore
         File tempFolder = new File(ftTransferReceiver.getDefaultReceivingroot() + "/" + "T_V_R_1234432123478");
         assertFalse(tempFolder.exists());
@@ -385,6 +359,58 @@ public class FileTransferReceiverTest extends TestCase
         bs.write(byteArray,0,byteArray.length);
         String content = bs.toString();
         assertEquals(content, dummyContent);
+
+        // Change the contentUrl property so that FSTR will detect a chance and consider the node for a new transfer:
+        String contentUrl = GUID.generate();
+        node.getProperties().put(ContentModel.PROP_CONTENT,
+                new ContentData("/" + contentUrl, "text/plain", dummyContent.getBytes("UTF-8").length, "UTF-8"));
+
+        // Run the transfer again using the same node but different contentUrl:
+        runFileTransferReceiverToTestBasicCommitContent(contentUrl, true);
+
+        FileTransferInfoEntity ftie = ftTransferReceiver.getDbHelper().findFileTransferInfoByNodeRef(node.getNodeRef().toString());
+        // The cause of MNT-15702 (content was always re-transferred after just one change and no subsequent ones) was 
+        // that contentUrl property was not persisted in the DB by FSTR, so we'll check this:
+        assertEquals("/" + contentUrl, ftie.getContentUrl());
+
+        // Run the transfer again using the same node, w/o any changes, just to prove there won't be any re-transferring (MNT-15702):
+        runFileTransferReceiverToTestBasicCommitContent(contentUrl, false);
+    }
+
+    private void runFileTransferReceiverToTestBasicCommitContent(String contentUrl, boolean contentShouldBeNewOrModified) throws Exception
+    {
+        String transferId = ftTransferReceiver.start("1234", true, ftTransferReceiver.getVersion());
+
+        try
+        {
+            TransferManifestNode node = staticNodes.get(staticNodes.size() - 1);
+
+            // set the root
+            NodeRef parentRef = node.getPrimaryParentAssoc().getParentRef();
+
+            String snapshot = createSnapshot(staticNodes, false);
+            assertEquals(parentRef, this.companytHome);
+            ftTransferReceiver.setTransferRootNode(parentRef.toString());
+            ftTransferReceiver.saveSnapshot(transferId, new ByteArrayInputStream(snapshot.getBytes("UTF-8")));
+
+            if (contentShouldBeNewOrModified)
+            {
+                assertTrue(ftTransferReceiver.isContentNewOrModified(node.getNodeRef().toString(), "/" + contentUrl));
+            }
+            else
+            {
+                assertFalse(ftTransferReceiver.isContentNewOrModified(node.getNodeRef().toString(), "/" + contentUrl));
+            }
+
+            ftTransferReceiver.saveContent(transferId, contentUrl, new ByteArrayInputStream(dummyContentBytes));
+            ftTransferReceiver.commit(transferId);
+
+        }
+        catch (Exception ex)
+        {
+            ftTransferReceiver.end(transferId);
+            throw ex;
+        }
     }
 
     public void testBasicRenameContentAndMove() throws Exception
