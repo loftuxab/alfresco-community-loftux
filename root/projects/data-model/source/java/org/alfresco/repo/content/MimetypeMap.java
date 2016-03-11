@@ -192,6 +192,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String MIMETYPE_VISIO = "application/vnd.visio";
 
+    public static final String MIMETYPE_VISIO_2013 = "application/vnd.visio2013";
+
     // Adobe
     public static final String MIMETYPE_APPLICATION_ILLUSTRATOR = "application/illustrator";
 
