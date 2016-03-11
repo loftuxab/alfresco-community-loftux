@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.extensions.surf</groupId>
         <artifactId>spring-surf-parent</artifactId>
-        <version>LX81</version>
+        <version>LX82</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
