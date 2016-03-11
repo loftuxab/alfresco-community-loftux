@@ -393,14 +393,7 @@ public class FileTransferReceiverTest extends TestCase
             ftTransferReceiver.setTransferRootNode(parentRef.toString());
             ftTransferReceiver.saveSnapshot(transferId, new ByteArrayInputStream(snapshot.getBytes("UTF-8")));
 
-            if (contentShouldBeNewOrModified)
-            {
-                assertTrue(ftTransferReceiver.isContentNewOrModified(node.getNodeRef().toString(), "/" + contentUrl));
-            }
-            else
-            {
-                assertFalse(ftTransferReceiver.isContentNewOrModified(node.getNodeRef().toString(), "/" + contentUrl));
-            }
+            assertEquals(contentShouldBeNewOrModified, ftTransferReceiver.isContentNewOrModified(node.getNodeRef().toString(), "/" + contentUrl));
 
             ftTransferReceiver.saveContent(transferId, contentUrl, new ByteArrayInputStream(dummyContentBytes));
             ftTransferReceiver.commit(transferId);
