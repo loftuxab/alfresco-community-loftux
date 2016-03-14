@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
+ * Copyright (C) 2005-2016 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -153,9 +153,12 @@ public class ContentData implements Serializable
     
     /**
      * Helper method to determine if the data represents any physical content or not.
+     * <p>
+     * This method only cares if there is a binary (content URL) and makes no assumptions
+     * about the length of the binary.
      * 
-     * @param contentData           the content to check (may be <tt>null</tt>)
-     * @return                      <tt>true</tt> if the value is non-null
+     * @param contentData   the content to check (may be <tt>null</tt>)
+     * @return              <tt>true</tt> if the content URL is non-null i.e. there is a binary available
      */
     public static boolean hasContent(ContentData contentData)
     {
