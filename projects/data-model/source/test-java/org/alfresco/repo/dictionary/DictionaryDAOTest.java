@@ -207,6 +207,7 @@ public class DictionaryDAOTest
         assertEquals("Wrong localised lov value.", "ABC display", lovConstraint.getDisplayLabel("ABC", service));
         assertEquals("Wrong localised lov value.", "DEF display", lovConstraint.getDisplayLabel("DEF", service));
         assertEquals("Wrong localised lov value.", "VALUE WITH SPACES display", lovConstraint.getDisplayLabel("VALUE WITH SPACES", service)); // Keys with spaces.
+        assertEquals("Wrong localised lov value.", "VALUE WITH TRAILING SPACE display", lovConstraint.getDisplayLabel("VALUE WITH TRAILING SPACE ", service)); // Keys with trailing space.
         assertNull(lovConstraint.getDisplayLabel("nosuchLOV", service));
         
         // 2. A named LoV defined within a specific property "non-Ref".
@@ -344,10 +345,11 @@ public class DictionaryDAOTest
         assertTrue("Constraint instance incorrect", propConstraints.get(0).getConstraint() instanceof ListOfValuesConstraint);
         ListOfValuesConstraint constraint = (ListOfValuesConstraint) propConstraints.get(0).getConstraint();
         List<String> allowedValues = constraint.getAllowedValues();
-        assertEquals("Expected 3 allowed values", 3, allowedValues.size());
+        assertEquals("Expected 4 allowed values", 4, allowedValues.size());
         assertEquals("ABC", allowedValues.get(0));
         assertEquals("DEF", allowedValues.get(1));
         assertEquals("VALUE WITH SPACES", allowedValues.get(2));
+        assertEquals("VALUE WITH TRAILING SPACE ", allowedValues.get(3));
 
         // check the inherited property on first derived aspect
         propDef = service.getProperty(aspectOneQName, propQName);
@@ -369,10 +371,11 @@ public class DictionaryDAOTest
         assertTrue("Constraint instance incorrect", propConstraints.get(1).getConstraint() instanceof ListOfValuesConstraint);
         constraint = (ListOfValuesConstraint) propConstraints.get(0).getConstraint();
         allowedValues = constraint.getAllowedValues();
-        assertEquals("Wrong number of allowed values", 3, allowedValues.size());
+        assertEquals("Wrong number of allowed values", 4, allowedValues.size());
         assertEquals("ABC", allowedValues.get(0));
         assertEquals("DEF", allowedValues.get(1));
         assertEquals("VALUE WITH SPACES", allowedValues.get(2));
+        assertEquals("VALUE WITH TRAILING SPACE ", allowedValues.get(3));
         constraint = (ListOfValuesConstraint) propConstraints.get(1).getConstraint();
         allowedValues = constraint.getAllowedValues();
         assertEquals("Wrong number of allowed values", 1, allowedValues.size());

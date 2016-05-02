@@ -37,6 +37,7 @@ import org.springframework.extensions.surf.util.I18NUtil;
  * @see org.alfresco.service.cmr.dictionary.Constraint
  * @see org.alfresco.repo.dictionary.constraint.AbstractConstraint
  * @see org.alfresco.repo.dictionary.constraint.RegexConstraint
+ * @see org.alfresco.repo.dictionary.constraint.ListOfValuesConstraint
  * 
  * @author Derek Hulley
  */
@@ -179,7 +180,7 @@ public class ConstraintsTest extends TestCase
             // expected
             checkI18NofExceptionMessage(e);
         }
-        List<String> allowedValues = Arrays.asList(new String[] {"abc", "def", "ghi"});
+        List<String> allowedValues = Arrays.asList(new String[] {"abc", "def", "ghi", " jkl "});
         constraint.setAllowedValues(allowedValues);
         
         assertEquals("ListOfValuesConstraint type should be 'LIST'", 
@@ -189,10 +190,11 @@ public class ConstraintsTest extends TestCase
         assertEquals("caseSensitive should be true", Boolean.TRUE,
                     constraint.getParameters().get("caseSensitive"));
         List<String> allowedValuesParam = (List<String>)constraint.getParameters().get("allowedValues");
-        assertEquals("Should be 3 allowable values", 3, allowedValuesParam.size());
+        assertEquals("Should be 4 allowable values", 4, allowedValuesParam.size());
         assertEquals("First allowable value should be 'abc'", "abc", allowedValuesParam.get(0));
         assertEquals("First allowable value should be 'def'", "def", allowedValuesParam.get(1));
         assertEquals("First allowable value should be 'ghi'", "ghi", allowedValuesParam.get(2));
+        assertEquals("First allowable value should be ' jkl '", " jkl ", allowedValuesParam.get(3));
         Boolean sorted = (Boolean)constraint.getParameters().get("sorted");
         assertFalse("sorting should be false", sorted.booleanValue());
         
@@ -207,6 +209,15 @@ public class ConstraintsTest extends TestCase
                     constraint.getParameters().get("caseSensitive"));
         evaluate(constraint, "DEF", false);
         evaluate(constraint, Arrays.asList("abc", "DEF"), false);
+        
+        // Check leading and trailing spaces are respected
+        evaluate(constraint, " jkl ", false);
+        evaluate(constraint, "jkl", true);
+        evaluate(constraint, " jkl", true);
+        evaluate(constraint, "jkl ", true);
+        evaluate(constraint, " jkl  ", true);
+        evaluate(constraint, Arrays.asList(" jkl ", " JKL "), false);
+        evaluate(constraint, Arrays.asList("  jkl  ", "  JKL  "), true);
     }
     
     public void testNumericRangeConstraint() throws Exception

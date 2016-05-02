@@ -326,6 +326,12 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
                     nodeRef,
                     ContentModel.PROP_VERSION_LABEL,
                     version.getVersionLabel());
+
+            // Set the version type (MNT-14681 fix)
+            this.nodeService.setProperty(
+                    nodeRef,
+                    ContentModel.PROP_VERSION_TYPE,
+                    version.getVersionType());
         }
         finally
         {
@@ -1056,27 +1062,36 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
             Map<QName, Serializable> newProps = this.nodeService.getProperties(versionNodeRef);
             VersionUtil.convertFrozenToOriginalProps(newProps);
             Set<QName> newAspectQNames = this.nodeService.getAspects(versionNodeRef);
-            
+                QName newNodeTypeQName = nodeService.getType(versionNodeRef);
+
             // RevertDetails - given to policy behaviours
             VersionRevertDetailsImpl revertDetails = new VersionRevertDetailsImpl();
             revertDetails.setNodeRef(nodeRef);
-            revertDetails.setNodeType(oldNodeTypeQName);
+                revertDetails.setNodeType(newNodeTypeQName);
             
             //  Do we want to maintain any existing property values?
             Collection<QName> propsToLeaveAlone = new ArrayList<QName>();
             Collection<QName> assocsToLeaveAlone = new ArrayList<QName>();
-            
-            TypeDefinition typeDef = dictionaryService.getType(oldNodeTypeQName);
-            if(typeDef != null)
-            {
-            	for(QName assocName : typeDef.getAssociations().keySet())
-            	{
-    		    	if(getRevertAssocAction(oldNodeTypeQName, assocName, revertDetails) == RevertAssocAction.IGNORE)
-    		    	{
-    		            assocsToLeaveAlone.add(assocName);
-    		    	}                		
-            	}
-            }
+
+                // The VersionRevertCallback was added in r50122 on HEAD-QA branch in ACE-1001
+                // If it is required to preserve this callback when the type is changed,
+                // this part should be reimplemented.
+                // see MNT-14688
+                if (newNodeTypeQName.equals(oldNodeTypeQName))
+                {
+                    // The node did not change the type, check the associations
+                    TypeDefinition typeDef = dictionaryService.getType(oldNodeTypeQName);
+                    if(typeDef != null)
+                    {
+                        for(QName assocName : typeDef.getAssociations().keySet())
+                        {
+                            if(getRevertAssocAction(oldNodeTypeQName, assocName, revertDetails) == RevertAssocAction.IGNORE)
+                            {
+                                assocsToLeaveAlone.add(assocName);
+                            }
+                        }
+                    }
+                }
             
         	for (QName aspect : oldAspectQNames)
         	{
@@ -1109,6 +1124,9 @@ public class Version2ServiceImpl extends VersionServiceImpl implements VersionSe
                 
                 //Restore forum properties
                 this.nodeService.addProperties(nodeRef, forumProps);
+
+                // Restore the type
+                this.nodeService.setType(nodeRef, newNodeTypeQName);
 
             Set<QName> aspectsToRemove = new HashSet<QName>(oldAspectQNames);
         	aspectsToRemove.removeAll(newAspectQNames);
