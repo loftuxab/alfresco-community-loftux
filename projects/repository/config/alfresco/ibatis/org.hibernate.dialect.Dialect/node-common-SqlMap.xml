@@ -722,7 +722,7 @@
         <where>
             <if test="nodeId != null">prop.node_id = #{nodeId}</if>
             <if test="nodeIds != null">
-                and node_id in 
+                and node.id in 
                 <foreach item="item" index="index" collection="nodeIds" open="(" separator="," close=")">
                     #{item}
                 </foreach>
@@ -1354,6 +1354,16 @@
             max(commit_time_ms)
         from
             alf_transaction
+    </select>
+    
+    <select id="select_TxnMinCommitTimeForNodeType" parameterType="TransactionQuery" resultType="java.lang.Long">
+        select 
+            min(txn.commit_time_ms)
+        from
+            alf_transaction txn
+            join alf_node node on (node.transaction_id = txn.id)
+        where
+            node.type_qname_id = #{typeQNameId}
     </select>
 
     <select id="select_OneTxnsByCommitTimeDescending" parameterType="TransactionQuery" resultMap="result_Transaction">

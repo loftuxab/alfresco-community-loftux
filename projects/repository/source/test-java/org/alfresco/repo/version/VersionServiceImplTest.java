@@ -1004,7 +1004,60 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
             fail("Transaction failed: " + e);
         }
     }
-    
+
+    /**
+     * Test reverting from Share with changing type
+     * see MNT-14688
+     * <li>
+     *     <ul>1) Create a node and a version (simulates upload a doc to Share)</ul>
+     *     <ul>2) Change the node's type to a custom with mandatory aspect</ul>
+     *     <ul>3) Create a new version via upload</ul>
+     *     <ul>4) Try to revert to original document and see if the type is reverted, too</ul>
+     * </li>
+     */
+    @SuppressWarnings("unused")
+    public void testScriptNodeRevertWithChangeType()
+    {
+        CheckOutCheckInService checkOutCheckInService =
+                (CheckOutCheckInService) applicationContext.getBean("checkOutCheckInService");
+
+        // Create a versionable node
+        NodeRef versionableNode = createNewVersionableNode();
+        Version version1 = createVersion(versionableNode);
+        //Set new type
+        nodeService.setType(versionableNode, TEST_TYPE_WITH_MANDATORY_ASPECT_QNAME);
+        // Create a new version
+        NodeRef checkedOut = checkOutCheckInService.checkout(versionableNode);
+        ContentWriter contentWriter = this.contentService.getWriter(checkedOut, ContentModel.PROP_CONTENT, true);
+        assertNotNull(contentWriter);
+        contentWriter.putContent(UPDATED_CONTENT_1);
+        nodeService.setProperty(checkedOut, PROP_1, VALUE_1);
+        checkOutCheckInService.checkin(checkedOut, null, contentWriter.getContentUrl(), false);
+        Version version2 = createVersion(versionableNode);
+
+        // Create a ScriptNode as used in Share
+        ServiceRegistry services = applicationContext.getBean(ServiceRegistry.class);
+        ScriptNode scriptNode = new ScriptNode(versionableNode, services);
+        assertEquals("0.2", nodeService.getProperty(scriptNode.getNodeRef(), ContentModel.PROP_VERSION_LABEL));
+        assertEquals(TEST_TYPE_WITH_MANDATORY_ASPECT_QNAME, nodeService.getType(scriptNode.getNodeRef()));
+
+        // Revert to version1
+        ScriptNode newNode = scriptNode.revert("History", false, version1.getVersionLabel());
+        assertEquals("0.3", nodeService.getProperty(newNode.getNodeRef(), ContentModel.PROP_VERSION_LABEL));
+        assertEquals(TEST_TYPE_QNAME, nodeService.getType(newNode.getNodeRef()));
+
+        // All done
+        setComplete();
+        try
+        {
+            endTransaction();
+        }
+        catch(Throwable e)
+        {
+            fail("Transaction failed: " + e);
+        }
+    }
+
     /**
      * Test restore
      */
@@ -2203,6 +2256,29 @@ public class VersionServiceImplTest extends BaseVersionStoreTest
         
         Object editionCodeArchive = nodeService.getProperty(versionNodeRef, prop);
         assertEquals(editionCodeArchive.getClass(), Integer.class);
+    }
+    
+    /**
+     * Check that the version type property is actually set when creating a new version.
+     * 
+     * @see https://issues.alfresco.com/jira/browse/MNT-14681
+     */
+    public void testVersionTypeIsSet()
+    {
+        ChildAssociationRef childAssociation = nodeService.createNode(this.rootNodeRef, ContentModel.ASSOC_CHILDREN,
+                QName.createQName("http://www.alfresco.org/test/versiontypeissettest/1.0", "versionTypeIsSetTest"), TEST_TYPE_QNAME);
+
+        NodeRef newNode = childAssociation.getChildRef();
+        assertNull(nodeService.getProperty(newNode, ContentModel.PROP_VERSION_TYPE));
+
+        Map<String, Serializable> versionProps = new HashMap<String, Serializable>(1);
+        versionProps.put(VersionModel.PROP_VERSION_TYPE, VersionType.MINOR);
+
+        versionService.createVersion(newNode, versionProps);
+
+        Serializable versionTypeProperty = nodeService.getProperty(newNode, ContentModel.PROP_VERSION_TYPE);
+        assertNotNull(versionTypeProperty);
+        assertTrue(versionTypeProperty.toString().equals(VersionType.MINOR.toString()));
     }
     
     /**

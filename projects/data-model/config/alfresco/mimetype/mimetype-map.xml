@@ -110,6 +110,9 @@
          <mimetype mimetype="application/vnd.visio" display="Microsoft Visio">
             <extension>vsd</extension>
          </mimetype>
+         <mimetype mimetype="application/vnd.visio2013" display="Microsoft Visio 2013">
+            <extension>vsdx</extension>
+         </mimetype>
          <mimetype mimetype="application/vnd.adobe.xdp+xml" display="Adobe Acrobat XML Data Package">
             <extension>xdp</extension>
          </mimetype>

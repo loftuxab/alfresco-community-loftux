@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.download.DownloadService;
 import org.alfresco.service.cmr.download.DownloadStatus;
 import org.alfresco.service.cmr.download.DownloadStatus.Status;
 import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -105,8 +106,9 @@ public class DownloadServiceIntegrationTest
     private static IntegrityChecker          INTEGRITY_CHECKER;
     
     // Test Content 
-	private NodeRef rootFolder;
-	private NodeRef rootFile;
+    private NodeRef rootFolder;
+    private NodeRef rootFile;
+    private NodeRef secondaryNode;
 
     private NodeRef level1Folder1;
 
@@ -118,13 +120,13 @@ public class DownloadServiceIntegrationTest
     
     @BeforeClass public static void init()
     {
-    	// Resolve required services
+        // Resolve required services
         CHECK_OUT_CHECK_IN_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("CheckOutCheckInService", CheckOutCheckInService.class);
         CONTENT_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("contentService", ContentService.class);
-    	DOWNLOAD_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("DownloadService", DownloadService.class);
-    	NODE_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("NodeService", NodeService.class);
-    	PERMISSION_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("PermissionService", PermissionService.class);
-    	TRANSACTION_HELPER = APP_CONTEXT_INIT.getApplicationContext().getBean("retryingTransactionHelper", RetryingTransactionHelper.class);
+        DOWNLOAD_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("DownloadService", DownloadService.class);
+        NODE_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("NodeService", NodeService.class);
+        PERMISSION_SERVICE = APP_CONTEXT_INIT.getApplicationContext().getBean("PermissionService", PermissionService.class);
+        TRANSACTION_HELPER = APP_CONTEXT_INIT.getApplicationContext().getBean("retryingTransactionHelper", RetryingTransactionHelper.class);
         INTEGRITY_CHECKER = APP_CONTEXT_INIT.getApplicationContext().getBean("integrityChecker", IntegrityChecker.class);
         INTEGRITY_CHECKER.setEnabled(true);
         INTEGRITY_CHECKER.setFailOnViolation(true);
@@ -167,7 +169,12 @@ public class DownloadServiceIntegrationTest
 
        testNodes.createNodeWithTextContent(level1Folder2, "level2File.txt", ContentModel.TYPE_CONTENT, AuthenticationUtil.getAdminUserName(), "Level 2 file content");
        allEntries.add("rootFolder/level1Folder2/level2File.txt");
-
+       
+       secondaryNode = testNodes.createNodeWithTextContent(COMPANY_HOME, "secondaryNodeFile.txt", ContentModel.TYPE_CONTENT, AuthenticationUtil.getAdminUserName(), "Secondary node");
+       ChildAssociationRef assoc = NODE_SERVICE.addChild(rootFolder, secondaryNode, ContentModel.ASSOC_CONTAINS, ContentModel.ASSOC_CONTAINS);
+       Assert.assertFalse(assoc.isPrimary());
+       allEntries.add("rootFolder/secondaryNodeFile.txt");
+       
        fileToCheckout = testNodes.createNodeWithTextContent(level1Folder2, "fileToCheckout.txt", ContentModel.TYPE_CONTENT, AuthenticationUtil.getAdminUserName(), "Level 2 file content");
        // Add the lock and version aspects to the created node
        NODE_SERVICE.addAspect(fileToCheckout, ContentModel.ASPECT_VERSIONABLE, null);
@@ -181,11 +188,11 @@ public class DownloadServiceIntegrationTest
     @Test public void createDownload() throws IOException, InterruptedException
     {
         // Initiate the download
-    	final NodeRef downloadNode = DOWNLOAD_SERVICE.createDownload(new NodeRef[] {rootFile, rootFolder},  true);
+        final NodeRef downloadNode = DOWNLOAD_SERVICE.createDownload(new NodeRef[] {rootFile, rootFolder},  true);
         Assert.assertNotNull(downloadNode);
 
         testNodes.addNodeRef(downloadNode);
-            	
+        
     	// Validate that the download node has been persisted correctly.
     	TRANSACTION_HELPER.doInTransaction(new RetryingTransactionCallback<Object>()
         {
@@ -209,17 +216,17 @@ public class DownloadServiceIntegrationTest
                 return null;
             }
         });
-            	
+        
         DownloadStatus status = getDownloadStatus(downloadNode);
-    	while (status.getStatus() == Status.PENDING) 
-    	{
-    	    Thread.sleep(PAUSE_TIME);
-    	    status = getDownloadStatus(downloadNode);
-    	}
-    	
-    	Assert.assertEquals(5l, status.getTotalFiles());
-    	
-    	long elapsedTime = waitForDownload(downloadNode);
+        while (status.getStatus() == Status.PENDING) 
+        {
+            Thread.sleep(PAUSE_TIME);
+            status = getDownloadStatus(downloadNode);
+        }
+        
+        Assert.assertEquals(6l, status.getTotalFiles());
+        
+        long elapsedTime = waitForDownload(downloadNode);
         
         Assert.assertTrue("Maximum creation time exceeded!", elapsedTime < MAX_TIME);
 
@@ -379,10 +386,10 @@ public class DownloadServiceIntegrationTest
            AuthenticationUtil.setFullAuthentication(previousAuth);
         }
         
-        try 
+        try
         {
             validateWorkingCopyFolder(preCheckoutExpectedEntries, level1Folder2, TEST_USER2.getUsername());
-    
+            
             final Set<String> postCheckoutExpectedEntries = new TreeSet<String>();
             postCheckoutExpectedEntries.add("level1Folder2/");
             postCheckoutExpectedEntries.add("level1Folder2/level2File.txt");
@@ -401,7 +408,7 @@ public class DownloadServiceIntegrationTest
             {
                AuthenticationUtil.setFullAuthentication(previousAuth);
             }
-        }        
+        }
         validateWorkingCopyFolder(preCheckoutExpectedEntries, level1Folder2, TEST_USER.getUsername());
         validateWorkingCopyFolder(preCheckoutExpectedEntries, level1Folder2, TEST_USER2.getUsername());
     }

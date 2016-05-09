@@ -187,6 +187,66 @@ public class TransformerConfigLimitsTest
         assertEquals(1, txtToPngLimits.getPageLimit());
     }
     
+    // MNT-14295 With Java 7 the order in which properties were supplied changed from
+    // what happen with Java 6 and happens with 8. When combined with a bug to do with
+    // always clearing the max value when setting a limit or the limit when setting
+    // the max value, the initial map of TransformerConfigLimits would be different.
+    // Java 7 was used as the runtime for 4.2 and the 5.0 but Java 8 became the default
+    // from 5.0.1.
+    // None of the other unit tests in this class failed as a none of them provided
+    // both max and limit values.
+    @Test
+    public void propertyOrderJava7Test()
+    {
+        mockProperties(transformerProperties,
+            "content.transformer.default.timeoutMs", "120000",
+            "content.transformer.default.readLimitTimeMs", "-1");
+    
+        extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
+        TransformationOptionLimits limits = extractor.getLimits(transformer1, "text/plain", "image/png", null);
+        assertEquals(120000L, limits.getTimeoutMs());
+        assertEquals(-1L, limits.getReadLimitTimeMs());
+    }
+
+    @Test
+    public void propertyOrderJava8or6Test()
+    {
+        mockProperties(transformerProperties,
+            "content.transformer.default.timeoutMs", "-1",
+            "content.transformer.default.readLimitTimeMs", "120000");
+    
+        extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
+        TransformationOptionLimits limits = extractor.getLimits(transformer1, "text/plain", "image/png", null);
+        assertEquals(-1L, limits.getTimeoutMs());
+        assertEquals(120000L, limits.getReadLimitTimeMs());
+    }
+
+    @Test
+    public void bothMaxAndLimitSetIgnoreLimitTest()
+    {
+        mockProperties(transformerProperties,
+            "content.transformer.default.readLimitTimeMs", "990000",
+            "content.transformer.default.timeoutMs", "120000");
+        
+        extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
+        TransformationOptionLimits limits = extractor.getLimits(transformer1, "text/plain", "image/png", null);
+        assertEquals(120000L, limits.getTimeoutMs());
+        assertEquals(-1L, limits.getReadLimitTimeMs());
+    }
+    
+    @Test
+    public void bothMaxAndLimitSetIgnoreMaxTest()
+    {
+        mockProperties(transformerProperties,
+            "content.transformer.default.readLimitTimeMs", "120000",
+            "content.transformer.default.timeoutMs", "990000");
+        
+        extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
+        TransformationOptionLimits limits = extractor.getLimits(transformer1, "text/plain", "image/png", null);
+        assertEquals(-1L, limits.getTimeoutMs());
+        assertEquals(120000L, limits.getReadLimitTimeMs());
+    }
+    
     // ---------------------------------------
 
     @Test
@@ -210,15 +270,20 @@ public class TransformerConfigLimitsTest
     public void transformerUseTest()
     {
         mockProperties(transformerProperties,
-                "content.transformer.transformer1.maxSourceSizeKBytes",           "10",
-                "content.transformer.transformer1.maxSourceSizeKBytes.use.index", "20");
+            "content.transformer.transformer2.maxSourceSizeKBytes",           "10",
+            "content.transformer.transformer1.maxSourceSizeKBytes.use.index", "20",
+            // The following is ignored when "index" is specified, as the 'use' property is transformer wide.
+            "content.transformer.transformer1.maxSourceSizeKBytes",           "30");
         
         extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
         TransformationOptionLimits limits = extractor.getLimits(transformer1, "application/pdf", "image/png", null);
-        assertEquals(10, limits.getMaxSourceSizeKBytes());
+        assertEquals(30, limits.getMaxSourceSizeKBytes());
 
         limits = extractor.getLimits(transformer1, "application/pdf", "image/png", "index");
         assertEquals(20, limits.getMaxSourceSizeKBytes());
+
+        limits = extractor.getLimits(transformer2, "application/pdf", "image/png", "index");
+        assertEquals(10, limits.getMaxSourceSizeKBytes());
     }
     
     @Test
@@ -227,13 +292,18 @@ public class TransformerConfigLimitsTest
     {
         mockProperties(transformerProperties,
                 "content.transformer.default.extensions.pdf.png.maxSourceSizeKBytes",           "10",
-                "content.transformer.default.extensions.pdf.png.maxSourceSizeKBytes.use.index", "20");
+                "content.transformer.default.extensions.pdf.png.maxSourceSizeKBytes.use.index", "20",
+                // The following is ignored when "index" is specified, as the 'use' property is system wide.
+                "content.transformer.transformer2.maxSourceSizeKBytes", "30");
         
         extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
         TransformationOptionLimits limits = extractor.getLimits(transformer1, "application/pdf", "image/png", null);
         assertEquals(10, limits.getMaxSourceSizeKBytes());
 
-        limits = extractor.getLimits(transformer1, "application/pdf", "image/png", "index");
+        limits = extractor.getLimits(transformer2, "application/pdf", "image/png", "doclib");
+        assertEquals(30, limits.getMaxSourceSizeKBytes());
+
+        limits = extractor.getLimits(transformer2, "application/pdf", "image/png", "index");
         assertEquals(20, limits.getMaxSourceSizeKBytes());
     }
     
@@ -260,6 +330,7 @@ public class TransformerConfigLimitsTest
         mockProperties(transformerProperties,
                 "content.transformer.default.maxSourceSizeKBytes",           "10",
                 "content.transformer.default.maxSourceSizeKBytes.use.index", "20",
+                // The following is ignored when "index" is specified, as the 'use' property is system wide.
                 "content.transformer.transformer2.maxSourceSizeKBytes",      "30");
         
         extractor = new TransformerConfigLimits(transformerProperties, mimetypeService);
@@ -273,7 +344,7 @@ public class TransformerConfigLimitsTest
         assertEquals(20, limits.getMaxSourceSizeKBytes());
 
         limits = extractor.getLimits(transformer2, "application/pdf", "image/png", "index");
-        assertEquals(30, limits.getMaxSourceSizeKBytes());
+        assertEquals(20, limits.getMaxSourceSizeKBytes());
     }
 
     @Test

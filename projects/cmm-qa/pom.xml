@@ -4,7 +4,7 @@
     <parent>
         <artifactId>alfresco-parent</artifactId>
         <groupId>org.alfresco</groupId>
-        <version>5.1-SNAPSHOT</version>
+        <version>5.2-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,7 @@
         <selenium.version>2.39.1</selenium.version>
         <spring.version>4.1.6.RELEASE</spring.version>
         <alfresco.version>${alfresco.base.version}</alfresco.version>
-        <alfresco.share.version>5.1-SNAPSHOT</alfresco.share.version>
+        <alfresco.share.version>5.2-SNAPSHOT</alfresco.share.version>
         <alfresco.api.utils.version>1.1</alfresco.api.utils.version>
         <enterprise.installer.path>/data/bamboo/artifacts/${enterprise.build.plan}/ALL/alfresco-*-linux-x64.???</enterprise.installer.path>
         <testng.sanity.xml>src/test/resources/cmm-sanity-testng.xml</testng.sanity.xml>

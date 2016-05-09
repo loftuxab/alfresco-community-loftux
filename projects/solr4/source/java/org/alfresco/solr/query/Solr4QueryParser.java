@@ -105,6 +105,7 @@ import org.apache.lucene.search.spans.SpanMultiTermQueryWrapper.TopTermsSpanBool
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.Version;
 import org.apache.solr.analysis.TokenizerChain;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.schema.SchemaField;
 import org.jaxen.saxpath.SAXPathException;
@@ -1301,6 +1302,20 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 					severalTokensAtSamePosition = true;
 			}
 		}
+        catch (SolrException e)
+        {
+            // MNT-15336
+            // Text against a numeric field should fail silently rather then tell you it is not possible.
+            if (isNumeric && e.getMessage() != null && e.getMessage().startsWith("Invalid Number:"))
+            {
+                // Generate a query that does not match any document - rather than nothing
+                return createNoMatchQuery();
+            }
+            else
+            {
+                throw e;
+            }
+        }
 		finally
 		{
 			try

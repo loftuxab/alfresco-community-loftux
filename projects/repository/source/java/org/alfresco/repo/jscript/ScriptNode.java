@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
+ * Copyright (C) 2005-2016 Alfresco Software Limited.
  *
  * This file is part of Alfresco
  *
@@ -31,6 +31,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.StringTokenizer;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ApplicationModel;
 import org.alfresco.model.ContentModel;
+import org.alfresco.opencmis.CMISConnector;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.action.executer.TransformActionExecuter;
@@ -63,6 +65,8 @@ import org.alfresco.repo.thumbnail.ThumbnailHelper;
 import org.alfresco.repo.thumbnail.ThumbnailRegistry;
 import org.alfresco.repo.thumbnail.script.ScriptThumbnail;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.workflow.jscript.JscriptWorkflowInstance;
 import org.alfresco.scripts.ScriptException;
@@ -193,6 +197,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     protected ServiceRegistry services = null;
     private NodeService nodeService = null;
     private FileFolderService fileFolderService = null;
+    private RetryingTransactionHelper retryingTransactionHelper = null;
     private Boolean isDocument = null;
     private Boolean isContainer = null;
     private Boolean isLinkToDocument = null;
@@ -259,6 +264,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         this.services = services;
         this.nodeService = services.getNodeService();
         this.fileFolderService = services.getFileFolderService();
+        this.retryingTransactionHelper = services.getTransactionService().getRetryingTransactionHelper();
         this.scope = scope;
     }
     
@@ -1536,6 +1542,31 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     }
     
     /**
+     * @return Sorted list of <code>AccessPermission</code> based on <code>CMISConnector.AccessPermissionComparator</code>
+     *         and <code>AccessStatus</code> of the permission for an authority.
+     */
+    public static List<AccessPermission> getSortedACLs(Set<AccessPermission> acls)
+    {
+        ArrayList<AccessPermission> ordered = new ArrayList<AccessPermission>(acls);
+        Map<String, AccessPermission> deDuplicatedPermissions = new HashMap<String, AccessPermission>(acls.size());
+        Collections.sort(ordered, new CMISConnector.AccessPermissionComparator());
+        for (AccessPermission current : ordered)
+        {
+            String composedKey = current.getAuthority() + current.getPermission();
+            if (current.getAccessStatus() == AccessStatus.ALLOWED)
+            {
+                deDuplicatedPermissions.put(composedKey, current);
+            }
+            else if (current.getAccessStatus() == AccessStatus.DENIED)
+            {
+                deDuplicatedPermissions.remove(composedKey);
+            }
+        }
+
+        return new ArrayList<AccessPermission>(deDuplicatedPermissions.values());
+    }
+
+    /**
      * Helper to construct the response object for the various getPermissions() calls.
      * 
      * @param direct    True to only retrieve direct permissions, false to get inherited also
@@ -1548,7 +1579,8 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     {
         Set<AccessPermission> acls = this.services.getPermissionService().getAllSetPermissions(getNodeRef());
         List<Object> permissions = new ArrayList<Object>(acls.size());
-        for (AccessPermission permission : acls)
+        List<AccessPermission> ordered = getSortedACLs(acls);
+        for (AccessPermission permission : ordered)
         {
             if (!direct || permission.isSetDirectly())
             {
@@ -1693,13 +1725,15 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         for (String key : this.properties.keySet())
         {
             Serializable value = (Serializable) this.properties.get(key);
-            QName qname= createQName(key);
             
-            // MNT-8678
-            if (ContentModel.PROP_CONTENT.equals(qname) && (value instanceof ScriptContentData))
+            QName qname = createQName(key);
+            
+            // MNT-15798
+            if (ContentModel.PROP_CONTENT.equals(qname) && isScriptContent(value))
             {
                 ScriptContentData contentData = (ScriptContentData) value;
-                if (contentData.getSize() == 0)
+                // Do not persist the contentData if it was not touched
+                if (!contentData.isDirty())
                 {
                     continue;
                 }
@@ -2001,18 +2035,41 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     }
     
     /**
-     * Remove this node. Any references to this Node or its NodeRef should be discarded!
+     * Remove this node. Any references to this Node or its NodeRef should be
+     * discarded!
      * 
-     * Beware: Any unsaved property changes will be lost when this is called.  To preserve property changes call {@link #save()} first.
-     *    
+     * Beware: Any unsaved property changes will be lost when this is called. To
+     * preserve property changes call {@link save()} first.
+     * 
      */
     public boolean remove()
+    {
+        return remove(false);
+    }
+
+    /**
+     * Remove this node in a new transaction or not as specified.
+     * Any references to this Node or its NodeRef should be discarded!
+     * 
+     * Beware: Any unsaved property changes will be lost when this is called. To
+     * preserve property changes call {@link save()} first.
+     * 
+     */
+    public boolean remove(boolean newTransaction)
     {
         boolean success = false;
         
         if (nodeService.exists(this.nodeRef))
         {
-            this.nodeService.deleteNode(this.nodeRef);
+            retryingTransactionHelper.doInTransaction(new RetryingTransactionCallback<Void>()
+            {
+                @Override
+                public Void execute() throws Throwable
+                {
+                    nodeService.deleteNode(nodeRef);
+                    return null;
+                }
+            }, false, newTransaction);
             success = true;
         }
         
@@ -2531,6 +2588,24 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
          this.services.getLockService().unlock(this.nodeRef);
     }
     
+    /**
+     * Gets the check-out of a working copy document
+     * @return the original Node that was checked out or null if it's not a working copy
+     */
+    public ScriptNode getCheckedOut()
+    {
+        NodeRef original = this.services.getCheckOutCheckInService().getCheckedOut(this.nodeRef);
+
+        if(original != null)
+        {
+            return newInstance(original, this.services, this.scope);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /**
      * Cancel the check-out of a working copy document. The working copy will be deleted and any changes made to it
      * are lost. Note that this method can only be called on a working copy Node. The reference to this working copy
@@ -3706,6 +3781,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         {
             this.contentData = contentData;
             this.property = property;
+            this.isDirty = ContentData.hasContent(contentData);
         }
 
         /* (non-Javadoc)
@@ -3753,6 +3829,15 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         }
         
         /**
+         * @return <code>true</code> if the contentData has a binary (content URL) associated and the updates on contentData and related properties should be saved. 
+         *         <code>false</code> if the contentData has a temporary value and no actual binary to be persisted.
+         */
+        public boolean isDirty()
+        {
+            return this.isDirty;
+        }
+        
+        /**
          * Set the content stream
          * 
          * @param content    Content string to set
@@ -3765,7 +3850,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             writer.putContent(content);
             
             // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(true);
         }
         
         /**
@@ -3782,7 +3867,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             writer.putContent(content.getInputStream());
 
             // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(true);
         }
         
         /**
@@ -3823,7 +3908,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             writer.putContent(is);
             
             // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(true);
         }
 
         /**
@@ -3838,7 +3923,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             writer.putContent(inputStream);
 
             // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(true);
         }
 
         /**
@@ -3861,7 +3946,7 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             writer.setEncoding(null);
             
             // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(true);
         }
         
         /**
@@ -3914,18 +3999,14 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
         {
             this.contentData = ContentData.setEncoding(this.contentData, encoding);
             services.getNodeService().setProperty(nodeRef, this.property, this.contentData);
-            
-            // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(false);
         }
 
         public void setMimetype(String mimetype)
         {
             this.contentData = ContentData.setMimetype(this.contentData, mimetype);
             services.getNodeService().setProperty(nodeRef, this.property, this.contentData);
-            
-            // update cached variables after putContent()
-            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            updateContentData(false);
         }
         
         /**
@@ -3985,8 +4066,18 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
             return encoding;
         }
         
+        /**
+         * Update cached contentData and the isDirty flag
+         */
+        private void updateContentData(boolean touchContent)
+        {
+            this.contentData = (ContentData) services.getNodeService().getProperty(nodeRef, this.property);
+            this.isDirty = touchContent ? true : this.isDirty;
+        }
+        
         private ContentData contentData;
         private QName property;
+        private boolean isDirty;
     }
     
     /**
