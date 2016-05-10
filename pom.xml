@@ -146,7 +146,8 @@
     <dependency.alfresco-jlan.version>6.2-SNAPSHOT</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
-    
+    <dependency.api-explorer.version>1.0-SNAPSHOT</dependency.api-explorer.version>
+
     <!-- Alfresco Office Services Module -->
     <alfresco.aos-module.version>1.1</alfresco.aos-module.version>
 
