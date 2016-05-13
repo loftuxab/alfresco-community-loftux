@@ -10,7 +10,7 @@
   </parent>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.2-SNAPSHOT</version>
+  <version>5.1.g</version>
   <name>Alfresco</name>
 
   <licenses>
@@ -1120,32 +1120,6 @@
         </modules>
     </profile>
 
-    <!-- Profile to build alfresco-enterprise -->
-    <profile>
-        <id>enterprise</id>
-        <modules>
-            <module>enterpriseprojects</module>
-        </modules>
-        <properties>
-            <!-- Enterprise specific properties -->
-            <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-enterprise-mirror/alfresco/HEAD</maven.scm.connection>
-            <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD</maven.scm.developerConnection>
-            <maven.scm.url>https://fisheye.alfresco.com/changelog/alfresco-enterprise</maven.scm.url>
-            <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/private</maven.repository.url>
-            <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/internal-snapshots</maven.distributionManagement.snapshot.url>
-            <maven.license.name>Alfresco Enterprise License</maven.license.name>
-            <maven.license.url>http://www.alfresco.com/legal</maven.license.url>
-        </properties>
-    </profile>
-
-    <!-- Profile to build Enterprise packaging, including installers -->
-    <profile>
-        <id>enterprise-packaging</id>
-        <modules>
-            <module>enterpriseprojects/packaging</module>
-        </modules>
-    </profile>
-
     <!-- Profile to add all sub-projects - handy to change the version -->
     <profile>
         <id>allprojects</id>
@@ -1153,8 +1127,6 @@
             <module>packaging</module>
             <module>projects/qa-share</module>
             <module>projects/cmm-qa</module>
-            <module>enterpriseprojects/packaging</module>
-            <module>enterpriseprojects/packaging/rpm</module>
             <module>projects/office-application</module>
         </modules>
 
