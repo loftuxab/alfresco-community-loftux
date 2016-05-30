@@ -2,13 +2,24 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="LX90"
-buildAlfresco="5.1-SNAPSHOT"
+buildnumber="LX91"
+buildAlfresco="5.2-SNAPSHOT"
+# Add url in format id::layout::url, see http://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html
+snapshotRepo=""
+releaseRepo=""
 
 # SCM Revision number -Fetch automatically
 
 scmpath=`git config --get remote.origin.url`
 scmrevision=`git log --pretty=format:'%h' -n 1`
+
+# Set values normally set by Alfresco bamboo build system.
+bamboo_planName="mvnLoftuxWrapper"
+bamboo_fullBuildKey="$buildnumber $buildAlfresco"
+bamboo_buildNumber=1
+bamboo_repository_revision_number=$scmrevision
+bamboo_custom_svn_lastchange_revision_number=$scmrevision
+bamboo_planRepository_repositoryUrl=$scmpath
 
 echo
 echo "Loftux Maven Wrapper. Helper script for building Alfresco with maven."
@@ -30,7 +41,9 @@ read KEY
 
 install() {
     echo "Starting local install build..."
-    mvn clean source:jar install -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+    mvn clean source:jar-no-fork install -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
+    -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
+    -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
 }
 
 deploy() {
@@ -40,11 +53,27 @@ deploy() {
 
     if [[ $buildnumber == *"SNAPSHOT"* ]]
     then
-        echo "Deploy to SNAPSHOT"
-        mvn clean deploy source:jar -Penv=production -DaltDeploymentRepository=loftux-snapshots::default::http://artifacts.loftux.net/nexus/content/repositories/snapshots -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+        if [ -n "$snapshotRepo" ]; then
+            echo "Deploy to SNAPSHOT $snapshotRepo"
+            echo
+            mvn clean deploy source:jar-no-fork -Penv=production -DaltSnapshotDeploymentRepository="$snapshotRepo" \
+            -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
+            -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
+            -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
+        else
+            echo "You must set the snapshotRepo url for a SNAPSHOT deployment"
+        fi
     else
-        echo "Deploy to Release"
-        mvn clean deploy source:jar -Penv=production -DaltDeploymentRepository=loftux-releases::default::http://artifacts.loftux.net/nexus/content/repositories/releases -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath"
+        if [ -n "$releaseRepo" ]; then
+            echo "Deploy to RELEASE $releaseRepo"
+            echo
+            mvn clean deploy source:jar-no-fork -Penv=production -DaltReleaseDeploymentRepository="$releaseRepo" \
+            -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
+            -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
+            -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
+        else
+            echo "You must set the releaseRepo url for a RELEASE deployment"
+        fi
     fi
 
 }
@@ -69,6 +98,10 @@ cleanup() {
 
     find . -name "pom.xml" -type f -exec sed -i '' "s/\<version\>$buildnumber\<\/version\>/\<version\>$buildAlfresco\<\/version\>/g" {} \;
     find . -name "pom.xml" -type f -exec sed -i '' "s/\<alfresco.platform.version\>$buildnumber\<\/alfresco.platform.version\>/\<alfresco.platform.version\>$buildAlfresco\<\/alfresco.platform.version\>/g" {} \;
+
+    echo
+    echo "Restore orginal Alfresco build number completed"
+    echo
 
 }
 
