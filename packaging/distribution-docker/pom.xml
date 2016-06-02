@@ -8,7 +8,6 @@
     <description>Downloads bits and pieces</description>
     <properties>
       <alfresco.version>${project.version}</alfresco.version>
-      <share.version>5.2.1-SNAPSHOT</share.version>
       <explorer.version>1.1-SNAPSHOT</explorer.version>
     </properties>
     <licenses>
@@ -29,13 +28,6 @@
         <groupId>org.alfresco</groupId>
         <artifactId>alfresco-solr4-distribution</artifactId>
         <version>${alfresco.version}</version>
-        <type>zip</type>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.alfresco</groupId>
-        <artifactId>alfresco-share-distribution</artifactId>
-        <version>${share.version}</version>
         <type>zip</type>
         <scope>provided</scope>
       </dependency>
