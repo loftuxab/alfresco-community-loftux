@@ -61,7 +61,7 @@
       <snapshotRepository>
           <id>alfresco-internal-snapshots</id>
           <url>${maven.distributionManagement.snapshot.url}</url>
-      </snapshotRepository>      
+      </snapshotRepository>
   </distributionManagement>
 
   <modules>
@@ -501,7 +501,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>                  
+  <build>
     <!-- Non standard folder layout -->
     <sourceDirectory>source/java</sourceDirectory>
     <testSourceDirectory>source/test-java</testSourceDirectory>
@@ -512,7 +512,7 @@
     </resources>
     <testResources>
         <testResource>
-             <directory>source/test-resources</directory> 
+             <directory>source/test-resources</directory>
         </testResource>
     </testResources>
 
@@ -690,9 +690,6 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
-                    <!-- Uncomment to generate javadoc on Java 8
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                    -->
                 </configuration>
             </plugin>
             <plugin>
@@ -895,7 +892,7 @@
         <id>run</id>
         <build>
             <plugins>
-                
+
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
@@ -1381,7 +1378,22 @@
             </dependency>
         </dependencies>
     </profile>
-
+    <profile>
+        <id>doclint-java8-disable</id>
+        <activation>
+            <jdk>[1.8,)</jdk>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <additionalparam>-Xdoclint:none</additionalparam>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>
