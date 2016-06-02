@@ -1,0 +1,8 @@
+alfresco:
+  image: dockerreg.alfresco.com/platform-distribution:api-latest
+  ports:
+  - "7203:7203"
+  - "8080:8080"
+  - "8443:8443"
+
+#JMX connect via service:jmx:rmi:///jndi/rmi://localhost:7203/jmxrmi
