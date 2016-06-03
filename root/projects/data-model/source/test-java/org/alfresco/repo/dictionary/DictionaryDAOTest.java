@@ -51,6 +51,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
@@ -71,6 +72,7 @@ public class DictionaryDAOTest
     private static final String TEST_URL = "http://www.alfresco.org/test/dictionarydaotest/1.0";
     private static final String TEST2_URL = "http://www.alfresco.org/test/dictionarydaotest2/1.0";
     private static final String TEST_MODEL = "org/alfresco/repo/dictionary/dictionarydaotest_model.xml";
+    private static final String TEST_NS_CLASH_MODEL = "org/alfresco/repo/dictionary/nstest_model.xml";
     private static final String TEST_BUNDLE = "org/alfresco/repo/dictionary/dictionarydaotest_model";
     private static final String TEST_COMMON_NS_PARENT_MODEL = "org/alfresco/repo/dictionary/commonpropertynsparent_model.xml";
     private static final String TEST_COMMON_NS_CHILD_MODEL = "org/alfresco/repo/dictionary/commonpropertynschild_model.xml";
@@ -145,6 +147,41 @@ public class DictionaryDAOTest
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.setTenantService(tenantService);
         bootstrap.bootstrap();
+    }
+
+    /**
+     * ACE-5120: Dictionary should not allow duplication of namespace prefixes
+     */
+    @Test
+    public void testNamespaceClashResultsInSensibleError()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+        
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        List<String> bootstrapModels = new ArrayList<String>();
+        
+        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
+        bootstrapModels.add(TEST_MODEL);
+        bootstrapModels.add(TEST_NS_CLASH_MODEL);
+
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.setTenantService(tenantService);
+
+        try
+        {
+            bootstrap.bootstrap();
+            fail("Expected "+NamespaceException.class.getName()+" to be thrown, but it was not.");
+        }
+        catch (NamespaceException e)
+        {
+            System.out.println(e.getMessage());
+            // Good!
+        }
     }
 
     @Test

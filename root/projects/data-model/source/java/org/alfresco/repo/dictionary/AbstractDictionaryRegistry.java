@@ -562,6 +562,14 @@ public abstract class AbstractDictionaryRegistry implements DictionaryRegistry
 		    {
 		        throw new NamespaceException("Namespace URI " + uri + " does not exist");
 		    }
+		    if (prefixesCache.containsKey(prefix))
+	        {
+	            throw new NamespaceException(
+	                    String.format("Namespace prefix '%s' is already in use for URI '%s' so cannot be registered for URI '%s'",
+	                            prefix,
+	                            prefixesCache.get(prefix),
+	                            uri));
+	        }
 		    prefixesCache.put(prefix,  uri);
         }
         finally
