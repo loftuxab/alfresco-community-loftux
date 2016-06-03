@@ -19,6 +19,7 @@
 package org.alfresco.repo.content;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -633,26 +634,43 @@ public class MimetypeMap implements MimetypeService
 //            metadata.add(Metadata.RESOURCE_NAME_KEY, filename);
 //        }
         TikaInputStream inp = null;
-        if (reader != null)
+        try
         {
-	        if (reader instanceof FileContentReader)
-	        {
-	            try
-	            {
-	                inp = TikaInputStream.get(((FileContentReader) reader).getFile());
-	            }
-	            catch (FileNotFoundException e)
-	            {
-	                logger.warn("No backing file found for ContentReader " + e);
-	                return null;
-	            }
-	        }
-	        else
-	        {
-	        	inp = TikaInputStream.get(reader.getContentInputStream());
-	        }
+            if (reader != null)
+            {
+    	        if (reader instanceof FileContentReader)
+    	        {
+    	            try
+    	            {
+    	                inp = TikaInputStream.get(((FileContentReader) reader).getFile());
+    	            }
+    	            catch (FileNotFoundException e)
+    	            {
+    	                logger.warn("No backing file found for ContentReader " + e);
+    	                return null;
+    	            }
+    	        }
+    	        else
+    	        {
+    	        	inp = TikaInputStream.get(reader.getContentInputStream());
+    	        }
+            }
+            return detectType(filename, inp);
         }
-        return detectType(filename, inp);
+        finally
+        {
+            if (inp != null)
+            {
+                try
+                {
+                    inp.close();
+                }
+                catch (IOException e)
+                {
+                    logger.error("Error while closing TikaInputStream.", e);
+                }
+            }
+        }
     }
 
     private MediaType detectType(String filename, InputStream input)
