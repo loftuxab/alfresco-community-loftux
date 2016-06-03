@@ -2426,6 +2426,8 @@ public class AlfrescoSolrDataModel implements QueryConstants
      {
          if(getNamespaceDAO().getURIs().contains(NamespaceService.CONTENT_MODEL_1_0_URI))
          {
+             // Remove the prefix before adding, as we do not allow overwriting.
+             getNamespaceDAO().removePrefix("");
              getNamespaceDAO().addPrefix("", NamespaceService.CONTENT_MODEL_1_0_URI);
          }
      }
