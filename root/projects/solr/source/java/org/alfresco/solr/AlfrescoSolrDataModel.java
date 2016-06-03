@@ -889,6 +889,8 @@ public class AlfrescoSolrDataModel
     {
         if(AlfrescoSolrDataModel.getInstance(id).getNamespaceDAO().getURIs().contains(NamespaceService.CONTENT_MODEL_1_0_URI))
         {
+            // Remove the prefix before adding, as we do not allow overwriting.
+            AlfrescoSolrDataModel.getInstance(id).getNamespaceDAO().removePrefix("");
             AlfrescoSolrDataModel.getInstance(id).getNamespaceDAO().addPrefix("", NamespaceService.CONTENT_MODEL_1_0_URI);
         }
     }
