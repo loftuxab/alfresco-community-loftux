@@ -299,6 +299,18 @@ public interface PermissionService
     public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions);
 
     /**
+    * Set the global inheritance behavior for permissions on a node. If the operation takes 
+    * too long and asyncCall parameter set accordingly, fixed ACLs method will be asynchronously called.
+    * 
+    * @param nodeRef                           node for which inheritance will be set.
+    * @param inheritParentPermissions          <tt>true</tt> to inherit parent permissions, <tt>false</tt> otherwise.
+    * @param asyncCall                         <tt>true</tt> if fixed ACLs should be asynchronously set when operation execution takes too long,
+    *                                          <tt>false</tt> to execute synchronously regardless of execution time.
+    */
+    @Auditable(parameters = { "nodeRef", "inheritParentPermissions", "asyncCall" })
+    public void setInheritParentPermissions(NodeRef nodeRef, boolean inheritParentPermissions, boolean asyncCall);
+
+    /**
      * Return the global inheritance behaviour for permissions on a node.
      */
     @Auditable(parameters = { "nodeRef" })

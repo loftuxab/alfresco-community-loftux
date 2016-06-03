@@ -138,6 +138,13 @@ public interface ContentModel
      */
     static final QName ASPECT_PENDING_DELETE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "pendingDelete");
     
+    /**
+     * Aspect marking nodes for pending set fixed ACL operation and it's contants
+     */
+    static final QName ASPECT_PENDING_FIX_ACL = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "pendingFixAcl");
+    static final QName PROP_SHARED_ACL_TO_REPLACE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "sharedAclToReplace");
+    static final QName PROP_INHERIT_FROM_ACL = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "inheritFromAcl");
+    
     //
     // Content Model Definitions
     //
