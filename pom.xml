@@ -123,6 +123,7 @@
     <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
+    <licenseName>community</licenseName>
 
     <!-- Default location of the root of the checkout. To be overriden if project is deeper than 2 levels -->
     <highest.basedir>${basedir}/../..</highest.basedir>
@@ -579,6 +580,42 @@
                 </execution>
             </executions>
         </plugin>
+
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>1.8</version>
+            <configuration>
+                <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+                <organizationName>Alfresco Software Limited</organizationName>
+                <failOnMissingHeader>true</failOnMissingHeader>
+                <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+                <licenseResolver>classpath://alfresco</licenseResolver>
+                <licenseName>${licenseName}</licenseName>
+                <roots>src,source</roots>
+                <includes>
+                    <include>**/*.java</include>
+                    <include>**/*.jsp</include>
+                </includes>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>check-licenses</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>check-file-header</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <dependencies>
+                <dependency>
+                    <groupId>org.alfresco</groupId>
+                    <artifactId>alfresco-license-headers</artifactId>
+                    <version>1.0</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+
         <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
