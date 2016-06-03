@@ -2542,13 +2542,22 @@ public class SolrInformationServer implements InformationServer
 
             String transformationStatusFieldName = getSolrFieldNameForContentPropertyMetadata(propertyQName, 
                         AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_STATUS);
-            newDoc.addField(transformationStatusFieldName, cachedDoc.getFieldValue(transformationStatusFieldName));
+            if(transformationStatusFieldName != null) 
+            {
+                newDoc.addField(transformationStatusFieldName, cachedDoc.getFieldValue(transformationStatusFieldName));
+            }
             String transformationExceptionFieldName = getSolrFieldNameForContentPropertyMetadata(propertyQName, 
                         AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_EXCEPTION);
-            newDoc.addField(transformationExceptionFieldName, cachedDoc.getFieldValue(transformationExceptionFieldName));
+            if(transformationExceptionFieldName != null) 
+            {
+                newDoc.addField(transformationExceptionFieldName, cachedDoc.getFieldValue(transformationExceptionFieldName));
+            }
             String transformationTimeFieldName = getSolrFieldNameForContentPropertyMetadata(propertyQName, 
                         AlfrescoSolrDataModel.ContentFieldType.TRANSFORMATION_TIME);
-            newDoc.addField(transformationTimeFieldName, cachedDoc.getFieldValue(transformationTimeFieldName));
+            if(transformationTimeFieldName != null) 
+            {
+                newDoc.addField(transformationTimeFieldName, cachedDoc.getFieldValue(transformationTimeFieldName));
+            }
 
             // Gets the new content docid and compares to that of the cachedDoc to mark the content as clean/dirty
             String fldName = getSolrFieldNameForContentPropertyMetadata(propertyQName, 
