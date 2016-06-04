@@ -182,6 +182,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String MIMETYPE_IMAGE_RAW_R3D = "image/x-raw-red";
 
+    public static final String MIMETYPE_IMAGE_DWT = "image/x-dwt";
+
     public static final String MIMETYPE_APPLICATION_EPS = "application/eps";
 
     public static final String MIMETYPE_JAVASCRIPT = "application/x-javascript";
