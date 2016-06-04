@@ -592,7 +592,10 @@
                 <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
                 <licenseResolver>classpath://alfresco</licenseResolver>
                 <licenseName>${licenseName}</licenseName>
-                <roots>src,source</roots>
+                <roots>
+                    <root>src</root>
+                    <root>source</root>
+                </roots>
                 <includes>
                     <include>**/*.java</include>
                     <include>**/*.jsp</include>
