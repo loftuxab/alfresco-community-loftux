@@ -86,7 +86,7 @@ public class ModelTracker extends AbstractTracker implements Tracker
         log.info("Alfresco Model dir " + alfrescoModelDir);
         if (!alfrescoModelDir.exists())
         {
-            alfrescoModelDir.mkdir();
+            alfrescoModelDir.mkdirs();
         }
         
         loadPersistedModels();
