@@ -223,6 +223,10 @@ public class CompiledModel implements ModelQuery
             {
                 throw new NamespaceException("URI " + uri + " cannot be imported as it is not defined (with prefix " + imported.getPrefix());
             }
+            if(model.getNamespace(uri) != null)
+            {
+                throw new NamespaceException("URI " + uri + " cannot be imported as it is already contained in the model's namespaces");
+            }
             prefixResolver.registerNamespace(imported.getPrefix(), uri);
         }
         for (M2Namespace defined : model.getNamespaces())
