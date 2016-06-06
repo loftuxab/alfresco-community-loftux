@@ -7019,7 +7019,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher, "ISUNSET:\""
                         + QName.createQName(TEST_NAMESPACE, "null").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "null").toString() + "\"", 1);
+             "null").toString() + "\"", 16);
             testQuery(dataModel, report, solrIndexSearcher, "EXISTS:\"" + QName.createQName(TEST_NAMESPACE,
                     "null").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "ISNOTNULL:\""
@@ -7028,7 +7028,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISUNSET:\"" + QName.createQName(TEST_NAMESPACE, "path-ista").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "path-ista").toString() + "\"", 0);
+             "path-ista").toString() + "\"", 15);
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISNOTNULL:\"" + QName.createQName(TEST_NAMESPACE, "path-ista").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher,
@@ -7037,7 +7037,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISUNSET:\"" + QName.createQName(TEST_NAMESPACE, "aspectProperty").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "aspectProperty").toString() + "\"", 0);
+             "aspectProperty").toString() + "\"", 15);
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISNOTNULL:\"" + QName.createQName(TEST_NAMESPACE, "aspectProperty").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher,
