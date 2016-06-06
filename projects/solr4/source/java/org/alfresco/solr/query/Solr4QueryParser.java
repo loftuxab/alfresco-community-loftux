@@ -917,7 +917,15 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		PropertyDefinition pd = QueryParserUtils.matchPropertyDefinition(searchParameters.getNamespace(), namespacePrefixResolver, dictionaryService, queryText);
 		if (pd != null)
 		{
-			return createTermQuery(FIELD_NULLPROPERTIES, pd.getName().toString());
+        	 Query q1 =  createTermQuery(FIELD_NULLPROPERTIES, pd.getName().toString());
+             Query q2 =  createTermQuery(FIELD_PROPERTIES, pd.getName().toString());
+             BooleanQuery query = new BooleanQuery();
+             query.add(q1, Occur.SHOULD);
+             BooleanQuery wrapped = new BooleanQuery();
+             wrapped.add(q2, Occur.MUST_NOT);
+             wrapped.add(createTermQuery(FIELD_ISNODE, "T"), Occur.MUST);
+             query.add(wrapped, Occur.SHOULD);
+             return query;
 		}
 		else
 		{
