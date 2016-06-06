@@ -30,8 +30,10 @@ import static org.alfresco.service.cmr.dictionary.DictionaryException.DuplicateD
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -75,6 +77,7 @@ public class CompiledModel implements ModelQuery
     private static final String ERR_DUPLICATE_TYPE = "d_dictionary.compiled_model.err.duplicate_type";
     private static final String ERR_DUPLICATE_ASPECT = "d_dictionary.compiled_model.err.duplicate_aspect";
     private static final String ERR_DUPLICATE_CONSTRAINT = "d_dictionary.compiled_model.err.duplicate_constraint";
+    private static final String ERR_CYCLIC_REFERENCE = "d_dictionary.compiled_model.err.cyclic_ref";
 
     private M2Model model;
     private ModelDefinition modelDefinition;
@@ -267,6 +270,8 @@ public class CompiledModel implements ModelQuery
             // Calculate class depth in hierarchy
             int depth = 0;
             QName parentName = def.getParentName();
+            Set<ClassDefinition> traversedNodes = new HashSet<ClassDefinition>();
+            traversedNodes.add(def);
             while (parentName != null)
             {
                 ClassDefinition parentClass = getClass(parentName);
@@ -274,7 +279,12 @@ public class CompiledModel implements ModelQuery
                 {
                     break;
                 }
+                if (traversedNodes.contains(parentClass))
+                {
+                    throw new DictionaryException(ERR_CYCLIC_REFERENCE, parentClass.getName(), model.getName());
+                }
                 depth = depth +1;
+                traversedNodes.add(parentClass);
                 parentName = parentClass.getParentName();
             }
 
