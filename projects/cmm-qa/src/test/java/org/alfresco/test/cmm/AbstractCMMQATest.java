@@ -354,17 +354,17 @@ public abstract class AbstractCMMQATest extends AbstractTestCMM
      */
     public String getTestDataRef(String testID)
     {
-    	if (testID.length() > 14) 
+    	if (testID.length() > 13) 
     	{
-    		testID = testID.substring(5,14);
+    		testID = testID.substring(4,13);
     	}
     	else if(testID.length() > 9)
     	{
-    		testID = testID.substring(5);
+    		testID = testID.substring(4);
     	}
     	
-        String testLongName = testID + System.currentTimeMillis();
-    	return testLongName.substring(testLongName.length()-7);
+    	String testLongName = "_" + System.currentTimeMillis();
+        return testID + testLongName.substring(7);
     }
 
     /**

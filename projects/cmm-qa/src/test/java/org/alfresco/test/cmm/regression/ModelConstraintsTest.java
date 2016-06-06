@@ -32,6 +32,7 @@ package org.alfresco.test.cmm.regression;
  */
 
 import org.alfresco.po.share.DashBoardPage;
+import org.alfresco.po.share.ShareDialogue;
 import org.alfresco.po.share.SharePage;
 import org.alfresco.po.share.SharePopup;
 import org.alfresco.po.share.cmm.admin.CreateNewModelPopUp;
@@ -171,11 +172,12 @@ public class ModelConstraintsTest extends AbstractCMMQATest
         
         // Try creating duplicate
         SharePage page = cmmActions.createNewModel(driver, modelName).render();
-        if (page instanceof SharePopup)
+        if (page instanceof ShareDialogue)
         {
-            //
+        	cmmPage = cmmActions.closeShareDialogue(driver, CreateNewModelPopUp.class).render();
         }
-        else if (page instanceof ModelManagerPage)
+        
+        if (page instanceof ModelManagerPage)
         {
             Assert.assertTrue(cmmPage.isCustomModelRowDisplayed(modelName), "Custom Model Row is not displayed");
         }
