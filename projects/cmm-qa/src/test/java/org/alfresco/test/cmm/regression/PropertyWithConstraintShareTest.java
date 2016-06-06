@@ -278,10 +278,16 @@ public class PropertyWithConstraintShareTest extends AbstractCMMQATest
         properties.put(propertyName, "fred ");
         siteActions.editNodeProperties(driver, true, properties).render();
         
+        // MNT-16165, MNT-14235: Fix means expect a failure from repo
+        // Remove Space at the end now: This should succeed
+        properties = new HashMap<String, Object>();
+        properties.put(propertyName, "fred");        
+        siteActions.editNodeProperties(driver, true, properties).render();
+        
         // Expected Error: Edit Property fails
         properties = new HashMap<String, Object>();
-        properties.put(detailsPagePropName, "fred ");
-        Assert.assertFalse(cmmActions.compareCMProperties(driver, properties), "Error: Node with Property values that do not adhere to the Constraint: Space at the end");  
+        properties.put(detailsPagePropName, "fred");
+        Assert.assertTrue(cmmActions.compareCMProperties(driver, properties), "Error: Node with Property values that do not adhere to the Constraint: Space at the end");  
         
         // Get Edit Properties Page
         siteActions.getEditPropertiesPage(driver, docFile.getName());
@@ -510,10 +516,16 @@ public class PropertyWithConstraintShareTest extends AbstractCMMQATest
         
         siteActions.getEditPropertiesPage(driver, docFile.getName());
         siteActions.editNodeProperties(driver, true, properties).render();
-        // Edit Property does not fail like cmis: Share trims the spaces, hence result not the same as cmis        
+        
+        // MNT-16165, MNT-14235: Fix means expect a failure from repo - same result as cmis
+        // Remove Space at the end now: This should succeed
+        properties = new HashMap<String, Object>();
+        properties.put(propertyName, "endswithspace@alfresco.com");        
+        siteActions.editNodeProperties(driver, true, properties).render();
+        
         properties = new HashMap<>();
-        properties.put(detailsPagePropName, "endswithspace@alfresco.com ");
-        Assert.assertFalse(cmmActions.compareCMProperties(driver, properties), "Error: Node with Property values that do not adhere to the Constraint");        
+        properties.put(detailsPagePropName, "endswithspace@alfresco.com");
+        Assert.assertTrue(cmmActions.compareCMProperties(driver, properties), "Error: Node with Property values that do not adhere to the Constraint");        
         
         // Valid value: Pattern Mismatch: Expect Failure like cmis
         properties = new HashMap<>();
