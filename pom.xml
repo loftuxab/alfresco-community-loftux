@@ -699,7 +699,7 @@
                 <serverId>alfresco-internal-staging</serverId>
                 <nexusUrl>https://artifacts.alfresco.com/nexus</nexusUrl>
                 <stagingProfileId>${release.staging.profile}</stagingProfileId>
-                <stagingDescription>Staging ${project.groupId}:${project.artifactId}:${project.version} (${bamboo_buildResultKey} ${bamboo_planRepository_revision})</stagingDescription>
+                <stagingDescription>Staging Platform (${bamboo_buildResultKey} ${bamboo_planRepository_revision})</stagingDescription>
                 <tags>
                     <build.number>${bamboo_buildNumber}</build.number>
                     <build.key>${bamboo_buildKey}</build.key>
