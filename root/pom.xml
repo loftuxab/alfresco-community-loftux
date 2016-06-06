@@ -1211,8 +1211,6 @@
         <id>allprojects</id>
         <modules>
             <module>packaging</module>
-            <module>projects/qa-share</module>
-            <module>projects/cmm-qa</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>projects/office-application</module>
