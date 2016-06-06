@@ -1802,7 +1802,7 @@ public class SolrInformationServer implements InformationServer
                         String fixedTenantDomain = AlfrescoSolrDataModel.getTenantId(nodeMetaData.getTenantDomain());
                         SolrInputDocument cachedDoc = retrieveDocFromSolrContentStore(fixedTenantDomain, nodeMetaData.getId());
                         
-                        if (cachedDoc != null)
+                        if (cachedDoc == null)
                         {
                             cachedDoc = recreateSolrDoc(nodeMetaData.getId(), fixedTenantDomain);
                             
