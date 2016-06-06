@@ -188,10 +188,10 @@ public class DynamicModelShareTest extends AbstractCMMQATest
         siteActions.uploadFile(driver, doc);
         siteActions.uploadFile(driver, doc2);
 
-        DetailsPage detailsPage = siteActions.selectContent(driver, doc.getName()).render();
+        siteActions.selectContent(driver, doc.getName()).render();
 
         // Check that nodes can be given the new Type and Aspects: Using Share
-        detailsPage.changeType(shareTypeName).render();
+        siteActions.changeType(driver, shareTypeName).render();
         
         // Check Properties
         Map<String, Object> expectedProps = new HashMap<String, Object>();
@@ -232,8 +232,8 @@ public class DynamicModelShareTest extends AbstractCMMQATest
         // The type / aspect is not available on Share 
         siteActions.openSiteDashboard(driver, siteName);
         siteActions.openDocumentLibrary(driver);
-        detailsPage = siteActions.selectContent(driver, doc2.getName()).render();
-        Assert.assertFalse(detailsPage.isTypeAvailable(shareTypeName), "Type is still available after Deactivating Model");
+        siteActions.selectContent(driver, doc2.getName()).render();
+        Assert.assertFalse(siteActions.isTypeAvailable(driver, shareTypeName), "Type is still available after Deactivating Model: " + shareTypeName);
 
         // Delete the model
         cmmActions.navigateToModelManagerPage(driver);
