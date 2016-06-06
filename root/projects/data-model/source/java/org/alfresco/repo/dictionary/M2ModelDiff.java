@@ -26,6 +26,7 @@
 package org.alfresco.repo.dictionary;  
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.dictionary.NamespaceDefinition;
 import org.alfresco.service.namespace.QName;
 import org.springframework.extensions.surf.util.ParameterCheck;
 
@@ -49,45 +50,59 @@ public class M2ModelDiff
 	public static final String TYPE_PROPERTY = "PROPERTY";
 	public static final String TYPE_ASSOCIATION = "ASSOCIATION";
 	public static final String TYPE_CONSTRAINT = "TYPE_CONSTRAINT";
+	public static final String TYPE_NAMESPACE = "TYPE_NAMESPACE";
 
     private static final String ERR_UNKNOWN_ELEMENT_TYPE = "d_dictionary.model_diff.element_type.unknown";
     private static final String ERR_UNKNOWN_DIFF_TYPE = "d_dictionary.model_diff.diff_type.unknown";
 
 	private QName elementName;   
+	private NamespaceDefinition namespace;
 	private String elementType;  
 	private String diffType;
 		
 	public M2ModelDiff(QName elementName, String elementType, String diffType)
     {
-         // Check that all the passed values are not null        
-         ParameterCheck.mandatory("elementName", elementName);
-         ParameterCheck.mandatoryString("elementType", elementType);
-         ParameterCheck.mandatoryString("diffType", diffType);
-        
-         if ((!elementType.equals(TYPE_TYPE)) &&
-             (!elementType.equals(TYPE_ASPECT)) &&
-             (!elementType.equals(TYPE_DEFAULT_ASPECT)) &&
-             (!elementType.equals(TYPE_PROPERTY)) &&
-             (!elementType.equals(TYPE_ASSOCIATION)) &&
-             (!elementType.equals(TYPE_CONSTRAINT))
-             )
-         {
-             throw new AlfrescoRuntimeException(ERR_UNKNOWN_ELEMENT_TYPE, new Object[] { elementType });
-         }
-        
-         if ((! diffType.equals(DIFF_CREATED)) && 
-             (! diffType.equals(DIFF_UPDATED)) && 
-             (! diffType.equals(DIFF_UPDATED_INC)) && 
-             (! diffType.equals(DIFF_DELETED)) && 
-             (! diffType.equals(DIFF_UNCHANGED)))
-         {
-             throw new AlfrescoRuntimeException(ERR_UNKNOWN_DIFF_TYPE, new Object[] { diffType });
-         }
-        
-         this.elementName = elementName;
-         this.elementType = elementType;
-         this.diffType = diffType;
-     }
+        initModelDiff(elementName, elementType, diffType);
+    }
+
+    public M2ModelDiff(QName elementName, NamespaceDefinition namespace, String elementType, String diffType)
+    {
+        initModelDiff(elementName, elementType, diffType);
+        this.namespace = namespace;
+    }
+
+    private void initModelDiff(QName elementName, String elementType, String diffType)
+    {
+        // Check that all the passed values are not null        
+        ParameterCheck.mandatory("elementName", elementName);
+        ParameterCheck.mandatoryString("elementType", elementType);
+        ParameterCheck.mandatoryString("diffType", diffType);
+
+        if ((!elementType.equals(TYPE_TYPE)) &&
+            (!elementType.equals(TYPE_ASPECT)) &&
+            (!elementType.equals(TYPE_DEFAULT_ASPECT)) &&
+            (!elementType.equals(TYPE_PROPERTY)) &&
+            (!elementType.equals(TYPE_ASSOCIATION)) &&
+            (!elementType.equals(TYPE_CONSTRAINT)) &&
+            (!elementType.equals(TYPE_NAMESPACE))
+            )
+        {
+            throw new AlfrescoRuntimeException(ERR_UNKNOWN_ELEMENT_TYPE, new Object[] { elementType });
+        }
+
+        if ((! diffType.equals(DIFF_CREATED)) &&
+            (! diffType.equals(DIFF_UPDATED)) &&
+            (! diffType.equals(DIFF_UPDATED_INC)) &&
+            (! diffType.equals(DIFF_DELETED)) &&
+            (! diffType.equals(DIFF_UNCHANGED)))
+        {
+            throw new AlfrescoRuntimeException(ERR_UNKNOWN_DIFF_TYPE, new Object[] { diffType });
+        }
+       
+        this.elementName = elementName;
+        this.elementType = elementType;
+        this.diffType = diffType;
+    }
 
      public QName getElementName()
      {
@@ -104,6 +119,11 @@ public class M2ModelDiff
          return diffType;
      }
 
+     public NamespaceDefinition getNamespaceDefinition()
+     {
+        return namespace;
+     }
+     
      public String toString()
      {
          return new String(elementType + " " + elementName + " " + diffType);

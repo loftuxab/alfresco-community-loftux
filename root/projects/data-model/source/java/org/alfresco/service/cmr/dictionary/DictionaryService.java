@@ -320,6 +320,13 @@ public interface DictionaryService extends MessageLookup
      */
     Collection<ConstraintDefinition> getConstraints(QName model, boolean referenceableDefsOnly);
     
+
+    /**
+     * @param uri the namespace uri for search for
+     * @return the named model definition
+     */
+    ModelDefinition getModelByNamespaceUri(String uri);
+
     // TODO: Behaviour definitions
     
 }
