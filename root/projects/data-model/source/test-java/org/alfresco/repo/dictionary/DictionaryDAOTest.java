@@ -54,6 +54,7 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -1102,5 +1103,65 @@ public class DictionaryDAOTest
             propertyWithAnalyserBundelName.setAnalyserResourceBundleName("propertyResourceBundle");
         }
         return model;
+    }
+
+    //testing a model containing circular dependency cannot be imported with bootstrap
+    @Test
+    public void testBootstrapImportModelWithCircularTypes()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        List<String> bootstrapModels = new ArrayList<String>();
+
+        bootstrapModels.add("org/alfresco/repo/dictionary/modelCircularTypes.xml");
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.setTenantService(tenantService);
+
+        try
+        {
+            bootstrap.bootstrap();
+            fail("Bootstrap should fail as the model contains a cyclic refrence");
+        }
+        catch(DictionaryException e)
+        {
+            assertEquals(e.getMsgId(), "d_dictionary.bootstrap.model_not_imported");
+        }
+    }
+
+    @Test
+    public void testCreateModelWithCircularTypeDependency()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+
+        //create model
+        String testNamespace = "http://www.alfresco.org/model/dictionary/1.0/my";
+        M2Model model = M2Model.createModel("my:circularModel");
+        model.createNamespace(testNamespace, "my");
+        model.setAnalyserResourceBundleName("typeModelResourceBundle");
+        M2Type typeA = model.createType("my:circularA");
+        typeA.setParentName("my:circularC");
+        M2Type typeB = model.createType("my:circularB");
+        typeB.setParentName("my:circularA");
+        M2Type typeC = model.createType("my:circularC");
+        typeC.setParentName("my:circularB");
+
+        try
+        {
+            dictionaryDAO.putModel(model);
+            fail("Model should not be saved successfully because it contains a cyclic reference");
+        } catch(DictionaryException e)
+        {
+            assertEquals(e.getMsgId(), "d_dictionary.compiled_model.err.compile.failure");
+        }
     }
 }
