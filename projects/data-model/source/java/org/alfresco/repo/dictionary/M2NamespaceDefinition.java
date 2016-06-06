@@ -25,6 +25,10 @@
  */
 package org.alfresco.repo.dictionary;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.NamespaceDefinition;
 
@@ -61,5 +65,51 @@ public class M2NamespaceDefinition implements NamespaceDefinition
     public String getPrefix()
     {
         return prefix;
+    }
+
+    static List<M2ModelDiff> diffNamespaceDefinitionLists(Collection<NamespaceDefinition> previousNamespaces, Collection<NamespaceDefinition> newNamespaces)
+    {
+        List<M2ModelDiff> modelDiffs = new ArrayList<M2ModelDiff>();
+
+        for (NamespaceDefinition previousNamespace: previousNamespaces)
+        {
+            boolean found = false;
+            for (NamespaceDefinition newNamespace : newNamespaces)
+            {
+                if (newNamespace.getUri().equals(previousNamespace.getUri()))
+                {
+                    if(!newNamespace.getPrefix().equals(previousNamespace.getPrefix()))
+                    {
+                        modelDiffs.add(new M2ModelDiff(newNamespace.getModel().getName(), newNamespace, M2ModelDiff.TYPE_NAMESPACE, M2ModelDiff.DIFF_UPDATED));
+                    }
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                modelDiffs.add(new M2ModelDiff(previousNamespace.getModel().getName(), M2ModelDiff.TYPE_NAMESPACE, M2ModelDiff.DIFF_DELETED));
+            }
+        }
+
+        for (NamespaceDefinition newNamespace : newNamespaces)
+        {
+            boolean found = false;
+            for (NamespaceDefinition previousNamespace : previousNamespaces)
+            {
+                if (newNamespace.getUri().equals(previousNamespace.getUri()))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found)
+            {
+                modelDiffs.add(new M2ModelDiff(newNamespace.getModel().getName(), newNamespace, M2ModelDiff.TYPE_NAMESPACE, M2ModelDiff.DIFF_CREATED));
+            }
+        }
+        return modelDiffs;
     }
 }

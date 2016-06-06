@@ -515,6 +515,19 @@ public class DictionaryComponent implements DictionaryService, TenantDeployer
         return messageLookup.getMessage(messageKey, locale, params);
     }
 
+    @Override
+    public ModelDefinition getModelByNamespaceUri(String uri)
+    {
+        for(QName modelQname : dictionaryDAO.getModels())
+        {
+            if(modelQname.getNamespaceURI().equals(uri))
+            {
+                return getModel(modelQname);
+            }
+        }
+        return null;
+    }
+
 //	@Override
 //	public Collection<QName> getCoreTypes()
 //	{
