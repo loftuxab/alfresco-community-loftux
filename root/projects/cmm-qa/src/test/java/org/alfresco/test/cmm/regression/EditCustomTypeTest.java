@@ -207,13 +207,13 @@ public class EditCustomTypeTest extends AbstractCMMQATest
         siteActions.createSite(driver,siteName, "", "");
         siteActions.openSitesDocumentLibrary(driver, siteName);
         siteActions.createContent(driver,contentDetails, ContentType.PLAINTEXT);
-        DetailsPage detailsPage = siteActions.selectContent(driver, name).render();
+        siteActions.selectContent(driver, name).render();
 
         //Verify type1 name is available in change type drop down in details page
-        Assert.assertTrue(detailsPage.isTypeAvailable(shareTypeName1),"type1 displayed in change type drop down");
+        Assert.assertTrue(siteActions.isTypeAvailable(driver, shareTypeName1), "Type is not available on Share: " + shareTypeName1);
         
-        //Verify type2 name is available in change type drop down in details page
-        Assert.assertTrue(detailsPage.isTypeAvailable(shareTypeName2),"type2 displayed in change type drop down");              
+        //Verify type2 name is available in change type drop down in details page            
+        Assert.assertTrue(siteActions.isTypeAvailable(driver, shareTypeName2), "Type is not available on Share: " + shareTypeName2);
         
         //Deactivate Model2
         cmmActions.navigateToModelManagerPage(driver);
@@ -339,14 +339,14 @@ public class EditCustomTypeTest extends AbstractCMMQATest
         siteActions.createSite(driver,siteName, "", "");
         siteActions.openSitesDocumentLibrary(driver, siteName);
         siteActions.createContent(driver,contentDetails, ContentType.PLAINTEXT);
-        DetailsPage detailsPage = siteActions.selectContent(driver, name).render();
+        siteActions.selectContent(driver, name).render();
         
         //Verify type1 is available in change type drop down in details page
-        Assert.assertTrue(detailsPage.isTypeAvailable(shareTypeName1),"type1 displayed in change type drop down");
+        Assert.assertTrue(siteActions.isTypeAvailable(driver, shareTypeName1), "Type is not available on Share: " + shareTypeName1);
         
         //Verify type2 is available in change type drop down in details page
-        Assert.assertTrue(detailsPage.isTypeAvailable(shareTypeName2),"type2 displayed in change type drop down");
-               
+        Assert.assertTrue(siteActions.isTypeAvailable(driver, shareTypeName2), "Type is not available on Share: " + shareTypeName2);
+        
         //Deactivate model1
         cmmActions.navigateToModelManagerPage(driver);
         cmmActions.setModelActive(driver, modelName1, false).render();
