@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.alfresco</groupId>
         <artifactId>alfresco-parent</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.a-EA</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <groupId>org.alfresco</groupId>
     <artifactId>alfresco-dev-tomcat</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.a-EA</version>
     <packaging>pom</packaging>
 
     <name>alfresco-dev-tomcat-conf</name>
