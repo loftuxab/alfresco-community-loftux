@@ -1747,6 +1747,7 @@ public class SolrInformationServer implements InformationServer
             StringBuilder builder = new StringBuilder();
             builder.append(FIELD_ANCESTOR).append(":\"").append(parentNodeMetaData.getNodeRef()).append("\"");
             builder.append(" AND -").append(FIELD_CASCADETX).append(":[").append(cascadeTx.getValue()).append(" TO MAX]");
+            builder.append(" AND ").append(FIELD_TENANT).append(":\"").append(AlfrescoSolrDataModel.getTenantId(parentNodeMetaData.getTenantDomain())).append("\"");
             
             ModifiableSolrParams params = new ModifiableSolrParams(request.getParams());
             params.set("q", builder.toString()).set("fl", FIELD_SOLR4_ID).set("rows", Integer.MAX_VALUE);
