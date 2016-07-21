@@ -138,14 +138,14 @@
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.14.RELEASE</dependency.spring.version>
     <dependency.tomcat.version>7.0.59</dependency.tomcat.version>
-    <dependency.activiti.version>5.19.0.1</dependency.activiti.version>
-    <dependency.activiti-engine.version>5.19.0.1</dependency.activiti-engine.version>
+    <dependency.activiti.version>5.19.0.2</dependency.activiti.version>
+    <dependency.activiti-engine.version>5.19.0.2</dependency.activiti-engine.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.2</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.7-SNAPSHOT</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.3-SNAPSHOT</dependency.alfresco-core.version>
+    <dependency.alfresco-core.version>6.4-SNAPSHOT</dependency.alfresco-core.version>
     <dependency.alfresco-jlan.version>6.2-SNAPSHOT</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
