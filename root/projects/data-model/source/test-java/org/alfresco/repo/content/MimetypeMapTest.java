@@ -234,7 +234,7 @@ public class MimetypeMapTest extends TestCase
         MimetypeMap m = new MimetypeMap(null);
         ContentReader reader = new DummyContentReader(MimetypeMap.MIMETYPE_VIDEO_QUICKTIME);
         assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, mimetypeService.getMimetypeIfNotMatches(reader));
-        assertEquals(MimetypeMap.MIMETYPE_BINARY, mimetypeService.guessMimetype("file.rm", reader.getContentInputStream()));
+        assertEquals(MimetypeMap.MIMETYPE_TEXT_PLAIN, mimetypeService.guessMimetype("file.rm", reader.getContentInputStream()));
         assertEquals(MimetypeMap.MIMETYPE_VIDEO_QUICKTIME, mimetypeService.guessMimetype("file.rm", reader));
     }
 
