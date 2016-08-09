@@ -97,6 +97,13 @@ public interface ContentModel
     static final QName PROP_ARCHIVED_CHILD_ASSOCS = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedChildAssocs");
     static final QName PROP_ARCHIVED_SOURCE_ASSOCS = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedSourceAssocs");
     static final QName PROP_ARCHIVED_TARGET_ASSOCS = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedTargetAssocs");
+    static final QName ASPECT_ARCHIVE_LOCKABLE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedLockable");
+    static final QName PROP_ARCHIVED_LOCK_OWNER = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedLockOwner");
+    static final QName PROP_ARCHIVED_LOCK_TYPE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedLockType");
+    static final QName PROP_ARCHIVED_LOCK_LIFETIME = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedLockLifetime");
+    static final QName PROP_ARCHIVED_EXPIRY_DATE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedExpiryDate");
+    static final QName PROP_ARCHIVED_LOCK_ADDITIONAL_INFO = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "archivedLockAdditionalInfo");
+
     
     // referenceable aspect constants
     static final QName TYPE_REFERENCE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "reference");
