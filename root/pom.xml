@@ -747,6 +747,9 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
+                    <links>
+                        <link>http://docs.oracle.com/javaee/7/api</link>
+                    </links>
                 </configuration>
             </plugin>
             <plugin>
