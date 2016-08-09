@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.alfresco</groupId>
     <artifactId>alfresco-super-pom</artifactId>
-    <version>6</version>
+    <version>7</version>
   </parent>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
@@ -109,7 +109,6 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.build.sourceVersion>1.8</maven.build.sourceVersion>
 
     <!-- Arguments for test execution in surefire -->
     <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
@@ -585,7 +584,6 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.8</version>
             <configuration>
                 <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
                 <organizationName>Alfresco Software Limited</organizationName>
@@ -693,7 +691,6 @@
         <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.6</version>
             <extensions>true</extensions>
             <configuration>
                 <serverId>alfresco-internal-staging</serverId>
