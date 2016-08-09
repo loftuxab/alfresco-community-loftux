@@ -67,7 +67,7 @@
   <modules>
     <module>projects/3rd-party</module>
     <module>projects/data-model</module>
-    <module>projects/dev-tomcat</module>
+    <module>projects/dev-tomcat</module> 
     <module>projects/legacy-lucene</module>
     <module>projects/mbeans</module>
     <module>projects/repository</module>
@@ -1436,8 +1436,9 @@
             </dependency>
         </dependencies>
     </profile>
-    <profile>
-        <id>doclint-java8-disable</id>
+    
+  <!--  <profile>
+        <id>doclint-java8-max</id>
         <activation>
             <jdk>[1.8,)</jdk>
         </activation>
@@ -1446,12 +1447,13 @@
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
-                        <additionalparam>-Xdoclint:none</additionalparam>
+                        <additionalparam>-Xmaxwarns 10000 -Xmaxerrs 10000</additionalparam>
                     </configuration>
                 </plugin>
             </plugins>
         </build>
-    </profile>
+    </profile> -->
+    
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>

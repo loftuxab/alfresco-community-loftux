@@ -34,8 +34,8 @@ import org.alfresco.api.AlfrescoPublicApi;
  * sets there is no selector - all the nodes returned do not have to have a specific type or aspect. For example, an FTS
  * search on properties of type d:content has no type constraint implied or otherwise. Searches against properties have
  * an implied type, but as there can be more than one property -> more than one type or aspect implied (eg via OR in FTS
- * or lucene) they are ignored An iterable result set from a searcher query.<b/> Implementations must implement the
- * indexes for row lookup as zero-based.<b/>
+ * or lucene) they are ignored An iterable result set from a searcher query.<b> Implementations must implement the
+ * indexes for row lookup as zero-based.<b>
  * 
  * @author andyh
  */
