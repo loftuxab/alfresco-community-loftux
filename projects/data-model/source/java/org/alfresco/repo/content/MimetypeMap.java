@@ -848,7 +848,10 @@ public class MimetypeMap implements MimetypeService
 
         // If Tika has supplied a very generic type, go with the filename one,
         // as it's probably a custom Text or XML format known only to Alfresco
-        if (MediaType.TEXT_PLAIN.equals(type) || MediaType.APPLICATION_XML.equals(type)) { return filenameGuess; }
+        if ((MediaType.TEXT_PLAIN.equals(type) || MediaType.APPLICATION_XML.equals(type)) && (! filenameGuess.equals(MIMETYPE_BINARY)))
+        { 
+            return filenameGuess; 
+        }
 
         // Alfresco doesn't support mimetype parameters
         // Use the form of the mimetype without any
