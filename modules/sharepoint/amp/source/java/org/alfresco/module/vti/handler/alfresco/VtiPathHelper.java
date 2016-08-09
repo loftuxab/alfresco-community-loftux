@@ -297,7 +297,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
      * Split URL path to document name and path to parent folder of that document
      *
      * @param path URL path
-     * @return Pair<String, String> first item of pair - path to parent folder, second item - document name
+     * @return first item of pair - path to parent folder, second item - document name
      */
     public static Pair<String, String> splitPathParentChild(String path)
     {

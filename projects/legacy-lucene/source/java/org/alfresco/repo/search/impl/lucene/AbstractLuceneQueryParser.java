@@ -4695,7 +4695,6 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
      * @param slop int
      * @param inOrder boolean
      * @param expandedFieldName String
-     * @param expandedLocales List<Locale>
      * @param mlAnalysisMode MLAnalysisMode
      * @return org.apache.lucene.search.Query
      */
@@ -5008,7 +5007,6 @@ public abstract class AbstractLuceneQueryParser extends QueryParser implements Q
      * @param analysisMode AnalysisMode
      * @param luceneFunction LuceneFunction
      * @param expandedFieldName String
-     * @param expandedLocales List<Locale>
      * @return Query
      * @throws ParseException
      */

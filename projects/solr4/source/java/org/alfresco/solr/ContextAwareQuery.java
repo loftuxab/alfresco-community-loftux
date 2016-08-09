@@ -133,7 +133,6 @@ public class ContextAwareQuery extends Query
 
 
     /**
-     * @param terms Set<Term>
      * @see org.apache.lucene.search.Query#extractTerms(java.util.Set)
      */
     public void extractTerms(Set<Term> terms)

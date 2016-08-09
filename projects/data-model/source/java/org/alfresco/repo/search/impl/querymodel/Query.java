@@ -40,7 +40,6 @@ public interface Query
      * "*"  "A.*" etc column specifications are not supported.
      * These should have been previously expanded between any query parse and building the query model. 
      * 
-     * @return List<Column>
      */
     public List<Column> getColumns();
     
@@ -58,7 +57,6 @@ public interface Query
     /**
      * Get any orderings (may be an empty list or null)
      *  
-     * @return List<Ordering>
      */
     public List<Ordering> getOrderings();
     

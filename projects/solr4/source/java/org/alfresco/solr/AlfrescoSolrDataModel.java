@@ -1819,7 +1819,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
 
     /**
      *
-     * @return List<AlfrescoModel>
      */
     public List<AlfrescoModel> getAlfrescoModels()
     {
@@ -1835,7 +1834,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     }
 
     /**
-     * @return Map<String, Set<String>>
      */
     public Map<String, Set<String>> getModelErrors()
     {
@@ -2209,7 +2207,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
     /**
      *
      * @param mode CMISQueryMode
-     * @param searchParametersAndFilter Pair<SearchParameters, Boolean>
      * @param req SolrQueryRequest
      * @param queryModelQuery Query
      * @param cmisVersion CmisVersion
@@ -2273,7 +2270,6 @@ public class AlfrescoSolrDataModel implements QueryConstants
      }
 
     /**
-     * @param searchParametersAndFilter Pair<SearchParameters, Boolean>
      * @param req SolrQueryRequest
      * @return Query
      * @throws ParseException

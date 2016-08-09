@@ -48,7 +48,7 @@ public interface VersionsServiceHandler
      * Returns information about the versions of the specified file
      * 
      * @param fileName A string that contains the site-relative URL of the file in the form Folder_Name/File_Name
-     * @return List<DocumentVersionBean> information about the versions of the specified file
+     * @return information about the versions of the specified file
      */
     public List<DocumentVersionBean> getVersions(String fileName) throws FileNotFoundException;
 
@@ -57,7 +57,7 @@ public interface VersionsServiceHandler
      * 
      * @param fileName site relative url to the file
      * @param fileVersion file version to restore
-     * @return List<DocumentVersionBean> list of DocumentVersion beans
+     * @return list of DocumentVersion beans
      */
     public List<DocumentVersionBean> restoreVersion(String fileName, String fileVersion);
 
@@ -66,7 +66,7 @@ public interface VersionsServiceHandler
      * 
      * @param fileName site relative url to the file
      * @param fileVersion file version to restore
-     * @return List<DocumentVersionBean> list of DocumentVersion beans
+     * @return list of DocumentVersion beans
      */
     public List<DocumentVersionBean> deleteVersion(String fileName, String fileVersion) 
        throws FileNotFoundException, VersionDoesNotExistException;

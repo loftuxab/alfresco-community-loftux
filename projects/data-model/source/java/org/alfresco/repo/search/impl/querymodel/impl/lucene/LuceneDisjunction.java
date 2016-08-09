@@ -44,7 +44,6 @@ public class LuceneDisjunction<Q, S, E extends Throwable> extends BaseDisjunctio
 {
 
     /**
-     * @param constraints List<Constraint>
      */
     public LuceneDisjunction(List<Constraint> constraints)
     {

@@ -629,7 +629,7 @@ public interface NodeService
      * <li>sys:node-dbid</li>
      * <li>sys:store-identifier</li>
      * <li>sys:store-protocol</li>
-     * <ul>
+     * </ul>
      * 
      * @param nodeRef           the parent node - usually a <b>container</b>
      * @param propertyQName     the fully qualified name of the property

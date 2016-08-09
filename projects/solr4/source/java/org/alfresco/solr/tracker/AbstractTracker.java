@@ -112,8 +112,6 @@ public abstract class AbstractTracker implements Tracker
     }
     
     /**
-     * @param node
-     * @return
      */
     protected boolean isInAclShard(long aclId)
     {

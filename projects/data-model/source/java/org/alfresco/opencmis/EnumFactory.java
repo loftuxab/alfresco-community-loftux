@@ -37,33 +37,23 @@ import java.util.TreeMap;
  * 
  * @author dcaruana
  *
- * @param <E>
  */
 public class EnumFactory<E extends Enum<E>>
 {
     private E defaultEnum;
     private Map<String, E> labelMap = new HashMap<String, E>(10);
     
-    /**
-     * @param enumClass Class<E>
-     */
     public EnumFactory(Class<E> enumClass)
     {
         this(enumClass, null, false);
     }
 
-    /**
-     * @param enumClass Class<E>
-     * @param defaultEnum E
-     */
     public EnumFactory(Class<E> enumClass, E defaultEnum)
     {
         this(enumClass, defaultEnum, false);
     }
     
     /**
-     * @param enumClass Class<E>
-     * @param defaultEnum E
      * @param caseSensitive  case-sensitive lookup for Enum label
      */
     public EnumFactory(Class<E> enumClass, E defaultEnum, boolean caseSensitive)

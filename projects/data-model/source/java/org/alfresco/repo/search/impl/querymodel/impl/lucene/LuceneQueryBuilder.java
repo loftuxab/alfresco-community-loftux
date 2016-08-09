@@ -43,8 +43,6 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
 {
     /**
      * Build the matching lucene query
-     * @param selectors Set<String>
-     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
      * @param functionContext FunctionEvaluationContext
      * @return - the query
      * @throws E
@@ -53,8 +51,6 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
 
     /**
      * Build the matching lucene sort
-     * @param selectors Set<String>
-     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
      * @param functionContext FunctionEvaluationContext
      * @return - the sort spec
      * @throws E 
@@ -63,10 +59,7 @@ public interface LuceneQueryBuilder <Q, S, E extends Throwable>
     
     /**
      * Build a sort definition for a sorted result set wrapper
-     * @param selectors Set<String>
-     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
      * @param functionContext FunctionEvaluationContext
-     * @return List<SortDefinition>
      */
     public List<SortDefinition> buildSortDefinitions(Set<String> selectors, LuceneQueryBuilderContext<Q, S, E> luceneContext, FunctionEvaluationContext functionContext);
 

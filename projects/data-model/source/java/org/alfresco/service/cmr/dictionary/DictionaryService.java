@@ -241,7 +241,6 @@ public interface DictionaryService extends MessageLookup
      * If dataType is null then this method will return *ALL* properties regardless of data type.
      * 
      * @param dataType QName
-     * @return Collection<QName>
      */
     @NotAuditable
     Collection<QName> getAllProperties(QName dataType);
@@ -255,7 +254,6 @@ public interface DictionaryService extends MessageLookup
      * 
      * @param model QName
      * @param dataType QName
-     * @return Collection<QName>
      */
     @NotAuditable
     Collection<QName> getProperties(QName model, QName dataType);
@@ -264,7 +262,6 @@ public interface DictionaryService extends MessageLookup
      * Get all properties for the specified model
      * 
      * @param model QName
-     * @return Collection<QName>
      */
     Collection<QName> getProperties(QName model);
     
@@ -303,7 +300,6 @@ public interface DictionaryService extends MessageLookup
      * Get constraints for the specified model
      * 
      * @param model QName
-     * @return Collection<ConstraintDefinition>
      */
     public Collection<ConstraintDefinition> getConstraints(QName model);
     
@@ -314,7 +310,6 @@ public interface DictionaryService extends MessageLookup
      * 
      * @param model QName
      * @param referenceableDefsOnly boolean
-     * @return Collection<ConstraintDefinition>
      *
      * @since 3.2R
      */

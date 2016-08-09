@@ -906,7 +906,6 @@ public class AlfrescoSolrEventListener implements SolrEventListener
      * @param before CacheSection[]
      * @param after CacheSection[]
      * @param afterIndexReaders IndexReader[]
-     * @return LinkedList<CacheMatch>
      */
     public LinkedList<CacheMatch> buildCacheUpdateOperations(boolean hasNew, CacheSection[] before, CacheSection[] after, IndexReader[] afterIndexReaders)
     {
@@ -1740,16 +1739,13 @@ public class AlfrescoSolrEventListener implements SolrEventListener
 
         /**
          * @param tracker CacheUpdateTracker
-         * @param oldIndexedByDocId ResizeableArrayList<CacheEntry>
          * @param oldAclIdByDocId long[]
          * @param oldTxByDocId long[]
          * @param oldAclTxByDocId long[]
-         * @param indexedByDocId ResizeableArrayList<CacheEntry>
          * @param allLeafDocs OpenBitSet
          * @param aclIdByDocId long[]
          * @param txIdByDocId long[]
          * @param aclTxIdByDocId long[]
-         * @param unmatchedByDBID HashMap<Long, CacheEntry>
          * @param deleted OpenBitSet
          * @param reader SolrIndexReader
          * @param ownerIdManager OwnerIdManager

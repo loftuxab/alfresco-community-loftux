@@ -52,7 +52,6 @@ public class DeleteVersionEndpoint extends AbstractVersionEndpoint
      * @param dws String
      * @param fileName String
      * @param fileVersion Element
-     * @return List<DocumentVersionBean>
      * @throws Exception
      */
     @Override

@@ -84,7 +84,6 @@ public interface CMISDictionaryService
     /**
      * Get all Types
      * 
-     * @return List<TypeDefinitionWrapper>
      */
     List<TypeDefinitionWrapper> getAllTypes();
 

@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  * CMIS Dictionary which provides Types that strictly conform to the CMIS
  * specification.
  * 
- * That is, only maps types to one of root Document, Folder, Relationship &
+ * That is, only maps types to one of root Document, Folder, Relationship and
  * Policy.   
  * 
  * And Item which is pretty much anything that is not a Document, Folder, Relationship or Policy.
