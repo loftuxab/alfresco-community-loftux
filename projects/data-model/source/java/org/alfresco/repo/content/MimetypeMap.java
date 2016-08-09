@@ -186,6 +186,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String MIMETYPE_APPLICATION_EPS = "application/eps";
 
+    public static final String MIMETYPE_APPLICATION_PS = "application/postscript";
+
     public static final String MIMETYPE_JAVASCRIPT = "application/x-javascript";
 
     public static final String MIMETYPE_ZIP = "application/zip";
