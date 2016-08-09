@@ -770,6 +770,17 @@ public class MimetypeMap implements MimetypeService
             // Probably close enough
             return null;
         }
+        
+        // Check through known aliases of the type
+        SortedSet<MediaType> aliases = tikaConfig.getMediaTypeRegistry().getAliases(type);
+        for (MediaType alias : aliases)
+        {
+            String aliasType = alias.toString();
+            if (aliasType.equals(claimed.toString())) 
+            {
+                return null; 
+            }
+        }
 
         // If we get here, then most likely the type is wrong
         return type.toString();

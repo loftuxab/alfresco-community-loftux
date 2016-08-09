@@ -27,11 +27,8 @@ package org.alfresco.repo.content;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -41,8 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentIOException;
@@ -56,6 +51,8 @@ import org.springframework.extensions.config.ConfigDeployment;
 import org.springframework.extensions.config.ConfigService;
 import org.springframework.extensions.config.ConfigSource;
 import org.springframework.extensions.config.xml.XMLConfigService;
+
+import junit.framework.TestCase;
 
 /**
  * @see org.alfresco.repo.content.MimetypeMap
@@ -226,12 +223,11 @@ public class MimetypeMapTest extends TestCase
     {
         Collection<String> types = mimetypeService.getMimetypes(null);
         assertNotNull(types);
-        types = mimetypeService.getMimetypes(".txt");
+        types = mimetypeService.getMimetypes("txt");
         assertNotNull(types);
 
         assertNull(mimetypeService.getMimetypeIfNotMatches(new DummyContentReader()));
     }
-
 
     public void testMisc() throws Exception
     {
@@ -241,7 +237,6 @@ public class MimetypeMapTest extends TestCase
         assertEquals(MimetypeMap.MIMETYPE_BINARY, mimetypeService.guessMimetype("file.rm", reader.getContentInputStream()));
         assertEquals(MimetypeMap.MIMETYPE_VIDEO_QUICKTIME, mimetypeService.guessMimetype("file.rm", reader));
     }
-
 
     public void testDuplicates() throws Exception
     {
