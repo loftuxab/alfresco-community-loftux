@@ -31,7 +31,7 @@ import java.util.Set;
 import org.alfresco.service.cmr.search.ResultSet;
 
 /**
- * Encapsulate Query engine results List<Pair<Set<String>, ResultSet>>
+ * Encapsulate Query engine results
  * 
  * @author andyh
  */

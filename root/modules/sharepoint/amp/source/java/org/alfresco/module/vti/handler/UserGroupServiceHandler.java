@@ -42,7 +42,6 @@ public interface UserGroupServiceHandler
      * 
      * @param dwsUrl dws url
      * @param emailList list that specifies the e-mail address of the user
-     * @return List<UserBean>
      */
     List<UserBean> getUserLoginFromEmail(String dwsUrl, List<String> emailList);
 

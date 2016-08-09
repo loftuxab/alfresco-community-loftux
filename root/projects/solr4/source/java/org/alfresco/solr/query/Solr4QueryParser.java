@@ -2345,7 +2345,6 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 
 	/**
      * @param field
-     * @param fixedTokenSequences LinkedList<LinkedList<org.apache.lucene.analysis.Token>>
      * @return Query
      */
     protected SpanOrQuery generateSpanOrQuery(String field, LinkedList<LinkedList<org.apache.lucene.analysis.Token>> fixedTokenSequences)

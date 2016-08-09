@@ -47,7 +47,7 @@ import org.alfresco.api.AlfrescoPublicApi;
  * but
  * <pre>
  *    (simpleCache.contains(key) == false) implies (simpleCache.get(key) == null)
- * <pre>
+ * </pre>
  * 
  * @author Derek Hulley
  */

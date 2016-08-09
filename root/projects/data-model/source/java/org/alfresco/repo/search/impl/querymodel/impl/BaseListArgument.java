@@ -43,7 +43,6 @@ public class BaseListArgument extends BaseStaticArgument implements ListArgument
 
     /**
      * @param name String
-     * @param arguments List<Argument>
      */
     public BaseListArgument(String name, List<Argument> arguments)
     {

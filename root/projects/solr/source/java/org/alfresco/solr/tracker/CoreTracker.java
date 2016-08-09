@@ -1219,7 +1219,6 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param txnsFound BoundedDeque<Transaction>
      * @param lastGoodTxCommitTimeInIndex long
      * @return Long
      */
@@ -1237,7 +1236,6 @@ public class CoreTracker implements Tracker
 
 
     /**
-     * @param changeSetsFound BoundedDeque<AclChangeSet>
      * @param lastGoodChangeSetCommitTimeInIndex long
      * @return Long
      */
@@ -1658,7 +1656,6 @@ public class CoreTracker implements Tracker
 
     /**
      *
-     * @param aclReaderList List<AclReaders>
      * @param overwrite boolean
      * @throws IOException
      */
@@ -1898,7 +1895,6 @@ public class CoreTracker implements Tracker
 
     /**
      * @param acltxid Long
-     * @return List<Long>
      */
     @Override
     public List<Long> getAclsForDbAclTransaction(Long acltxid)

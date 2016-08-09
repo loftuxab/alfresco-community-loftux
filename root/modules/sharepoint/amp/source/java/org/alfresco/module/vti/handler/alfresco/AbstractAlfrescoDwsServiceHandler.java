@@ -786,7 +786,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * Get document workspace site users
      * 
      * @param dwsFileInfo document workspace site file info ({@link FileInfo})
-     * @return List<MemberBean> list of document workspace site users
+     * @return list of document workspace site users
      */
     protected abstract List<MemberBean> doListDwsMembers(FileInfo dwsFileInfo);
 
@@ -825,7 +825,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * Get users permissions
      * 
      * @param dwsFileInfo document workspace site file info ({@link FileInfo})
-     * @return List<Permission> list of permissions
+     * @return list of permissions
      */
     protected abstract List<Permission> doGetUsersPermissions(FileInfo dwsFileInfo);
 

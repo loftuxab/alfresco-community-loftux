@@ -372,7 +372,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
      * 
      * @param paramName name of parameter
      * @param defaultValue default value for parameter if not present
-     * @return List<String> parameter from request or defaultValue if not present
+     * @return parameter from request or defaultValue if not present
      */
     public List<String> getParameter(String paramName, List<String> defaultValue)
     {
@@ -480,7 +480,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
      * Get dictionary
      * 
      * @param paramName name of parameter
-     * @return Map<String, String> parameter from request
+     * @return parameter from request
      */
     public Map<String, String> getDictionary(String paramName)
     {
@@ -524,7 +524,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
      * Get meta-dictionary
      * 
      * @param paramName name of parameter
-     * @return Map<String, Object> parameter from request
+     * @return parameter from request
      */
     public Map<String, Object> getMetaDictionary(String paramName)
     {
