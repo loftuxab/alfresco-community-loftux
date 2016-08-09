@@ -67,7 +67,7 @@
   <modules>
     <module>projects/3rd-party</module>
     <module>projects/data-model</module>
-    <module>projects/dev-tomcat</module> 
+    <module>projects/dev-tomcat</module>
     <module>projects/legacy-lucene</module>
     <module>projects/mbeans</module>
     <module>projects/repository</module>
