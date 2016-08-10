@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.rule.ruletrigger;
 
@@ -43,26 +50,12 @@ import org.alfresco.service.namespace.QName;
  */
 public abstract class RuleTriggerAbstractBase implements RuleTrigger
 {
-    /** the types (hardcoded) to ignore generally */
-    private static final Set<QName> IGNORE_TYPES;
-    
-    static
-    {
-        IGNORE_TYPES = new HashSet<QName>(13);
-        IGNORE_TYPES.add(RuleModel.TYPE_RULE);
-        IGNORE_TYPES.add(ActionModel.TYPE_ACTION);
-        IGNORE_TYPES.add(ContentModel.TYPE_THUMBNAIL);
-        IGNORE_TYPES.add(ContentModel.TYPE_FAILED_THUMBNAIL);
-        // Workaround to prevent rules running on cm:rating nodes (which happened for 'liked' folders ALF-8308 & ALF-8382)
-        IGNORE_TYPES.add(ContentModel.TYPE_RATING);
-        IGNORE_TYPES.add(ContentModel.TYPE_SYSTEM_FOLDER);
-    }
-    
     /**
      * A list of the rule types that are interested in this trigger
      */
     private Set<RuleType> ruleTypes = new HashSet<RuleType>();
     private Set<QName> ignoredAspects = Collections.emptySet();
+    private Set<QName> ignoredTypes=Collections.emptySet();
 
     protected PolicyComponent policyComponent;
     protected NodeService nodeService;
@@ -187,7 +180,7 @@ public abstract class RuleTriggerAbstractBase implements RuleTrigger
     {
     	boolean result = false;    	
     	QName typeQName = nodeService.getType(actionedUponNodeRef);
-    	if (IGNORE_TYPES.contains(typeQName))
+    	if (ignoredTypes.contains(typeQName))
     	{
     		result = true;
     	}
@@ -222,6 +215,25 @@ public abstract class RuleTriggerAbstractBase implements RuleTrigger
         for (String ignoredAspectStr : ignoredAspects)
         {
             this.ignoredAspects.add(QName.createQName(ignoredAspectStr));
+        }
+    }
+
+    public Set<QName> getIgnoredTypes()
+    {
+        return ignoredTypes;
+    }
+
+    /**
+     * Converting String ignored Types from Spring context to QNames
+     * 
+     * @param ignoredTypes
+     */
+    public void setIgnoredTypeStr(List<String> ignoredTypes)
+    {
+        this.ignoredTypes = new HashSet<QName>(13);
+        for (String ignoredTypeStr : ignoredTypes)
+        {
+            this.ignoredTypes.add(QName.createQName(ignoredTypeStr));
         }
     }
 }

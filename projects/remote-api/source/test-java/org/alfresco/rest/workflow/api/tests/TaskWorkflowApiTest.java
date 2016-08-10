@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.rest.workflow.api.tests;
 import static org.junit.Assert.assertEquals;
@@ -1981,6 +1988,81 @@ public class TaskWorkflowApiTest extends EnterpriseWorkflowTestApi
             assertEquals(false, paginationJSON.get("hasMoreItems"));
             jsonEntries = (JSONArray) taskListJSONObject.get("entries");
             assertEquals(2, jsonEntries.size());
+        }
+        finally
+        {
+            cleanupProcessInstance(startedProcesses.toArray(new ProcessInstance[] {}));
+        }
+    }
+    
+    @Test
+    public void testGetTasksWithPagingAndVariablesLimit() throws Exception 
+    {
+        RequestContext requestContext = initApiClientWithTestUser();
+        List<ProcessInstance> startedProcesses = new ArrayList<ProcessInstance>();
+        
+        // system.workflow.engine.activiti.taskvariableslimit is set to 200 in test-resources/alfresco-global.properties
+        try
+        {
+            // MNT-16040: Create tasks with a number of variables just below the taskvariableslimit and test that skipCount is working as expected.
+            int numberOfTasks = 15;
+            for (int i = 0; i < numberOfTasks; i++) 
+            {
+                startedProcesses.add(startAdhocProcess(requestContext.getRunAsUser(), requestContext.getNetworkId(), null));
+            }
+            TaskService taskService = activitiProcessEngine.getTaskService();
+            List<Task> taskList = new ArrayList<Task>();
+            for (int i = 0; i < numberOfTasks; i++) 
+            {
+                Task task = taskService.createTaskQuery().processInstanceId(startedProcesses.get(i).getProcessInstanceId()).singleResult();
+                taskService.setPriority(task.getId(), (i + 1) * 10);
+                
+                // Add an extra variable to the task, there are other 12 added, so a total of 13 variables for each task.
+                taskService.setVariableLocal(task.getId(), "test1", "test1");
+                taskList.add(task);
+            }
+            
+            TasksClient tasksClient = publicApiClient.tasksClient();
+            
+            // Test without skipCount
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("where", "(includeProcessVariables = true AND includeTaskVariables = true)");
+            JSONObject taskListJSONObject = tasksClient.findTasks(params);
+            assertNotNull(taskListJSONObject);
+            JSONObject paginationJSON = (JSONObject) taskListJSONObject.get("pagination");
+            assertEquals(15l, paginationJSON.get("count"));
+            assertEquals(15l, paginationJSON.get("totalItems"));
+            assertEquals(0l, paginationJSON.get("skipCount"));
+            assertEquals(false, paginationJSON.get("hasMoreItems"));
+            JSONArray jsonEntries = (JSONArray) taskListJSONObject.get("entries");
+            assertEquals(15, jsonEntries.size());
+            
+            // Test with skipCount
+            params.clear();
+            params.put("skipCount", "5");
+            params.put("where", "(includeProcessVariables = true AND includeTaskVariables = true)");
+            taskListJSONObject = tasksClient.findTasks(params);
+            assertNotNull(taskListJSONObject);
+            paginationJSON = (JSONObject) taskListJSONObject.get("pagination");
+            assertEquals(10l, paginationJSON.get("count"));
+            assertEquals(15l, paginationJSON.get("totalItems"));
+            assertEquals(5l, paginationJSON.get("skipCount"));
+            assertEquals(false, paginationJSON.get("hasMoreItems"));
+            jsonEntries = (JSONArray) taskListJSONObject.get("entries");
+            assertEquals(10, jsonEntries.size());
+            
+            params.clear();
+            params.put("maxItems", "10");
+            params.put("where", "(includeProcessVariables = true AND includeTaskVariables = true)");
+            taskListJSONObject = tasksClient.findTasks(params);
+            assertNotNull(taskListJSONObject);
+            paginationJSON = (JSONObject) taskListJSONObject.get("pagination");
+            assertEquals(10l, paginationJSON.get("count"));
+            assertEquals(15l, paginationJSON.get("totalItems"));
+            assertEquals(0l, paginationJSON.get("skipCount"));
+            assertEquals(true, paginationJSON.get("hasMoreItems"));
+            jsonEntries = (JSONArray) taskListJSONObject.get("entries");
+            assertEquals(10, jsonEntries.size());
         }
         finally
         {

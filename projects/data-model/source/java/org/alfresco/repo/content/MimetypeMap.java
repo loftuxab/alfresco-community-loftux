@@ -1,24 +1,32 @@
 /*
- * Copyright (C) 2005-2016 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Data model classes
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -173,6 +181,8 @@ public class MimetypeMap implements MimetypeService
     public static final String MIMETYPE_IMAGE_RAW_RWL = "image/x-raw-leica";
 
     public static final String MIMETYPE_IMAGE_RAW_R3D = "image/x-raw-red";
+
+    public static final String MIMETYPE_IMAGE_DWT = "image/x-dwt";
 
     public static final String MIMETYPE_APPLICATION_EPS = "application/eps";
 
@@ -633,26 +643,43 @@ public class MimetypeMap implements MimetypeService
 //            metadata.add(Metadata.RESOURCE_NAME_KEY, filename);
 //        }
         TikaInputStream inp = null;
-        if (reader != null)
+        try
         {
-	        if (reader instanceof FileContentReader)
-	        {
-	            try
-	            {
-	                inp = TikaInputStream.get(((FileContentReader) reader).getFile());
-	            }
-	            catch (FileNotFoundException e)
-	            {
-	                logger.warn("No backing file found for ContentReader " + e);
-	                return null;
-	            }
-	        }
-	        else
-	        {
-	        	inp = TikaInputStream.get(reader.getContentInputStream());
-	        }
+            if (reader != null)
+            {
+    	        if (reader instanceof FileContentReader)
+    	        {
+    	            try
+    	            {
+    	                inp = TikaInputStream.get(((FileContentReader) reader).getFile());
+    	            }
+    	            catch (FileNotFoundException e)
+    	            {
+    	                logger.warn("No backing file found for ContentReader " + e);
+    	                return null;
+    	            }
+    	        }
+    	        else
+    	        {
+    	        	inp = TikaInputStream.get(reader.getContentInputStream());
+    	        }
+            }
+            return detectType(filename, inp);
         }
-        return detectType(filename, inp);
+        finally
+        {
+            if (inp != null)
+            {
+                try
+                {
+                    inp.close();
+                }
+                catch (IOException e)
+                {
+                    logger.error("Error while closing TikaInputStream.", e);
+                }
+            }
+        }
     }
 
     private MediaType detectType(String filename, InputStream input)

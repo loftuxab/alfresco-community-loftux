@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.imap;
 
@@ -60,6 +67,7 @@ import org.alfresco.repo.management.subsystems.ChildApplicationContextFactory;
 import org.alfresco.repo.node.integrity.IntegrityChecker;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileFolderUtil;
@@ -237,6 +245,7 @@ public class ImapServiceImplTest extends TestCase
         {
             e.printStackTrace();
         }
+        AuthenticationUtil.clearCurrentSecurityContext();
     }
 
     private void importInternal(String acpName, NodeRef space)
@@ -276,11 +285,18 @@ public class ImapServiceImplTest extends TestCase
         return present;
     }
     
-    private void reauthenticate(String name, String password)
+    private void reauthenticate(final String name, final String password)
     {
-        authenticationService.invalidateTicket(authenticationService.getCurrentTicket());
-        authenticationService.clearCurrentSecurityContext();
-        authenticationService.authenticate(name, password.toCharArray());
+        transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Object>()
+        {
+            public Object execute()
+            {
+                authenticationService.invalidateTicket(authenticationService.getCurrentTicket());
+                authenticationService.clearCurrentSecurityContext();
+                authenticationService.authenticate(name, password.toCharArray());
+                return null;
+            }
+        });
     }
 
     public void testGetFolder() throws Exception

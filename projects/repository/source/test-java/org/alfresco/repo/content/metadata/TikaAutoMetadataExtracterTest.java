@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content.metadata;
 
@@ -22,6 +29,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -70,6 +78,8 @@ public class TikaAutoMetadataExtracterTest extends AbstractMetadataExtracterTest
         TikaConfig config = (TikaConfig)ctx.getBean("tikaConfig");
         extracter = new TikaAutoMetadataExtracter(config);
         extracter.setDictionaryService(dictionaryService);
+        MetadataExtracterConfig metadataExtracterConfig = (MetadataExtracterConfig)ctx.getBean("metadataExtracterConfig");
+        extracter.setMetadataExtracterConfig(metadataExtracterConfig);
         extracter.register();
         
         // Attach some extra mappings, using the Tika
@@ -163,7 +173,62 @@ public class TikaAutoMetadataExtracterTest extends AbstractMetadataExtracterTest
            testFileSpecificMetadata(mimetype, properties);
         }
     }
-    
+
+    /**
+     * Test MNT-15219 Excel (.xlsx) containing xmls (shapes/drawings) with multi byte characters may
+     * cause OutOfMemory in Tika Note - doesn't use extractFromMimetype
+     */
+    public void testParsingOfShapesInXLSXFiles() throws Exception
+    {
+        AutoDetectParser ap = new AutoDetectParser();
+
+        String filename = "dmsu1332-reproduced.xlsx";
+        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("quick/" + filename);
+        File file = new File(url.getFile());
+
+        // Cheat and ask Tika for the mime type!
+        Metadata metadata = new Metadata();
+        metadata.set(Metadata.RESOURCE_NAME_KEY, filename);
+        MediaType mt = ap.getDetector().detect(TikaInputStream.get(file), metadata);
+        String mimetype = mt.toString();
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Detected mimetype " + mimetype + " for quick test file " + filename);
+        }
+
+        // Have it processed
+        // Note that if the patched/fix from MNT-15219 is not applied,
+        // or if the default false value of the content.metadataExtracter.parseShapes property is overridden
+        // then the next call will throw an OutOfMemory that is dealt with by the tika metadata extracter framework
+        // and it will fail at the next assert because properties extracted will be empty
+        Map<QName, Serializable> properties = extractFromFile(file, mimetype);
+
+        // check we got something
+        assertFalse("extractFromMimetype should return at least some properties, none found for " + mimetype + " - " + filename, 
+                properties.isEmpty());
+
+        if (properties.containsKey(ContentModel.PROP_AUTHOR))
+        {
+            assertEquals("Property " + ContentModel.PROP_AUTHOR + " not found for mimetype " + mimetype, 
+                    "Udintsev, Anton (external - Project)",
+                    DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(ContentModel.PROP_AUTHOR)));
+        }
+        else
+        {
+            fail("Expected one property out of " + ContentModel.PROP_CREATOR + " and " + ContentModel.PROP_AUTHOR + " but found neither of them for "
+                    + mimetype);
+        }
+
+        // Ensure that we can also get things which are standard
+        // Tika metadata properties, if we so choose to
+        assertTrue("Test Property " + TIKA_MIMETYPE_TEST_PROPERTY + " not found for mimetype " + mimetype, 
+                properties.containsKey(TIKA_MIMETYPE_TEST_PROPERTY));
+        assertEquals("Test Property " + TIKA_MIMETYPE_TEST_PROPERTY + " incorrect for mimetype " + mimetype, 
+                mimetype,
+                DefaultTypeConverter.INSTANCE.convert(String.class, properties.get(TIKA_MIMETYPE_TEST_PROPERTY)));
+    }
+
     @Override
     protected boolean skipAuthorCheck(String mimetype) { return true; }
 
@@ -274,6 +339,7 @@ public void testImageVideo() throws Throwable {
       // Check regular Tika properties
       assertEquals(QUICK_TITLE, p.get(Metadata.COMMENT));
       assertEquals("canon-55-250, moscow-birds, serbor", p.get(Metadata.SUBJECT));
+      assertTrue(Arrays.equals(new String[] { "canon-55-250", "moscow-birds", "serbor" }, (String[]) p.get("dc:subject")));
       // Check namespace'd Tika properties
       assertEquals("12.54321", p.get("geo:lat"));
       assertEquals("-54.1234", p.get("geo:long"));

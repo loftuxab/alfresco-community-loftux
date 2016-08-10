@@ -1,11 +1,38 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.framework.tests.core;
 
+import static org.hamcrest.CoreMatchers.any;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +50,7 @@ import org.alfresco.rest.api.tests.util.MultiPartBuilder.FileData;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder.MultiPartRequest;
 import org.alfresco.rest.framework.core.ResourceLocator;
 import org.alfresco.rest.framework.core.ResourceMetadata;
+import org.alfresco.rest.framework.core.ResourceOperation;
 import org.alfresco.rest.framework.core.exceptions.UnsupportedResourceOperationException;
 import org.alfresco.rest.framework.jacksonextensions.BeanPropertiesFilter;
 import org.alfresco.rest.framework.jacksonextensions.JacksonHelper;
@@ -30,6 +58,7 @@ import org.alfresco.rest.framework.jacksonextensions.RestJsonModule;
 import org.alfresco.rest.framework.resource.parameters.Paging;
 import org.alfresco.rest.framework.resource.parameters.Params;
 import org.alfresco.rest.framework.tests.api.mocks.Farmer;
+import org.alfresco.rest.framework.tools.ApiAssistant;
 import org.alfresco.rest.framework.webscripts.ParamsExtractor;
 import org.alfresco.rest.framework.webscripts.ResourceWebScriptDelete;
 import org.alfresco.rest.framework.webscripts.ResourceWebScriptGet;
@@ -54,7 +83,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 public class ParamsExtractorTests
 {
     static JacksonHelper jsonHelper = null;
-    
+    static ApiAssistant assistant = null;
+
     @BeforeClass
     public static void setupTests() throws Exception
     {
@@ -62,6 +92,9 @@ public class ParamsExtractorTests
         RestJsonModule module = new RestJsonModule();
         jsonHelper.setModule(module);
         jsonHelper.afterPropertiesSet();
+
+        assistant = new ApiAssistant();
+        assistant.setJsonHelper(jsonHelper);
     }
 
     @Test
@@ -85,12 +118,19 @@ public class ParamsExtractorTests
         params = extractor.extractParams(mockEntity(), request);
         assertNotNull(params);
         assertNotNull(params.getRelationsFilter());
-        
+        assertFalse(params.includeSource());
+
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "codfish");
+        params = extractor.extractParams(mockRelationship(), request);
+        assertNotNull(params);
+        assertNull("For getting a Collection there should be no relationshipId params.",params.getRelationshipId());
+
         templateVars.put(ResourceLocator.RELATIONSHIP_ID, "45678");
         params = extractor.extractParams(mockRelationship(), request);
         assertNotNull(params);
         assertEquals("1234", params.getEntityId());
         assertEquals("45678", params.getRelationshipId());
+        assertFalse(params.includeSource());
 
         testExtractAddressedParams(templateVars, request, extractor);
     }
@@ -105,6 +145,14 @@ public class ParamsExtractorTests
         assertTrue(params.hasBinaryProperty("codfish"));
         assertFalse(params.hasBinaryProperty("something"));
         assertEquals("codfish", params.getBinaryProperty());
+
+        templateVars.put(ResourceLocator.RELATIONSHIP_ID, "9865");
+        templateVars.put(ResourceLocator.PROPERTY, "monkFish");
+        params = extractor.extractParams(mockProperty(), request);
+        assertNotNull(params);
+        assertEquals("1234", params.getEntityId());
+        assertEquals("9865", params.getRelationshipId());
+        assertTrue(params.hasBinaryProperty("monkFish"));
         return params;
     }
     
@@ -114,7 +162,7 @@ public class ParamsExtractorTests
     {
         //Put together the stubs
         ResourceWebScriptPost extractor = new ResourceWebScriptPost();
-        extractor.setJsonHelper(jsonHelper);
+        extractor.setAssistant(assistant);
         Map<String, String> templateVars = new HashMap<String, String>();
 
         Content content = mock(Content.class);
@@ -170,7 +218,7 @@ public class ParamsExtractorTests
         { 
             assertNotNull("POSTING to a relationship collection by id is not correct.",iae);  //Must throw this exception
         }
- 
+
         templateVars.clear();
         when(content.getReader()).thenReturn(new StringReader(JsonJacksonTests.FARMER_JSON));  //reset the reader
         templateVars.put(ResourceLocator.ENTITY_ID, "1234");
@@ -185,13 +233,32 @@ public class ParamsExtractorTests
         {
             assertNotNull(uoe);  //Must throw this exception
         }
+        testExtractOperationParams(templateVars, request, extractor);
+    }
+
+    private Params testExtractOperationParams(Map<String, String> templateVars, WebScriptRequest request, ParamsExtractor extractor)
+    {
+        templateVars.clear();
+        templateVars.put(ResourceLocator.ENTITY_ID, "1234");
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "codfish");
+        Params params = extractor.extractParams(mockOperation(), request);
+        assertNotNull(params);
+        assertNull("For a Collection there should be no relationshipId params.",params.getRelationshipId());
+
+        templateVars.put(ResourceLocator.RELATIONSHIP_ID, "9865");
+        templateVars.put(ResourceLocator.PROPERTY, "monkFish");
+        params = extractor.extractParams(mockOperation(), request);
+        assertNotNull(params);
+        assertEquals("1234", params.getEntityId());
+        assertEquals("9865", params.getRelationshipId());
+        return params;
     }
 
     @Test
     public void testMultiPartPostExtractor() throws Exception
     {
         ResourceWebScriptPost extractor = new ResourceWebScriptPost();
-        extractor.setJsonHelper(jsonHelper);
+        extractor.setAssistant(assistant);
         Map<String, String> templateVars = new HashMap<String, String>();
 
         WebScriptRequest request = mock(WebScriptRequest.class);
@@ -221,9 +288,6 @@ public class ParamsExtractorTests
         FormData formData = (FormData) passed;
         assertTrue(formData.getIsMultiPart());
 
-        assertNotNull(params.getStatus());
-        assertFalse(params.getStatus().getRedirect());
-
         // No entity id for POST
         templateVars.put(ResourceLocator.ENTITY_ID, "1234");
         try
@@ -251,7 +315,7 @@ public class ParamsExtractorTests
     {
         //Put together the stubs
         ResourceWebScriptPut extractor = new ResourceWebScriptPut();
-        extractor.setJsonHelper(jsonHelper);
+        extractor.setAssistant(assistant);
         Map<String, String> templateVars = new HashMap<String, String>();
 
         Content content = mock(Content.class);
@@ -371,7 +435,7 @@ public class ParamsExtractorTests
     {
        String specialChars = new String(new char[] { (char) '香' }) + " 香蕉";
        ResourceWebScriptPost extractor = new ResourceWebScriptPost();
-       extractor.setJsonHelper(jsonHelper);
+        extractor.setAssistant(assistant);
        Map<String, String> templateVars = new HashMap<String, String>();
        String mockMe = "{\"name\":\""+specialChars+"\",\"created\":\"2012-03-23T15:56:18.552+0000\",\"age\":54,\"id\":\"1234A3\",\"farm\":\"LARGE\"}";
        Content content = mock(Content.class);
@@ -393,7 +457,7 @@ public class ParamsExtractorTests
        
        //Test passing in special characters as a param.
        ResourceWebScriptGet getExtractor = new ResourceWebScriptGet();
-       getExtractor.setJsonHelper(jsonHelper);
+       getExtractor.setAssistant(assistant);
        Map<String, String> getTemplateVars = new HashMap<String, String>();
        WebScriptRequest getRequest = mock(WebScriptRequest.class);
        when(getRequest.getServiceMatch()).thenReturn(new Match(null, getTemplateVars, null));
@@ -412,9 +476,10 @@ public class ParamsExtractorTests
     private static ResourceMetadata mockEntity()
     {
         ResourceMetadata resourceMock = mock(ResourceMetadata.class);
+        ResourceOperation resourceOperation = mock(ResourceOperation.class);
         when(resourceMock.getType()).thenReturn(ResourceMetadata.RESOURCE_TYPE.ENTITY);
-        when(resourceMock.getObjectType(HttpMethod.PUT)).thenReturn(Farmer.class);
-        when(resourceMock.getObjectType(HttpMethod.POST)).thenReturn(Farmer.class);
+        when(resourceMock.getOperation(notNull(HttpMethod.class))).thenReturn(resourceOperation);
+        when(resourceMock.getObjectType(notNull(ResourceOperation.class))).thenReturn(Farmer.class);
         return resourceMock;
     }
  
@@ -430,6 +495,18 @@ public class ParamsExtractorTests
         //when(resourceMock.getObjectType(HttpMethod.POST)).thenReturn(Farmer.class);
         return resourceMock;
     }
+
+    /**
+     * Mocks an operation
+     * @return ResourceMetadata a Entity
+     */
+    private static ResourceMetadata mockOperation()
+    {
+        ResourceMetadata resourceMock = mock(ResourceMetadata.class);
+        when(resourceMock.getType()).thenReturn(ResourceMetadata.RESOURCE_TYPE.OPERATION);
+        return resourceMock;
+    }
+
     /**
      * Mocks a Relationship Resource
      * @return ResourceMetadata a Relationship
@@ -437,9 +514,10 @@ public class ParamsExtractorTests
     private static ResourceMetadata mockRelationship()
     {
         ResourceMetadata resourceMock = mock(ResourceMetadata.class);
+        ResourceOperation resourceOperation = mock(ResourceOperation.class);
+        when(resourceMock.getOperation(notNull(HttpMethod.class))).thenReturn(resourceOperation);
         when(resourceMock.getType()).thenReturn(ResourceMetadata.RESOURCE_TYPE.RELATIONSHIP);
-        when(resourceMock.getObjectType(HttpMethod.PUT)).thenReturn(Farmer.class);
-        when(resourceMock.getObjectType(HttpMethod.POST)).thenReturn(Farmer.class);
+        when(resourceMock.getObjectType(notNull(ResourceOperation.class))).thenReturn(Farmer.class);
         return resourceMock;
     }
     

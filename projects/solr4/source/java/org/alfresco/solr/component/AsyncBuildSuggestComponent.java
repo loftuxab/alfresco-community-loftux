@@ -1,30 +1,30 @@
-package org.alfresco.solr.component;
-
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Solr 4
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
- * 
- * 
- * This file is based upon code copied from the Solr project and modified.
- * The original code is licensed to the Apache Software Foundation. Please see:
- * 
- *   http://lucene.apache.org/solr/
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * #L%
  */
+package org.alfresco.solr.component;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +69,7 @@ import org.apache.solr.handler.component.ShardRequest;
 import org.apache.solr.handler.component.ShardResponse;
 import org.apache.solr.handler.component.SuggestComponent;
 import org.apache.solr.search.SolrIndexSearcher;
+import org.apache.solr.spelling.suggest.AlfrescoSolrSuggester;
 import org.apache.solr.spelling.suggest.SolrSuggester;
 import org.apache.solr.spelling.suggest.SuggesterOptions;
 import org.apache.solr.spelling.suggest.SuggesterParams;
@@ -165,7 +166,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
       for (int i = 0; i < initParams.size(); i++) {
         if (initParams.getName(i).equals(CONFIG_PARAM_LABEL)) {
           NamedList suggesterParams = (NamedList) initParams.getVal(i);
-          SolrSuggester suggester = new SolrSuggester();
+          AlfrescoSolrSuggester suggester = new AlfrescoSolrSuggester();
           boolean buildOnCommit = Boolean.parseBoolean((String) suggesterParams.get(BUILD_ON_COMMIT_LABEL));
           boolean buildOnOptimize = Boolean.parseBoolean((String) suggesterParams.get(BUILD_ON_OPTIMIZE_LABEL));
           boolean enabled = Boolean.parseBoolean((String) suggesterParams.get(ENABLED_LABEL));
@@ -225,10 +226,10 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     boolean buildAll = params.getBool(SUGGEST_BUILD_ALL, false);
     boolean reloadAll = params.getBool(SUGGEST_RELOAD_ALL, false);
     
-    final Collection<SolrSuggester> querysuggesters;
+    final Collection<AlfrescoSolrSuggester> querysuggesters;
     if (buildAll || reloadAll) {
       Collection<SuggesterCache> suggesterCaches = suggesters.values();
-      querysuggesters = new ArrayList<SolrSuggester>(suggesterCaches.size());
+      querysuggesters = new ArrayList<AlfrescoSolrSuggester>(suggesterCaches.size());
       for (SuggesterCache cache : suggesterCaches)
       {
           querysuggesters.add(cache.get(ASYNC_CACHE_KEY));
@@ -238,12 +239,12 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     }
     
     if (params.getBool(SUGGEST_BUILD, false) || buildAll) {
-      for (SolrSuggester suggester : querysuggesters) {
+      for (AlfrescoSolrSuggester suggester : querysuggesters) {
         suggester.build(rb.req.getCore(), rb.req.getSearcher());
       }
       rb.rsp.add("command", (!buildAll) ? "build" : "buildAll");
     } else if (params.getBool(SUGGEST_RELOAD, false) || reloadAll) {
-      for (SolrSuggester suggester : querysuggesters) {
+      for (AlfrescoSolrSuggester suggester : querysuggesters) {
         suggester.reload(rb.req.getCore(), rb.req.getSearcher());
       }
       rb.rsp.add("command", (!reloadAll) ? "reload" : "reloadAll");
@@ -283,7 +284,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     
     boolean buildAll = params.getBool(SUGGEST_BUILD_ALL, false);
     boolean reloadAll = params.getBool(SUGGEST_RELOAD_ALL, false);
-    Set<SolrSuggester> querySuggesters;
+    Set<AlfrescoSolrSuggester> querySuggesters;
     try {
       querySuggesters = getSuggesters(params);
     } catch(IllegalArgumentException ex) {
@@ -307,7 +308,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
       SuggesterOptions options = new SuggesterOptions(new CharsRef(query), count);
       Map<String, SimpleOrderedMap<NamedList<Object>>> namedListResults = 
           new HashMap<>();
-      for (SolrSuggester suggester : querySuggesters) {
+      for (AlfrescoSolrSuggester suggester : querySuggesters) {
         SuggesterResult suggesterResult = suggester.getSuggestions(options);
         toNamedList(suggesterResult, namedListResults);
       }
@@ -407,7 +408,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     NamedList<String> stats = new SimpleOrderedMap<>();
     stats.add("totalSizeInBytes", String.valueOf(ramBytesUsed()));
     for (Map.Entry<String, SuggesterCache> entry : suggesters.entrySet()) {
-      SolrSuggester suggester = entry.getValue().get(entry.getKey());
+    	AlfrescoSolrSuggester suggester = entry.getValue().get(entry.getKey());
       stats.add(entry.getKey(), suggester.toString());
     }
     return stats;
@@ -422,10 +423,10 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     return sizeInBytes;
   }
   
-  private Set<SolrSuggester> getSuggesters(SolrParams params) {
-    Set<SolrSuggester> solrSuggesters = new HashSet<>();
+  private Set<AlfrescoSolrSuggester> getSuggesters(SolrParams params) {
+    Set<AlfrescoSolrSuggester> solrSuggesters = new HashSet<>();
     for(String suggesterName : getSuggesterNames(params)) {
-      SolrSuggester curSuggester = suggesters.get(suggesterName).get(ASYNC_CACHE_KEY);
+    	AlfrescoSolrSuggester curSuggester = suggesters.get(suggesterName).get(ASYNC_CACHE_KEY);
       if (curSuggester != null) {
         solrSuggesters.add(curSuggester);
       } else {
@@ -592,7 +593,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
   }
   
   
-  static class SuggesterCache extends AbstractAsynchronouslyRefreshedCache<SolrSuggester>
+  static class SuggesterCache extends AbstractAsynchronouslyRefreshedCache<AlfrescoSolrSuggester>
   {
     private final SolrCore core;
     private final AtomicBoolean isNewSearcher = new AtomicBoolean(false);
@@ -600,7 +601,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
     private final boolean buildOnCommit;
     private final boolean buildOnOptimize;
     private final boolean enabled;
-    private final SolrSuggester initialSuggester;
+    private final AlfrescoSolrSuggester initialSuggester;
     private long lastBuild = 0;
     
     public SuggesterCache(SolrCore core, NamedList suggesterParams, boolean enabled, boolean buildOnCommit, boolean buildOnOptimize)
@@ -615,7 +616,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
         setThreadPoolExecutor(new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, threadPool, getThreadFactory(core)));
         
         // Create and configure the initial empty suggester
-        initialSuggester = new SolrSuggester();
+        initialSuggester = new AlfrescoSolrSuggester();
         initialSuggester.init(suggesterParams, core);
     }
     
@@ -636,7 +637,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
      * when possible, so it is fine to do this.
      */
     @Override
-    public SolrSuggester get(String key)
+    public AlfrescoSolrSuggester get(String key)
     {
         liveLock.readLock().lock();
         try
@@ -663,7 +664,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
 
 
     @Override
-    protected SolrSuggester buildCache(String key)
+    protected AlfrescoSolrSuggester buildCache(String key)
     {
         if (!enabled)
         {
@@ -683,7 +684,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
             SolrIndexSearcher searcher = refCountedSearcher.get();
             
             // Create and configure the suggester
-            SolrSuggester suggester = new SolrSuggester();
+            AlfrescoSolrSuggester suggester = new AlfrescoSolrSuggester();
             suggester.init(suggesterParams, core);
             
             if (!isNewSearcher.getAndSet(true)) {
@@ -730,7 +731,7 @@ public class AsyncBuildSuggestComponent extends SearchComponent implements SolrC
         return lastBuild;
     }
     
-    private void buildSuggesterIndex(SolrSuggester suggester, SolrIndexSearcher newSearcher) {
+    private void buildSuggesterIndex(AlfrescoSolrSuggester suggester, SolrIndexSearcher newSearcher) {
       try {
         LOG.info("Building suggester index for: " + suggester.getName());
         final long startMillis = System.currentTimeMillis();

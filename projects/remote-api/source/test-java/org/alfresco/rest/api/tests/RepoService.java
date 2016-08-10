@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.rest.api.tests;
 
@@ -76,9 +83,9 @@ import org.alfresco.rest.api.impl.node.ratings.RatingScheme;
 import org.alfresco.rest.api.tests.client.data.Activity;
 import org.alfresco.rest.api.tests.client.data.Comment;
 import org.alfresco.rest.api.tests.client.data.Company;
-import org.alfresco.rest.api.tests.client.data.Document;
+import org.alfresco.rest.api.tests.client.data.FavouriteDocument;
+import org.alfresco.rest.api.tests.client.data.FavouriteFolder;
 import org.alfresco.rest.api.tests.client.data.FavouriteSite;
-import org.alfresco.rest.api.tests.client.data.Folder;
 import org.alfresco.rest.api.tests.client.data.MemberOfSite;
 import org.alfresco.rest.api.tests.client.data.NetworkImpl;
 import org.alfresco.rest.api.tests.client.data.NodeRating;
@@ -393,41 +400,62 @@ public class RepoService
 
 	public TestPerson createUser(final PersonInfo personInfo, final String username, final TestNetwork network)
 	{
+		return getOrCreateUser(personInfo, username, network, true);
+	}
+
+    public TestPerson getOrCreateUser(final PersonInfo personInfo, final String username, final TestNetwork network)
+    {
+        return getOrCreateUser(personInfo, username, network, false);
+    }
+
+    // TODO review delete person
+	public TestPerson getOrCreateUser(final PersonInfo personInfo, final String username, final TestNetwork network, final boolean deletePerson)
+	{
 		return AuthenticationUtil.runAsSystem(new RunAsWork<TestPerson>()
 		{
 			@Override
 			public TestPerson doWork() throws Exception
 			{
+
 				final TestPerson testPerson = new TestPerson(personInfo.getFirstName(), personInfo.getLastName(), username, personInfo.getPassword(),
 						personInfo.getCompany(), network, personInfo.getSkype(), personInfo.getLocation(), personInfo.getTel(),
 						personInfo.getMob(), personInfo.getInstantmsg(), personInfo.getGoogle());
+
 				final Map<QName, Serializable> props = testPerson.getProperties();
 
-				if(personService.personExists(testPerson.getId()))
-				{
-					AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
-					{
-						@Override
-						public Void doWork() throws Exception
-						{
-							personService.deletePerson(testPerson.getId());
-							return null;
-						}
-					});
-				}
+                // short-circuit for default "admin"
+                if (! username.equalsIgnoreCase("admin"))
+                {
+                    NodeRef personNodeRef = personService.getPersonOrNull(username);
 
-				NodeRef createdPerson = personService.createPerson(props);
+                    if ((personNodeRef != null) && deletePerson)
+                    {
+                        AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+                        {
+                            @Override
+                            public Void doWork() throws Exception
+                            {
+                                personService.deletePerson(testPerson.getId());
+                                return null;
+                            }
+                        });
+                    }
 
-		        // create authentication to represent user
-		        authenticationService.createAuthentication(username, personInfo.getPassword().toCharArray());
+                    if (personNodeRef == null)
+                    {
+                        personNodeRef = personService.createPerson(props);
 
-				if (EnterpriseTestFixture.WITH_AVATAR.equals(personInfo.getInstantmsg()))
-				{
-					InvitationWebScriptTest.makeAvatar(nodeService,createdPerson);
-					log("Made avatar for " + testPerson.getId() + (network != null ? " in network " + network : ""));
-				}
+                        // create authentication to represent user
+                        authenticationService.createAuthentication(username, personInfo.getPassword().toCharArray());
 
-				log("Created person " + testPerson.getId() + (network != null ? " in network " + network : ""));
+                        if (EnterpriseTestFixture.WITH_AVATAR.equals(personInfo.getInstantmsg()))
+                        {
+                            InvitationWebScriptTest.makeAvatar(nodeService, personNodeRef);
+                            log("Made avatar for " + testPerson.getId() + (network != null ? " in network " + network : ""));
+                        }
+                    }
+                }
+				log("Username " + testPerson.getId() + (network != null ? " in network " + network : ""));
 
 				publicApiContext.addUser(testPerson.getId());
 				addPerson(testPerson);
@@ -917,20 +945,20 @@ public class RepoService
 		return wrapProperties;
     }
     
-    public Document getDocument(String networkId, final NodeRef nodeRef)
+    public FavouriteDocument getDocument(String networkId, final NodeRef nodeRef)
     {
-    	return TenantUtil.runAsSystemTenant(new TenantRunAsWork<Document>()
+    	return TenantUtil.runAsSystemTenant(new TenantRunAsWork<FavouriteDocument>()
 		{
 			@Override
-			public Document doWork() throws Exception
+			public FavouriteDocument doWork() throws Exception
 			{
-				Document document = null;
+				FavouriteDocument document = null;
 
 		    	QName type = nodeService.getType(nodeRef);
 		    	if(dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT))
 		    	{
 		    		Properties properties = getProperties(nodeRef);
-		    		document = Document.getDocument(nodeRef.getId(), nodeRef.getId(), properties);
+		    		document = FavouriteDocument.getDocument(nodeRef.getId(), nodeRef.getId(), properties);
 		    	}
 		    	else
 		    	{
@@ -942,20 +970,20 @@ public class RepoService
 		}, networkId);
     }
     
-    public Folder getFolder(String networkId, final NodeRef nodeRef)
+    public FavouriteFolder getFolder(String networkId, final NodeRef nodeRef)
     {
-    	return TenantUtil.runAsSystemTenant(new TenantRunAsWork<Folder>()
+    	return TenantUtil.runAsSystemTenant(new TenantRunAsWork<FavouriteFolder>()
 		{
 			@Override
-			public Folder doWork() throws Exception
+			public FavouriteFolder doWork() throws Exception
 			{
-				Folder folder = null;
+				FavouriteFolder folder = null;
 
 		    	QName type = nodeService.getType(nodeRef);
 		    	if(dictionaryService.isSubClass(type, ContentModel.TYPE_FOLDER))
 		    	{
 		    		Properties properties = getProperties(nodeRef);
-		    		folder = Folder.getFolder(nodeRef.getId(), nodeRef.getId(), properties);
+		    		folder = FavouriteFolder.getFolder(nodeRef.getId(), nodeRef.getId(), properties);
 		    	}
 		    	else
 		    	{
@@ -1301,12 +1329,12 @@ public class RepoService
 
 		public void create()
 		{
-			if(!getId().equals(TenantService.DEFAULT_DOMAIN))
+			if(!getId().equals(TenantService.DEFAULT_DOMAIN) && !tenantAdminService.existsTenant(getId()))
 			{
 				tenantAdminService.createTenant(getId(), "admin".toCharArray());
+				numNetworks++;
+				log("Created network " + getId());
 			}
-	    	numNetworks++;
-			log("Created network " + getId());
 		}
 
 		public TestSite createSite(SiteVisibility siteVisibility)

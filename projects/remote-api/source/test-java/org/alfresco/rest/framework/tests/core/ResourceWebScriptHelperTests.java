@@ -1,3 +1,28 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.framework.tests.core;
 
 import static org.junit.Assert.assertEquals;
@@ -147,15 +172,27 @@ public class ResourceWebScriptHelperTests
     }
 
     @Test
+    public void getIncludeClauseTest()
+    {
+        getClauseTest("include");
+    }
+
+    @Test
     public void getSelectClauseTest()
     {
-        List<String> theSelect = ResourceWebScriptHelper.getSelectClause(null);
-        assertNotNull(theSelect);
-        assertFalse("Null passed in so nothing in the Select.",theSelect.size() > 0);
+        getClauseTest("select");
+    }
+
+    // at the moment select and include are parsed the same way, hence common/shared test
+    private void getClauseTest(String paramName)
+    {
+        List<String> theClause = getClause(paramName, null);
+        assertNotNull(theClause);
+        assertFalse("Null passed in so nothing in the "+paramName, theClause.size() > 0);
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause(",,,");
+            theClause = getClause(paramName, ",,,");
             fail("Should throw an InvalidSelectException");
         }
         catch (InvalidSelectException error)
@@ -165,7 +202,7 @@ public class ResourceWebScriptHelperTests
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("(,,,");
+            theClause = getClause(paramName, "(,,,");
             fail("Should throw an InvalidSelectException");
         }
         catch (InvalidSelectException error)
@@ -175,7 +212,7 @@ public class ResourceWebScriptHelperTests
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("(,,,)");
+            theClause = getClause(paramName, "(,,,)");
             fail("Should throw an InvalidSelectException");
         }
         catch (InvalidSelectException error)
@@ -185,94 +222,119 @@ public class ResourceWebScriptHelperTests
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("x/,z");
+            theClause = getClause(paramName, "x/,z");
             fail("Should throw an InvalidSelectException");
         }
-        catch (InvalidArgumentException error)
+        catch (InvalidSelectException error)
         {
             //this is correct
         }
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("/x'n,/z");
+            theClause = getClause(paramName, "/x'n,/z");
             fail("Should throw an InvalidSelectException");
         }
-        catch (InvalidArgumentException error)
+        catch (InvalidSelectException error)
         {
             //this is correct
         } 
       
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("/foo/0");
+            theClause = getClause(paramName, "/foo/0");
             fail("Should throw an InvalidSelectException. Legal identifiers must start with a letter not zero");
         }
-        catch (InvalidArgumentException error)
+        catch (InvalidSelectException error)
         {
             //this is correct
         }        
         
         try
         {
-            theSelect  = ResourceWebScriptHelper.getSelectClause("/");
+            theClause = getClause(paramName, "/");
             fail("Should throw an InvalidSelectException. No identifier specified.");
         }
-        catch (InvalidArgumentException error)
+        catch (InvalidSelectException error)
         {
             //this is correct
-        }              
+        }
+
+        try
+        {
+            theClause = getClause(paramName,  "path, isLink");
+            fail("Should throw an InvalidSelectException. No identifier specified.");
+        }
+        catch (InvalidSelectException error)
+        {
+            //this is correct
+        }
+
+        theClause = getClause(paramName, "king/kong");
+        assertTrue("has a valid "+paramName, theClause.size() == 1);
+        assertEquals("king/kong",theClause.get(0));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("king/kong");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("king/kong",theSelect.get(0));
-        
-        theSelect  = ResourceWebScriptHelper.getSelectClause("x,y");
-        assertTrue("has a valid select",theSelect.size() == 2);
-        assertEquals("x",theSelect.get(0));
-        assertEquals("y",theSelect.get(1));
+        theClause = getClause(paramName, "x,y");
+        assertTrue("has a valid "+paramName, theClause.size() == 2);
+        assertEquals("x",theClause.get(0));
+        assertEquals("y",theClause.get(1));
     
-        theSelect  = ResourceWebScriptHelper.getSelectClause("x,/z");
-        assertTrue("has a valid select",theSelect.size() == 2);
-        assertEquals("x",theSelect.get(0));
-        assertEquals("/z",theSelect.get(1));
+        theClause = getClause(paramName, "x,/z");
+        assertTrue("has a valid "+paramName, theClause.size() == 2);
+        assertEquals("x",theClause.get(0));
+        assertEquals("/z",theClause.get(1));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/b");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("/b",theSelect.get(0));
+        theClause = getClause(paramName, "/b");
+        assertTrue("has a valid "+paramName, theClause.size() == 1);
+        assertEquals("/b",theClause.get(0));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/be,/he");
-        assertTrue("has a valid select",theSelect.size() == 2);
-        assertEquals("/be",theSelect.get(0));
-        assertEquals("/he",theSelect.get(1));
+        theClause = getClause(paramName, "/be,/he");
+        assertTrue("has a valid "+paramName, theClause.size() == 2);
+        assertEquals("/be",theClause.get(0));
+        assertEquals("/he",theClause.get(1));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/king/kong");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("/king/kong",theSelect.get(0));
+        theClause = getClause(paramName, "/king/kong");
+        assertTrue("has a valid "+paramName, theClause.size() == 1);
+        assertEquals("/king/kong",theClause.get(0));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/name,/person/age");
-        assertTrue("has a valid select",theSelect.size() == 2);
-        assertEquals("/name",theSelect.get(0));
-        assertEquals("/person/age",theSelect.get(1));
+        theClause = getClause(paramName, "/name,/person/age");
+        assertTrue("has a valid "+paramName, theClause.size() == 2);
+        assertEquals("/name",theClause.get(0));
+        assertEquals("/person/age",theClause.get(1));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/foo");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("/foo",theSelect.get(0));
+        theClause = getClause(paramName, "/foo");
+        assertTrue("has a valid select",theClause.size() == 1);
+        assertEquals("/foo",theClause.get(0));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/foo/anArray/x");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("/foo/anArray/x",theSelect.get(0));
+        theClause = getClause(paramName, "/foo/anArray/x");
+        assertTrue("has a valid "+paramName, theClause.size() == 1);
+        assertEquals("/foo/anArray/x",theClause.get(0));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/foo/anArray/x,/person/age,/eggs/bacon/sausage,/p");
-        assertTrue("has a valid select",theSelect.size() == 4);
-        assertEquals("/foo/anArray/x",theSelect.get(0));
-        assertEquals("/person/age",theSelect.get(1));
-        assertEquals("/eggs/bacon/sausage",theSelect.get(2));
-        assertEquals("/p",theSelect.get(3));
+        theClause = getClause(paramName, "/foo/anArray/x,/person/age,/eggs/bacon/sausage,/p");
+        assertTrue("has a valid "+paramName, theClause.size() == 4);
+        assertEquals("/foo/anArray/x",theClause.get(0));
+        assertEquals("/person/age",theClause.get(1));
+        assertEquals("/eggs/bacon/sausage",theClause.get(2));
+        assertEquals("/p",theClause.get(3));
         
-        theSelect  = ResourceWebScriptHelper.getSelectClause("/foo/_bar ");
-        assertTrue("has a valid select",theSelect.size() == 1);
-        assertEquals("/foo/_bar",theSelect.get(0));
+        theClause = getClause(paramName, "/foo/_bar ");
+        assertTrue("has a valid "+paramName, theClause.size() == 1);
+        assertEquals("/foo/_bar",theClause.get(0));
+    }
+
+    private List<String> getClause(String paramName, String paramValue)
+    {
+        if (paramName.equalsIgnoreCase("include"))
+        {
+            return ResourceWebScriptHelper.getIncludeClause(paramValue);
+        }
+        else if (paramName.equalsIgnoreCase("select"))
+        {
+            return ResourceWebScriptHelper.getSelectClause(paramValue);
+        }
+
+        fail("Unexpected clause: "+paramName);
+        return null;
     }
  
     @Test

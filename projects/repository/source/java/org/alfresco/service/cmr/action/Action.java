@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.service.cmr.action;
 
@@ -99,11 +106,12 @@ public interface Action extends ParameterizedItem
     void setTrackStatus(Boolean trackStatus);
     
     /**
-     * Gets a value indicating whether the action should be executed asychronously or not.
+     * A guide for the ActionService; Should the action be executed asychronously or not?
+     * It is not a general purpose flag to indicate the action is running asychronously.
      * <p>
      * The default is to execute the action synchronously.
      * 
-     * @return    true if the action is executed asychronously, false otherwise.  
+     * @return    true if the action should be executed asychronously, false otherwise.
      */
     boolean getExecuteAsychronously();
     

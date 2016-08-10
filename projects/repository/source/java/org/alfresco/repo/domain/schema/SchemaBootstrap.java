@@ -1,21 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
-
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.domain.schema;
 
@@ -70,6 +76,7 @@ import org.alfresco.repo.admin.patch.AppliedPatch;
 import org.alfresco.repo.admin.patch.Patch;
 import org.alfresco.repo.admin.patch.impl.SchemaUpgradeScriptPatch;
 import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.repo.domain.hibernate.dialect.AlfrescoMySQLClusterNDBDialect;
 import org.alfresco.repo.domain.hibernate.dialect.AlfrescoOracle9Dialect;
 import org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect;
 import org.alfresco.repo.domain.hibernate.dialect.AlfrescoSybaseAnywhereDialect;
@@ -172,6 +179,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     public static final int DEFAULT_LOCK_RETRY_WAIT_SECONDS = 5;
     
     public static final int DEFAULT_MAX_STRING_LENGTH = 1024;
+    public static final int DEFAULT_MAX_STRING_LENGTH_NDB = 400;
 
     private static volatile int maxStringLength = DEFAULT_MAX_STRING_LENGTH;
     private Dialect dialect;
@@ -181,15 +189,17 @@ public class SchemaBootstrap extends AbstractLifecycleBean
     /**
      * @see #DEFAULT_MAX_STRING_LENGTH
      */
-    private static final void setMaxStringLength(int length)
+    private static final void setMaxStringLength(int length, Dialect dialect)
     {
-        if (length < 1024)
+        int max = (dialect instanceof AlfrescoMySQLClusterNDBDialect ? DEFAULT_MAX_STRING_LENGTH_NDB : DEFAULT_MAX_STRING_LENGTH);
+        
+        if (length < max)
         {
-            throw new AlfrescoRuntimeException("The maximum string length must >= 1024 characters.");
+            throw new AlfrescoRuntimeException("The maximum string length must >= "+max+" characters.");
         }
         SchemaBootstrap.maxStringLength = length;
     }
-
+    
     /**
      * @return      Returns the maximum number of characters that a string field can be
      */
@@ -1478,6 +1488,23 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                             sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=InnoDB");
                         }
                         
+                        if (this.dialect != null && this.dialect instanceof AlfrescoMySQLClusterNDBDialect)
+                        {
+                            // note: enable bootstrap on MySQL Cluster NDB
+                            /*
+                        	 * WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect !
+                    		 */
+                        	sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=NDB"); // belts-and-braces
+                            sql = sql.replaceAll("(?i)ENGINE=InnoDB", "ENGINE=NDB");
+                            
+                            sql = sql.replaceAll("(?i) BIT ", " BOOLEAN ");
+                            sql = sql.replaceAll("(?i) BIT,", " BOOLEAN,");
+                            
+                            sql = sql.replaceAll("(?i) string_value text", " string_value VARCHAR("+DEFAULT_MAX_STRING_LENGTH_NDB+")");
+                            
+                            sql = sql.replaceAll("(?i) VARCHAR(4000)", "TEXT(4000)");
+                        }
+                        
                         Object fetchedVal = executeStatement(connection, sql, fetchColumnName, optional, line, scriptFile);
                         if (fetchVarName != null && fetchColumnName != null)
                         {
@@ -1629,6 +1656,12 @@ public class SchemaBootstrap extends AbstractLifecycleBean
             // serializable_value varbinary(8192),
             maxStringLength = SchemaBootstrap.DEFAULT_MAX_STRING_LENGTH;
         }
+        else if (dialect instanceof AlfrescoMySQLClusterNDBDialect)
+        {
+            // string_value varchar(400),
+            // serializable_value blob,
+            maxStringLength = SchemaBootstrap.DEFAULT_MAX_STRING_LENGTH_NDB;
+        }
         else if (dialect instanceof MySQLInnoDBDialect)
         {
             // string_value text,
@@ -1647,13 +1680,14 @@ public class SchemaBootstrap extends AbstractLifecycleBean
             // serializable_value bytea,
             maxStringLength = SchemaBootstrap.DEFAULT_MAX_STRING_LENGTH;
         }
-        SchemaBootstrap.setMaxStringLength(maxStringLength);
+        
+        SchemaBootstrap.setMaxStringLength(maxStringLength, dialect);
         SerializableTypeHandler.setSerializableType(serializableType);
         
         // Now override the maximum string length if it was set directly
         if (maximumStringLength > 0)
         {
-            SchemaBootstrap.setMaxStringLength(maximumStringLength);
+            SchemaBootstrap.setMaxStringLength(maximumStringLength, dialect);
         }
     }
     
@@ -1942,44 +1976,51 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                     dialect.getClass().getSimpleName(),
                     reference.getDbPrefix()
         };
-        PrintWriter pw;
+        PrintWriter pw = null;
         File outputFile = null;
-        if (out == null)
-        {
-            String outputFileName = MessageFormat.format(outputFileNameTemplate, outputFileNameParams);
 
-            outputFile = TempFileProvider.createTempFile(outputFileName, ".txt");
+        try
+        {
+            if (out == null)
+            {
+                String outputFileName = MessageFormat.format(outputFileNameTemplate, outputFileNameParams);
 
-            try
-            {
-                pw = new PrintWriter(outputFile, SchemaComparator.CHAR_SET);
+                outputFile = TempFileProvider.createTempFile(outputFileName, ".txt");
+
+                try
+                {
+                    pw = new PrintWriter(outputFile, SchemaComparator.CHAR_SET);
+                }
+                catch (FileNotFoundException error)
+                {
+                    throw new RuntimeException("Unable to open file for writing: " + outputFile);
+                }
+                catch (UnsupportedEncodingException error)
+                {
+                    throw new RuntimeException("Unsupported char set: " + SchemaComparator.CHAR_SET, error);
+                }
             }
-            catch (FileNotFoundException error)
+            else
             {
-                throw new RuntimeException("Unable to open file for writing: " + outputFile);
+                pw = out;
             }
-            catch (UnsupportedEncodingException error)
+
+            // Populate the file with details of the comparison's results.
+            for (Result result : results)
             {
-                throw new RuntimeException("Unsupported char set: " + SchemaComparator.CHAR_SET, error);
+                pw.print(result.describe());
+                pw.print(SchemaComparator.LINE_SEPARATOR);
             }
         }
-        else
+        finally
         {
-            pw = out;
-        }
-        
-        // Populate the file with details of the comparison's results.
-        for (Result result : results)
-        {
-            pw.print(result.describe());
-            pw.print(SchemaComparator.LINE_SEPARATOR);
+            // We care only about output streams for reporting, which are created specially for current reference resource...
+            if (null == out)
+            {
+                pw.close();
+            }
         }
 
-        // We care only about output streams for reporting, which are created specially for current reference resource...
-        if (null == out)
-        {
-            pw.close();
-        }
 
         if (results.size() == 0)
         {

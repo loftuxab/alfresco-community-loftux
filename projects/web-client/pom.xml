@@ -13,6 +13,7 @@
 
     <properties>
         <maven.tomcat.path>/alfresco</maven.tomcat.path>
+        <maven.tomcat.uriEncoding>UTF-8</maven.tomcat.uriEncoding>
         <maven.tomcat.port>${tomcat.default.alfresco.port}</maven.tomcat.port>
         <maven.tomcat.httpsPort>${tomcat.default.alfresco.ssl.port}</maven.tomcat.httpsPort>
     </properties>
@@ -120,7 +121,7 @@
         <dependency>
             <groupId>com.thetransactioncompany</groupId>
             <artifactId>cors-filter</artifactId>
-            <version>1.9.3</version>
+            <version>2.5</version>
         </dependency>
 
         <!-- Test dependencies -->
@@ -226,7 +227,7 @@
 
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <executions> 
+                <executions>
                     <!-- ACE-2318 Bring alfresco-jmxrmi.* from repository -->
                     <execution>
                         <id>fetch-jmxrmi-properties</id>
@@ -319,7 +320,15 @@
                             <asWebapp>true</asWebapp>
                             <contextFile>${runtime.tomcat.conf.folder}/solr-context.xml</contextFile>
                         </webapp>
-                    </webapps> 
+                        <webapp>
+                            <groupId>org.alfresco</groupId>
+                            <artifactId>api-explorer</artifactId>
+                            <version>${dependency.api-explorer.version}</version>
+                            <contextPath>/api-explorer</contextPath>
+                            <type>war</type>
+                            <asWebapp>true</asWebapp>
+                        </webapp>
+                    </webapps>
                 </configuration>
             </plugin>
         </plugins>
@@ -339,8 +348,8 @@
                 <dependency>
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
-                </dependency>            
+                </dependency>
             </dependencies>
        </profile>
-    </profiles>   
+    </profiles>
 </project>

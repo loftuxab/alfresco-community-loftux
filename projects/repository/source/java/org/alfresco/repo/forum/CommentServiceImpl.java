@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.forum;
 
@@ -25,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.ForumModel;
@@ -35,17 +43,29 @@ import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.activities.ActivityType;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.node.getchildren.GetChildrenCannedQuery;
 import org.alfresco.repo.node.getchildren.GetChildrenCannedQueryFactory;
+import org.alfresco.repo.policy.BehaviourFilter;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.cmr.activities.ActivityService;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
+import org.alfresco.service.cmr.lock.NodeLockedException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -54,13 +74,17 @@ import org.alfresco.util.registry.NamedObjectRegistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.extensions.surf.util.AbstractLifecycleBean;
 
 /**
  * @author Neil Mc Erlean
  * @since 4.0
  */
 // TODO consolidate this and ScriptCommentService and the implementations of comments.* web scripts.
-public class CommentServiceImpl implements CommentService
+public class CommentServiceImpl extends AbstractLifecycleBean 
+        implements CommentService, NodeServicePolicies.BeforeDeleteNodePolicy, NodeServicePolicies.BeforeUpdateNodePolicy
 {
     private static Log logger = LogFactory.getLog(CommentServiceImpl.class);  
 
@@ -77,6 +101,10 @@ public class CommentServiceImpl implements CommentService
     private ContentService contentService;
     private ActivityService activityService;
     private SiteService siteService;
+    private PolicyComponent policyComponent;
+    private BehaviourFilter behaviourFilter;
+    private PermissionService permissionService;
+    private LockService lockService;
     
     private NamedObjectRegistry<CannedQueryFactory<? extends Object>> cannedQueryRegistry;
 
@@ -105,7 +133,87 @@ public class CommentServiceImpl implements CommentService
 		this.cannedQueryRegistry = cannedQueryRegistry;
 	}
 
-	@Override
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+
+    public void setBehaviourFilter(BehaviourFilter behaviourFilter)
+    {
+        this.behaviourFilter = behaviourFilter;
+    }
+
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
+    }
+
+    public void setLockService(LockService lockService)
+    {
+        this.lockService = lockService;
+    }
+
+    @Override
+    protected void onBootstrap(ApplicationEvent event)
+    {
+        // belts-and-braces (in case of broken spring-bean override)
+        ApplicationContext ctx = getApplicationContext();
+        if (ctx != null)
+        {
+            if (this.nodeService == null)
+            {
+                this.nodeService = (NodeService)ctx.getBean("NodeService");
+            }
+            if (this.contentService == null)
+            {
+                this.contentService = (ContentService)ctx.getBean("ContentService");
+            }
+            if (this.siteService == null)
+            {
+                this.siteService = (SiteService)ctx.getBean("SiteService");
+            }
+            if (this.activityService == null)
+            {
+                this.activityService = (ActivityService)ctx.getBean("activityService");
+            }
+            if (this.cannedQueryRegistry == null)
+            {
+                this.cannedQueryRegistry = (NamedObjectRegistry<CannedQueryFactory<? extends Object>>)ctx.getBean("commentsCannedQueryRegistry");
+            }
+            if (this.policyComponent == null)
+            {
+                this.policyComponent = (PolicyComponent)ctx.getBean("policyComponent");
+            }
+            if (this.behaviourFilter == null)
+            {
+                this.behaviourFilter = (BehaviourFilter)ctx.getBean("policyBehaviourFilter");
+            }
+            if (this.permissionService == null)
+            {
+                this.permissionService = (PermissionService)ctx.getBean("PermissionService");
+            }
+            if (this.lockService == null)
+            {
+                this.lockService = (LockService)ctx.getBean("LockService");
+            }
+        }
+        
+        this.policyComponent.bindClassBehaviour(
+                NodeServicePolicies.BeforeUpdateNodePolicy.QNAME,
+                ForumModel.TYPE_POST,
+                new JavaBehaviour(this, "beforeUpdateNode"));
+        this.policyComponent.bindClassBehaviour(
+                NodeServicePolicies.BeforeDeleteNodePolicy.QNAME,
+                ForumModel.TYPE_POST,
+                new JavaBehaviour(this, "beforeDeleteNode"));
+    }
+
+    @Override
+    protected void onShutdown(ApplicationEvent event)
+    {
+    }
+
+    @Override
     public NodeRef getDiscussableAncestor(NodeRef descendantNodeRef)
     {
         // For "Share comments" i.e. fm:post nodes created via the Share commenting UI, the containment structure is as follows:
@@ -127,15 +235,20 @@ public class CommentServiceImpl implements CommentService
             
             if (nodeService.getType(topicNode).equals(ForumModel.TYPE_TOPIC))
             {
-                NodeRef forumNode = nodeService.getPrimaryParent(topicNode).getParentRef();
-                
-                if (nodeService.getType(forumNode).equals(ForumModel.TYPE_FORUM))
+                ChildAssociationRef forumToTopicChildAssocRef = nodeService.getPrimaryParent(topicNode);
+
+                if (forumToTopicChildAssocRef.getQName().equals(FORUM_TO_TOPIC_ASSOC_QNAME))
                 {
-                    NodeRef discussableNode = nodeService.getPrimaryParent(forumNode).getParentRef();
+                    NodeRef forumNode = forumToTopicChildAssocRef.getParentRef();
                     
-                    if (nodeService.hasAspect(discussableNode, ForumModel.ASPECT_DISCUSSABLE))
+                    if (nodeService.getType(forumNode).equals(ForumModel.TYPE_FORUM))
                     {
-                        result = discussableNode;
+                        NodeRef discussableNode = nodeService.getPrimaryParent(forumNode).getParentRef();
+    
+                        if (nodeService.hasAspect(discussableNode, ForumModel.ASPECT_DISCUSSABLE))
+                        {
+                            result = discussableNode;
+                        }
                     }
                 }
             }
@@ -314,13 +427,13 @@ public class CommentServiceImpl implements CommentService
         // Forum node is created automatically by DiscussableAspect behaviour.
         NodeRef forumNode = nodeService.getChildAssocs(discussableNode, ForumModel.ASSOC_DISCUSSION, QName.createQName(NamespaceService.FORUMS_MODEL_1_0_URI, "discussion")).get(0).getChildRef();
         
-        final List<ChildAssociationRef> existingTopics = nodeService.getChildAssocs(forumNode, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Comments"));
+        final List<ChildAssociationRef> existingTopics = nodeService.getChildAssocs(forumNode, ContentModel.ASSOC_CONTAINS, FORUM_TO_TOPIC_ASSOC_QNAME);
         NodeRef topicNode = null;
         if (existingTopics.isEmpty())
         {
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(1, 1.0f);
             props.put(ContentModel.PROP_NAME, COMMENTS_TOPIC_NAME);
-            topicNode = nodeService.createNode(forumNode, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Comments"), ForumModel.TYPE_TOPIC, props).getChildRef();
+            topicNode = nodeService.createNode(forumNode, ContentModel.ASSOC_CONTAINS, FORUM_TO_TOPIC_ASSOC_QNAME, ForumModel.TYPE_TOPIC, props).getChildRef();
         }
         else
         {
@@ -351,10 +464,29 @@ public class CommentServiceImpl implements CommentService
     	{
     		throw new IllegalArgumentException("Node to update is not a comment node.");
     	}
-
-    	ContentWriter writer = contentService.getWriter(commentNodeRef, ContentModel.PROP_CONTENT, true);
-    	writer.setMimetype(MimetypeMap.MIMETYPE_HTML); // TODO should this be set by the caller?
-    	writer.putContent(comment);
+        
+        try
+        {
+            ContentWriter writer = contentService.getWriter(commentNodeRef, ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_HTML); // TODO should this be set by the caller?
+            writer.putContent(comment);
+        }
+        catch (ContentIOException cioe)
+        {
+            Throwable cause = cioe.getCause();
+            if (cause instanceof AccessDeniedException)
+            {
+                throw (AccessDeniedException)cause;
+            }
+            else if (cause instanceof NodeLockedException)
+            {
+                throw (NodeLockedException)cause;
+            }
+            else
+            {
+                throw cioe;
+            }
+        }
 
     	if(title != null)
     	{
@@ -402,6 +534,115 @@ public class CommentServiceImpl implements CommentService
         else
         {
         	logger.warn("Unable to determine discussable node for the comment with nodeRef " + commentNodeRef + ", not posting an activity");
+        }
+    }
+
+    // TODO review against ACE-5437 (eg. introduce CommentInfo as part of the CommentService)
+    public Map<String, Boolean> getCommentPermissions(NodeRef discussableNode, NodeRef commentNodeRef)
+    {
+        boolean canEdit = false;
+        boolean canDelete = false;
+        
+        // belts-and-braces
+        NodeRef discussableNodeRef = getDiscussableAncestor(commentNodeRef);
+        if (discussableNodeRef.equals(discussableNode))
+        {
+            if (!isWorkingCopyOrLocked(discussableNode))
+            {
+                canEdit = canEditPermission(commentNodeRef);
+                canDelete = canDeletePermission(commentNodeRef);
+            }
+        }
+        
+        Map<String, Boolean> map = new HashMap<>(2);
+        map.put(CommentService.CAN_EDIT, canEdit);
+        map.put(CommentService.CAN_DELETE, canDelete);
+        
+        return map;
+    }
+
+    private boolean canEditPermission(NodeRef commentNodeRef)
+    {
+        String creator = (String)nodeService.getProperty(commentNodeRef, ContentModel.PROP_CREATOR);
+        Serializable owner = nodeService.getProperty(commentNodeRef, ContentModel.PROP_OWNER);
+        String currentUser = AuthenticationUtil.getFullyAuthenticatedUser();
+
+        boolean isSiteManager = permissionService.hasPermission(commentNodeRef, SiteModel.SITE_MANAGER) == (AccessStatus.ALLOWED);
+        boolean isCoordinator = permissionService.hasPermission(commentNodeRef, PermissionService.COORDINATOR) == (AccessStatus.ALLOWED);
+        return (isSiteManager || isCoordinator || currentUser.equals(creator) || currentUser.equals(owner));
+    }
+    
+    private boolean canDeletePermission(NodeRef commentNodeRef)
+    {
+        return permissionService.hasPermission(commentNodeRef, PermissionService.DELETE) == AccessStatus.ALLOWED;
+    }
+
+    private boolean isWorkingCopyOrLocked(NodeRef nodeRef)
+    {
+        boolean isWorkingCopy = false;
+        boolean isLocked = false;
+
+        if (nodeRef != null)
+        {
+            Set<QName> aspects = nodeService.getAspects(nodeRef);
+
+            isWorkingCopy = aspects.contains(ContentModel.ASPECT_WORKING_COPY);
+            if (!isWorkingCopy)
+            {
+                if (aspects.contains(ContentModel.ASPECT_LOCKABLE))
+                {
+                    LockStatus lockStatus = lockService.getLockStatus(nodeRef);
+                    if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
+                    {
+                        isLocked = true;
+                    }
+                }
+            }
+        }
+        return (isWorkingCopy || isLocked);
+    }
+
+    @Override
+    public void beforeUpdateNode(NodeRef commentNodeRef)
+    {
+        NodeRef discussableNodeRef = getDiscussableAncestor(commentNodeRef);
+        if (discussableNodeRef != null)
+        {
+            if (behaviourFilter.isEnabled(ContentModel.ASPECT_LOCKABLE) 
+                    && isWorkingCopyOrLocked(discussableNodeRef))
+            {
+                throw new NodeLockedException(discussableNodeRef);
+            }
+            else
+            {
+                boolean canEdit = canEditPermission(commentNodeRef);
+                if (! canEdit)
+                {
+                    throw new AccessDeniedException("Cannot edit comment");
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void beforeDeleteNode(final NodeRef commentNodeRef)
+    {
+        NodeRef discussableNodeRef = getDiscussableAncestor(commentNodeRef);
+        if (discussableNodeRef != null)
+        {
+            if (behaviourFilter.isEnabled(ContentModel.ASPECT_LOCKABLE) // eg. delete site (MNT-14671)
+                    && isWorkingCopyOrLocked(discussableNodeRef))
+            {
+                throw new NodeLockedException(discussableNodeRef);
+            }
+            else
+            {
+                boolean canDelete = canDeletePermission(commentNodeRef);
+                if (! canDelete)
+                {
+                    throw new AccessDeniedException("Cannot delete comment");
+                }
+            }
         }
     }
 }

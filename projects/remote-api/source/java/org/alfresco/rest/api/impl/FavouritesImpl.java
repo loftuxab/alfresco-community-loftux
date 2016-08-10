@@ -1,3 +1,28 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.api.impl;
 
 import java.util.AbstractList;
@@ -22,7 +47,6 @@ import org.alfresco.rest.api.model.Favourite;
 import org.alfresco.rest.api.model.Folder;
 import org.alfresco.rest.api.model.FolderTarget;
 import org.alfresco.rest.api.model.Site;
-import org.alfresco.rest.api.model.SiteImpl;
 import org.alfresco.rest.api.model.SiteTarget;
 import org.alfresco.rest.api.model.Target;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
@@ -35,6 +59,7 @@ import org.alfresco.rest.framework.resource.parameters.where.QueryHelper.WalkerC
 import org.alfresco.service.cmr.favourites.FavouritesService;
 import org.alfresco.service.cmr.favourites.FavouritesService.Type;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.util.Pair;
@@ -101,7 +126,7 @@ public class FavouritesImpl implements Favourites
 		{
 			SiteInfo siteInfo = siteService.getSite(nodeRef);
 			String role = sites.getSiteRole(siteInfo.getShortName());
-			Site site = new SiteImpl(siteInfo, role);
+			Site site = new Site(siteInfo, role);
 			target = new SiteTarget(site);
 		}
 		else
@@ -164,8 +189,8 @@ public class FavouritesImpl implements Favourites
     	else if(target instanceof SiteTarget)
     	{
     		SiteTarget siteTarget = (SiteTarget)target;
-    		NodeRef guid = siteTarget.getSite().getGuid();
-    		SiteInfo siteInfo = sites.validateSite(guid);
+    		String guid = siteTarget.getSite().getGuid();
+    		SiteInfo siteInfo = sites.validateSite(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, guid));
     		NodeRef siteNodeRef = siteInfo.getNodeRef();
     		String siteId = siteInfo.getShortName();
 

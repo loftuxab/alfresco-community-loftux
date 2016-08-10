@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.service.cmr.invitation;
 
@@ -283,13 +290,35 @@ public interface InvitationService
     public List<Invitation> listPendingInvitationsForResource(Invitation.ResourceType resourceType, String resourceName);
 
     /**
-     * search invitation
+     * This is the general search invitation method returning {@link Invitation}
+     * This method has a hardcoded limit of 200 invitations to return. It has
+     * been deprecated and it is recommended to use the overloaded version for
+     * which you can specify an appropriate limit depending on the needs
      * 
      * @param criteria InvitationSearchCriteria
+     *            search criteria
      * @return the list of invitations
+     * 
+     * @deprecated
      */
     @NotAuditable
     public List<Invitation> searchInvitation(InvitationSearchCriteria criteria);
+
+    /**
+     * This is the general search invitation method returning {@link Invitation}
+     * This is the recommended method to use for searching invitations; Consider
+     * that the performance of the method will be greatly influenced by the
+     * limit specified
+     * 
+     * @param criteria
+     *            search criteria
+     * @param limit
+     *            maximum number of IDs to return. If less than 1, there is no
+     *            limit.
+     * @return the list of invitations
+     */
+    @NotAuditable
+    public List<Invitation> searchInvitation(InvitationSearchCriteria criteria, int limit);
 
     /**
      * @return true if emails are sent on invite.

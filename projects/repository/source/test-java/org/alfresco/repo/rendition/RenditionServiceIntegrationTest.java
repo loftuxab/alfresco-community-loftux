@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.repo.rendition;
@@ -648,6 +655,11 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
      */
     protected void renderPdfDocumentLongRunningTest(AbstractNodeModifyingRunnable nodeModifyingRunnable) throws Exception
     {
+        renderPdfDocumentLongRunningTest(nodeModifyingRunnable, false);
+    }
+    
+    protected void renderPdfDocumentLongRunningTest(AbstractNodeModifyingRunnable nodeModifyingRunnable, boolean joinNodeModifyingThread) throws Exception
+    {
         this.setComplete();
         this.endTransaction();
         
@@ -697,6 +709,11 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
         // Give a moment for roll back of rendition and commit of node modification to occur
         Thread.sleep(3000);
         
+        if (joinNodeModifyingThread)
+        {
+            nodeModifyingThread.join();
+        }
+        
         // Note that the node modification is retried on failure by RetryingTransactionHelper
         // and will always succeed after the rendition is complete, but due to the 
         // sleep in AbstractNodeModifyingRunnable isModificationUnblocked will still 
@@ -732,7 +749,7 @@ public class RenditionServiceIntegrationTest extends BaseAlfrescoSpringTest
                     checkOutCheckInService.checkout(nodeWithDocContent);
                 }
             };
-            renderPdfDocumentLongRunningTest(new CheckoutRunnable(nodeWithDocContent));
+            renderPdfDocumentLongRunningTest(new CheckoutRunnable(nodeWithDocContent), true);
         }
         finally
         {

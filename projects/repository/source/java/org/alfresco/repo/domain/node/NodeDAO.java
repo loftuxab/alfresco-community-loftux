@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.domain.node;
 
@@ -696,6 +703,19 @@ public interface NodeDAO extends NodeBulkLoader
             ChildAssocRefQueryCallback resultsCallback);
 
     /**
+     * @param parentNodeId              the parent node id
+     * @param minNodeId                 the minimum node ID (inclusive), <tt>null</tt> for no limitation on the minimum value of the node id
+     * @param maxNodeId                 the maximum node ID (exclusive), <tt>null</tt> for no limitation on the maximum value of the node id
+     * @param assocToExcludeTypeQNames  the node associations to exclude, <tt>null</tt> for no filtering of the associations types
+     * @return list of child nodes
+     */
+    public List<Node> selectChildAssocsWithoutNodeAssocsOfTypes(
+            final Long parentNodeId,
+            final Long minNodeId,
+            final Long maxNodeId,
+            final Set<QName> assocToExcludeTypeQNames);
+
+    /**
      * Finds the association between the node's primary parent and the node itself
      * 
      * @return                      Returns the primary (defining) association or <tt>null</tt>
@@ -866,6 +886,16 @@ public interface NodeDAO extends NodeBulkLoader
      */
     public Long getMaxNodeId();
     
+    /**
+     * Returns the [minId, maxId] interval for nodes of a type, with the transaction time in the given window time.
+     * 
+     * @param type           the node type
+     * @param startTxnTime   the starting transaction time, <tt>null</tt> is allowed, case in which no minimum transaction time is considered
+     * @param endTxnTime     the end transaction time, <tt>null</tt> is allowed, case in which no maximum transaction time is considered
+     * @return the interval, as a pair
+     */
+    public Pair<Long, Long> getNodeIdsIntervalForType(QName type, Long startTxnTime, Long endTxnTime);
+
     /**
      * Select children by property values
      */

@@ -145,6 +145,9 @@
    <bean id="nodeDAO.org.hibernate.dialect.MySQLInnoDBDialect" class="org.alfresco.repo.domain.node.ibatis.NodeDAOImpl$MySQL" parent="nodeDAO.org.hibernate.dialect.Dialect" />
    <bean id="nodeDAO.org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect" class="org.alfresco.repo.domain.node.ibatis.NodeDAOImpl$MSSQL" parent="nodeDAO.org.hibernate.dialect.Dialect" />
    
+   <!-- WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect ! -->
+   <bean id="nodeDAO.org.alfresco.repo.domain.hibernate.dialect.AlfrescoMySQLClusterNDBDialect" class="org.alfresco.repo.domain.node.ibatis.NodeDAOImpl$MySQLClusterNDB" parent="nodeDAO.org.hibernate.dialect.Dialect" />
+   
    <bean id="lockDAO" class="org.alfresco.repo.domain.locks.ibatis.LockDAOImpl">
       <property name="sqlSessionTemplate" ref="locksSqlSessionTemplate"/>
       <property name="qnameDAO" ref="qnameDAO"/>
@@ -261,6 +264,7 @@
       <property name="aclDAO" ref="aclDAO"/>
       <property name="behaviourFilter" ref="policyBehaviourFilter" />
       <property name="preserveAuditableData" value="${system.auditableData.ACLs}"></property>
+      <property name="fixedAclMaxTransactionTime" value="${system.fixedACLs.maxTransactionTime}"/>
    </bean>
     
    <bean id="aclCrudDAO" class="org.alfresco.repo.domain.permissions.ibatis.AclCrudDAOImpl">

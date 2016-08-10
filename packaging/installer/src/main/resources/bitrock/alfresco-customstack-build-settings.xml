@@ -29,7 +29,7 @@
                 <setInstallerVariable name="alfresco_awe_config_source_file" value="${wcmqs_folder.unix}/alfresco"/>
                 <setInstallerVariable name="alfresco_wcmqs_config_source_file" value="${wcmqs_folder.unix}/alfresco"/>
                 <!-- Binaries -->
-                <setInstallerVariable name="manager_distribution_folder" value="${binaries_folder}/manager"/>
+                <setInstallerVariable name="manager_distribution_folder" value="${local_binaries_folder}/manager"/>
                 <setInstallerVariable name="common_distribution_folder" value="${local_binaries_folder}/common"/>
                 <setInstallerVariable name="postgres_distribution_folder" value="${local_binaries_folder}/postgresql"/>
                 <setInstallerVariable name="imagemagick_distribution_folder_windows" value="${local_binaries_folder}/ImageMagick"/>

@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.domain.node;
 
@@ -1390,6 +1397,37 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
 
         if (!allowAuditableAspect) addAuditableAspect = false;
         
+        Long id = newNodeImplInsert(node);
+        node.setId(id);
+        
+        Set<QName> nodeAspects = null;
+        if (addAuditableAspect)
+        {
+            Long auditableAspectQNameId = qnameDAO.getOrCreateQName(ContentModel.ASPECT_AUDITABLE).getFirst();
+            insertNodeAspect(id, auditableAspectQNameId);
+            nodeAspects = Collections.<QName>singleton(ContentModel.ASPECT_AUDITABLE);
+        }
+        else
+        {
+            nodeAspects = Collections.<QName>emptySet();
+        }
+        
+        // Lock the node and cache
+        node.lock();
+        nodesCache.setValue(id, node);
+        //  Pre-populate some of the other caches so that we don't immediately query
+        setNodeAspectsCached(id, nodeAspects);
+        setNodePropertiesCached(id, Collections.<QName, Serializable>emptyMap());
+        
+        if (isDebugEnabled)
+        {
+            logger.debug("Created new node: \n" + "   " + node);
+        }
+        return node;
+    }
+    
+    protected Long newNodeImplInsert(NodeEntity node)
+    {
         Long id = null;
         Savepoint savepoint = controlDAO.createSavepoint("newNodeImpl");
         try
@@ -1425,32 +1463,8 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
                 throw new NodeExistsException(dbTargetNode.getNodePair(), e);
             }
         }
-        node.setId(id);
         
-        Set<QName> nodeAspects = null;
-        if (addAuditableAspect)
-        {
-            Long auditableAspectQNameId = qnameDAO.getOrCreateQName(ContentModel.ASPECT_AUDITABLE).getFirst();
-            insertNodeAspect(id, auditableAspectQNameId);
-            nodeAspects = Collections.<QName>singleton(ContentModel.ASPECT_AUDITABLE);
-        }
-        else
-        {
-            nodeAspects = Collections.<QName>emptySet();
-        }
-        
-        // Lock the node and cache
-        node.lock();
-        nodesCache.setValue(id, node);
-        //  Pre-populate some of the other caches so that we don't immediately query
-        setNodeAspectsCached(id, nodeAspects);
-        setNodePropertiesCached(id, Collections.<QName, Serializable>emptyMap());
-        
-        if (isDebugEnabled)
-        {
-            logger.debug("Created new node: \n" + "   " + node);
-        }
-        return node;
+        return id;
     }
 
     @Override
@@ -1528,60 +1542,16 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
         }
         
         final Long newChildNodeId = newChildNode.getId();
+        
         // Now update the primary parent assoc
-        RetryingCallback<Integer> callback = new RetryingCallback<Integer>()
-        {
-            public Integer execute() throws Throwable
-            {
-                // Because we are retrying in-transaction i.e. absorbing exceptions, we need a Savepoint
-                Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
-                // We use the child node's UUID if there is no cm:name
-                String childNodeNameToUse = childNodeName == null ? childNode.getUuid() : childNodeName;
-
-                try
-                {
-                    int updated = updatePrimaryParentAssocs(
-                            newChildNodeId,
-                            newParentNodeId,
-                            assocTypeQName,
-                            assocQName,
-                            childNodeNameToUse);
-                    controlDAO.releaseSavepoint(savepoint);
-                    // Ensure we invalidate the name cache (the child version key might not have been 'bumped' by the last
-                    // 'touch')
-                    if (updated > 0 && primaryParentAssoc != null)
-                    {
-                        Pair<Long, QName> oldTypeQnamePair = qnameDAO.getQName(
-                                primaryParentAssoc.getTypeQNameId());
-                        if (oldTypeQnamePair != null)
-                        {
-                            childByNameCache.remove(new ChildByNameKey(oldParentNodeId, oldTypeQnamePair.getSecond(),
-                                    primaryParentAssoc.getChildNodeName()));
-                        }
-                    }
-                    return updated;
-                }
-                catch (Throwable e)
-                {
-                    controlDAO.rollbackToSavepoint(savepoint);
-                    // DuplicateChildNodeNameException implements DoNotRetryException.
-                    // There are some cases - FK violations, specifically - where we DO actually want to retry.
-                    // Detecting this is done by looking for the related FK names, 'fk_alf_cass_*' in the error message
-                    String lowerMsg = e.getMessage().toLowerCase();
-                    if (lowerMsg.contains("fk_alf_cass_"))
-                    {
-                        throw new ConcurrencyFailureException("FK violation updating primary parent association for " + childNodeId, e); 
-                    }
-                    // We assume that this is from the child cm:name constraint violation
-                    throw new DuplicateChildNodeNameException(
-                            newParentNode.getNodeRef(),
-                            assocTypeQName,
-                            childNodeName,
-                            e);
-                }
-            }
-        };
-        childAssocRetryingHelper.doWithRetry(callback);
+        updatePrimaryParentAssocs(primaryParentAssoc,
+                    newParentNode,
+                    childNode,
+                    newChildNodeId,
+                    childNodeName,
+                    oldParentNodeId,
+                    assocTypeQName,
+                    assocQName);
         
         // Optimize for rename case
         if (!EqualsHelper.nullSafeEquals(newParentNodeId, oldParentNodeId))
@@ -1606,6 +1576,94 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
             logger.debug("Moved node: " + assocPair + " ... " + nodePair);
         }
         return new Pair<Pair<Long, ChildAssociationRef>, Pair<Long, NodeRef>>(assocPair, nodePair);
+    }
+    
+    protected void updatePrimaryParentAssocs(
+                final ChildAssocEntity primaryParentAssoc,
+                final Node newParentNode,
+                final Node childNode,
+                final Long newChildNodeId,
+                final String childNodeName,
+                final Long oldParentNodeId,
+                final QName assocTypeQName,
+                final QName assocQName)
+    {
+        // Because we are retrying in-transaction i.e. absorbing exceptions, we need partial rollback &/or via savepoint if needed (eg. PostgreSQL)
+        RetryingCallback<Integer> callback = new RetryingCallback<Integer>()
+        {
+            public Integer execute() throws Throwable
+            {
+                return updatePrimaryParentAssocsImpl(primaryParentAssoc,
+                            newParentNode,
+                            childNode,
+                            newChildNodeId,
+                            childNodeName,
+                            oldParentNodeId,
+                            assocTypeQName,
+                            assocQName);
+            }
+        };
+        childAssocRetryingHelper.doWithRetry(callback);
+    }
+    
+    protected int updatePrimaryParentAssocsImpl(
+                ChildAssocEntity primaryParentAssoc,
+                Node newParentNode,
+                Node childNode,
+                Long newChildNodeId,
+                String childNodeName,
+                Long oldParentNodeId,
+                QName assocTypeQName,
+                QName assocQName)
+    {
+        Long newParentNodeId = newParentNode.getId();
+        Long childNodeId = childNode.getId();
+        
+        Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
+        // We use the child node's UUID if there is no cm:name
+        String childNodeNameToUse = childNodeName == null ? childNode.getUuid() : childNodeName;
+
+        try
+        {
+            int updated = updatePrimaryParentAssocs(
+                    newChildNodeId,
+                    newParentNodeId,
+                    assocTypeQName,
+                    assocQName,
+                    childNodeNameToUse);
+            controlDAO.releaseSavepoint(savepoint);
+            // Ensure we invalidate the name cache (the child version key might not have been 'bumped' by the last
+            // 'touch')
+            if (updated > 0 && primaryParentAssoc != null)
+            {
+                Pair<Long, QName> oldTypeQnamePair = qnameDAO.getQName(
+                        primaryParentAssoc.getTypeQNameId());
+                if (oldTypeQnamePair != null)
+                {
+                    childByNameCache.remove(new ChildByNameKey(oldParentNodeId, oldTypeQnamePair.getSecond(),
+                            primaryParentAssoc.getChildNodeName()));
+                }
+            }
+            return updated;
+        }
+        catch (Throwable e)
+        {
+            controlDAO.rollbackToSavepoint(savepoint);
+            // DuplicateChildNodeNameException implements DoNotRetryException.
+            // There are some cases - FK violations, specifically - where we DO actually want to retry.
+            // Detecting this is done by looking for the related FK names, 'fk_alf_cass_*' in the error message
+            String lowerMsg = e.getMessage().toLowerCase();
+            if (lowerMsg.contains("fk_alf_cass_"))
+            {
+                throw new ConcurrencyFailureException("FK violation updating primary parent association for " + childNodeId, e); 
+            }
+            // We assume that this is from the child cm:name constraint violation
+            throw new DuplicateChildNodeNameException(
+                    newParentNode.getNodeRef(),
+                    assocTypeQName,
+                    childNodeName,
+                    e);
+        }
     }
     
     @Override
@@ -3136,46 +3194,8 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
         // Index
         assoc.setAssocIndex(-1);
         
-        RetryingCallback<Long> callback = new RetryingCallback<Long>()
-        {
-            public Long execute() throws Throwable
-            {
-                Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
-                try
-                {
-                    Long id = insertChildAssoc(assoc);
-                    controlDAO.releaseSavepoint(savepoint);
-                    return id;
-                }
-                catch (Throwable e)
-                {
-                    controlDAO.rollbackToSavepoint(savepoint);
-                    // DuplicateChildNodeNameException implements DoNotRetryException.
-                    
-                    // Allow real DB concurrency issues (e.g. DeadlockLoserDataAccessException) straight through for a retry
-                    if (e instanceof ConcurrencyFailureException)
-                    {
-                        throw e;                        
-                    }
-
-                    // There are some cases - FK violations, specifically - where we DO actually want to retry.
-                    // Detecting this is done by looking for the related FK names, 'fk_alf_cass_*' in the error message
-                    String lowerMsg = e.getMessage().toLowerCase();
-                    if (lowerMsg.contains("fk_alf_cass_"))
-                    {
-                        throw new ConcurrencyFailureException("FK violation updating primary parent association:" + assoc, e); 
-                    }
-                    
-                    // We assume that this is from the child cm:name constraint violation
-                    throw new DuplicateChildNodeNameException(
-                            parentNode.getNodeRef(),
-                            assocTypeQName,
-                            childNodeName,
-                            e);
-                }
-            }
-        };
-        Long assocId = childAssocRetryingHelper.doWithRetry(callback);
+        Long assocId = newChildAssocInsert(assoc, assocTypeQName, childNodeName);
+        
         // Persist it
         assoc.setId(assocId);
         
@@ -3192,6 +3212,57 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
             logger.debug("Created child association: " + assoc);
         }
         return assoc;
+    }
+    
+    protected Long newChildAssocInsert(final ChildAssocEntity assoc, final QName assocTypeQName, final String childNodeName)
+    {
+        // Because we are retrying in-transaction i.e. absorbing exceptions, we need partial rollback &/or via savepoint if needed (eg. PostgreSQL)
+        RetryingCallback<Long> callback = new RetryingCallback<Long>()
+        {
+            public Long execute() throws Throwable
+            {
+                return newChildAssocInsertImpl(assoc, assocTypeQName, childNodeName);
+            }
+        };
+        Long assocId = childAssocRetryingHelper.doWithRetry(callback);
+        return assocId;
+    }
+    
+    protected Long newChildAssocInsertImpl(final ChildAssocEntity assoc, final QName assocTypeQName, final String childNodeName)
+    {
+        Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
+        try
+        {
+            Long id = insertChildAssoc(assoc);
+            controlDAO.releaseSavepoint(savepoint);
+            return id;
+        }
+        catch (Throwable e)
+        {
+            controlDAO.rollbackToSavepoint(savepoint);
+            // DuplicateChildNodeNameException implements DoNotRetryException.
+            
+            // Allow real DB concurrency issues (e.g. DeadlockLoserDataAccessException) straight through for a retry
+            if (e instanceof ConcurrencyFailureException)
+            {
+                throw e;                        
+            }
+
+            // There are some cases - FK violations, specifically - where we DO actually want to retry.
+            // Detecting this is done by looking for the related FK names, 'fk_alf_cass_*' in the error message
+            String lowerMsg = e.getMessage().toLowerCase();
+            if (lowerMsg.contains("fk_alf_cass_"))
+            {
+                throw new ConcurrencyFailureException("FK violation updating primary parent association:" + assoc, e); 
+            }
+            
+            // We assume that this is from the child cm:name constraint violation
+            throw new DuplicateChildNodeNameException(
+                    assoc.getParentNode().getNodeRef(),
+                    assocTypeQName,
+                    childNodeName,
+                    e);
+        }
     }
 
     @Override
@@ -3261,53 +3332,10 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
      * TODO: See about pulling automatic cm:name update logic into this DAO
      */
     @Override
-    public void setChildAssocsUniqueName(final Long childNodeId, final String childName)
+    public void setChildAssocsUniqueName(Long childNodeId, String childName)
     {
-        RetryingCallback<Integer> callback = new RetryingCallback<Integer>()
-        {
-            public Integer execute() throws Throwable
-            {
-                int total = 0;
-                Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
-                try
-                {
-                    for (ChildAssocEntity parentAssoc : getParentAssocsCached(childNodeId).getParentAssocs().values())
-                    {
-                        // Subtlety: We only update those associations for which name uniqueness checking is enforced.
-                        // Such associations have a positive CRC
-                        if (parentAssoc.getChildNodeNameCrc() <= 0)
-                        {
-                            continue;
-                        }
-                        Pair<Long, QName> oldTypeQnamePair = qnameDAO.getQName(parentAssoc.getTypeQNameId());
-                        // Ensure we invalidate the name cache (the child version key might not be 'bumped' by the next
-                        // 'touch')
-                        if (oldTypeQnamePair != null)
-                        {
-                            childByNameCache.remove(new ChildByNameKey(parentAssoc.getParentNode().getId(),
-                                    oldTypeQnamePair.getSecond(), parentAssoc.getChildNodeName()));
-                        }
-                        int count = updateChildAssocUniqueName(parentAssoc.getId(), childName);
-                        if (count <= 0)
-                        {
-                            // Should not be attempting to delete a deleted node
-                            throw new ConcurrencyFailureException("Failed to update an existing parent association "
-                                    + parentAssoc.getId());
-                        }
-                        total += count;
-                    }
-                    controlDAO.releaseSavepoint(savepoint);
-                    return total;
-                }
-                catch (Throwable e)
-                {
-                    controlDAO.rollbackToSavepoint(savepoint);
-                    // We assume that this is from the child cm:name constraint violation
-                    throw new DuplicateChildNodeNameException(null, null, childName, e);
-                }
-            }
-        };
-        Integer count = childAssocRetryingHelper.doWithRetry(callback);
+        Integer count = setChildAssocsUniqueNameImpl(childNodeId, childName);
+                    
         if (count > 0)
         {
             // Touch the node; parent assocs are out of sync
@@ -3321,6 +3349,61 @@ public abstract class AbstractNodeDAOImpl implements NodeDAO, BatchingDAO
                     "   Node:    " + childNodeId + "\n" +
                     "   Name:    " + childName + "\n" +
                     "   Updated: " + count);
+        }
+    }
+    
+    protected int setChildAssocsUniqueNameImpl(final Long childNodeId, final String childName)
+    {
+        // Because we are retrying in-transaction i.e. absorbing exceptions, we need partial rollback &/or via savepoint if needed (eg. PostgreSQL)
+        RetryingCallback<Integer> callback = new RetryingCallback<Integer>()
+        {
+            public Integer execute() throws Throwable
+            {
+                return updateChildAssocUniqueNameImpl(childNodeId, childName);
+            }
+        };
+        return childAssocRetryingHelper.doWithRetry(callback);
+    }
+    
+    protected int updateChildAssocUniqueNameImpl(final Long childNodeId, final String childName)
+    {
+        int total = 0;
+        Savepoint savepoint = controlDAO.createSavepoint("DuplicateChildNodeNameException");
+        try
+        {
+            for (ChildAssocEntity parentAssoc : getParentAssocsCached(childNodeId).getParentAssocs().values())
+            {
+                // Subtlety: We only update those associations for which name uniqueness checking is enforced.
+                // Such associations have a positive CRC
+                if (parentAssoc.getChildNodeNameCrc() <= 0)
+                {
+                    continue;
+                }
+                Pair<Long, QName> oldTypeQnamePair = qnameDAO.getQName(parentAssoc.getTypeQNameId());
+                // Ensure we invalidate the name cache (the child version key might not be 'bumped' by the next
+                // 'touch')
+                if (oldTypeQnamePair != null)
+                {
+                    childByNameCache.remove(new ChildByNameKey(parentAssoc.getParentNode().getId(),
+                            oldTypeQnamePair.getSecond(), parentAssoc.getChildNodeName()));
+                }
+                int count = updateChildAssocUniqueName(parentAssoc.getId(), childName);
+                if (count <= 0)
+                {
+                    // Should not be attempting to delete a deleted node
+                    throw new ConcurrencyFailureException("Failed to update an existing parent association "
+                            + parentAssoc.getId());
+                }
+                total += count;
+            }
+            controlDAO.releaseSavepoint(savepoint);
+            return total;
+        }
+        catch (Throwable e)
+        {
+            controlDAO.rollbackToSavepoint(savepoint);
+            // We assume that this is from the child cm:name constraint violation
+            throw new DuplicateChildNodeNameException(null, null, childName, e);
         }
     }
 

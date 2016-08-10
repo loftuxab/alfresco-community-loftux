@@ -61,7 +61,7 @@
       <snapshotRepository>
           <id>alfresco-internal-snapshots</id>
           <url>${maven.distributionManagement.snapshot.url}</url>
-      </snapshotRepository>      
+      </snapshotRepository>
   </distributionManagement>
 
   <modules>
@@ -109,9 +109,11 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.build.sourceVersion>1.8</maven.build.sourceVersion>
+
     <!-- Arguments for test execution in surefire -->
     <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
-    <argLine>-Xmx2G -XX:MaxPermSize=256m -Duser.language=en -Dcom.sun.management.jmxremote -da:org.apache.lucene.analysis.TokenStream -da:org.apache.chemistry.opencmis...</argLine>
+    <argLine>-Xmx2G -Duser.language=en -Dcom.sun.management.jmxremote -da:org.apache.lucene.analysis.TokenStream -da:org.apache.chemistry.opencmis...</argLine>
 
     <!-- Community build specific properties -->
     <maven.scm.connection>scm:svn:http://svn.alfresco.com/repos/alfresco-open-mirror/alfresco/HEAD</maven.scm.connection>
@@ -121,6 +123,7 @@
     <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
+    <licenseName>community</licenseName>
 
     <!-- Default location of the root of the checkout. To be overriden if project is deeper than 2 levels -->
     <highest.basedir>${basedir}/../..</highest.basedir>
@@ -129,26 +132,27 @@
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
     <dependency.truezip.version>7.7.9</dependency.truezip.version>
     <dependency.jibx.version>1.2.6</dependency.jibx.version>
-    <dependency.tika.version>1.6-20140428-alfresco-patched</dependency.tika.version>
+    <dependency.tika.version>1.6-20160412-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.14.RELEASE</dependency.spring.version>
     <dependency.tomcat.version>7.0.59</dependency.tomcat.version>
-    <dependency.activiti.version>5.19.0.1</dependency.activiti.version>
-    <dependency.activiti-engine.version>5.19.0.1</dependency.activiti-engine.version>
+    <dependency.activiti.version>5.19.0.3</dependency.activiti.version>
+    <dependency.activiti-engine.version>5.19.0.3</dependency.activiti-engine.version>
     <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
-    <dependency.alfresco-authorised-users.version>5.2.0.1</dependency.alfresco-authorised-users.version>
-    <dependency.webscripts.version>6.5</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.1</dependency.alfresco-core.version>
-    <dependency.alfresco-jlan.version>6.0</dependency.alfresco-jlan.version>
+    <dependency.alfresco-authorised-users.version>5.2.0.2</dependency.alfresco-authorised-users.version>
+    <dependency.webscripts.version>6.8</dependency.webscripts.version>
+    <dependency.alfresco-core.version>6.4-SNAPSHOT</dependency.alfresco-core.version>
+    <dependency.alfresco-jlan.version>6.2-SNAPSHOT</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
-    
+    <dependency.api-explorer.version>1.1-SNAPSHOT</dependency.api-explorer.version>
+
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.2-SNAPSHOT</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
@@ -164,6 +168,7 @@
 
     <!-- Installer version that will be used in the final name -->
     <installer.version.name>${project.version}</installer.version.name>
+    <installer.manager.version>1.0</installer.manager.version>
   </properties>
 
   <!-- Define versions of very common components -->
@@ -498,7 +503,7 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>                  
+  <build>
     <!-- Non standard folder layout -->
     <sourceDirectory>source/java</sourceDirectory>
     <testSourceDirectory>source/test-java</testSourceDirectory>
@@ -509,7 +514,7 @@
     </resources>
     <testResources>
         <testResource>
-             <directory>source/test-resources</directory> 
+             <directory>source/test-resources</directory>
         </testResource>
     </testResources>
 
@@ -576,6 +581,45 @@
                 </execution>
             </executions>
         </plugin>
+
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>1.8</version>
+            <configuration>
+                <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+                <organizationName>Alfresco Software Limited</organizationName>
+                <failOnMissingHeader>true</failOnMissingHeader>
+                <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+                <licenseResolver>classpath://alfresco</licenseResolver>
+                <licenseName>${licenseName}</licenseName>
+                <roots>
+                    <root>src</root>
+                    <root>source</root>
+                </roots>
+                <includes>
+                    <include>**/*.java</include>
+                    <include>**/*.jsp</include>
+                </includes>
+            </configuration>
+            <executions>
+                <execution>
+                    <id>check-licenses</id>
+                    <phase>generate-sources</phase>
+                    <goals>
+                        <goal>check-file-header</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <dependencies>
+                <dependency>
+                    <groupId>org.alfresco</groupId>
+                    <artifactId>alfresco-license-headers</artifactId>
+                    <version>1.0</version>
+                </dependency>
+            </dependencies>
+        </plugin>
+
         <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -710,9 +754,6 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
-                    <!-- Uncomment to generate javadoc on Java 8
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                    -->
                 </configuration>
             </plugin>
             <plugin>
@@ -915,7 +956,7 @@
         <id>run</id>
         <build>
             <plugins>
-                
+
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-dependency-plugin</artifactId>
@@ -1174,8 +1215,6 @@
         <id>allprojects</id>
         <modules>
             <module>packaging</module>
-            <module>projects/qa-share</module>
-            <module>projects/cmm-qa</module>
             <module>enterpriseprojects/packaging</module>
             <module>enterpriseprojects/packaging/rpm</module>
             <module>projects/office-application</module>
@@ -1401,7 +1440,22 @@
             </dependency>
         </dependencies>
     </profile>
-
+    <profile>
+        <id>doclint-java8-disable</id>
+        <activation>
+            <jdk>[1.8,)</jdk>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <additionalparam>-Xdoclint:none</additionalparam>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>

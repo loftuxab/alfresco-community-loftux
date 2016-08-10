@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content.transform;
 
@@ -131,16 +138,19 @@ public class TikaPoweredContainerExtractor
        
        // Get the contents
        ContentReader reader = contentService.getReader(source, ContentModel.PROP_CONTENT);
-       TikaInputStream stream = TikaInputStream.get(reader.getContentInputStream());
-
-       // Build the recursing parser
-       Extractor handler = new Extractor(folder, mimetypes);
-       
-       // Have Tika look for things
-       ParserContainerExtractor extractor = new ParserContainerExtractor(
-             parser, detector
-       );
+       InputStream wrappedInputStream = null;
+       TikaInputStream stream = null;
+       Extractor handler = null;
        try {
+           wrappedInputStream = reader.getContentInputStream();
+           stream = TikaInputStream.get(wrappedInputStream);
+           // Build the recursing parser
+           handler = new Extractor(folder, mimetypes);
+           
+           // Have Tika look for things
+           ParserContainerExtractor extractor = new ParserContainerExtractor(
+                       parser, detector
+                       );
           logger.info("Beginning extraction of " + source.toString());
           extractor.extract(stream, null, handler);
           logger.info("Completed extraction of " + source.toString());
@@ -149,11 +159,32 @@ public class TikaPoweredContainerExtractor
        } catch(IOException ie) {
           throw new AlfrescoRuntimeException("Extraction Failed", ie);
        }
-       
-       // Tidy up
-       try {
-          stream.close();
-       } catch(IOException e) {}
+       finally
+       {
+           // Tidy up
+           if (stream != null)
+           {
+               try
+               {
+                   stream.close();
+               }
+               catch (IOException error)
+               {
+                   logger.debug("Error while closing stream.", error);
+               }
+           }
+           if (wrappedInputStream != null)
+           {
+               try
+               {
+                   wrappedInputStream.close();
+               }
+               catch (IOException error)
+               {
+                   logger.debug("Error while closing stream.", error);
+               }
+           }    
+       } 
        
        // All done
        return handler.extracted;

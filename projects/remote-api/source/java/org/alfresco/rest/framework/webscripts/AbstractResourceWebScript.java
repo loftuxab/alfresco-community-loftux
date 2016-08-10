@@ -1,29 +1,66 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.framework.webscripts;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.tenant.TenantUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.web.scripts.content.ContentStreamer;
 import org.alfresco.rest.framework.Api;
 import org.alfresco.rest.framework.core.HttpMethodSupport;
+import org.alfresco.rest.framework.core.ResourceInspector;
 import org.alfresco.rest.framework.core.ResourceLocator;
+import org.alfresco.rest.framework.core.ResourceOperation;
 import org.alfresco.rest.framework.core.ResourceWithMetadata;
 import org.alfresco.rest.framework.core.exceptions.ApiException;
 import org.alfresco.rest.framework.jacksonextensions.JacksonHelper;
 import org.alfresco.rest.framework.resource.actions.ActionExecutor;
+import org.alfresco.rest.framework.resource.actions.interfaces.BinaryResourceAction;
+import org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceBinaryAction;
 import org.alfresco.rest.framework.resource.content.BinaryResource;
+import org.alfresco.rest.framework.resource.content.CacheDirective;
 import org.alfresco.rest.framework.resource.content.ContentInfo;
 import org.alfresco.rest.framework.resource.content.FileBinaryResource;
 import org.alfresco.rest.framework.resource.content.NodeBinaryResource;
 import org.alfresco.rest.framework.resource.parameters.Params;
+import org.alfresco.rest.framework.tools.ApiAssistant;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.extensions.webscripts.Status;
+import org.springframework.extensions.webscripts.Cache;
 import org.springframework.extensions.webscripts.WebScriptException;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptResponse;
@@ -39,6 +76,7 @@ import org.springframework.http.HttpMethod;
  * 5) Renders the response
  * 
  * @author Gethin James
+ * @author janv
  */
 // TODO for requests that pass in input streams e.g. binary content for workflow, this is going to need a way to re-read the input stream a la
 // code in RepositoryContainer due to retrying transaction logic
@@ -56,48 +94,55 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
     @Override
     public void execute(final Api api, final WebScriptRequest req, final WebScriptResponse res) throws IOException
     {
-    	try
-    	{
+        try
+        {
             final Map<String, Object> respons = new HashMap<String, Object>();
             final Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-	        final ResourceWithMetadata resource = locator.locateResource(api,templateVars, httpMethod);
+            final ResourceWithMetadata resource = locator.locateResource(api,templateVars, httpMethod);
             final Params params = paramsExtractor.extractParams(resource.getMetaData(),req);
-            final ActionExecutor executor = findExecutor(httpMethod, params, resource, req.getContentType());
+            final boolean isReadOnly = HttpMethod.GET==httpMethod;
 
             //This execution usually takes place in a Retrying Transaction (see subclasses)
-            executor.execute(resource, params, new ExecutionCallback()
-            {
-                @Override
-                public void onSuccess(Object result, ContentInfo contentInfo)
-                {
-                    respons.put("toSerialize", result); 
-                    respons.put("contentInfo", contentInfo);
-                    if (params.getStatus().getRedirect())
-                    {
-                        res.setStatus(params.getStatus().getCode());
-                    }
-                    else
-                    {
-                        setSuccessResponseStatus(res);
-                    }
-                }
-            });
+            final Object toSerialize = execute(resource, params, res, isReadOnly);
             
             //Outside the transaction.
-            Object toSerialize = respons.get("toSerialize");
-            ContentInfo contentInfo = (ContentInfo) respons.get("contentInfo");
-            
-            // set caching (MNT-13938)
-            res.setCache(ApiWebScript.CACHE_NEVER);
-            
-            // set content info
-            setContentInfoOnResponse(res, contentInfo);
-            
             if (toSerialize != null)
             {
                 if (toSerialize instanceof BinaryResource)
                 {
-                    streamResponse(req, res, (BinaryResource) toSerialize);
+                    // TODO review (experimental) - can we move earlier & wrap complete execute ? Also for QuickShare (in MT/Cloud) needs to be tenant for the nodeRef (TBC).
+                    boolean noAuth = false;
+
+                    if (BinaryResourceAction.Read.class.isAssignableFrom(resource.getResource().getClass()))
+                    {
+                        noAuth = resource.getMetaData().isNoAuth(BinaryResourceAction.Read.class);
+                    }
+                    else if (RelationshipResourceBinaryAction.Read.class.isAssignableFrom(resource.getResource().getClass()))
+                    {
+                        noAuth = resource.getMetaData().isNoAuth(RelationshipResourceBinaryAction.Read.class);
+                    }
+                    else
+                    {
+                        logger.warn("Unexpected");
+                    }
+
+                    if (noAuth)
+                    {
+                        String networkTenantDomain = TenantUtil.getCurrentDomain();
+
+                        TenantUtil.runAsSystemTenant(new TenantUtil.TenantRunAsWork<Void>()
+                        {
+                            public Void doWork() throws Exception
+                            {
+                                streamResponse(req, res, (BinaryResource) toSerialize);
+                                return null;
+                            }
+                        }, networkTenantDomain);
+                    }
+                    else
+                    {
+                        streamResponse(req, res, (BinaryResource) toSerialize);
+                    }
                 }
                 else
                 {
@@ -105,19 +150,39 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
                 }
             }
 
-		}
-		catch (ApiException apiException)
-		{
-			renderErrorResponse(resolveException(apiException), res);
-		}
-		catch (WebScriptException webException)
-		{
-			renderErrorResponse(resolveException(webException), res);
-		}
-		catch (RuntimeException runtimeException)
-		{
-			renderErrorResponse(resolveException(runtimeException), res);
-		}
+        }
+        catch (AlfrescoRuntimeException | ApiException | WebScriptException xception )
+        {
+            assistant.renderException(xception, res);
+        }
+        catch (RuntimeException runtimeException)
+        {
+            assistant.renderException(runtimeException, res);
+        }
+    }
+
+    public Object execute(final ResourceWithMetadata resource, final Params params, final WebScriptResponse res, boolean isReadOnly)
+    {
+        final String entityCollectionName = ResourceInspector.findEntityCollectionNameName(resource.getMetaData());
+        final ResourceOperation operation = resource.getMetaData().getOperation(getHttpMethod());
+        final WithResponse callBack = new WithResponse(operation.getSuccessStatus(), ApiAssistant.DEFAULT_JSON_CONTENT,ApiAssistant.CACHE_NEVER);
+        Object toReturn = transactionService.getRetryingTransactionHelper().doInTransaction(
+                new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+                {
+                    @Override
+                    public Object execute() throws Throwable
+                    {
+
+                        Object result = executeAction(resource, params, callBack);
+                        if (result instanceof BinaryResource)
+                        {
+                            return result; //don't postprocess it.
+                        }
+                        return helper.processAdditionsToTheResponse(res, resource.getMetaData().getApi(), entityCollectionName, params, result);
+                    }
+                }, isReadOnly, true);
+        setResponse(res,callBack);
+        return toReturn;
     }
 
     protected void streamResponse(final WebScriptRequest req, final WebScriptResponse res, BinaryResource resource) throws IOException
@@ -125,16 +190,76 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
         if (resource instanceof FileBinaryResource)
         {
             FileBinaryResource fileResource = (FileBinaryResource) resource;
-            streamer.streamContent(req, res, fileResource.getFile(), null, false, null, null);
+            // if requested, set attachment
+            boolean attach = StringUtils.isNotEmpty(fileResource.getAttachFileName());
+            Map<String, Object> model = getModelForCacheDirective(fileResource.getCacheDirective());
+            streamer.streamContent(req, res, fileResource.getFile(), null, attach, fileResource.getAttachFileName(), model);
         }
         else if (resource instanceof NodeBinaryResource)
         {
             NodeBinaryResource nodeResource = (NodeBinaryResource) resource;
-            streamer.streamContent(req, res, nodeResource.getNodeRef(), nodeResource.getPropertyQName(), false, null, null);        
+            ContentInfo contentInfo = nodeResource.getContentInfo();
+            assistant.setContentInfoOnResponse(res, contentInfo);
+            // if requested, set attachment
+            boolean attach = StringUtils.isNotEmpty(nodeResource.getAttachFileName());
+            Map<String, Object> model = getModelForCacheDirective(nodeResource.getCacheDirective());
+            streamer.streamContent(req, res, nodeResource.getNodeRef(), nodeResource.getPropertyQName(), attach, nodeResource.getAttachFileName(), model);
         }
 
     }
-    
+
+    private static Map<String, Object> getModelForCacheDirective(CacheDirective cacheDirective)
+    {
+        if (cacheDirective != null)
+        {
+            return Collections.singletonMap(ContentStreamer.KEY_CACHE_DIRECTIVE, (Object) cacheDirective);
+        }
+        return null;
+    }
+
+    /**
+     * The response status must be set before the response is written by Jackson (which will by default close and commit the response).
+     * In a r/w txn, web script buffered responses ensure that it doesn't really matter but for r/o txns this is important.
+     *
+     * If you set content information via the contentInfo object and ALSO the headers then "headers" will win because they are
+     * set last.
+     *
+     * @param res
+     * @param status
+     * @param cache
+     * @param contentInfo
+     * @param headers
+     */
+    public void setResponse(final WebScriptResponse res, int status, Cache cache, ContentInfo contentInfo,  Map<String, List<String>> headers)
+    {
+        res.setStatus(status);
+        if (cache != null) res.setCache(cache);
+        assistant.setContentInfoOnResponse(res,contentInfo);
+        if (headers != null && !headers.isEmpty())
+        {
+            for (Map.Entry<String, List<String>> header:headers.entrySet())
+            {
+                for (int i=0; i < header.getValue().size(); i++) {
+                    if (i==0)
+                    {
+                        //If its the first one then set the header overwriting.
+                        res.setHeader(header.getKey(), header.getValue().get(i));
+                    }
+                    else
+                    {
+                        //If its not the first one than update the header
+                        res.addHeader(header.getKey(), header.getValue().get(i));
+                    }
+                }
+            }
+        }
+    }
+
+    protected void setResponse(final WebScriptResponse res, WithResponse withResponse)
+    {
+        setResponse(res, withResponse.getStatus(), withResponse.getCache(), withResponse.getContentInfo(), withResponse.getHeaders());
+    }
+
     /**
      * Renders the result of an execution.
      * 
@@ -145,7 +270,7 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
     protected void renderJsonResponse(final WebScriptResponse res, final Object toSerialize)
                 throws IOException
     {
-        jsonHelper.withWriter(res.getOutputStream(), new JacksonHelper.Writer()
+        assistant.getJsonHelper().withWriter(res.getOutputStream(), new JacksonHelper.Writer()
         {
             @Override
             public void writeContents(JsonGenerator generator, ObjectMapper objectMapper)
@@ -154,31 +279,6 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
                 objectMapper.writeValue(generator, toSerialize);
             }
         });
-    }
-
-    /**
-     * The response status must be set before the response is written by Jackson (which will by default close and commit the response).
-     * In a r/w txn, web script buffered responses ensure that it doesn't really matter but for r/o txns this is important.
-     * @param res WebScriptResponse
-     */
-    protected void setSuccessResponseStatus(final WebScriptResponse res)
-    {
-        // default for GET, HEAD, OPTIONS, PUT, TRACE
-        res.setStatus(Status.STATUS_OK);
-    }
-    
-    /**
-     * Finds the action executor to execute actions on.
-     * @param httpMethod - the http method
-     * @param params Params
-     * @param resource ResourceWithMetadata
-     * @param contentType Request content type
-     * @return ActionExecutor the action executor
-     */
-    public ActionExecutor findExecutor(HttpMethod httpMethod, Params params, ResourceWithMetadata resource, String contentType)
-    {
-        //Ignore all params and return this
-        return this;
     }
 
     public void setLocator(ResourceLocator locator)
@@ -210,5 +310,4 @@ public abstract class AbstractResourceWebScript extends ApiWebScript implements 
     {
         this.streamer = streamer;
     }
-
 }

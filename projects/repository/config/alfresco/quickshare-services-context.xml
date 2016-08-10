@@ -51,8 +51,21 @@
       </property>
    </bean>
 
-   <!-- Calendar Service base bean -->
-	<bean id="quickShareService" class="org.alfresco.repo.quickshare.QuickShareServiceImpl" init-method="init">
+    <bean id="quickShareDefaultProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath*:alfresco/quickshare/quickshare-clients.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="quickShareClientsConfig" class="org.alfresco.repo.quickshare.ClientAppConfig" init-method="init">
+        <property name="defaultProperties" ref="quickShareDefaultProperties"/>
+        <property name="globalProperties" ref="global-properties"/>
+    </bean>
+
+    <!-- QuickShare Service base bean -->
+    <bean id="quickShareService" class="org.alfresco.repo.quickshare.QuickShareServiceImpl" init-method="init">
         <property name="attributeService" ref="AttributeService"/>
         <property name="dictionaryService" ref="dictionaryService"/>
         <property name="enabled" value="${system.quickshare.enabled}" />
@@ -64,6 +77,21 @@
         <property name="thumbnailService" ref="ThumbnailService"/>
         <property name="eventPublisher" ref="eventPublisher" />
         <property name="behaviourFilter" ref="policyBehaviourFilter" />
- 	</bean>
+        <property name="actionService" ref="ActionService" />
+        <property name="preferenceService" ref="PreferenceService" />
+        <property name="defaultEmailSender" value="${system.quickshare.email.from.default}" />
+        <property name="clientAppConfig" ref="quickShareClientsConfig" />
+        <property name="searchService" ref="SearchService" />
+        <property name="siteService" ref="SiteService" />
+        <property name="authorityService" ref="AuthorityService" />
+    </bean>
+
+    <bean id="quickShareResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.quickshare-service</value>
+            </list>
+        </property>
+    </bean>
 
 </beans>

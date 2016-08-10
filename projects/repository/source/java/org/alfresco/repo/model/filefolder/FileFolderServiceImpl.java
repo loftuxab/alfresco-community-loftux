@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.model.filefolder;
 
@@ -42,6 +49,7 @@ import org.alfresco.repo.copy.AbstractBaseCopyService;
 import org.alfresco.repo.model.filefolder.HiddenAspect.Visibility;
 import org.alfresco.repo.model.filefolder.traitextender.FileFolderServiceExtension;
 import org.alfresco.repo.model.filefolder.traitextender.FileFolderServiceTrait;
+import org.alfresco.repo.node.getchildren.FilterProp;
 import org.alfresco.repo.node.getchildren.GetChildrenCannedQuery;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.search.QueryParameterDefImpl;
@@ -480,6 +488,19 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
         CannedQueryResults<NodeRef> results = listImpl(rootNodeRef, null,  searchTypeQNames, ignoreAspectQNames, sortProps, pagingRequest);
         return getPagingResults(pagingRequest, results);
     }
+
+    @Override
+    public PagingResults<FileInfo> list(NodeRef rootNodeRef,
+                                        Set<QName> assocTypeQNames,
+                                        Set<QName> searchTypeQNames,
+                                        Set<QName> ignoreAspectQNames,
+                                        List<Pair<QName, Boolean>> sortProps,
+                                        List<FilterProp> filterProps,
+                                        PagingRequest pagingRequest)
+    {
+        CannedQueryResults<NodeRef> results = listImpl(rootNodeRef, null,  assocTypeQNames, searchTypeQNames, ignoreAspectQNames, sortProps, filterProps, pagingRequest);
+        return getPagingResults(pagingRequest, results);
+    }
     
     private CannedQueryResults<NodeRef> listImpl(NodeRef contextNodeRef, boolean files, boolean folders)
     {
@@ -506,12 +527,18 @@ public class FileFolderServiceImpl extends AbstractBaseCopyService implements Fi
      */
     private CannedQueryResults<NodeRef> listImpl(NodeRef contextNodeRef, String pattern,  Set<QName> searchTypeQNames, Set<QName> ignoreAspectQNames, List<Pair<QName, Boolean>> sortProps, PagingRequest pagingRequest)
     {
+        return listImpl(contextNodeRef, pattern, Collections.singleton(ContentModel.ASSOC_CONTAINS), searchTypeQNames, ignoreAspectQNames, sortProps, null, pagingRequest);
+    }
+
+    private CannedQueryResults<NodeRef> listImpl(NodeRef contextNodeRef, String pattern, Set<QName> assocTypeQNames, Set<QName> searchTypeQNames, Set<QName> ignoreAspectQNames,
+                                                 List<Pair<QName, Boolean>> sortProps, List<FilterProp> filterProps, PagingRequest pagingRequest)
+    {
         Long start = (logger.isDebugEnabled() ? System.currentTimeMillis() : null);
         
         // get canned query
         GetChildrenCannedQueryFactory getChildrenCannedQueryFactory = (GetChildrenCannedQueryFactory)cannedQueryRegistry.getNamedObject(CANNED_QUERY_FILEFOLDER_LIST);
 
-        GetChildrenCannedQuery cq = (GetChildrenCannedQuery)getChildrenCannedQueryFactory.getCannedQuery(contextNodeRef, pattern, Collections.singleton(ContentModel.ASSOC_CONTAINS), searchTypeQNames, ignoreAspectQNames, null, sortProps, pagingRequest);
+        GetChildrenCannedQuery cq = (GetChildrenCannedQuery)getChildrenCannedQueryFactory.getCannedQuery(contextNodeRef, pattern, assocTypeQNames, searchTypeQNames, ignoreAspectQNames, filterProps, sortProps, pagingRequest);
 
         // execute canned query
         CannedQueryResults<NodeRef> results = cq.execute();

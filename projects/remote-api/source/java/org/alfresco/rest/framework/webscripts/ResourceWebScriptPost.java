@@ -1,12 +1,38 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.framework.webscripts;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.rest.framework.core.ResourceInspector;
+import org.alfresco.rest.framework.core.OperationResourceMetaData;
+import org.alfresco.rest.framework.core.ResourceInspectorUtil;
 import org.alfresco.rest.framework.core.ResourceLocator;
 import org.alfresco.rest.framework.core.ResourceMetadata;
+import org.alfresco.rest.framework.core.ResourceOperation;
 import org.alfresco.rest.framework.core.ResourceParameter;
 import org.alfresco.rest.framework.core.ResourceWithMetadata;
 import org.alfresco.rest.framework.core.exceptions.DeletedResourceException;
@@ -20,10 +46,8 @@ import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.framework.resource.parameters.Params;
 import org.alfresco.rest.framework.resource.parameters.Params.RecognizedParams;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptRequest;
 import org.springframework.extensions.webscripts.WebScriptRequestImpl;
-import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.extensions.webscripts.servlet.FormData;
 import org.springframework.http.HttpMethod;
 
@@ -42,38 +66,61 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
        setParamsExtractor(this);
     }
     
-    
     @Override
     public Params extractParams(ResourceMetadata resourceMeta, WebScriptRequest req)
     {
         final RecognizedParams params = ResourceWebScriptHelper.getRecognizedParams(req);
-        
+        final String entityId = req.getServiceMatch().getTemplateVars().get(ResourceLocator.ENTITY_ID);
+        final String relationshipId = req.getServiceMatch().getTemplateVars().get(ResourceLocator.RELATIONSHIP_ID);
+        final ResourceOperation operation = resourceMeta.getOperation(HttpMethod.POST);
+
         switch (resourceMeta.getType())
         {
             case ENTITY:
 
-                String entityIdCheck = req.getServiceMatch().getTemplateVars().get(ResourceLocator.ENTITY_ID);
-                if (StringUtils.isNotBlank(entityIdCheck))
+                if (StringUtils.isNotBlank(entityId))
                 {
                     throw new UnsupportedResourceOperationException("POST is executed against the collection URL");
                 }
                 else
                 {
-                    Object postedObj = processRequest(resourceMeta, req);
-                    return Params.valueOf(null, params, postedObj);
+                    Object postedObj = processRequest(resourceMeta, operation, req);
+                    return Params.valueOf(null, params, postedObj, req);
                 }
             case RELATIONSHIP:
-                String entityId = req.getServiceMatch().getTemplateVars().get(ResourceLocator.ENTITY_ID);
-                String relationshipId = req.getServiceMatch().getTemplateVars().get(ResourceLocator.RELATIONSHIP_ID);
                 if (StringUtils.isNotBlank(relationshipId))
                 {
                     throw new UnsupportedResourceOperationException("POST is executed against the collection URL");
                 }
                 else
                 {
-                    Object postedRel = processRequest(resourceMeta, req);
-                    return Params.valueOf(entityId, params, postedRel);
+                    Object postedRel = processRequest(resourceMeta, operation, req);
+                    return Params.valueOf(entityId, params, postedRel, req);
                 }
+            case OPERATION:
+                final String operationName = req.getServiceMatch().getTemplateVars().get(ResourceLocator.RELATIONSHIP_RESOURCE);
+                final String propertyName = req.getServiceMatch().getTemplateVars().get(ResourceLocator.PROPERTY);
+
+                if (StringUtils.isNotBlank(entityId) && StringUtils.isNotBlank(operationName))
+                {
+                    Class objectType = resourceMeta.getObjectType(operation);
+                    Object postedObj =  null;
+                    if (objectType!= null)
+                    {
+                        //Operations don't support a List as json body
+                        postedObj = ResourceWebScriptHelper.extractJsonContent(req, assistant.getJsonHelper(), objectType);
+                    }
+
+                    if (StringUtils.isNotBlank(propertyName))
+                    {
+                        return Params.valueOf(entityId, relationshipId, params, postedObj, req);
+                    }
+                    else
+                    {
+                        return Params.valueOf(entityId, params, postedObj, req);
+                    }
+                }
+                //Fall through to unsupported.
             default:
                 throw new UnsupportedResourceOperationException("POST not supported for Actions");
         }
@@ -84,14 +131,14 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
      * returns the {@link FormData}, otherwise it tries to extract the required
      * object from the JSON payload.
      */
-    private Object processRequest(ResourceMetadata resourceMeta, WebScriptRequest req)
+    private Object processRequest(ResourceMetadata resourceMeta, ResourceOperation operation, WebScriptRequest req)
     {
         if (WebScriptRequestImpl.MULTIPART_FORM_DATA.equals(req.getContentType()))
         {
             return (FormData) req.parseContent();
         }
 
-        return extractObjFromJson(resourceMeta, req);
+        return extractObjFromJson(resourceMeta, operation, req);
     }
 
     /**
@@ -101,10 +148,10 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
      * @param req WebScriptRequest
      * @return Either an object 
      */
-    private Object extractObjFromJson(ResourceMetadata resourceMeta, WebScriptRequest req)
+    private Object extractObjFromJson(ResourceMetadata resourceMeta, ResourceOperation operation, WebScriptRequest req)
     {
-        List<ResourceParameter> params = resourceMeta.getParameters(HttpMethod.POST);
-        Class<?> objType = resourceMeta.getObjectType(HttpMethod.POST);
+        List<ResourceParameter> params = operation.getParameters();
+        Class<?> objType = resourceMeta.getObjectType(operation);
 
         if (!params.isEmpty())
         {
@@ -115,7 +162,7 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
                     // Only allow 1 value.
                     try
                     {
-                        Object content = ResourceWebScriptHelper.extractJsonContent(req,jsonHelper, objType);
+                        Object content = ResourceWebScriptHelper.extractJsonContent(req,assistant.getJsonHelper(), objType);
                         return Arrays.asList(content);
                     }
                     catch (InvalidArgumentException iae)
@@ -132,7 +179,31 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
                }
             }
         }
-        return ResourceWebScriptHelper.extractJsonContentAsList(req, jsonHelper, objType);
+        return ResourceWebScriptHelper.extractJsonContentAsList(req, assistant.getJsonHelper(), objType);
+    }
+
+
+    /**
+     * Execute a generic operation method
+     * @param resource
+     * @param params
+     * @return the result of the execution.
+     */
+    private Object executeOperation(ResourceWithMetadata resource, Params params, WithResponse withResponse)  throws Throwable
+    {
+        OperationResourceMetaData operationResourceMetaData = (OperationResourceMetaData) resource.getMetaData();
+
+        switch (operationResourceMetaData.getOperationMethod().getParameterTypes().length)
+        {
+            case 4:
+                //EntityResource operation by id
+                return ResourceInspectorUtil.invokeMethod(operationResourceMetaData.getOperationMethod(),resource.getResource(), params.getEntityId(), params.getPassedIn(), params, withResponse);
+            case 5:
+                //RelationshipEntityResource operation by id
+                return ResourceInspectorUtil.invokeMethod(operationResourceMetaData.getOperationMethod(),resource.getResource(), params.getEntityId(), params.getRelationshipId(), params.getPassedIn(), params, withResponse);
+        }
+
+        throw new UnsupportedResourceOperationException("The operation method has an invalid signature");
     }
 
     /**
@@ -141,64 +212,111 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
      * @param params parameters to use
      * @return anObject the result of the execute
      */
-    @SuppressWarnings("unchecked")
-    private Object executeInternal(ResourceWithMetadata resource, Params params)
+    @Override
+    public Object executeAction(ResourceWithMetadata resource, Params params, WithResponse withResponse) throws Throwable
     {
         final Object resObj = resource.getResource();
+
         switch (resource.getMetaData().getType())
         {
             case ENTITY:
-                if (resource.getMetaData().isDeleted(EntityResourceAction.Create.class))
-                {
-                    throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
-                }
 
-                if (resObj instanceof MultiPartResourceAction.Create<?>)
+                if (resObj instanceof MultiPartResourceAction.Create<?> && params.getPassedIn() instanceof FormData)
                 {
                     MultiPartResourceAction.Create<Object> creator = (MultiPartResourceAction.Create<Object>) resObj;
-                    return creator.create((FormData) params.getPassedIn(), params);
+                    return creator.create((FormData) params.getPassedIn(), params, withResponse);
 
                 }
                 else
                 {
-                    EntityResourceAction.Create<Object> creator = (EntityResourceAction.Create<Object>) resObj;
-                    List<Object> created = creator.create((List<Object>) params.getPassedIn(), params);
-                    if (created != null && created.size() == 1)
+                    if (EntityResourceAction.Create.class.isAssignableFrom(resource.getResource().getClass()))
                     {
-                        // return just one object instead of an array
-                        return created.get(0);
+                        if (resource.getMetaData().isDeleted(EntityResourceAction.Create.class))
+                        {
+                            throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
+                        }
+                        EntityResourceAction.Create<Object> creator = (EntityResourceAction.Create<Object>) resObj;
+                        List<Object> created = creator.create((List<Object>) params.getPassedIn(), params);
+                        if (created != null && created.size() == 1)
+                        {
+                            // return just one object instead of an array
+                            return created.get(0);
+                        }
+                        else
+                        {
+                            return wrapWithCollectionWithPaging(created);
+                        }
                     }
-                    else
+                    if (EntityResourceAction.CreateWithResponse.class.isAssignableFrom(resource.getResource().getClass()))
                     {
-                        return wrapWithCollectionWithPaging(created);
+                        if (resource.getMetaData().isDeleted(EntityResourceAction.CreateWithResponse.class))
+                        {
+                            throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
+                        }
+                        EntityResourceAction.CreateWithResponse<Object> creator = (EntityResourceAction.CreateWithResponse<Object>) resObj;
+                        List<Object> created = creator.create((List<Object>) params.getPassedIn(), params, withResponse);
+                        if (created != null && created.size() == 1)
+                        {
+                            // return just one object instead of an array
+                            return created.get(0);
+                        }
+                        else
+                        {
+                            return wrapWithCollectionWithPaging(created);
+                        }
                     }
                 }
 
             case RELATIONSHIP:
-                if (resource.getMetaData().isDeleted(RelationshipResourceAction.Create.class))
-                {
-                    throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
-                }
-
-                if (resObj instanceof MultiPartRelationshipResourceAction.Create<?>)
+                if (resObj instanceof MultiPartRelationshipResourceAction.Create<?> && params.getPassedIn() instanceof FormData)
                 {
                     MultiPartRelationshipResourceAction.Create<Object> creator = (MultiPartRelationshipResourceAction.Create<Object>) resObj;
-                    return creator.create(params.getEntityId(), (FormData) params.getPassedIn(), params);
+                    return creator.create(params.getEntityId(), (FormData) params.getPassedIn(), params, withResponse);
                 }
                 else
                 {
-                    RelationshipResourceAction.Create<Object> createRelation = (RelationshipResourceAction.Create<Object>) resource.getResource();
-                    List<Object> createdRel = createRelation.create(params.getEntityId(), (List<Object>) params.getPassedIn(), params);
-                    if (createdRel != null && createdRel.size() == 1)
+                    if (RelationshipResourceAction.Create.class.isAssignableFrom(resource.getResource().getClass()))
                     {
-                        // return just one object instead of an array
-                        return createdRel.get(0);
+                        if (resource.getMetaData().isDeleted(RelationshipResourceAction.Create.class))
+                        {
+                            throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
+                        }
+
+                        RelationshipResourceAction.Create<Object> createRelation = (RelationshipResourceAction.Create<Object>) resource.getResource();
+                        List<Object> createdRel = createRelation.create(params.getEntityId(), (List<Object>) params.getPassedIn(), params);
+                        if (createdRel != null && createdRel.size() == 1)
+                        {
+                            // return just one object instead of an array
+                            return createdRel.get(0);
+                        }
+                        else
+                        {
+                            return wrapWithCollectionWithPaging(createdRel);
+                        }
                     }
-                    else
+
+                    if (RelationshipResourceAction.CreateWithResponse.class.isAssignableFrom(resource.getResource().getClass()))
                     {
-                        return wrapWithCollectionWithPaging(createdRel);
+                        if (resource.getMetaData().isDeleted(RelationshipResourceAction.CreateWithResponse.class))
+                        {
+                            throw new DeletedResourceException("(DELETE) " + resource.getMetaData().getUniqueId());
+                        }
+
+                        RelationshipResourceAction.CreateWithResponse<Object> createRelation = (RelationshipResourceAction.CreateWithResponse<Object>) resource.getResource();
+                        List<Object> createdRel = createRelation.create(params.getEntityId(), (List<Object>) params.getPassedIn(), params, withResponse);
+                        if (createdRel != null && createdRel.size() == 1)
+                        {
+                            // return just one object instead of an array
+                            return createdRel.get(0);
+                        }
+                        else
+                        {
+                            return wrapWithCollectionWithPaging(createdRel);
+                        }
                     }
                 }
+            case OPERATION:
+                return executeOperation(resource, params, withResponse);
             default:
                 throw new UnsupportedResourceOperationException("POST not supported for Actions");
         }
@@ -214,30 +332,6 @@ public class ResourceWebScriptPost extends AbstractResourceWebScript implements 
         {
             return created;
         }
-    }
-
-    @Override
-    public void execute(final ResourceWithMetadata resource, final Params params, final ExecutionCallback executionCallback)
-    {
-        final String entityCollectionName = ResourceInspector.findEntityCollectionNameName(resource.getMetaData());
-        transactionService.getRetryingTransactionHelper().doInTransaction(
-            new RetryingTransactionCallback<Void>()
-            {
-                @SuppressWarnings("unchecked")
-                @Override
-                public Void execute() throws Throwable
-                {
-                    Object result = executeInternal(resource, params);
-                    executionCallback.onSuccess(helper.postProcessResponse(resource.getMetaData().getApi(), entityCollectionName, params, result), DEFAULT_JSON_CONTENT);
-                    return null;
-                }
-            }, false, true);
-    }
-
-    @Override
-    protected void setSuccessResponseStatus(WebScriptResponse res)
-    {
-        res.setStatus(Status.STATUS_CREATED);
     }
 
 }

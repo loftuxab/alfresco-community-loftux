@@ -1,33 +1,41 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.rest.api.tests.util;
 
 import static org.junit.Assert.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.alfresco.rest.api.tests.client.PublicApiClient;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A utility class for Rest API tests
@@ -127,11 +135,35 @@ public class RestApiUtil
     }
 
     /**
+     * Parses the alfresco REST API error response.
+     *
+     * @param jsonObject the {@code JSONObject} derived from the response
+     * @return ExpectedErrorResponse the error object
+     * @throws Exception
+     */
+    public static PublicApiClient.ExpectedErrorResponse parseErrorResponse(JSONObject jsonObject) throws Exception
+    {
+        return parsePojo("error", jsonObject, PublicApiClient.ExpectedErrorResponse.class);
+    }
+
+    /**
      * Converts the POJO which represents the JSON payload into a JSON string
      */
     public static String toJsonAsString(Object object) throws Exception
     {
         assertNotNull(object);
         return OBJECT_MAPPER.writeValueAsString(object);
+    }
+
+    /**
+     * Converts the POJO which represents the JSON payload into a JSON string.
+     * null values will be ignored.
+     */
+    public static String toJsonAsStringNonNull(Object object) throws IOException
+    {
+        assertNotNull(object);
+        ObjectMapper om = new ObjectMapper();
+        om.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
+        return om.writeValueAsString(object);
     }
 }

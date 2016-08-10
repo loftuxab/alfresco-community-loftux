@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Data model classes
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.dictionary;
 
@@ -23,8 +30,10 @@ import static org.alfresco.service.cmr.dictionary.DictionaryException.DuplicateD
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -68,6 +77,7 @@ public class CompiledModel implements ModelQuery
     private static final String ERR_DUPLICATE_TYPE = "d_dictionary.compiled_model.err.duplicate_type";
     private static final String ERR_DUPLICATE_ASPECT = "d_dictionary.compiled_model.err.duplicate_aspect";
     private static final String ERR_DUPLICATE_CONSTRAINT = "d_dictionary.compiled_model.err.duplicate_constraint";
+    private static final String ERR_CYCLIC_REFERENCE = "d_dictionary.compiled_model.err.cyclic_ref";
 
     private M2Model model;
     private ModelDefinition modelDefinition;
@@ -213,6 +223,10 @@ public class CompiledModel implements ModelQuery
             {
                 throw new NamespaceException("URI " + uri + " cannot be imported as it is not defined (with prefix " + imported.getPrefix());
             }
+            if(model.getNamespace(uri) != null)
+            {
+                throw new NamespaceException("URI " + uri + " cannot be imported as it is already contained in the model's namespaces");
+            }
             prefixResolver.registerNamespace(imported.getPrefix(), uri);
         }
         for (M2Namespace defined : model.getNamespaces())
@@ -260,6 +274,8 @@ public class CompiledModel implements ModelQuery
             // Calculate class depth in hierarchy
             int depth = 0;
             QName parentName = def.getParentName();
+            Set<ClassDefinition> traversedNodes = new HashSet<ClassDefinition>();
+            traversedNodes.add(def);
             while (parentName != null)
             {
                 ClassDefinition parentClass = getClass(parentName);
@@ -267,7 +283,12 @@ public class CompiledModel implements ModelQuery
                 {
                     break;
                 }
+                if (traversedNodes.contains(parentClass))
+                {
+                    throw new DictionaryException(ERR_CYCLIC_REFERENCE, parentClass.getName(), model.getName());
+                }
                 depth = depth +1;
+                traversedNodes.add(parentClass);
                 parentName = parentClass.getParentName();
             }
 

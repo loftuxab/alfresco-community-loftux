@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2016 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.jscript;
 
@@ -1626,6 +1633,18 @@ public class ScriptNode implements Scopeable, NamespacePrefixResolverProvider
     public void setInheritsPermissions(boolean inherit)
     {
         this.services.getPermissionService().setInheritParentPermissions(this.nodeRef, inherit);
+    }
+    
+    /**
+     * Set whether this node should inherit permissions from the parent node. If the operation takes 
+     * too long and asyncCall parameter set accordingly, fixed ACLs method will be asynchronously called.
+     * 
+     * @param inherit True to inherit parent permissions, false otherwise.
+     * @param asyncCall True if fixed ACLs should be asynchronously set when operation execution takes too long, false otherwise.
+     */
+    public void setInheritsPermissions(boolean inherit, boolean asyncCall)
+    {
+        this.services.getPermissionService().setInheritParentPermissions(this.nodeRef, inherit, asyncCall);
     }
     
     /**

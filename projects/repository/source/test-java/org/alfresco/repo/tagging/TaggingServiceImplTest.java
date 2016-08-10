@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.tagging;
 
@@ -39,6 +46,7 @@ import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.audit.AuditServiceImpl;
 import org.alfresco.repo.audit.UserAuditFilter;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
+import org.alfresco.repo.node.NodeRefPropertyMethodInterceptor;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -115,6 +123,8 @@ public class TaggingServiceImplTest extends TestCase
     private MutableAuthenticationService authenticationService;
     private AsyncOccurs asyncOccurs;
     
+    private NodeRefPropertyMethodInterceptor nodeRefPropInterceptor;
+    
     private static StoreRef storeRef;
     private static NodeRef rootNode;
     private NodeRef folder;
@@ -174,6 +184,7 @@ public class TaggingServiceImplTest extends TestCase
         this.personService = (PersonService)ctx.getBean("PersonService");
         this.permissionService = (PermissionService)ctx.getBean("PermissionService");
         this.authenticationService = (MutableAuthenticationService)ctx.getBean("authenticationService");
+        this.nodeRefPropInterceptor = (NodeRefPropertyMethodInterceptor)ctx.getBean("nodeRefPropertyInterceptor");
 
         if (init == false)
         {
@@ -2066,15 +2077,19 @@ public class TaggingServiceImplTest extends TestCase
           
           // If there are any more actions of the same type,
           //  then wait for them to finish too
-          for(int i=0; i<50; i++)
+          for(int i=0; i<100; i++)
           {
              if( actionTrackingService.getExecutingActions(ACTION_TYPE).size() == 0 )
              {
                 break;
              }
              try {
-                Thread.sleep(10);
+                Thread.sleep(100);
              } catch(InterruptedException e) {}
+          }
+          if (actionTrackingService.getExecutingActions(ACTION_TYPE).size() > 0)
+          {
+              System.err.println("Warning - not all actions finished");
           }
           
           return returnVal;
@@ -2336,4 +2351,43 @@ public class TaggingServiceImplTest extends TestCase
             }
         });    	
     }
+    
+    /**
+     * Tests that when the deleteTag() method runs, it will remove invalid references to the deleted tag. 
+     */
+    public void testDeleteTag() throws Exception{
+        
+        try{
+            // We instruct the 'nodeRefPropInterceptor' to skip processing on the 'get' methods.
+            // This is needed because this interceptor removes any properties which are invalid. e.g. have been deleted.
+            // We need to make sure that the 'taggable' property stays put. 
+            nodeRefPropInterceptor.setFilterOnGet(false);
+            
+            this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
+
+                @SuppressWarnings("unchecked")
+                @Override
+                public Void execute() throws Throwable
+                {
+                    taggingService.clearTags(folder);
+                    taggingService.addTag(folder, TAG_1);
+                    
+                    // The deleteTag() should remove any reference to the deleted tag
+                    List<NodeRef> taggableProperty = (List<NodeRef>) nodeService.getProperty(folder, ContentModel.PROP_TAGS);
+                    assertTrue("Our folder should have a reference on one tag.", taggableProperty.size() == 1);
+                    
+                    taggingService.deleteTag(TaggingServiceImplTest.storeRef, TAG_1);
+                    
+                    // The deleteTag() should remove any reference to the deleted tag
+                    taggableProperty = (List<NodeRef>) nodeService.getProperty(folder, ContentModel.PROP_TAGS);
+                    assertTrue("Our folder shouldn't have any references left to deleted tags.", taggableProperty.size() == 0);
+                    
+                    return null;
+                }
+            });
+        } finally{
+            nodeRefPropInterceptor.setFilterOnGet(true);
+        }
+    }
+
 }

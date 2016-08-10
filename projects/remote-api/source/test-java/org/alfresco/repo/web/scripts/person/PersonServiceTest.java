@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.web.scripts.person;
 
@@ -236,6 +243,27 @@ public class PersonServiceTest extends BaseWebScriptTest
         JSONObject result = createPerson(userName, "myTitle", "myFirstName", "myLastName", "myOrganisation",
                                 "myJobTitle", "myEmailAddress", "myBio", "images/avatar.jpg", 200);
         response = sendRequest(new GetRequest(URL_PEOPLE + "/" + userName), 200);
+    }
+    
+    public void testGetPeopleSkipCount() throws Exception
+    {
+        // Test case for MNT-15357 skipCount
+        int skipCount = 1;
+
+        // Ensure that the REST call with no filter will always be routed to a DB canned query rather than a FTS
+        // (see ALF-18876 for details)
+        String filter = "*%20[hint:useCQ]";
+
+        Response response = sendRequest(new GetRequest(URL_PEOPLE + "?filter=" + filter), 200);
+        JSONObject res = new JSONObject(response.getContentAsString());
+
+        int peopleFound = res.getJSONArray("people").length();
+        assertTrue("No people found", peopleFound > 0);
+
+        response = sendRequest(new GetRequest(URL_PEOPLE + "?filter=" + filter + "&skipCount=" + skipCount), 200);
+
+        res = new JSONObject(response.getContentAsString());
+        assertTrue("skipCount ignored", res.getJSONArray("people").length() < peopleFound);
     }
     
     public void testUpdatePerson() throws Exception

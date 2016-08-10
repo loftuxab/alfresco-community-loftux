@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content;
 
@@ -44,7 +51,6 @@ import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
-import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -214,10 +220,6 @@ public class ContentServiceImpl implements ContentService, ApplicationContextAwa
                 NodeServicePolicies.OnUpdatePropertiesPolicy.QNAME,
                 this,
                 new JavaBehaviour(this, "onUpdateProperties"));
-        this.policyComponent.bindClassBehaviour(
-                NodeServicePolicies.OnRemoveAspectPolicy.QNAME, 
-                ContentModel.ASPECT_NO_CONTENT, 
-                new JavaBehaviour(this, "onRemoveAspect", NotificationFrequency.EVERY_EVENT));
         
         // Register on content update policy
         this.onContentUpdateDelegate = this.policyComponent.registerClassPolicy(OnContentUpdatePolicy.class);
@@ -344,25 +346,7 @@ public class ContentServiceImpl implements ContentService, ApplicationContextAwa
         }
     }
     
-    /**
-     * MNT-10966: removing ASPECT_NO_CONTENT means that new content was uploaded
-     * 
-     * @param nodeRef            the node reference
-     * @param aspectTypeQName    tha removed aspect
-     */
-    public void onRemoveAspect(NodeRef nodeRef, QName aspectTypeQName)
-    {
-        if (!nodeService.exists(nodeRef))
-        {
-            return;
-        }
         
-        // Fire the content update policy
-        Set<QName> types = getTypes(nodeRef, null);
-        OnContentUpdatePolicy policy = onContentUpdateDelegate.get(nodeRef, types);
-        policy.onContentUpdate(nodeRef, true);
-    }
-    
     /**
      * Helper method to lazily populate the types associated with a node
      * 

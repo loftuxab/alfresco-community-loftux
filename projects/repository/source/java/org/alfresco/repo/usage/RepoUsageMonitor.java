@@ -1,26 +1,35 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.usage;
 
 import java.util.Date;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.lock.JobLockService;
+import org.alfresco.repo.lock.LockAcquisitionException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -55,10 +64,14 @@ import org.quartz.TriggerUtils;
 public class RepoUsageMonitor implements RepoUsageComponent.RestrictionObserver
 {
     private static Log logger = LogFactory.getLog(RepoUsageMonitor.class);
-    
+
+    public static final Long LOCK_TTL = 60000L;
+    public static final QName LOCK_USAGE = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "RepoUsageMonitor");
+
     private Scheduler scheduler;
     private TransactionServiceImpl transactionService;
     private RepoUsageComponent repoUsageComponent;
+    private JobLockService jobLockService;
     private final QName vetoName = QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "RepoUsageMonitor");
     
     /**
@@ -93,6 +106,14 @@ public class RepoUsageMonitor implements RepoUsageComponent.RestrictionObserver
     }
 
     /**
+     * @param jobLockService            service to prevent duplicate work when updating usages
+     */
+    public void setJobLockService(JobLockService jobLockService)
+    {
+        this.jobLockService = jobLockService;
+    }
+
+    /**
      * Check that all properties are properly set
      */
     public void init() throws SchedulerException
@@ -100,7 +121,8 @@ public class RepoUsageMonitor implements RepoUsageComponent.RestrictionObserver
         PropertyCheck.mandatory(this, "scheduler", scheduler);
         PropertyCheck.mandatory(this, "transactionService", transactionService);
         PropertyCheck.mandatory(this, "repoUsageComponent", repoUsageComponent);
-        
+        PropertyCheck.mandatory(this, "jobLockService", jobLockService);
+
         // Trigger the scheduled updates
         final JobDetail jobDetail = new JobDetail("rmj", Scheduler.DEFAULT_GROUP, RepoUsageMonitorJob.class);
         jobDetail.getJobDataMap().put("RepoUsageMonitor", this);
@@ -160,7 +182,34 @@ public class RepoUsageMonitor implements RepoUsageComponent.RestrictionObserver
                 return null;
             }
         };
-        AuthenticationUtil.runAs(runAs, AuthenticationUtil.getSystemUserName());
+        String lockToken = null;
+        TrackerJobLockRefreshCallback callback = new TrackerJobLockRefreshCallback();
+        try
+        {
+            // Lock to prevent concurrent queries
+            lockToken = jobLockService.getLock(LOCK_USAGE, LOCK_TTL);
+            jobLockService.refreshLock(lockToken, LOCK_USAGE, LOCK_TTL / 2, callback);
+            AuthenticationUtil.runAs(runAs, AuthenticationUtil.getSystemUserName());
+        }
+        catch (LockAcquisitionException e)
+        {
+            logger.debug("Failed to get lock for usage monitor: " + e.getMessage());
+        }
+        finally
+        {
+            if (lockToken != null)
+            {
+                try
+                {
+                    callback.isActive = false;
+                    jobLockService.releaseLock(lockToken, LOCK_USAGE);
+                }
+                catch (LockAcquisitionException e)
+                {
+                    logger.debug("Failed to release lock for usage monitor: " + e.getMessage());
+                }
+            }
+        }
     }
 
     /**
@@ -200,6 +249,26 @@ public class RepoUsageMonitor implements RepoUsageComponent.RestrictionObserver
             final JobDataMap jdm = context.getJobDetail().getJobDataMap();
             final RepoUsageMonitor repoUsageMonitor = (RepoUsageMonitor) jdm.get("RepoUsageMonitor");
             repoUsageMonitor.checkUsages();
+        }
+    }
+
+    private class TrackerJobLockRefreshCallback implements JobLockService.JobLockRefreshCallback
+    {
+        public boolean isActive = true;
+
+        @Override
+        public boolean isActive()
+        {
+            return isActive;
+        }
+
+        @Override
+        public void lockReleased()
+        {
+            if (logger.isTraceEnabled())
+            {
+                logger.trace("lock released");
+            }
         }
     }
 }

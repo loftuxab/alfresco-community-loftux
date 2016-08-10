@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.model.filefolder;
 
@@ -46,6 +53,7 @@ import org.alfresco.repo.dictionary.DictionaryBootstrap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Type;
+import org.alfresco.repo.domain.hibernate.dialect.AlfrescoMySQLClusterNDBDialect;
 import org.alfresco.repo.model.filefolder.FileFolderServiceImpl.InvalidTypeException;
 import org.alfresco.repo.node.integrity.IntegrityChecker;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -80,6 +88,7 @@ import org.alfresco.util.FileFilterMode;
 import org.alfresco.util.FileFilterMode.Client;
 import org.alfresco.util.GUID;
 import org.alfresco.util.Pair;
+import org.hibernate.dialect.Dialect;
 import org.junit.experimental.categories.Category;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.surf.util.I18NUtil;
@@ -1736,7 +1745,7 @@ public class FileFolderServiceImplTest extends TestCase
         checkFileList(pageRes, 6, 0, expectedNames);
     }	
     
-    public void testMoveCopy3000Files() throws FileNotFoundException
+    public void testMoveCopyLotsOfFiles() throws FileNotFoundException
     {
         final String CONTAINING_FOLDER = "CONTAINING FOLDER " + GUID.generate(),
                      FOLDER_1 = "FOLDER 1 " + GUID.generate(),
@@ -1746,8 +1755,18 @@ public class FileFolderServiceImplTest extends TestCase
                  folder1 = fileFolderService.create(containingFolder.getNodeRef(), FOLDER_1, ContentModel.TYPE_FOLDER),
                  folder2 = fileFolderService.create(containingFolder.getNodeRef(), FOLDER_2, ContentModel.TYPE_FOLDER);
         
-        // create 3000 files within the folder
-        final int COUNT = 3000;
+        // create thousand(s) of files within the folder
+        int COUNT = 3000;
+        
+        Dialect dialect = (Dialect) ctx.getBean("dialect");
+        if (dialect instanceof AlfrescoMySQLClusterNDBDialect)
+        {
+            // note: to increase the file count on NDB, may need to further bump-up NDB cluster config
+            // eg. DataMemory, IndexMemory, MaxNoOfConcurrentOperations, ...
+            // also consider splitting into separate txns (eg. after each bulk create, move, delete, copy, ...)
+            COUNT = 1000;
+        }
+        
         for (int index = 0; index < COUNT; index++)
         {
             fileFolderService.create(folder1.getNodeRef(), "Name " + index, ContentModel.TYPE_CONTENT);
@@ -1778,11 +1797,13 @@ public class FileFolderServiceImplTest extends TestCase
         assertEquals(COUNT, fileFolderService.listFiles(folders.get(0).getNodeRef()).size());
         
         fileFolderService.delete(folder1.getNodeRef());
+        
         assertEquals(1, fileFolderService.list(containingFolder.getNodeRef()).size());
         
         folder1 = folders.get(0);
         // copy back
         FileInfo newFolder = fileFolderService.copy(folder1.getNodeRef(), containingFolder.getNodeRef(), null);
+        
         assertEquals(2, fileFolderService.list(containingFolder.getNodeRef()).size());
         assertEquals(COUNT, fileFolderService.list(newFolder.getNodeRef()).size());
     }

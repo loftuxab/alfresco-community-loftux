@@ -1,44 +1,53 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.rest.api;
 
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.repo.web.scripts.TenantWebScriptServletRuntime;
+import org.alfresco.rest.framework.tools.ApiAssistant;
 import org.springframework.extensions.config.ServerProperties;
 import org.springframework.extensions.surf.util.URLDecoder;
-import org.springframework.extensions.webscripts.Match;
-import org.springframework.extensions.webscripts.RuntimeContainer;
-import org.springframework.extensions.webscripts.WebScriptRequest;
+import org.springframework.extensions.webscripts.*;
 import org.springframework.extensions.webscripts.servlet.ServletAuthenticatorFactory;
 
 public class PublicApiTenantWebScriptServletRuntime extends TenantWebScriptServletRuntime
 {
     private static final Pattern CMIS_URI_PATTERN = Pattern.compile(".*/cmis/versions/[0-9]+\\.[0-9]+/.*");
-    
+    private ApiAssistant apiAssistant;
+
 	public PublicApiTenantWebScriptServletRuntime(RuntimeContainer container, ServletAuthenticatorFactory authFactory, HttpServletRequest req,
-			HttpServletResponse res, ServerProperties serverProperties)
+			HttpServletResponse res, ServerProperties serverProperties, ApiAssistant apiAssistant)
 	{
 		super(container, authFactory, req, res, serverProperties);
+        this.apiAssistant = apiAssistant;
 	}
 
     /* (non-Javadoc)
@@ -120,5 +129,25 @@ public class PublicApiTenantWebScriptServletRuntime extends TenantWebScriptServl
     public String getName()
     {
         return "PublicApiTenantServletRuntime";
+    }
+
+    @Override
+    protected void renderErrorResponse(Match match, Throwable exception, WebScriptRequest request, WebScriptResponse response) {
+
+        //If its cmis or not an exception then use the default behaviour
+        if (CMIS_URI_PATTERN.matcher(req.getRequestURI()).matches() || !(exception instanceof Exception))
+        {
+            super.renderErrorResponse(match, exception, request, response);
+        }
+        else
+        {
+            try {
+                apiAssistant.renderException((Exception)exception, response);
+            } catch (IOException e) {
+                logger.error("Internal error", e);
+                throw new WebScriptException("Internal error", e);
+            }
+        }
+
     }
 }

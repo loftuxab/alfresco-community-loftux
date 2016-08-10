@@ -1,3 +1,28 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 
 package org.alfresco.rest.framework.core;
 
@@ -12,11 +37,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.alfresco.rest.framework.Operation;
 import org.alfresco.rest.framework.Api;
 import org.alfresco.rest.framework.BinaryProperties;
 import org.alfresco.rest.framework.WebApi;
 import org.alfresco.rest.framework.WebApiDeleted;
 import org.alfresco.rest.framework.WebApiDescription;
+import org.alfresco.rest.framework.WebApiNoAuth;
 import org.alfresco.rest.framework.WebApiParam;
 import org.alfresco.rest.framework.WebApiParameters;
 import org.alfresco.rest.framework.core.ResourceMetadata.RESOURCE_TYPE;
@@ -30,11 +57,14 @@ import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAct
 import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartRelationshipResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceAction;
+import org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceBinaryAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.ResourceAction;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.extensions.webscripts.Status;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.ReflectionUtils;
 
@@ -42,6 +72,7 @@ import org.springframework.util.ReflectionUtils;
  * Looks at resources to see what they can do
  * 
  * @author Gethin James
+ * @author janv
  */
 public class ResourceInspector
 {
@@ -60,6 +91,14 @@ public class ResourceInspector
         ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.Update.class);
         ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.Delete.class);
         ALL_ENTITY_RESOURCE_INTERFACES.add(BinaryResourceAction.Read.class);
+
+        ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.CreateWithResponse.class);
+        ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.ReadWithResponse.class);
+        ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.ReadByIdWithResponse.class);
+        ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.UpdateWithResponse.class);
+        ALL_ENTITY_RESOURCE_INTERFACES.add(EntityResourceAction.DeleteWithResponse.class);
+        ALL_ENTITY_RESOURCE_INTERFACES.add(BinaryResourceAction.ReadWithResponse.class);
+
         ALL_ENTITY_RESOURCE_INTERFACES.add(MultiPartResourceAction.Create.class);
 
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Create.class);
@@ -67,11 +106,22 @@ public class ResourceInspector
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.ReadById.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Update.class);
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.Delete.class);
+
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.CreateWithResponse.class);
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.ReadWithResponse.class);
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.ReadByIdWithResponse.class);
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.UpdateWithResponse.class);
+        ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(RelationshipResourceAction.DeleteWithResponse.class);
+
         ALL_RELATIONSHIP_RESOURCE_INTERFACES.add(MultiPartRelationshipResourceAction.Create.class);
 
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Read.class);
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Delete.class);
         ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.Update.class);
+
+        ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.ReadWithResponse.class);
+        ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.DeleteWithResponse.class);
+        ALL_PROPERTY_RESOURCE_INTERFACES.add(BinaryResourceAction.UpdateWithResponse.class);
     }
     
     /**
@@ -94,26 +144,41 @@ public class ResourceInspector
         findOperation(EntityResourceAction.ReadById.class, HttpMethod.GET, helper);
         findOperation(EntityResourceAction.Update.class,   HttpMethod.PUT, helper);  
         findOperation(EntityResourceAction.Delete.class,   HttpMethod.DELETE, helper);
+
+        findOperation(EntityResourceAction.CreateWithResponse.class,   HttpMethod.POST, helper);
+        findOperation(EntityResourceAction.ReadWithResponse.class,     HttpMethod.GET, helper);
+        findOperation(EntityResourceAction.ReadByIdWithResponse.class, HttpMethod.GET, helper);
+        findOperation(EntityResourceAction.UpdateWithResponse.class,   HttpMethod.PUT, helper);
+        findOperation(EntityResourceAction.DeleteWithResponse.class,   HttpMethod.DELETE, helper);
+
         findOperation(MultiPartResourceAction.Create.class,   HttpMethod.POST, helper);
+
+        boolean noAuth = resource.isAnnotationPresent(WebApiNoAuth.class);
+        if (noAuth)
+        {
+            throw new IllegalArgumentException("@WebApiNoAuth should not be on all (entity resource class) - only on individual methods: "+urlPath);
+        }
+
+        Set<Class<? extends ResourceAction>> apiNoAuth = helper.apiNoAuth;
 
         if (resource.isAnnotationPresent(WebApiDeleted.class))
         {
             metainfo.add(new ResourceMetadata(ResourceDictionary.resourceKey(urlPath,null), RESOURCE_TYPE.ENTITY,
-                        null, api, ALL_ENTITY_RESOURCE_INTERFACES, null));
+                                              null, api, ALL_ENTITY_RESOURCE_INTERFACES, apiNoAuth, null));
         }
         else 
         {
             if (!helper.apiDeleted.isEmpty() || !helper.operations.isEmpty())
             {
                 metainfo.add(new ResourceMetadata(ResourceDictionary.resourceKey(urlPath,null), RESOURCE_TYPE.ENTITY,
-                        helper.operations, api, helper.apiDeleted, null));
+                                                  helper.operations, api, helper.apiDeleted, apiNoAuth, null));
             }
         }
-           
+
         inspectAddressedProperties(api, resource, urlPath, metainfo);
+        inspectOperations(api, resource, urlPath, metainfo);
         return metainfo;
     }
-
 
     /**
      * Inspects the entity resource and returns meta data about any addresssed/binary properties
@@ -125,56 +190,46 @@ public class ResourceInspector
     public static void inspectAddressedProperties(Api api, Class<?> resource, final String entityPath, List<ResourceMetadata> metainfo)
     {
         final Map<String,List<ResourceOperation>> operationGroupedByProperty = new HashMap<String,List<ResourceOperation>>();
-        MetaHelperCallback helperForAddressProps = new MetaHelperCallback(resource) {
 
-            @Override
-            public void whenNewOperation(ResourceOperation operation, Method aMethod)
-            {
-                Annotation addressableProps = AnnotationUtils.findAnnotation(aMethod, BinaryProperties.class);
-                if (addressableProps != null)
-                {
-                    Map<String, Object> annotAttribs = AnnotationUtils.getAnnotationAttributes(addressableProps);
-                    String[] props = (String[]) annotAttribs.get("value");
-                    for (String property : props)
-                    {
-                        String propKey = ResourceDictionary.propertyResourceKey(entityPath,property);
-                        if (!operationGroupedByProperty.containsKey(propKey))
-                        {
-                            List<ResourceOperation> ops = new ArrayList<ResourceOperation>();
-                            operationGroupedByProperty.put(propKey, ops);
-                        }
-                        List<ResourceOperation> operations = operationGroupedByProperty.get(propKey);
-                        operations.add(operation);
-                    }
-                    
-                }
-                else
-                {
-                    logger.warn("Resource "+resource.getCanonicalName()+" should declare a @BinaryProperties annotation.");
-                }
-            }
+        MetaHelperAddressable helperForAddressProps = new MetaHelperAddressable(resource, entityPath, operationGroupedByProperty);
 
-            @Override
-            public void whenOperationDeleted(Class<? extends ResourceAction> deleted, Method aMethod)
-            {
-            }
-        };
         findOperation(BinaryResourceAction.Read.class,   HttpMethod.GET, helperForAddressProps);
         findOperation(BinaryResourceAction.Delete.class, HttpMethod.DELETE, helperForAddressProps);
         findOperation(BinaryResourceAction.Update.class, HttpMethod.PUT, helperForAddressProps);
-         
+
+        findOperation(BinaryResourceAction.ReadWithResponse.class,   HttpMethod.GET, helperForAddressProps);
+        findOperation(BinaryResourceAction.DeleteWithResponse.class, HttpMethod.DELETE, helperForAddressProps);
+        findOperation(BinaryResourceAction.UpdateWithResponse.class, HttpMethod.PUT, helperForAddressProps);
+
+        findOperation(RelationshipResourceBinaryAction.Read.class,   HttpMethod.GET, helperForAddressProps);
+        findOperation(RelationshipResourceBinaryAction.Delete.class, HttpMethod.DELETE, helperForAddressProps);
+        findOperation(RelationshipResourceBinaryAction.Update.class, HttpMethod.PUT, helperForAddressProps);
+
+        findOperation(RelationshipResourceBinaryAction.ReadWithResponse.class,   HttpMethod.GET, helperForAddressProps);
+        findOperation(RelationshipResourceBinaryAction.DeleteWithResponse.class, HttpMethod.DELETE, helperForAddressProps);
+        findOperation(RelationshipResourceBinaryAction.UpdateWithResponse.class, HttpMethod.PUT, helperForAddressProps);
+
+        boolean noAuth = resource.isAnnotationPresent(WebApiNoAuth.class);
+        if (noAuth)
+        {
+            throw new IllegalArgumentException("@WebApiNoAuth should not be on all (address properties) - only on individual methods: "+entityPath);
+        }
+
+        Set<Class<? extends ResourceAction>> apiNoAuth = helperForAddressProps.apiNoAuth;
+
         if (resource.isAnnotationPresent(WebApiDeleted.class))
         {
             metainfo.add(new ResourceMetadata(ResourceDictionary.propertyResourceKey(entityPath,"FIX_ME"), RESOURCE_TYPE.PROPERTY,
-                        null, inspectApi(resource), ALL_PROPERTY_RESOURCE_INTERFACES, null));
+                                              null, inspectApi(resource), ALL_PROPERTY_RESOURCE_INTERFACES, apiNoAuth, null));
         }
         else 
         {
             for (Entry<String, List<ResourceOperation>> groupedOps : operationGroupedByProperty.entrySet())
             {           
-                metainfo.add(new ResourceMetadata(groupedOps.getKey(), RESOURCE_TYPE.PROPERTY, groupedOps.getValue(), api, null, null));
-            }   
+                metainfo.add(new ResourceMetadata(groupedOps.getKey(), RESOURCE_TYPE.PROPERTY, groupedOps.getValue(), api, null, apiNoAuth, null));
+            }
         }
+
     }
 
     /**
@@ -188,6 +243,9 @@ public class ResourceInspector
         Map<String, Object> annotAttribs = AnnotationUtils.getAnnotationAttributes(annot);
         String urlPath = String.valueOf(annotAttribs.get("name"));
         String entityPath = findEntityNameByAnnotationAttributes(annotAttribs);
+        String relationshipKey = ResourceDictionary.resourceKey(entityPath,urlPath);
+        Api api = inspectApi(resource);
+        List<ResourceMetadata> metainfo = new ArrayList<ResourceMetadata>();
 
         MetaHelper helper = new MetaHelper(resource);
         findOperation(RelationshipResourceAction.Create.class,   HttpMethod.POST, helper);
@@ -195,17 +253,35 @@ public class ResourceInspector
         findOperation(RelationshipResourceAction.ReadById.class, HttpMethod.GET, helper);
         findOperation(RelationshipResourceAction.Update.class,   HttpMethod.PUT, helper);  
         findOperation(RelationshipResourceAction.Delete.class,   HttpMethod.DELETE, helper);
+
+        findOperation(RelationshipResourceAction.CreateWithResponse.class,   HttpMethod.POST, helper);
+        findOperation(RelationshipResourceAction.ReadWithResponse.class,     HttpMethod.GET, helper);
+        findOperation(RelationshipResourceAction.ReadByIdWithResponse.class, HttpMethod.GET, helper);
+        findOperation(RelationshipResourceAction.UpdateWithResponse.class,   HttpMethod.PUT, helper);
+        findOperation(RelationshipResourceAction.DeleteWithResponse.class,   HttpMethod.DELETE, helper);
+
         findOperation(MultiPartRelationshipResourceAction.Create.class, HttpMethod.POST, helper);
-        
+
+        boolean noAuth = resource.isAnnotationPresent(WebApiNoAuth.class);
+        if (noAuth)
+        {
+            throw new IllegalArgumentException("@WebApiNoAuth should not be on all (relationship resource class) - only on methods: "+urlPath);
+        }
+
+        Set<Class<? extends ResourceAction>> apiNoAuth = helper.apiNoAuth;
+
         if (resource.isAnnotationPresent(WebApiDeleted.class))
         {
-            return Arrays.asList(new ResourceMetadata(ResourceDictionary.resourceKey(entityPath,urlPath), RESOURCE_TYPE.RELATIONSHIP, null, inspectApi(resource), ALL_RELATIONSHIP_RESOURCE_INTERFACES, entityPath));
+            metainfo.add(new ResourceMetadata(relationshipKey, RESOURCE_TYPE.RELATIONSHIP, null, inspectApi(resource), ALL_RELATIONSHIP_RESOURCE_INTERFACES, apiNoAuth, entityPath));
         }
         else 
         {
-            return Arrays.asList(new ResourceMetadata(ResourceDictionary.resourceKey(entityPath,urlPath), RESOURCE_TYPE.RELATIONSHIP, helper.operations, inspectApi(resource), helper.apiDeleted, entityPath));
+            metainfo.add(new ResourceMetadata(relationshipKey, RESOURCE_TYPE.RELATIONSHIP, helper.operations, inspectApi(resource), helper.apiDeleted, apiNoAuth, entityPath));
         }
-        
+
+        inspectAddressedProperties(api, resource, relationshipKey, metainfo);
+        inspectOperations(api, resource, relationshipKey, metainfo);
+        return metainfo;
    }
 
     /**
@@ -220,6 +296,7 @@ public class ResourceInspector
         {
             Method aMethod = findMethod(resourceInterfaceWithOneMethod, helper.resource);
             ResourceOperation operation = inspectOperation(helper.resource, aMethod, httpMethod);
+
             if (isDeleted(aMethod))
             {
                 helper.whenOperationDeleted(resourceInterfaceWithOneMethod, aMethod);    
@@ -227,6 +304,15 @@ public class ResourceInspector
             else 
             {
                 helper.whenNewOperation(operation, aMethod);
+            }
+
+            if (isNoAuth(aMethod))
+            {
+                if (! (httpMethod.equals(HttpMethod.GET) || httpMethod.equals(HttpMethod.POST)))
+                {
+                    throw new IllegalArgumentException("@WebApiNoAuth should only be on GET methods: "+operation.getTitle()+" Or POST method for creating a ticket.");
+                }
+                helper.whenOperationNoAuth(resourceInterfaceWithOneMethod, aMethod);
             }
         }
     }
@@ -250,14 +336,40 @@ public class ResourceInspector
             Map<String, Object> annotAttribs = AnnotationUtils.getAnnotationAttributes(annot);
             String title = String.valueOf(annotAttribs.get("title"));
             String desc = String.valueOf(annotAttribs.get("description"));
-            return new ResourceOperation(httpMethod, title, desc, parameters);
+            Integer success = (Integer) annotAttribs.get("successStatus");
+            return new ResourceOperation(httpMethod, title, desc, parameters, validSuccessCode(httpMethod,success));
         }
         else {
             return new ResourceOperation(httpMethod, 
-                        "Missing @WebApiDescription annotation", "This method should be annotated with @WebApiDescription", parameters); 
+                        "Missing @WebApiDescription annotation",
+                        "This method should be annotated with @WebApiDescription", parameters, validSuccessCode(httpMethod, ResourceOperation.UNSET_STATUS));
         }
     }
-    
+
+    public static int validSuccessCode(HttpMethod httpMethod, int success)
+    {
+        if (!(ResourceOperation.UNSET_STATUS == success))
+        {
+            //The status has been set by the api implementor so use it.
+            return success;
+        }
+
+        switch (httpMethod)
+        {
+            case GET:
+                return Status.STATUS_OK;
+            case POST:
+                return Status.STATUS_CREATED;
+            case PUT:
+                return Status.STATUS_OK;
+            case DELETE:
+                return Status.STATUS_NO_CONTENT;
+            default:
+                return Status.STATUS_OK;
+        }
+
+    }
+
     /**
      * Inspects the Method to find any @WebApiParameters and @WebApiParam
      * @param resource the class
@@ -298,8 +410,7 @@ public class ResourceInspector
                 }
                 if (paramsCount(params,ResourceParameter.KIND.HTTP_BODY_OBJECT) == 0)
                 {
-                    Class<?> dType = ResourceInspectorUtil.determineType(resource,aMethod);
-                    params.add(ResourceParameter.valueOf(dType.getSimpleName().toUpperCase(), "The entity", "Unique entity properties", true, ResourceParameter.KIND.HTTP_BODY_OBJECT, true, dType));
+                    inspectBodyParamAndReturnType(resource, aMethod, params);
                 }
                 break;
             case PUT:
@@ -314,8 +425,7 @@ public class ResourceInspector
                 }
                 if (paramsCount(params,ResourceParameter.KIND.HTTP_BODY_OBJECT)== 0)
                 {
-                    Class<?> dType = ResourceInspectorUtil.determineType(resource,aMethod);
-                    params.add(ResourceParameter.valueOf(dType.getSimpleName().toUpperCase(), "The entity", "Unique entity properties", true, ResourceParameter.KIND.HTTP_BODY_OBJECT, true, dType));
+                    inspectBodyParamAndReturnType(resource, aMethod, params);
                 }
                 break;
             case GET:
@@ -358,6 +468,15 @@ public class ResourceInspector
         }
         
         return params;
+    }
+
+    private static void inspectBodyParamAndReturnType(Class<?> resource, Method aMethod, List<ResourceParameter> params)
+    {
+        Class<?> dType = ResourceInspectorUtil.determineType(resource,aMethod);
+        if (dType!= null)
+        {
+            params.add(ResourceParameter.valueOf(dType.getSimpleName().toUpperCase(), "The entity", "Unique entity properties", true, KIND.HTTP_BODY_OBJECT, true, dType));
+        }
     }
 
 
@@ -414,6 +533,17 @@ public class ResourceInspector
     {
         WebApiDeleted deleted = AnnotationUtils.getAnnotation(method, WebApiDeleted.class);
         return (deleted!=null);
+    }
+
+    /**
+     * Returns true if the method has been marked as no auth required.
+     * @param method the method
+     * @return true - if is is marked as no auth required.
+     */
+    public static boolean isNoAuth(Method method)
+    {
+        WebApiNoAuth noAuth = AnnotationUtils.getAnnotation(method, WebApiNoAuth.class);
+        return (noAuth!=null);
     }
     
     /**
@@ -512,6 +642,59 @@ public class ResourceInspector
     }
     
     /**
+     * Inspect a resource to find operations on it.
+     * @param api Api
+     * @param resource Class<?>
+     * @param entityPath String
+     * @param metainfo List<ResourceMetadata>
+     */
+    public static void inspectOperations(Api api, Class<?> resource, final String entityPath, List<ResourceMetadata> metainfo)
+    {
+        Map<String,Pair<ResourceOperation,Method>> operations = findOperations(entityPath, resource);
+        if (operations != null && !operations.isEmpty())
+        {
+            for (Entry<String, Pair<ResourceOperation, Method>> opera : operations.entrySet())
+            {
+                if (isDeleted(opera.getValue().getSecond()))
+                {
+                    metainfo.add(new OperationResourceMetaData(opera.getKey(), api, new HashSet(Arrays.asList(opera.getValue().getFirst()))));
+                }
+                else
+                {
+                    metainfo.add(new OperationResourceMetaData(opera.getKey(), Arrays.asList(opera.getValue().getFirst()), api, opera.getValue().getSecond()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Finds operations on an entity
+     * @param entityPath path to the entity
+     * @param anyClass resource clause
+     * @return The operations
+     */
+    private static Map<String,Pair<ResourceOperation,Method>> findOperations(String entityPath, Class<?> anyClass)
+    {
+        Map<String, Pair<ResourceOperation,Method>> embeds = new HashMap<String, Pair<ResourceOperation,Method>>();
+        List<Method> annotatedMethods = ResourceInspectorUtil.findMethodsByAnnotation(anyClass, Operation.class);
+        if (annotatedMethods != null && !annotatedMethods.isEmpty())
+            for (Method annotatedMethod : annotatedMethods)
+            {
+                //validateOperationMethod(annotatedMethod, anyClass);
+                Annotation annot = AnnotationUtils.findAnnotation(annotatedMethod, Operation.class);
+                if (annot != null)
+                {
+                    Map<String, Object> annotAttribs = AnnotationUtils.getAnnotationAttributes(annot);
+                    String actionName = String.valueOf(annotAttribs.get("value"));
+                    String actionPath = ResourceDictionary.propertyResourceKey(entityPath, actionName);
+                    ResourceOperation ro = inspectOperation(anyClass, annotatedMethod, HttpMethod.POST);
+                    embeds.put(actionPath, new Pair<ResourceOperation, Method>(ro, annotatedMethod));
+                }
+            }
+        return embeds;
+    }
+    
+    /**
      * Inspects the resource to determine what api it belongs to.
      * It does this by looking for the WebApi package annotation.
      * 
@@ -567,6 +750,10 @@ public class ResourceInspector
         Object id = ResourceInspectorUtil.invokeMethod(annotatedMethod, obj);
         if (id != null)
         {
+            if (id instanceof NodeRef)
+            {
+                return ((NodeRef)id).getId();
+            }
             return String.valueOf(id);
         }
         else
@@ -616,6 +803,66 @@ public class ResourceInspector
         }
         return UniqueId.UNIQUE_NAME;
     }
+
+    private static class MetaHelperAddressable extends MetaHelperCallback {
+
+        private Set<Class<? extends ResourceAction>> apiNoAuth = new HashSet<Class<? extends ResourceAction>>();
+
+        private String entityPath;
+        private Map<String,List<ResourceOperation>> operationGroupedByProperty;
+
+        public MetaHelperAddressable(Class<?> resource, String entityPath, Map<String,List<ResourceOperation>> operationGroupedByProperty)
+        {
+            super(resource);
+
+            this.entityPath = entityPath;
+            this.operationGroupedByProperty = operationGroupedByProperty;
+        }
+
+        public MetaHelperAddressable(Class<?> resource)
+        {
+            super(resource);
+        }
+
+        @Override
+        public void whenNewOperation(ResourceOperation operation, Method aMethod)
+        {
+            Annotation addressableProps = AnnotationUtils.findAnnotation(aMethod, BinaryProperties.class);
+            if (addressableProps != null)
+            {
+                Map<String, Object> annotAttribs = AnnotationUtils.getAnnotationAttributes(addressableProps);
+                String[] props = (String[]) annotAttribs.get("value");
+                for (String property : props)
+                {
+                    String propKey = ResourceDictionary.propertyResourceKey(entityPath,property);
+                    if (!operationGroupedByProperty.containsKey(propKey))
+                    {
+                        List<ResourceOperation> ops = new ArrayList<ResourceOperation>();
+                        operationGroupedByProperty.put(propKey, ops);
+                    }
+                    List<ResourceOperation> operations = operationGroupedByProperty.get(propKey);
+                    operations.add(operation);
+                }
+
+            }
+            else
+            {
+                logger.warn("Resource "+resource.getCanonicalName()+" should declare a @BinaryProperties annotation.");
+            }
+        }
+
+        @Override
+        public void whenOperationDeleted(Class<? extends ResourceAction> deleted, Method aMethod)
+        {
+        }
+
+        @Override
+        public void whenOperationNoAuth(Class<? extends ResourceAction> noAuth, Method aMethod)
+        {
+            // TODO review - is this right ?
+            apiNoAuth.add(noAuth);
+        }
+    }
     
     /**
      * Little container of a subset of metadata
@@ -630,7 +877,9 @@ public class ResourceInspector
         }
         
         private List<ResourceOperation> operations = new ArrayList<ResourceOperation>();
+
         private Set<Class<? extends ResourceAction>> apiDeleted = new HashSet<Class<? extends ResourceAction>>();
+        private Set<Class<? extends ResourceAction>> apiNoAuth = new HashSet<Class<? extends ResourceAction>>();
         
         @Override
         public void whenNewOperation(ResourceOperation operation, Method aMethod)
@@ -642,6 +891,12 @@ public class ResourceInspector
         public void whenOperationDeleted(Class<? extends ResourceAction> deleted, Method aMethod)
         {
             apiDeleted.add(deleted);
+        }
+
+        @Override
+        public void whenOperationNoAuth(Class<? extends ResourceAction> noAuth, Method aMethod)
+        {
+            apiNoAuth.add(noAuth);
         }
     }
     
@@ -662,6 +917,7 @@ public class ResourceInspector
         
         public abstract void whenNewOperation(ResourceOperation operation, Method aMethod);
         public abstract void whenOperationDeleted(Class<? extends ResourceAction> deleted, Method aMethod);
+        public abstract void whenOperationNoAuth(Class<? extends ResourceAction> noAuth, Method aMethod);
     }
 
 }

@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content.metadata;
 
@@ -23,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -97,12 +105,25 @@ public abstract class TikaPoweredMetadataExtracter
     protected static final String KEY_CREATED = "created";
     protected static final String KEY_DESCRIPTION = "description";
     protected static final String KEY_COMMENTS = "comments";
+    protected static final String KEY_TAGS = "dc:subject";
 
     private DateTimeFormatter tikaUTCDateFormater;
     private DateTimeFormatter tikaDateFormater;
     protected DocumentSelector documentSelector;
 
     private String extractorContext = null;
+
+    private String metadataSeparator = ","; // Default separator.
+
+    public String getMetadataSeparator()
+    {
+        return metadataSeparator;
+    }
+
+    public void setMetadataSeparator(String metadataSeparator)
+    {
+        this.metadataSeparator = metadataSeparator;
+    }
 
     /**
      * Builds up a list of supported mime types by merging
@@ -358,7 +379,11 @@ public abstract class TikaPoweredMetadataExtracter
             
             Metadata metadata = new Metadata();
             metadata.add(Metadata.CONTENT_TYPE, reader.getMimetype());
-            
+            if (metadataExtracterConfig != null)
+            {
+               metadataExtracterConfig.prepareMetadataWithConfigParams(metadata);
+            }
+
             ParseContext context = buildParseContext(metadata, reader.getMimetype());
             
             ContentHandler handler;
@@ -400,7 +425,10 @@ public abstract class TikaPoweredMetadataExtracter
             putRawValue(KEY_AUTHOR, getMetadataValue(metadata, Metadata.AUTHOR), rawProperties);
             putRawValue(KEY_TITLE, getMetadataValue(metadata, Metadata.TITLE), rawProperties);
             putRawValue(KEY_COMMENTS, getMetadataValue(metadata, Metadata.COMMENTS), rawProperties);
-            
+
+            // Tags
+            putRawValue(KEY_TAGS, getMetadataValues(metadata, KEY_TAGS), rawProperties);
+
             // Get the subject and description, despite things not
             //  being nearly as consistent as one might hope
             String subject = getMetadataValue(metadata, Metadata.SUBJECT);
@@ -503,6 +531,28 @@ public abstract class TikaPoweredMetadataExtracter
         InputStream inputStream = getInputStream(reader);
         OutputStream outputStream = writer.getContentOutputStream();
         embedder.embed(metadataToEmbed, inputStream, outputStream, null);
+    }
+
+    private Serializable getMetadataValues(Metadata metadata, String key)
+    {
+        // Use Set to prevent duplicates.
+        Set<String> valuesSet = new LinkedHashSet<String>();
+        String[] values = metadata.getValues(key);
+
+        for (int i = 0; i < values.length; i++)
+        {
+            String[] parts = values[i].split(metadataSeparator);
+
+            for (String subPart : parts)
+            {
+                valuesSet.add(subPart.trim());
+            }
+        }
+
+        Object[] objArrayValues = valuesSet.toArray();
+        values = Arrays.copyOf(objArrayValues, objArrayValues.length, String[].class);
+
+        return values.length == 0 ? null : (values.length == 1 ? values[0] : values);
     }
     
     private String getMetadataValue(Metadata metadata, String key)

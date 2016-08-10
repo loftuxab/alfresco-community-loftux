@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.repo.invitation;
@@ -33,6 +40,7 @@ import javax.mail.internet.MimeMessage;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.management.subsystems.ApplicationContextFactory;
+import org.alfresco.repo.processor.TemplateServiceImpl;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.site.SiteModel;
@@ -44,9 +52,7 @@ import org.alfresco.service.cmr.invitation.InvitationService;
 import org.alfresco.service.cmr.invitation.ModeratedInvitation;
 import org.alfresco.service.cmr.invitation.NominatedInvitation;
 import org.alfresco.service.cmr.repository.TemplateService;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.security.PersonService.PersonInfo;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.site.SiteVisibility;
@@ -55,7 +61,6 @@ import org.alfresco.util.PropertyMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.ReflectionUtils;
-import org.alfresco.repo.processor.TemplateServiceImpl;
 
 /**
  * Unit tests of Invitation Service
@@ -655,6 +660,39 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
     }
     
     /**
+     * MNT-15614 Site with name "IT" cannot be managed properly
+     * 
+     * @throws Exception
+     */
+    public void test_MNT15614() throws Exception
+    {
+        String[] siteNames = {"it", "site", "GROUP"};
+        String inviteeUserName = USER_ONE;
+        Invitation.ResourceType resourceType = Invitation.ResourceType.WEB_SITE;
+
+        String inviteeRole = SiteModel.SITE_COLLABORATOR;
+        String acceptUrl = "froob";
+        String rejectUrl = "marshmallow";
+        
+        this.authenticationComponent.setCurrentUser(AuthenticationUtil.getAdminUserName());
+        
+        for (String siteName : siteNames)
+        {
+            SiteInfo siteInfoRed = siteService.getSite(siteName);
+            if (siteInfoRed == null)
+            {
+                siteService.createSite("InviteSitePreset", siteName, "InviteSiteTitle",
+                        "InviteSiteDescription", SiteVisibility.MODERATED);
+            }
+
+            // Invite user
+            NominatedInvitation nominatedInvitation = invitationService.inviteNominated(
+                    inviteeUserName, resourceType, siteName, inviteeRole, acceptUrl, rejectUrl);
+            assertNotNull("nominated invitation is null", nominatedInvitation);
+        }
+    }
+    
+    /**
      * Test nominated user - new user with whitespace in name. Related to
      * ETHREEOH-3030.
      */
@@ -1142,12 +1180,20 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         List<Invitation> resFive = invitationService.searchInvitation(crit1);
         assertEquals("user one does not have 2 nominated", 2, resFive.size());
 
+        // now limit the search to 1 returned value
+        List<Invitation> limitRes = invitationService.searchInvitation(crit1, 1);
+        assertEquals("user one does not have 1 nominated", 1, limitRes.size());
+
         /**
          * Search with an empty criteria - should find all open invitations
          */
         InvitationSearchCriteria crit2 = new InvitationSearchCriteriaImpl();
         invitationService.searchInvitation(crit2);
         assertTrue("search everything returned 0 elements", resFive.size() > 0);
+
+        // now search everything but limit the results to 3
+        invitationService.searchInvitation(crit2, 3);
+        assertTrue("search everything returned 0 or more than 3 elements", resFive.size() > 0 && resFive.size() <=3);
 
         InvitationSearchCriteriaImpl crit3 = new InvitationSearchCriteriaImpl();
         crit3.setInviter(USER_MANAGER);
@@ -1156,6 +1202,51 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         List<Invitation> res3 = invitationService.searchInvitation(crit3);
         assertEquals("user one does not have 2 nominated", 2, res3.size());
 
+        //now limit the search to 1 result
+        res3 = invitationService.searchInvitation(crit3, 1);
+        assertEquals("user one does not have 1 nominated", 1, res3.size());
+    }
+
+    /**
+     * test that the search limiter works
+     */
+    public void testSearchInvitationWithLimit() throws Exception
+    {
+        Invitation.ResourceType resourceType = Invitation.ResourceType.WEB_SITE;
+        String resourceName = SITE_SHORT_NAME_INVITE;
+        String inviteeRole = SiteModel.SITE_COLLABORATOR;
+        String serverPath = "wibble";
+        String acceptUrl = "froob";
+        String rejectUrl = "marshmallow";
+
+        authenticationComponent.setCurrentUser(USER_MANAGER);
+
+        // Create 10 invites
+        for (int i = 0; i < 10; i++)
+        {
+            invitationService
+                    .inviteNominated(USER_ONE, resourceType, resourceName, inviteeRole, serverPath, acceptUrl, rejectUrl);
+        }
+
+        // Invite USER_TWO
+        NominatedInvitation inviteForUserTwo = invitationService.inviteNominated(USER_TWO, resourceType, resourceName,
+                inviteeRole, serverPath, acceptUrl, rejectUrl);
+
+        InvitationSearchCriteriaImpl query = new InvitationSearchCriteriaImpl();
+        query.setInvitee(USER_TWO);
+
+        // search all of them
+        List<Invitation> results = invitationService.searchInvitation(query, 0);
+        assertEquals(1, results.size());
+        assertEquals(inviteForUserTwo.getInviteId(), results.get(0).getInviteId());
+
+        query = new InvitationSearchCriteriaImpl();
+        query.setInvitee(USER_ONE);
+
+        final int MAX_SEARCH = 3;
+        // only search for the first MAX_SEARCH
+        results = invitationService.searchInvitation(query, MAX_SEARCH);
+        assertEquals(MAX_SEARCH, results.size());
     }
 
     public void disabled_test100Invites() throws Exception
@@ -1175,7 +1266,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
             invitationService.inviteNominated(USER_ONE, resourceType, resourceName, inviteeRole, serverPath, acceptUrl, rejectUrl);
         }
         
-        // Invite USER_TWO
+        // Invite USER_TWO 
         NominatedInvitation invite = invitationService.inviteNominated(USER_TWO, resourceType, resourceName, inviteeRole, serverPath, acceptUrl, rejectUrl);
         
         InvitationSearchCriteriaImpl query = new InvitationSearchCriteriaImpl();

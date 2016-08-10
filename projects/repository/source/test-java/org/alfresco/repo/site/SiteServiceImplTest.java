@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2013 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.site;
 
@@ -852,6 +859,33 @@ public class SiteServiceImplTest extends BaseAlfrescoSpringTest
                     {
                         siteService.deleteSite(siteName);
                     }
+                }
+
+                return null;
+            }
+        };
+        endTransaction();
+        transactionService.getRetryingTransactionHelper().doInTransaction(work);
+        startNewTransaction();
+    }
+    
+    public void testMNT_15614() throws Exception
+    {
+        RetryingTransactionCallback<Object> work = new RetryingTransactionCallback<Object>()
+        {
+
+            @Override
+            public Object execute() throws Throwable
+            {
+                String[] siteNames = { "it", "site", "GROUP" };
+
+                authenticationComponent.setCurrentUser(AuthenticationUtil.getAdminUserName());
+
+                for (String siteName : siteNames)
+                {
+                    siteService.createSite(siteName, siteName, siteName, siteName, SiteVisibility.PUBLIC);
+                    assertEquals( SiteModel.SITE_MANAGER, siteService.getMembersRole(siteName, AuthenticationUtil.getAdminUserName()));
+                    siteService.deleteSite(siteName);
                 }
 
                 return null;

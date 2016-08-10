@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.repo.rendition.executer;
@@ -38,6 +45,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
+import org.alfresco.repo.content.metadata.MetadataExtracterConfig;
 import org.alfresco.repo.rendition.RenditionLocation;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -81,7 +89,7 @@ public class HTMLRenderingEngine extends AbstractRenderingEngine
 {
     private static Log logger = LogFactory.getLog(HTMLRenderingEngine.class);
     private TikaConfig tikaConfig;
-    
+    private MetadataExtracterConfig metadataExtracterConfig;
     /**
      * This optional parameter, when set to true, causes only the
      *  contents of the HTML body to be written out as the rendition.
@@ -120,6 +128,14 @@ public class HTMLRenderingEngine extends AbstractRenderingEngine
     public void setTikaConfig(TikaConfig tikaConfig)
     {
         this.tikaConfig = tikaConfig;
+    }
+
+    /**
+     * The metadata extracter config.
+     */
+    public void setMetadataExtracterConfig(MetadataExtracterConfig metadataExtracterConfig)
+    {
+        this.metadataExtracterConfig = metadataExtracterConfig;
     }
 
     /*
@@ -343,6 +359,10 @@ public class HTMLRenderingEngine extends AbstractRenderingEngine
                    ContentModel.PROP_NAME
              ).toString()
        );
+       if (metadataExtracterConfig != null)
+       {
+          metadataExtracterConfig.prepareMetadataWithConfigParams(metadata);
+       }
        
        // Our parse context needs to extract images
        ParseContext parseContext = new ParseContext();

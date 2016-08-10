@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.filesys.repo;
 
@@ -2988,6 +2995,15 @@ public class ContentDiskDriver2 extends  AlfrescoDiskDriver implements ExtendedD
             
             lockKeeper.removeLock(target);
             
+            if(nodeService.hasAspect(target, ContentModel.ASPECT_NO_CONTENT))
+            {
+                if(logger.isDebugEnabled())
+                {
+                    logger.debug("removed no content aspect");
+                }
+                nodeService.removeAspect(target, ContentModel.ASPECT_NO_CONTENT);
+            }
+            
             if(tempFile.isChanged()) 
             {
                 tempFile.flushFile();
@@ -3085,16 +3101,6 @@ public class ContentDiskDriver2 extends  AlfrescoDiskDriver implements ExtendedD
                     writer.setMimetype(mimetype);
                     writer.setEncoding(encoding);
                     writer.putContent(tempFile.getFile());
-                    
-                    // remove ASPECT_NO_CONTENT after content is present
-                    if(nodeService.hasAspect(target, ContentModel.ASPECT_NO_CONTENT))
-                    {
-                        if(logger.isDebugEnabled())
-                        {
-                            logger.debug("removed no content aspect");
-                        }
-                        nodeService.removeAspect(target, ContentModel.ASPECT_NO_CONTENT);
-                    }
                 } // if content changed
             }
         }

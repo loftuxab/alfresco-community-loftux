@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Solr 4
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.solr;
 
@@ -399,7 +406,7 @@ public class AlfrescoCoreAdminTester
             mlText.addValue(Locale.GERMAN, "banane");
             mlText.addValue(new Locale("el"), "μπανάνα");
             mlText.addValue(Locale.ITALIAN, "banana");
-            mlText.addValue(new Locale("ja"), "�?ナナ");
+            mlText.addValue(new Locale("ja"), "�?ナナ");
             mlText.addValue(new Locale("ko"), "바나나");
             mlText.addValue(new Locale("pt"), "banana");
             mlText.addValue(new Locale("ru"), "банан");
@@ -7012,7 +7019,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher, "ISUNSET:\""
                         + QName.createQName(TEST_NAMESPACE, "null").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "null").toString() + "\"", 1);
+             "null").toString() + "\"", 16);
             testQuery(dataModel, report, solrIndexSearcher, "EXISTS:\"" + QName.createQName(TEST_NAMESPACE,
                     "null").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher, "ISNOTNULL:\""
@@ -7021,7 +7028,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISUNSET:\"" + QName.createQName(TEST_NAMESPACE, "path-ista").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "path-ista").toString() + "\"", 0);
+             "path-ista").toString() + "\"", 15);
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISNOTNULL:\"" + QName.createQName(TEST_NAMESPACE, "path-ista").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher,
@@ -7030,7 +7037,7 @@ public class AlfrescoCoreAdminTester
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISUNSET:\"" + QName.createQName(TEST_NAMESPACE, "aspectProperty").toString() + "\"", 0);
             testQuery(dataModel, report, solrIndexSearcher, "ISNULL:\"" + QName.createQName(TEST_NAMESPACE,
-             "aspectProperty").toString() + "\"", 0);
+             "aspectProperty").toString() + "\"", 15);
             testQuery(dataModel, report, solrIndexSearcher,
                         "ISNOTNULL:\"" + QName.createQName(TEST_NAMESPACE, "aspectProperty").toString() + "\"", 1);
             testQuery(dataModel, report, solrIndexSearcher,
@@ -7763,7 +7770,7 @@ public class AlfrescoCoreAdminTester
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":banana", 1,
                         Locale.ITALIAN, null, null);
             testQuery(dataModel, report, solrIndexSearcher,
-                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":�?ナナ", 1, new Locale(
+                        "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":�?ナナ", 1, new Locale(
                                     "ja"), null, null);
             testQuery(dataModel, report, solrIndexSearcher,
                         "@" + SearchLanguageConversion.escapeLuceneQuery(mlQName.toString()) + ":바나나", 1, new Locale(

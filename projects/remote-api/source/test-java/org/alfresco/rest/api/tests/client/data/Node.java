@@ -1,217 +1,427 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.api.tests.client.data;
 
+import org.alfresco.rest.api.model.AssocChild;
+import org.alfresco.rest.api.model.AssocTarget;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import org.json.simple.JSONObject;
-
 /**
- * Alfresco API (non-CMIS) node representation.
- * 
- * @author steveglover
+ * Representation of a node - initially for client tests for Nodes (aka File Folder) API
  *
+ * TODO push null check down into AssertUtil (making sure that no other existing tests break)
+ *
+ * @author janv
  */
-public class Node implements Serializable, ExpectedComparison
+public class Node
 {
-	private static final long serialVersionUID = -6881545732441221372L;
+    protected String id;
+    protected String name;
 
-	protected String nodeId;
-	protected String guid;
-	protected String name;
-	protected String title;
-	protected String description;
-	protected Date createdAt;
-	protected Date modifiedAt;
-	protected String createdBy;
-	protected String modifiedBy;
+    protected Date createdAt;
+    protected Date modifiedAt;
+    protected UserInfo createdByUser;
+    protected UserInfo modifiedByUser;
 
-	public Node()
-	{
-	}
+    protected Date archivedAt;
+    protected UserInfo archivedByUser;
 
-	/**
-	 * For POSTs
-	 * 
-	 * @param guid String
-	 */
-	public Node(String guid)
-	{
-		this.guid = guid;
-	}
+    protected Boolean isFolder;
+    protected Boolean isFile;
+    protected Boolean isLink;
 
-	public Node(String id, String guid)
-	{
-		this.nodeId = id;
-		this.guid = guid;
-	}
+    protected String parentId;
+    protected PathInfo path;
+    protected String nodeType;
 
-	public void setGuid(String guid)
-	{
-		this.guid = guid;
-	}
+    protected List<String> aspectNames;
 
-	public String getGuid()
-	{
-		return guid;
-	}
+    protected Map<String, Object> properties;
 
-	public String getRawNodeId()
-	{
-		return nodeId;
-	}
+    protected ContentInfo contentInfo;
 
-	public String getNodeId()
-	{
-		return nodeId;
-	}
+    protected List<String> allowableOperations;
 
-	public boolean isFolder()
-	{
-		return false;
-	}
-	
-	public String getName()
-	{
-		return name;
-	}
+    // please note: these are currently only used (optionally) for node create request
+    protected String relativePath;
+    protected List<AssocChild> secondaryChildren;
+    protected List<AssocTarget> targets;
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    public Node()
+    {
+    }
 
-	public String getTitle()
-	{
-		return title;
-	}
+    public String getId()
+    {
+        return id;
+    }
 
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
-	public String getDescription()
-	{
-		return description;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	public Date getCreatedAt()
-	{
-		return createdAt;
-	}
+    public Date getCreatedAt()
+    {
+        return createdAt;
+    }
 
-	public void setCreatedAt(Date createdAt)
-	{
-		this.createdAt = createdAt;
-	}
+    public Date getModifiedAt()
+    {
+        return modifiedAt;
+    }
 
-	public Date getModifiedAt()
-	{
-		return modifiedAt;
-	}
+    public UserInfo getCreatedByUser()
+    {
+        return createdByUser;
+    }
 
-	public void setModifiedAt(Date modifiedAt)
-	{
-		this.modifiedAt = modifiedAt;
-	}
+    public void setCreatedByUser(UserInfo createdByUser)
+    {
+        this.createdByUser = createdByUser;
+    }
 
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
+    public UserInfo getModifiedByUser()
+    {
+        return modifiedByUser;
+    }
 
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
+    public void setModifiedByUser(UserInfo modifiedByUser)
+    {
+        this.modifiedByUser = modifiedByUser;
+    }
 
-	public String getModifiedBy()
-	{
-		return modifiedBy;
-	}
+    public Date getArchivedAt()
+    {
+        return archivedAt;
+    }
 
-	public void setModifiedBy(String modifiedBy)
-	{
-		this.modifiedBy = modifiedBy;
-	}
+    public void setArchivedAt(Date archivedAt)
+    {
+        this.archivedAt = archivedAt;
+    }
 
-	public void setNodeId(String nodeId)
-	{
-		this.nodeId = nodeId;
-	}
+    public UserInfo getArchivedByUser()
+    {
+        return archivedByUser;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
-		return result;
-	}
+    public void setArchivedByUser(UserInfo archivedByUser)
+    {
+        this.archivedByUser = archivedByUser;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Node other = (Node) obj;
-		if (nodeId == null)
-		{
-			if (other.nodeId != null)
-				return false;
-		} else if (!nodeId.equals(other.nodeId))
-			return false;
-		return true;
-	}
+    public Boolean getIsFolder()
+    {
+        return isFolder;
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJSON()
-	{
-		JSONObject json = new JSONObject();
-		json.put("guid", getGuid());
-		json.put("id", getNodeId());
-		return json;
-	}
+    public void setIsFolder(Boolean isFolder)
+    {
+        this.isFolder = isFolder;
+    }
 
-	@Override
-	public void expected(Object o)
-	{
-		assertTrue(o instanceof Node);
+    public Boolean getIsFile()
+    {
+        return isFile;
+    }
 
-		Node other = (Node) o;
+    public void setIsFile(Boolean isFile)
+    {
+        this.isFile = isFile;
+    }
 
-		AssertUtil.assertEquals("id", nodeId, other.getNodeId());
-		AssertUtil.assertEquals("guid", guid, other.getGuid());
-		AssertUtil.assertEquals("name", name, other.getName());
-		AssertUtil.assertEquals("title", title, other.getTitle());
-		AssertUtil.assertEquals("description", description, other.getDescription());
-		AssertUtil.assertEquals("createdAt", createdAt, other.getCreatedAt());
-		if(modifiedAt != null)
-		{
-			assertTrue(modifiedAt.before(other.getModifiedAt()) || modifiedAt.equals(other.getModifiedAt()));
-		}
-		AssertUtil.assertEquals("createdBy", createdBy, other.getCreatedBy());
-		AssertUtil.assertEquals("modifiedBy", modifiedBy, other.getModifiedBy());
-	}
+    public Boolean getIsLink()
+    {
+        return isLink;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "Node [nodeId=" + nodeId + ", guid=" + guid + ", name=" + name
-				+ ", title=" + title + ", description=" + description
-				+ ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt
-				+ ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
-				+ "]";
-	}
+    public void setIsLink(Boolean link)
+    {
+        isLink = link;
+    }
+
+    public String getParentId()
+    {
+        return parentId;
+    }
+
+    public void setParentId(String parentId)
+    {
+        this.parentId = parentId;
+    }
+
+    public PathInfo getPath()
+    {
+        return path;
+    }
+
+    public void setPath(PathInfo path)
+    {
+        this.path = path;
+    }
+
+    public String getNodeType()
+    {
+        return nodeType;
+    }
+
+    public void setNodeType(String nodeType)
+    {
+        this.nodeType = nodeType;
+    }
+
+    public List<String> getAspectNames()
+    {
+        return aspectNames;
+    }
+
+    public void setAspectNames(List<String> aspectNames)
+    {
+        this.aspectNames = aspectNames;
+    }
+
+    public Map<String, Object> getProperties()
+    {
+        return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties)
+    {
+        this.properties = properties;
+    }
+
+    public void setContent(ContentInfo contentInfo)
+    {
+        this.contentInfo = contentInfo;
+    }
+
+    public ContentInfo getContent()
+    {
+        return this.contentInfo;
+    }
+
+    public List<String> getAllowableOperations()
+    {
+        return allowableOperations;
+    }
+
+    public void setAllowableOperations(List<String> allowableOperations)
+    {
+        this.allowableOperations = allowableOperations;
+    }
+
+
+    public String getRelativePath()
+    {
+        return relativePath;
+    }
+
+    public void setRelativePath(String relativePath)
+    {
+        this.relativePath = relativePath;
+    }
+
+    public List<AssocChild> getSecondaryChildren()
+    {
+        return secondaryChildren;
+    }
+
+    public void setSecondaryChildren(List<AssocChild> secondaryChildren)
+    {
+        this.secondaryChildren = secondaryChildren;
+    }
+
+    public List<AssocTarget> getTargets()
+    {
+        return targets;
+    }
+
+    public void setTargets(List<AssocTarget> targets)
+    {
+        this.targets = targets;
+    }
+
+
+    // note: can be child or peer (latter has assocType only)
+    protected Association association;
+
+    public Association getAssociation()
+    {
+        return association;
+    }
+
+    public void setAssociation(Association association)
+    {
+        this.association = association;
+    }
+
+    public void expected(Object o)
+    {
+        Node other = (Node) o;
+
+        if (id != null)
+        {
+            AssertUtil.assertEquals("id", id, other.getId());
+        }
+        else
+        {
+            assertNotNull(other.id);
+        }
+
+        AssertUtil.assertEquals("parentId", parentId, other.getParentId());
+        AssertUtil.assertEquals("name", name, other.getName());
+        AssertUtil.assertEquals("nodeType", nodeType, other.getNodeType());
+
+        if (createdAt != null)
+        {
+            AssertUtil.assertEquals("createdAt", createdAt, other.getCreatedAt());
+        }
+        else
+        {
+            assertNotNull(other.createdAt);
+        }
+
+        if (createdByUser != null)
+        {
+            createdByUser.expected(other.getCreatedByUser());
+        }
+        else
+        {
+            assertNotNull(other.createdByUser);
+        }
+
+        if (modifiedAt != null)
+        {
+            assertTrue(modifiedAt.before(other.getModifiedAt()) || modifiedAt.equals(other.getModifiedAt()));
+        }
+        else
+        {
+            assertNotNull(other.modifiedAt);
+        }
+
+        if (modifiedByUser != null)
+        {
+            modifiedByUser.expected(other.getModifiedByUser());
+        }
+        else
+        {
+            assertNotNull(other.modifiedByUser);
+        }
+
+        if (aspectNames != null)
+        {
+            assertNotNull(other.getAspectNames());
+            assertEquals("Expected: "+aspectNames+", actual: "+other.getAspectNames(), aspectNames.size(), other.getAspectNames().size());
+            for (String aspectName : aspectNames)
+            {
+                assertTrue(other.getAspectNames().contains(aspectName));
+            }
+        }
+        else
+        {
+            assertNull(other.getAspectNames());
+        }
+
+        if (properties != null)
+        {
+            assertNotNull(other.getProperties());
+            assertEquals(properties.size(), other.getProperties().size());
+            for (Map.Entry<String,Object> e : properties.entrySet())
+            {
+                Object otherObj = other.getProperties().get(e.getKey());
+                assertEquals(e.getValue(), otherObj); // TODO fix !
+            }
+        }
+        else
+        {
+            assertNull(other.getProperties());
+        }
+
+        AssertUtil.assertEquals("isFolder", isFolder, other.getIsFolder());
+        AssertUtil.assertEquals("isFile", isFile, other.getIsFile());
+        AssertUtil.assertEquals("isLink", isLink, other.getIsLink());
+
+        if (path != null)
+        {
+            path.expected(other.getPath());
+        }
+        else
+        {
+            assertNull(other.getPath());
+        }
+
+        if (contentInfo != null)
+        {
+            contentInfo.expected(other.getContent());
+        }
+        else
+        {
+            assertNull(other.getContent());
+        }
+
+        if (allowableOperations != null)
+        {
+            assertNotNull(other.getAllowableOperations());
+            assertEquals("Expected: "+allowableOperations+", actual: "+other.getAllowableOperations(), allowableOperations.size(), other.getAllowableOperations().size());
+            for (String allowableOperation : allowableOperations)
+            {
+                assertTrue(other.getAllowableOperations().contains(allowableOperation));
+            }
+        }
+        else
+        {
+            assertNull(other.getAllowableOperations());
+        }
+
+        if (relativePath != null)
+        {
+            assertEquals(relativePath, other.getRelativePath());
+        }
+        else
+        {
+            assertNull(other.getRelativePath());
+        }
+    }
 }

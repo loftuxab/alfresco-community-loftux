@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.repo.content.transform;
@@ -45,6 +52,8 @@ public class EMLTransformerTest extends AbstractContentTransformerTest
     private static final String QUICK_EML_ATTACHMENT_CONTENT =  "File attachment content";
     
     private static final String QUICK_EML_ALTERNATIVE_CONTENT =  "alternative plain text";
+    
+    private static final String QUICK_EML_NESTED_ALTERNATIVE_CONTENT =  "nested alternative plain text";
     
     private static final String HTML_SPACE_SPECIAL_CHAR = "&nbsp;";
 
@@ -156,12 +165,32 @@ public class EMLTransformerTest extends AbstractContentTransformerTest
     }
     
     /**
+     * Test transforming a valid eml with nested mimetype multipart/alternative to text
+     */
+    public void testRFC822NestedAlternativeToText() throws Exception
+    {
+        File emlSourceFile = loadQuickTestFile("nested.alternative.eml");
+        File txtTargetFile = TempFileProvider.createTempFile("test5", ".txt");
+        ContentReader reader = new FileContentReader(emlSourceFile);
+        reader.setMimetype(MimetypeMap.MIMETYPE_RFC822);
+        ContentWriter writer = new FileContentWriter(txtTargetFile);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+
+        transformer.transform(reader, writer);
+
+        ContentReader reader2 = new FileContentReader(txtTargetFile);
+        reader2.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        String contentStr = reader2.getContentString();
+        assertTrue(contentStr.contains(QUICK_EML_NESTED_ALTERNATIVE_CONTENT));
+    }
+    
+    /**
      * Test transforming a valid eml with a html part containing html special characters to text
      */
     public void testHtmlSpecialCharsToText() throws Exception
     {
         File emlSourceFile = loadQuickTestFile("htmlChars.eml");
-        File txtTargetFile = TempFileProvider.createTempFile("test5", ".txt");
+        File txtTargetFile = TempFileProvider.createTempFile("test6", ".txt");
         ContentReader reader = new FileContentReader(emlSourceFile);
         reader.setMimetype(MimetypeMap.MIMETYPE_RFC822);
         ContentWriter writer = new FileContentWriter(txtTargetFile);

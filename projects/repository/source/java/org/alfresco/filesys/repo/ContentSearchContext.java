@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.filesys.repo;
 
@@ -486,21 +493,22 @@ public class ContentSearchContext extends SearchContext
      * @param resumeId Resume point id.
      * @return true if the search can be restarted, else false.
      */
-    public boolean restartAt(int resumeId)
+    public boolean restartAt(int resumeIdParameter)
     {
         // Resume ids are one based as zero has special meaning for some protocols, adjust the resume id
         
-        resumeId--;
+        resumeIdParameter--;
         
         //  Check if the resume point is in the pseudo file list
 
         if (pseudoList != null)
         {
-            if ( resumeId < pseudoList.numberOfFiles())
+            if ( resumeIdParameter < pseudoList.numberOfFiles())
             {
                 // Resume at a pseudo file
                 
-                index = resumeId;
+                index = resumeIdParameter;
+                resumeId = resumeIdParameter + 1;
                 donePseudoFiles = false;
                 
                 return true;
@@ -509,15 +517,16 @@ public class ContentSearchContext extends SearchContext
             {
                 // Adjust the resume id so that it is an index into the main file list
                 
-                resumeId -= pseudoList.numberOfFiles();
+                resumeIdParameter -= pseudoList.numberOfFiles();
             }
         }
         
         // Check if the resume point is valid
         
-        if ( results != null && resumeId < results.size())
+        if ( results != null && resumeIdParameter < results.size())
         {
-            index = resumeId;
+            index = resumeIdParameter;
+            resumeId = resumeIdParameter + 1;
             donePseudoFiles = true;
             
             return true;

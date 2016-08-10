@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.web.scripts.quickshare;
 
@@ -35,6 +42,7 @@ import org.alfresco.repo.content.transform.magick.ImageTransformationOptions;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -144,7 +152,8 @@ public class QuickShareRestApiTest extends BaseWebScriptTest
         AuthenticationUtil.setFullyAuthenticatedUser(USER_TWO);
         
         assertEquals(AccessStatus.DENIED, permissionService.hasPermission(testNode, PermissionService.READ));
-        
+
+        AuthenticationUtil.clearCurrentSecurityContext();
     }
     
     @Override
@@ -170,20 +179,32 @@ public class QuickShareRestApiTest extends BaseWebScriptTest
         
         deleteUser(USER_ONE);
         deleteUser(USER_TWO);
+
+        AuthenticationUtil.clearCurrentSecurityContext();
     }
     
     private void checkTransformer()
     {
-        ContentTransformer transformer = this.contentService.getImageTransformer();
-        assertNotNull("No transformer returned for 'getImageTransformer'", transformer);
-        
-        // Check that it is working
-        ImageTransformationOptions imageTransformationOptions = new ImageTransformationOptions();
-        if (!transformer.isTransformable(MimetypeMap.MIMETYPE_IMAGE_JPEG, -1, MimetypeMap.MIMETYPE_IMAGE_PNG,
-                    imageTransformationOptions))
+        AuthenticationUtil.runAs(new RunAsWork<Void>()
         {
-            fail("Image transformer is not working.  Please check your image conversion command setup.");
-        }
+            @Override
+            public Void doWork() throws Exception
+            {
+                ContentTransformer transformer = contentService.getImageTransformer();
+
+                assertNotNull("No transformer returned for 'getImageTransformer'", transformer);
+
+                // Check that it is working
+                ImageTransformationOptions imageTransformationOptions = new ImageTransformationOptions();
+                if (!transformer.isTransformable(MimetypeMap.MIMETYPE_IMAGE_JPEG, -1, MimetypeMap.MIMETYPE_IMAGE_PNG, imageTransformationOptions))
+
+                {
+                    fail("Image transformer is not working.  Please check your image conversion command setup.");
+                }
+
+                return null;
+            }
+        }, AuthenticationUtil.getAdminUserName());
     }
     
     private void checkBytes(byte[] content1, byte[] content2)

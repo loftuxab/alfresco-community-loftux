@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.security.permissions.impl.acegi;
 
@@ -46,6 +53,7 @@ import org.alfresco.repo.security.permissions.PermissionCheckValue;
 import org.alfresco.repo.security.permissions.PermissionCheckedCollection.PermissionCheckedCollectionMixin;
 import org.alfresco.repo.security.permissions.PermissionCheckedValue;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -944,6 +952,10 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     {
                         testNodeRef = ((PermissionCheckValue) nextObject).getNodeRef();
                     }
+                    else if (AssociationRef.class.isAssignableFrom(nextObject.getClass()))
+                    {
+                        testNodeRef = ((AssociationRef) nextObject).getTargetRef();
+                    }
                     else
                     {
                         throw new ACLEntryVoterException("The specified parameter is not recognized: " + nextObject.getClass());
@@ -963,6 +975,10 @@ public class ACLEntryAfterInvocationProvider implements AfterInvocationProvider,
                     else if (ChildAssociationRef.class.isAssignableFrom(nextObject.getClass()))
                     {
                         testNodeRef = ((ChildAssociationRef) nextObject).getParentRef();
+                    }
+                    else if (AssociationRef.class.isAssignableFrom(nextObject.getClass()))
+                    {
+                        testNodeRef = ((AssociationRef) nextObject).getSourceRef();
                     }
                     else if (Pair.class.isAssignableFrom(nextObject.getClass()))
                     {

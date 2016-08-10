@@ -1,24 +1,32 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.rule.ruletrigger;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.model.ForumModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
@@ -90,7 +98,23 @@ public class RuleTriggerTest extends BaseSpringTest
         // Check to see if the rule type has been triggered
         assertTrue(ruleType.rulesTriggered);
     }
-    
+
+    public void testOnCreateIgnoredTypesTrigger()
+    {
+        TestRuleType ruleType = createTestRuleType(ON_CREATE_NODE_TRIGGER);
+        assertFalse(ruleType.rulesTriggered);
+
+        //Try and trigger the type
+        this.nodeService.createNode(
+                this.rootNodeRef, 
+                ForumModel.ASSOC_DISCUSSION,
+                ForumModel.ASSOC_DISCUSSION, 
+                ForumModel.TYPE_POST);
+        
+        //Check to see if the rule type has been triggered
+        assertFalse(ruleType.rulesTriggered);
+    }
+ 
     public void testOnUpdateNodeTrigger()
     {
         NodeRef nodeRef = this.nodeService.createNode(

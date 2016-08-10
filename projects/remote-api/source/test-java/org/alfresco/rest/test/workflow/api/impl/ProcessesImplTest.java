@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.rest.test.workflow.api.impl;
 
@@ -208,7 +215,7 @@ public class ProcessesImplTest extends TestCase
     private CollectionWithPagingInfo<ProcessInfo> queryMatchesProcesses(String matchesString)
     {
         Query query = ResourceWebScriptHelper.getWhereClause(String.format(QUERY_WORKFLOWDESCRIPTION_MATCHES, matchesString));
-        Parameters parameters = Params.valueOf(new RecognizedParams(null, Paging.valueOf(0, ACTIVE_WORKFLOWS_INITIAL_AMOUNT), null, null, null, query, null), null, null);
+        Parameters parameters = Params.valueOf(new RecognizedParams(null, Paging.valueOf(0, ACTIVE_WORKFLOWS_INITIAL_AMOUNT), null, null, null, null, query, null, false), null, null, null);
         
         return processes.getProcesses(parameters);
     }
@@ -216,7 +223,7 @@ public class ProcessesImplTest extends TestCase
     private CollectionWithPagingInfo<ProcessInfo> queryActiveProcessesAndAssertResult(int skipCount, int maxItems)
     {
         Query query = ResourceWebScriptHelper.getWhereClause(QUERY_STATUS_ACTIVE);
-        Parameters parameters = Params.valueOf(new RecognizedParams(null, Paging.valueOf(skipCount, maxItems), null, null, null, query, null), null, null);
+        Parameters parameters = Params.valueOf(new RecognizedParams(null, Paging.valueOf(skipCount, maxItems), null, null, null, null, query, null, false), null, null, null);
 
         CollectionWithPagingInfo<ProcessInfo> result = processes.getProcesses(parameters);
 

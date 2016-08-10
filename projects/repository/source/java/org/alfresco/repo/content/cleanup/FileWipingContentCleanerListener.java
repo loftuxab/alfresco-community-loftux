@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.content.cleanup;
 
@@ -123,9 +130,12 @@ public class FileWipingContentCleanerListener implements ContentStoreCleanerList
             throw new ContentIOException("Unable to write to file: " + file);
         }
         long bytes = file.length();
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(file));
+        OutputStream fos = null;
+        OutputStream bos = null;
         try
         {
+            fos = new FileOutputStream(file);
+            bos = new BufferedOutputStream(fos);
             /*
              * There are many more efficient ways of writing bytes into the file.
              * However, it is likely that implementations will do a lot more than
@@ -133,12 +143,19 @@ public class FileWipingContentCleanerListener implements ContentStoreCleanerList
              */
             for (int i = 0; i < bytes; i++)
             {
-                os.write(0);
+                bos.write(0);
             }
         }
         finally
         {
-            try {os.close(); } catch (Throwable e) {}
+            if (bos != null)
+            {
+                try {bos.close(); } catch (Throwable e) {}
+            }
+            if (fos != null)
+            {
+                fos.close();
+            }
         }
     }
 }

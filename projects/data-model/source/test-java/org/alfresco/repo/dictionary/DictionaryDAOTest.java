@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Data model classes
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.dictionary;
 
@@ -47,10 +54,12 @@ import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
+import org.alfresco.service.namespace.NamespaceException;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.DynamicallySizedThreadPoolExecutor;
 import org.alfresco.util.TraceableThreadFactory;
@@ -71,6 +80,7 @@ public class DictionaryDAOTest
     private static final String TEST_URL = "http://www.alfresco.org/test/dictionarydaotest/1.0";
     private static final String TEST2_URL = "http://www.alfresco.org/test/dictionarydaotest2/1.0";
     private static final String TEST_MODEL = "org/alfresco/repo/dictionary/dictionarydaotest_model.xml";
+    private static final String TEST_NS_CLASH_MODEL = "org/alfresco/repo/dictionary/nstest_model.xml";
     private static final String TEST_BUNDLE = "org/alfresco/repo/dictionary/dictionarydaotest_model";
     private static final String TEST_COMMON_NS_PARENT_MODEL = "org/alfresco/repo/dictionary/commonpropertynsparent_model.xml";
     private static final String TEST_COMMON_NS_CHILD_MODEL = "org/alfresco/repo/dictionary/commonpropertynschild_model.xml";
@@ -145,6 +155,41 @@ public class DictionaryDAOTest
         bootstrap.setDictionaryDAO(dictionaryDAO);
         bootstrap.setTenantService(tenantService);
         bootstrap.bootstrap();
+    }
+
+    /**
+     * ACE-5120: Dictionary should not allow duplication of namespace prefixes
+     */
+    @Test
+    public void testNamespaceClashResultsInSensibleError()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+        
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        List<String> bootstrapModels = new ArrayList<String>();
+        
+        bootstrapModels.add("alfresco/model/dictionaryModel.xml");
+        bootstrapModels.add(TEST_MODEL);
+        bootstrapModels.add(TEST_NS_CLASH_MODEL);
+
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.setTenantService(tenantService);
+
+        try
+        {
+            bootstrap.bootstrap();
+            fail("Expected "+NamespaceException.class.getName()+" to be thrown, but it was not.");
+        }
+        catch (NamespaceException e)
+        {
+            System.out.println(e.getMessage());
+            // Good!
+        }
     }
 
     @Test
@@ -1058,5 +1103,65 @@ public class DictionaryDAOTest
             propertyWithAnalyserBundelName.setAnalyserResourceBundleName("propertyResourceBundle");
         }
         return model;
+    }
+
+    //testing a model containing circular dependency cannot be imported with bootstrap
+    @Test
+    public void testBootstrapImportModelWithCircularTypes()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+
+        DictionaryBootstrap bootstrap = new DictionaryBootstrap();
+        List<String> bootstrapModels = new ArrayList<String>();
+
+        bootstrapModels.add("org/alfresco/repo/dictionary/modelCircularTypes.xml");
+        bootstrap.setModels(bootstrapModels);
+        bootstrap.setDictionaryDAO(dictionaryDAO);
+        bootstrap.setTenantService(tenantService);
+
+        try
+        {
+            bootstrap.bootstrap();
+            fail("Bootstrap should fail as the model contains a cyclic refrence");
+        }
+        catch(DictionaryException e)
+        {
+            assertEquals(e.getMsgId(), "d_dictionary.bootstrap.model_not_imported");
+        }
+    }
+
+    @Test
+    public void testCreateModelWithCircularTypeDependency()
+    {
+        TenantService tenantService = new SingleTServiceImpl();
+
+        DictionaryDAOImpl dictionaryDAO = new DictionaryDAOImpl();
+        dictionaryDAO.setTenantService(tenantService);
+        initDictionaryCaches(dictionaryDAO, tenantService);
+
+        //create model
+        String testNamespace = "http://www.alfresco.org/model/dictionary/1.0/my";
+        M2Model model = M2Model.createModel("my:circularModel");
+        model.createNamespace(testNamespace, "my");
+        model.setAnalyserResourceBundleName("typeModelResourceBundle");
+        M2Type typeA = model.createType("my:circularA");
+        typeA.setParentName("my:circularC");
+        M2Type typeB = model.createType("my:circularB");
+        typeB.setParentName("my:circularA");
+        M2Type typeC = model.createType("my:circularC");
+        typeC.setParentName("my:circularB");
+
+        try
+        {
+            dictionaryDAO.putModel(model);
+            fail("Model should not be saved successfully because it contains a cyclic reference");
+        } catch(DictionaryException e)
+        {
+            assertEquals(e.getMsgId(), "d_dictionary.compiled_model.err.compile.failure");
+        }
     }
 }

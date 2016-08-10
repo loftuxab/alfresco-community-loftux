@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.node.archive;
 
@@ -916,6 +923,8 @@ public class ArchiveAndRestoreTest extends TestCase
         RestoreNodeReport report = nodeArchiveService.restoreArchivedNode(r_);
         assertEquals("Restore failed", RestoreStatus.SUCCESS, report.getStatus());
 
+        commitAndBeginNewTransaction();
+
         //It is restored, still with no AUDITABLE ASPECT
         verifyNodeExistence(r, true);
         verifyAspectExistence(r, ContentModel.ASPECT_AUDITABLE, false);
@@ -1013,7 +1022,10 @@ public class ArchiveAndRestoreTest extends TestCase
 
         // USER_B deletes "bb"
         nodeService.deleteNode(bb);
-        
+
+        result = nodeArchiveService.listArchivedNodes(queryBuilder);
+        assertEquals("USER_B deleted 1 item and USER_B can see it.", 1, result.getPage().size());
+
         result = runListArchivedNodesAsAdmin(queryBuilder);
         assertEquals("USER_B deleted only 1 item.", 1, result.getPage().size());
 
@@ -1025,6 +1037,9 @@ public class ArchiveAndRestoreTest extends TestCase
         queryBuilder = new ArchivedNodesCannedQueryBuilder.Builder(
                     this.archiveStoreRootNodeRef, paging)
                     .build();
+
+        result = nodeArchiveService.listArchivedNodes(queryBuilder);
+        assertEquals("USER_A deleted 1 item and USER_A can see it.", 1, result.getPage().size());
 
         result = runListArchivedNodesAsAdmin(queryBuilder);
         assertEquals("USER_A deleted only 1 item.", 1, result.getPage().size());

@@ -1,3 +1,28 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.framework.tests.core;
 
 import static org.junit.Assert.assertEquals;
@@ -5,48 +30,24 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.transaction.RetryingTransactionHelper;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder.FileData;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder.MultiPartRequest;
 import org.alfresco.rest.framework.Api;
-import org.alfresco.rest.framework.core.ResourceDictionaryBuilder;
-import org.alfresco.rest.framework.core.ResourceLookupDictionary;
 import org.alfresco.rest.framework.core.ResourceWithMetadata;
 import org.alfresco.rest.framework.core.exceptions.UnsupportedResourceOperationException;
 import org.alfresco.rest.framework.jacksonextensions.BeanPropertiesFilter;
 import org.alfresco.rest.framework.jacksonextensions.ExecutionResult;
-import org.alfresco.rest.framework.jacksonextensions.JacksonHelper;
 import org.alfresco.rest.framework.jacksonextensions.JacksonHelper.Writer;
-import org.alfresco.rest.framework.resource.EntityResource;
-import org.alfresco.rest.framework.resource.RelationshipResource;
-import org.alfresco.rest.framework.resource.actions.ActionExecutor.ExecutionCallback;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction;
-import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction.Read;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction.ReadById;
+import org.alfresco.rest.framework.resource.actions.interfaces.MultiPartResourceAction;
 import org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceAction;
 import org.alfresco.rest.framework.resource.content.BinaryProperty;
-import org.alfresco.rest.framework.resource.content.BinaryResource;
-import org.alfresco.rest.framework.resource.content.ContentInfo;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.framework.resource.parameters.Paging;
 import org.alfresco.rest.framework.resource.parameters.Params;
@@ -58,7 +59,8 @@ import org.alfresco.rest.framework.tests.api.mocks3.Flock;
 import org.alfresco.rest.framework.tests.api.mocks3.SlimGoat;
 import org.alfresco.rest.framework.webscripts.AbstractResourceWebScript;
 import org.alfresco.rest.framework.webscripts.ResourceWebScriptHelper;
-import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonGenerationException;
@@ -69,65 +71,29 @@ import org.codehaus.jackson.schema.JsonSchema;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.webscripts.Format;
+import org.springframework.extensions.webscripts.WebScriptResponse;
 import org.springframework.extensions.webscripts.servlet.FormData;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath:test-rest-context.xml" })
-public class SerializeTests
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+public class SerializeTests extends AbstractContextTest
 {
-    @Autowired
-    private ResourceLookupDictionary locator;
 
-    @Autowired
-    private ApplicationContext applicationContext;
-    
-    @Autowired
-    private ResourceWebScriptHelper helper;
-    
-    private static Api api = Api.valueOf("alfrescomock", "private", "1");
-    private static Params NOT_USED = Params.valueOf("notUsed", null);
-    
-    @Autowired
-    protected JacksonHelper jsonHelper;
-    
-    @SuppressWarnings("unchecked")
-    @Before
-    public void setUp() throws Exception
-    {
-        Map<String, Object> entityResourceBeans = applicationContext.getBeansWithAnnotation(EntityResource.class);
-        Map<String, Object> relationResourceBeans = applicationContext.getBeansWithAnnotation(RelationshipResource.class);
-        locator.setDictionary(ResourceDictionaryBuilder.build(entityResourceBeans.values(), relationResourceBeans.values()));
-        AbstractResourceWebScript executor = (AbstractResourceWebScript) applicationContext.getBean("executorOfGets");
-        
-        //Mock transaction service
-        TransactionService transerv = mock(TransactionService.class);
-        RetryingTransactionHelper tHelper = mock(RetryingTransactionHelper.class);
-        when(transerv.getRetryingTransactionHelper()).thenReturn(tHelper);
-        when(tHelper.doInTransaction(any(RetryingTransactionCallback.class), anyBoolean(), anyBoolean())).thenAnswer(new Answer<Object>() {
-            @SuppressWarnings("rawtypes")
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-              Object[] args = invocation.getArguments();
-              RetryingTransactionCallback cb = (RetryingTransactionCallback) args[0];
-              cb.execute();
-              return null;
-            }
-          });
-        executor.setTransactionService(transerv);
-    }
-    
     @Test
     public void testInvokeEntity() throws IOException
     {
@@ -135,12 +101,12 @@ public class SerializeTests
         assertNotNull(entityResource);
         EntityResourceAction.ReadById<?> getter = (ReadById<?>) entityResource.getResource();
 
-        String out = writeResponse(helper.postProcessResponse(api,null, NOT_USED, getter.readById("1234A3", NOT_USED)));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, NOT_USED, getter.readById("1234A3", NOT_USED)));
         assertTrue("There must be json output", StringUtils.startsWith(out, "{\"entry\":"));
         
         EntityResourceAction.Read<?> getAll = (Read<?>) entityResource.getResource();
         CollectionWithPagingInfo<?> resources = getAll.readAll(null);
-        out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), resources));
+        out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), resources));
         assertTrue("There must be json output as List", StringUtils.startsWith(out, "{\"list\":"));
     }
 
@@ -164,7 +130,7 @@ public class SerializeTests
         mockRequest.setContent(reqBody.getBody());
         mockRequest.setContentType(reqBody.getContentType());
 
-        String out = writeResponse(helper.postProcessResponse(api,null, NOT_USED, resource.create(new FormData(mockRequest), NOT_USED)));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, NOT_USED, resource.create(new FormData(mockRequest), NOT_USED, callBack)));
         assertTrue("There must be json output", StringUtils.startsWith(out, "{\"entry\":"));
     }
 
@@ -174,8 +140,8 @@ public class SerializeTests
         ResourceWithMetadata relationResource = locator.locateRelationResource(api,"sheep", "baaahh", HttpMethod.GET);
         assertNotNull(relationResource);
         RelationshipResourceAction.Read<?> getter = (RelationshipResourceAction.Read<?>) relationResource.getResource();
-        CollectionWithPagingInfo<?> resources = getter.readAll("123",Params.valueOf("", null));
-        String out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), resources));
+        CollectionWithPagingInfo<?> resources = getter.readAll("123",Params.valueOf("", null, null));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), resources));
         assertTrue("There must be json output as List", StringUtils.startsWith(out, "{\"list\":"));
     }
     
@@ -185,17 +151,17 @@ public class SerializeTests
         ResourceWithMetadata relationResource = locator.locateRelationResource(api,"sheep", "baaahh", HttpMethod.GET);
         assertNotNull(relationResource);
         RelationshipResourceAction.Read<?> getter = (RelationshipResourceAction.Read<?>) relationResource.getResource();
-        CollectionWithPagingInfo<?> resources = getter.readAll("123",Params.valueOf("", null));
+        CollectionWithPagingInfo<?> resources = getter.readAll("123",Params.valueOf("", null, null));
         assertNotNull(resources);
         assertTrue(resources.getTotalItems().intValue() == 3);
         assertFalse(resources.hasMoreItems());
-        String out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), resources));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), resources));
         assertTrue("There must be json output as List with pagination", StringUtils.startsWith(out, "{\"list\":{\"pagination\":{\"count\":3,"));
         
         resources = getter.readAll("123",ParamsExtender.valueOf(Paging.valueOf(0, 1),"123"));
         assertTrue(resources.getCollection().size() == 1);
         assertTrue(resources.hasMoreItems());
-        out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), resources));
+        out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), resources));
         assertTrue("There must be json output as List with pagination", StringUtils.startsWith(out, "{\"list\":{\"pagination\":{\"count\":1,"));
 
     }
@@ -207,7 +173,7 @@ public class SerializeTests
         Farmer aFarmer = new Farmer("180");
         aFarmer.setGoatId("1111");
         aFarmer.setSheepId("2222");
-        ExecutionResult res = (ExecutionResult) helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),aFarmer);
+        ExecutionResult res = (ExecutionResult) helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),aFarmer);
         assertNotNull(res);
         assertTrue(Farmer.class.equals(res.getRoot().getClass()));
         Map<String,Object> embeds = res.getEmbedded();
@@ -232,19 +198,43 @@ public class SerializeTests
     {
         assertNotNull(helper);
         Map<String, BeanPropertiesFilter> rFilter = ResourceWebScriptHelper.getRelationFilter("blacksheep,baaahh");
-        ExecutionResult res = (ExecutionResult) helper.postProcessResponse(api,"sheep",ParamsExtender.valueOf(rFilter,"1"),new Farmer("180"));
+        ExecutionResult res = (ExecutionResult) helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(rFilter,"1"),new Farmer("180"));
         assertNotNull(res);
         String out = writeResponse(res);
         assertTrue(Farmer.class.equals(res.getRoot().getClass()));
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
         Paging pageRequest = Paging.valueOf(1, 2);
         
-        Object resultCollection =  helper.postProcessResponse(api,"sheep",ParamsExtender.valueOf(rFilter,"1"),CollectionWithPagingInfo.asPaged(pageRequest,Arrays.asList(new Farmer("180"), new Farmer("190"), new Farmer("280"))));
+        Object resultCollection =  helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(rFilter,"1"),CollectionWithPagingInfo.asPaged(pageRequest,Arrays.asList(new Farmer("180"), new Farmer("190"), new Farmer("280"))));
         assertNotNull(resultCollection);
         out = writeResponse(resultCollection);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
     }
-    
+
+    @Test
+    public void testIncludeSource() throws IOException
+    {
+        ExecutionResult exec1 = new ExecutionResult(new Farmer("180"),null);
+        ExecutionResult exec2 = new ExecutionResult(new Farmer("456"), null);
+        CollectionWithPagingInfo<ExecutionResult> coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1, exec2));
+
+        Object resultCollection =  helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(true,"1"),coll);
+        assertNotNull(resultCollection);
+        String out = writeResponse(resultCollection);
+        assertTrue("There must 'source' json output", StringUtils.contains(out, "\"source\":{\"name\":\"Dolly\",\"age\":3,\"sheepGuid\":\"1\"}"));
+
+        resultCollection =  helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(false,"1"),coll);
+        assertNotNull(resultCollection);
+        out = writeResponse(resultCollection);
+        assertFalse("There must not 'source' json output", StringUtils.contains(out, "\"source\":{\"name\":\"Dolly\",\"age\":3,\"sheepGuid\":\"1\"}"));
+
+        coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1, exec2), false, 2, new Sheep("barbie"));
+        resultCollection =  helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(true,"1"),coll);
+        assertNotNull(resultCollection);
+        out = writeResponse(resultCollection);
+        assertTrue("There must 'source' json output", StringUtils.contains(out, "\"source\":{\"name\":\"Dolly\",\"age\":3,\"sheepGuid\":\"barbie\""));
+    }
+
     @Test
     public void testExpandRecursiveRelations() throws IOException
     {
@@ -265,7 +255,7 @@ public class SerializeTests
     public void testSerializeExecutionResult() throws IOException
     {
         assertNotNull(helper);
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),new Farmer("180"));        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),new Farmer("180"));
         String out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
        
@@ -277,16 +267,16 @@ public class SerializeTests
     {
         assertNotNull(helper);
         CollectionWithPagingInfo paged = CollectionWithPagingInfo.asPaged(null,null);
-        String out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), paged));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), paged));
         assertTrue("There must be json output as List with pagination", StringUtils.startsWith(out, "{\"list\":{\"pagination\":{\"count\":0,"));
         Paging pageRequest = Paging.valueOf(1, 2);
         
         paged = CollectionWithPagingInfo.asPaged(pageRequest,Arrays.asList(new Goat(), new Sheep("ABCD"), new Sheep("XYZ")));
-        out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), paged));
+        out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), paged));
         assertTrue("There must be json output as List with pagination", StringUtils.startsWith(out, "{\"list\":{\"pagination\":{\"count\":3,"));
         
         paged = CollectionWithPagingInfo.asPaged(pageRequest,Arrays.asList(new Goat(), new Sheep("ABCD"), new Sheep("XYZ")),true,5000);
-        out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), paged));
+        out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), paged));
         assertTrue("There must be json output as List with pagination", StringUtils.startsWith(out, "{\"list\":{\"pagination\":{\"count\":3,\"hasMoreItems\":true,\"totalItems\":5000"));
        
     }
@@ -299,7 +289,7 @@ public class SerializeTests
         aMap.put("goatie", new Goat());
         aMap.put("sheepie", new Sheep("ABCD"));
         aMap.put("sheepy", new Sheep("XYZ"));
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),aMap);        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),aMap);
         String out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
        
@@ -313,7 +303,7 @@ public class SerializeTests
         aSet.add(new Goat());
         aSet.add(new Sheep("ABCD"));
         aSet.add(new Sheep("XYZ"));
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),aSet);        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),aSet);
         String out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
        
@@ -324,11 +314,11 @@ public class SerializeTests
     {
         assertNotNull(helper);
         CollectionWithPagingInfo<String> pString = CollectionWithPagingInfo.asPaged(null,Arrays.asList("goat", "sheep", "horse")); 
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),pString);        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),pString);
         String out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
         CollectionWithPagingInfo<Integer> pInts = CollectionWithPagingInfo.asPaged(null,Arrays.asList(234, 45, 890, 3456)); 
-        res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),pInts);
+        res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),pInts);
         out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
     } 
@@ -337,17 +327,28 @@ public class SerializeTests
     public void testSerializeList() throws IOException
     {
         assertNotNull(helper);
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null),Arrays.asList(new Goat(), new Sheep("ABCD"), new Sheep("XYZ")));        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null),Arrays.asList(new Goat(), new Sheep("ABCD"), new Sheep("XYZ")));
         String out = writeResponse(res);
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
        
     }
 
     @Test
+    public void testSerializeCustom() throws IOException
+    {
+        assertNotNull(helper);
+        String uuid = GUID.generate();
+        String out = writeResponse(uuid);
+        NodeRef n = jsonHelper.construct(new StringReader(out),NodeRef.class);
+        assertNotNull(n);
+        assertEquals(uuid, n.getId());
+    }
+
+    @Test
     public void testSerializeUniqueId() throws IOException
     {
         assertNotNull(helper);
-        Object res = helper.postProcessResponse(api,null,Params.valueOf("notUsed", null), new Sheep("ABCD"));        
+        Object res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null,Params.valueOf("notUsed", null, null), new Sheep("ABCD"));
         String out = writeResponse(res);
         assertTrue("Id field must be called sheepGuid.",  StringUtils.contains(out, "\"sheepGuid\":\"ABCD\""));      
     }
@@ -358,7 +359,7 @@ public class SerializeTests
         ResourceWithMetadata relationResource = locator.locateRelationResource(api,"sheep", "baaahh", HttpMethod.GET);
         assertNotNull(relationResource);
         RelationshipResourceAction.Read<?> getter = (RelationshipResourceAction.Read<?>) relationResource.getResource();
-        String out = writeResponse(helper.postProcessResponse(api,null, Params.valueOf("notUsed", null), getter.readAll("1234A3", Params.valueOf("notUsed", null))));
+        String out = writeResponse(helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,null, Params.valueOf("notUsed", null, null), getter.readAll("1234A3", Params.valueOf("notUsed", null, null))));
         assertTrue("There must be json output", StringUtils.isNotBlank(out));
     }
 
@@ -390,17 +391,12 @@ public class SerializeTests
     {        
         Api api3 = Api.valueOf("alfrescomock", "private", "3");
         ResourceWithMetadata propResource = locator.locateRelationResource(api3,"flock", "photo", HttpMethod.GET);
-        AbstractResourceWebScript executor = (AbstractResourceWebScript) applicationContext.getBean("executorOfGets");
-        executor.execute(propResource, Params.valueOf("234", null), new ExecutionCallback<BinaryResource>(){
-            @Override
-            public void onSuccess(BinaryResource result, ContentInfo contentInfo)
-            {
-                assertNotNull(result);
-            }});
-        
+        AbstractResourceWebScript executor = getExecutor();
+        Object result = executor.execute(propResource,  Params.valueOf("234", null, null),  mock(WebScriptResponse.class), true);
+        assertNotNull(result);
     }
-    
-    @Test
+
+        @Test
     public void testInvokeVersions() throws IOException
     {
         final Map<String, Object> respons = new HashMap<String, Object>();
@@ -434,7 +430,8 @@ public class SerializeTests
             //this is correct
         }
     }
-    
+
+    // note: exposed as "properties" query param
     @Test
     public void testFilter() throws IOException, JSONException
     {
@@ -448,13 +445,27 @@ public class SerializeTests
         res = new ExecutionResult(new Sheep("bob"),theFilter);  
         out = writeResponse(res);
         JSONObject jsonRsp = new JSONObject(new JSONTokener(out));
+        assertEquals(1, jsonRsp.length());
         JSONObject entry = jsonRsp.getJSONObject("entry");
+        assertEquals(2, entry.length());
+        assertEquals("The name should be 'Dolly'", "Dolly", entry.getString("name"));
+        assertTrue("The age should be 3", entry.getInt("age") == 3);
+
+        // unit test filter with "include" taking precendence over "fields" filter
+        List<String> theInclude = ResourceWebScriptHelper.getIncludeClause("name");
+        theFilter  = ResourceWebScriptHelper.getFilter("age", theInclude);
+        res = new ExecutionResult(new Sheep("bob"),theFilter);
+        out = writeResponse(res);
+        jsonRsp = new JSONObject(new JSONTokener(out));
+        assertEquals(1, jsonRsp.length());
+        entry = jsonRsp.getJSONObject("entry");
+        assertEquals(2, entry.length());
         assertEquals("The name should be 'Dolly'", "Dolly", entry.getString("name"));
         assertTrue("The age should be 3", entry.getInt("age") == 3);
         
         Api v3 = Api.valueOf(api.getName(), api.getScope().toString(), "3");
         Map<String, BeanPropertiesFilter> relFiler = ResourceWebScriptHelper.getRelationFilter("herd");
-        res = helper.postProcessResponse(v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat()); 
+        res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat());
         out = writeResponse(res);
         jsonRsp = new JSONObject(new JSONTokener(out));
         entry = jsonRsp.getJSONObject("relations")
@@ -466,10 +477,9 @@ public class SerializeTests
         assertTrue("The quantity should be 56", entry.getInt("quantity") == 56);
 
         relFiler = ResourceWebScriptHelper.getRelationFilter("herd(name)");
-        res = helper.postProcessResponse(v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat()); 
+        res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat());
         out = writeResponse(res);
         assertTrue("Must return only the herd name.", StringUtils.contains(out, "{\"name\":\"bigun\"}"));
-        
     }
     
     @Test

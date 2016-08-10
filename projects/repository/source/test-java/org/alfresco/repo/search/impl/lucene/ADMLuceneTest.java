@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.search.impl.lucene;
 
@@ -258,7 +265,6 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
     {
         // Register the test model
         dictionaryDAO.putModel(model);
-        namespaceDao.addPrefix("test", TEST_NAMESPACE);
     }
 
     public void setUp() throws Exception
@@ -1519,7 +1525,7 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
         sp.addQueryTemplate("ANDY", "%cm:content");
         sp.setNamespace(NamespaceService.CONTENT_MODEL_1_0_URI);
         sp.excludeDataInTheCurrentTransaction(true);
-        sp.addSort("test:neverIndexed", false);
+        sp.addSort("lucene-test:neverIndexed", false);
         results = searcher.query(sp);
         assertEquals(16, results.length());
         results.close();
@@ -1686,7 +1692,7 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
         ftsQueryWithCount(searcher, qname + ":(<3.4 TO 4])", 0);
         ftsQueryWithCount(searcher, qname + ":(<3.4 TO 3.4>)", 0);
 
-        ftsQueryWithCount(searcher, "test:float_x002D_ista:3.40", 1);
+        ftsQueryWithCount(searcher, "lucene\\-test:float_x002D_ista:3.40", 1);
 
         ftsQueryWithCount(searcher, "lazy", 1);
         ftsQueryWithCount(searcher, "laz*", 1);
@@ -2791,9 +2797,10 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
     }
 
     /**
+     * The test is ignored, see MNT-15976
      * @throws Exception
      */
-    public void testMTDeleteIssue() throws Exception
+    public void ignoreTestMTDeleteIssue() throws Exception
     {
         luceneFTS.pause();
         testTX.commit();
@@ -4228,11 +4235,11 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
         assertEquals(1, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PRIMARYASSOCTYPEQNAME:\"test:assoc\"", null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "PRIMARYASSOCTYPEQNAME:\"lucene-test:assoc\"", null);
         assertEquals(11, results.length());
         results.close();
 
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASSOCTYPEQNAME:\"test:assoc\"", null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "ASSOCTYPEQNAME:\"lucene-test:assoc\"", null);
         assertEquals(11, results.length());
         results.close();
 
@@ -4277,7 +4284,7 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
         results.close();
 
         qname = QName.createQName(TEST_NAMESPACE, "int-ista");
-        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@test\\:int\\-ista:\"0001\"", null);
+        results = searcher.query(rootNodeRef.getStoreRef(), "lucene", "\\@lucene-test\\:int\\-ista:\"0001\"", null);
         assertEquals(1, results.length());
         assertNotNull(results.getRow(0).getValue(qname));
         results.close();
@@ -7872,7 +7879,7 @@ public class ADMLuceneTest extends TestCase implements DictionaryListener
         nspr.registerNamespace(NamespaceService.DICTIONARY_MODEL_PREFIX, NamespaceService.DICTIONARY_MODEL_1_0_URI);
         nspr.registerNamespace(NamespaceService.SYSTEM_MODEL_PREFIX, NamespaceService.SYSTEM_MODEL_1_0_URI);
         nspr.registerNamespace("namespace", "namespace");
-        nspr.registerNamespace("test", TEST_NAMESPACE);
+        nspr.registerNamespace("lucene-test", TEST_NAMESPACE);
         nspr.registerNamespace(NamespaceService.DEFAULT_PREFIX, defaultURI);
         return nspr;
     }

@@ -1,28 +1,40 @@
 /*
- * Copyright (C) 2005-2016 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.quickshare;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.events.types.ActivityEvent;
 import org.alfresco.events.types.Event;
@@ -30,6 +42,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.model.QuickShareModel;
 import org.alfresco.repo.Client;
 import org.alfresco.repo.Client.ClientType;
+import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.copy.CopyBehaviourCallback;
 import org.alfresco.repo.copy.CopyDetails;
 import org.alfresco.repo.copy.CopyServicePolicies;
@@ -40,37 +53,53 @@ import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.quickshare.ClientAppConfig.ClientApp;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
 import org.alfresco.repo.thumbnail.ThumbnailDefinition;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.quickshare.InvalidSharedIdException;
 import org.alfresco.service.cmr.quickshare.QuickShareDTO;
 import org.alfresco.service.cmr.quickshare.QuickShareDisabledException;
 import org.alfresco.service.cmr.quickshare.QuickShareService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.Pair;
+import org.alfresco.util.ParameterCheck;
+import org.alfresco.util.PropertyCheck;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.safehaus.uuid.UUID;
 import org.safehaus.uuid.UUIDGenerator;
+import org.springframework.extensions.surf.util.I18NUtil;
+
 
 /**
  * QuickShare Service implementation.
@@ -78,16 +107,25 @@ import org.safehaus.uuid.UUIDGenerator;
  * In addition to the quick share service, this class also provides a BeforeDeleteNodePolicy and
  * OnCopyNodePolicy for content with the QuickShare aspect.
  *
- * @author Alex Miller, janv
+ * @author Alex Miller, janv, Jamal Kaabi-Mofrad
  */
-public class QuickShareServiceImpl implements QuickShareService, NodeServicePolicies.BeforeDeleteNodePolicy, CopyServicePolicies.OnCopyNodePolicy
+public class QuickShareServiceImpl implements QuickShareService,
+            NodeServicePolicies.BeforeDeleteNodePolicy,
+            CopyServicePolicies.OnCopyNodePolicy,
+            NodeServicePolicies.OnRestoreNodePolicy
 {
     private static final Log logger = LogFactory.getLog(QuickShareServiceImpl.class);
 
     static final String ATTR_KEY_SHAREDIDS_ROOT = ".sharedIds";
-    
-    
-    private boolean enabled;
+
+    private static final String FTL_SHARED_NODE_URL = "shared_node_url";
+    private static final String FTL_SHARED_NODE_NAME = "shared_node_name";
+    private static final String FTL_SENDER_MESSAGE = "sender_message";
+    private static final String FTL_SENDER_FIRST_NAME = "sender_first_name";
+    private static final String FTL_SENDER_LAST_NAME = "sender_last_name";
+    private static final String FTL_TEMPLATE_ASSETS_URL = "template_assets_url";
+    private static final String DEFAULT_EMAIL_SUBJECT = "quickshare.notifier.email.subject";
+    private static final String EMAIL_TEMPLATE_REF ="alfresco/templates/quickshare-email-templates/quickshare-email.default.template.ftl";
 
     private AttributeService attributeService;
     private DictionaryService dictionaryService;
@@ -98,28 +136,18 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
     private TenantService tenantService;
     private ThumbnailService thumbnailService;
     private EventPublisher eventPublisher;
-    
+    private ActionService actionService;
+    private PreferenceService preferenceService;
     /** Component to determine which behaviours are active and which not */
     private BehaviourFilter behaviourFilter;
-    
-    /**
-     * Spring configuration
-     * 
-     * @param behaviourFilter the behaviourFilter to set
-     */
-    public void setBehaviourFilter(BehaviourFilter behaviourFilter)
-    {
-        this.behaviourFilter = behaviourFilter;
-    }
-    
-    /**
-     * Enable or disable this service.
-     */
-    public void setEnabled(boolean enabled) 
-    {
-        this.enabled = enabled;
-    }
-    
+    private SearchService searchService;
+    private SiteService siteService;
+    private AuthorityService authorityService;
+
+    private boolean enabled;
+    private String defaultEmailSender;
+    private ClientAppConfig clientAppConfig;
+
     /**
      * Set the attribute service
      */
@@ -191,12 +219,115 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
     {
         this.eventPublisher = eventPublisher;
     }
-    
+
+    /**
+     * Set the actionService
+     */
+    public void setActionService(ActionService actionService)
+    {
+        this.actionService = actionService;
+    }
+
+    /**
+     * Set the preferenceService
+     */
+    public void setPreferenceService(PreferenceService preferenceService)
+    {
+        this.preferenceService = preferenceService;
+    }
+
+    /**
+     * Spring configuration
+     *
+     * @param behaviourFilter the behaviourFilter to set
+     */
+    public void setBehaviourFilter(BehaviourFilter behaviourFilter)
+    {
+        this.behaviourFilter = behaviourFilter;
+    }
+
+    /**
+     * Spring configuration
+     *
+     * @param searchService the searchService to set
+     */
+    public void setSearchService(SearchService searchService)
+    {
+        this.searchService = searchService;
+    }
+
+    /**
+     * Spring configuration
+     *
+     * @param siteService the siteService to set
+     */
+    public void setSiteService(SiteService siteService)
+    {
+        this.siteService = siteService;
+    }
+
+    /**
+     * Spring configuration
+     *
+     * @param authorityService the authorityService to set
+     */
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+
+    /**
+     * Enable or disable this service.
+     */
+    public void setEnabled(boolean enabled)
+    {
+        this.enabled = enabled;
+    }
+
+    /**
+     * Set the default email sender
+     */
+    public void setDefaultEmailSender(String defaultEmailSender)
+    {
+        this.defaultEmailSender = defaultEmailSender;
+    }
+
+    /**
+     * Set the quickShare clientAppConfig
+     */
+    public void setClientAppConfig(ClientAppConfig clientAppConfig)
+    {
+        this.clientAppConfig = clientAppConfig;
+    }
+
+    private void checkMandatoryProperties()
+    {
+        PropertyCheck.mandatory(this, "attributeService", attributeService);
+        PropertyCheck.mandatory(this, "dictionaryService", dictionaryService);
+        PropertyCheck.mandatory(this, "nodeService", nodeService);
+        PropertyCheck.mandatory(this, "permissionService", permissionService);
+        PropertyCheck.mandatory(this, "personService", personService);
+        PropertyCheck.mandatory(this, "policyComponent", policyComponent);
+        PropertyCheck.mandatory(this, "tenantService", tenantService);
+        PropertyCheck.mandatory(this, "thumbnailService", thumbnailService);
+        PropertyCheck.mandatory(this, "eventPublisher", eventPublisher);
+        PropertyCheck.mandatory(this, "actionService", actionService);
+        PropertyCheck.mandatory(this, "preferenceService", preferenceService);
+        PropertyCheck.mandatory(this, "behaviourFilter", behaviourFilter);
+        PropertyCheck.mandatory(this, "defaultEmailSender", defaultEmailSender);
+        PropertyCheck.mandatory(this, "clientAppConfig", clientAppConfig);
+        PropertyCheck.mandatory(this, "searchService", searchService);
+        PropertyCheck.mandatory(this, "siteService", siteService);
+        PropertyCheck.mandatory(this, "authorityService", authorityService);
+    }
+
     /**
      * The initialise method. Register our policies.
      */
     public void init()
     {
+        checkMandatoryProperties();
+
         // Register interest in the beforeDeleteNode policy - note: currently for content only !!
         policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDeleteNode"),
@@ -208,6 +339,11 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
                     CopyServicePolicies.OnCopyNodePolicy.QNAME, 
                     QuickShareModel.ASPECT_QSHARE, 
                     new JavaBehaviour(this, "getCopyCallback"));
+
+        this.policyComponent.bindClassBehaviour(
+                    NodeServicePolicies.OnRestoreNodePolicy.QNAME,
+                    QuickShareModel.ASPECT_QSHARE,
+                    new JavaBehaviour(this, "onRestoreNode"));
     }
 
 
@@ -314,7 +450,7 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
     @Override
     public Map<String, Object> getMetaData(NodeRef nodeRef)
     {
-    	// TODO This functionality MUST be available when quickshare is also disabled, therefor refactor it out from the quickshare package to a more common package.
+        // TODO This functionality MUST be available when quickshare is also disabled, therefor refactor it out from the quickshare package to a more common package.
         
         Map<QName, Serializable> nodeProps = nodeService.getProperties(nodeRef);
         ContentData contentData = (ContentData)nodeService.getProperty(nodeRef, ContentModel.PROP_CONTENT);
@@ -397,9 +533,9 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
         }
         else
         {
-        	QName type = nodeService.getType(nodeRef);
-        	boolean sharable = isSharable(type);
-        	metadata.put("sharable", sharable);        	
+            QName type = nodeService.getType(nodeRef);
+            boolean sharable = isSharable(type);
+            metadata.put("sharable", sharable);
         }
 
         Map<String, Object> model = new HashMap<String, Object>(2);
@@ -410,30 +546,63 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
     @Override
     public Pair<String, NodeRef> getTenantNodeRefFromSharedId(final String sharedId)
     {
-        final NodeRef nodeRef = TenantUtil.runAsDefaultTenant(new TenantRunAsWork<NodeRef>()
+        NodeRef nodeRef = TenantUtil.runAsDefaultTenant(new TenantRunAsWork<NodeRef>()
         {
             public NodeRef doWork() throws Exception
             {
-                return (NodeRef)attributeService.getAttribute(ATTR_KEY_SHAREDIDS_ROOT, sharedId);
+                return (NodeRef) attributeService.getAttribute(ATTR_KEY_SHAREDIDS_ROOT, sharedId);
             }
         });
-        
+
         if (nodeRef == null)
         {
-            throw new InvalidSharedIdException(sharedId);
+            /* TODO
+             * Temporary fix for RA-1093 and MNT-16224. The extra lookup should be
+             * removed (the same as before, just throw the 'InvalidSharedIdException' exception) when we
+             * have a system wide patch to remove the 'shared' aspect of the nodes that have been archived while shared.
+             */
+            // TMDQ
+            final String query = "+TYPE:\"cm:content\" AND +ASPECT:\"qshare:shared\" AND =qshare:sharedId:\"" + sharedId + "\"";
+            SearchParameters sp = new SearchParameters();
+            sp.setLanguage(SearchService.LANGUAGE_FTS_ALFRESCO);
+            sp.setQuery(query);
+            sp.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+
+            List<NodeRef> nodeRefs = null;
+            ResultSet results = null;
+            try
+            {
+                results = searchService.query(sp);
+                nodeRefs = results.getNodeRefs();
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidSharedIdException(sharedId);
+            }
+            finally
+            {
+                if (results != null)
+                {
+                    results.close();
+                }
+            }
+            if (nodeRefs.size() != 1)
+            {
+                throw new InvalidSharedIdException(sharedId);
+            }
+            nodeRef = tenantService.getName(nodeRefs.get(0));
         }
-        
+
         // note: relies on tenant-specific (ie. mangled) nodeRef
         String tenantDomain = tenantService.getDomain(nodeRef.getStoreRef().getIdentifier());
-        
-        return new Pair<String, NodeRef>(tenantDomain, tenantService.getBaseName(nodeRef));
+        return new Pair<>(tenantDomain, tenantService.getBaseName(nodeRef));
     }
 
     @Override
     public Map<String, Object> getMetaData(String sharedId)
     {
-    	checkEnabled();
-    	
+        checkEnabled();
+
         Pair<String, NodeRef> pair = getTenantNodeRefFromSharedId(sharedId);
         final String tenantDomain = pair.getFirst();
         final NodeRef nodeRef = pair.getSecond();
@@ -476,30 +645,70 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
                 String sharedId = (String)nodeService.getProperty(beforeDeleteNodeRef, QuickShareModel.PROP_QSHARE_SHAREDID);
                 if (sharedId != null)
                 {
-                	try 
-                	{
-	                    Pair<String, NodeRef> pair = getTenantNodeRefFromSharedId(sharedId);
-	                    
-	                    @SuppressWarnings("unused")
-	                    final String tenantDomain = pair.getFirst();
-	                    final NodeRef nodeRef = pair.getSecond();
-	                    
-	                    // note: deleted nodeRef might not match, eg. for upload new version -> checkin -> delete working copy
-	                    if (nodeRef.equals(beforeDeleteNodeRef))
-	                    {
-	                        removeSharedId(sharedId);
-	                    }
-                	}
-                	catch (InvalidSharedIdException ex)
-                	{
-                		logger.warn("Couldn't find shareId, " + sharedId + ", attributes for node " + beforeDeleteNodeRef);
-                	}
+                    try
+                    {
+                        Pair<String, NodeRef> pair = getTenantNodeRefFromSharedId(sharedId);
+
+                        @SuppressWarnings("unused")
+                        final String tenantDomain = pair.getFirst();
+                        final NodeRef nodeRef = pair.getSecond();
+
+                        // note: deleted nodeRef might not match, eg. for upload new version -> checkin -> delete working copy
+                        if (nodeRef.equals(beforeDeleteNodeRef))
+                        {
+                            // Disable audit to preserve modifier and modified date
+                            behaviourFilter.disableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+                            try
+                            {
+                                nodeService.removeAspect(nodeRef, QuickShareModel.ASPECT_QSHARE);
+                            }
+                            finally
+                            {
+                                behaviourFilter.enableBehaviour(nodeRef, ContentModel.ASPECT_AUDITABLE);
+                            }
+                            removeSharedId(sharedId);
+                        }
+                    }
+                    catch (InvalidSharedIdException ex)
+                    {
+                        logger.warn("Couldn't find shareId, " + sharedId + ", attributes for node " + beforeDeleteNodeRef);
+                    }
                 }
                 return null;
             }
         });
     }
-    
+
+    /* TODO
+     * Temporary fix for MNT-16224. This method should be removed when we
+     * have a system wide patch to remove the 'shared' aspect of the nodes that have been archived while shared.
+     */
+    @Override
+    public void onRestoreNode(ChildAssociationRef childAssocRef)
+    {
+        final NodeRef childNodeRef = childAssocRef.getChildRef();
+        AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+        {
+            public Void doWork() throws Exception
+            {
+                if (nodeService.hasAspect(childNodeRef, QuickShareModel.ASPECT_QSHARE))
+                {
+                    // Disable audit to preserve modifier and modified date
+                    behaviourFilter.disableBehaviour(childNodeRef, ContentModel.ASPECT_AUDITABLE);
+                    try
+                    {
+                        nodeService.removeAspect(childNodeRef, QuickShareModel.ASPECT_QSHARE);
+                    }
+                    finally
+                    {
+                        behaviourFilter.enableBehaviour(childNodeRef, ContentModel.ASPECT_AUDITABLE);
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
     private void removeSharedId(final String sharedId)
     {
         TenantUtil.runAsDefaultTenant(new TenantRunAsWork<Void>()
@@ -562,7 +771,7 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
 
     private boolean isSharable(QName type)
     {
-    	return type.equals(ContentModel.TYPE_CONTENT) || dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT);
+        return type.equals(ContentModel.TYPE_CONTENT) || dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT);
     }
     // Prevent copying of Quick share properties on node copy.
     @Override
@@ -596,4 +805,294 @@ public class QuickShareServiceImpl implements QuickShareService, NodeServicePoli
         
     }
 
+    @Override
+    public void sendEmailNotification(final QuickShareEmailRequest emailRequest)
+    {
+        ParameterCheck.mandatory("emailRequest", emailRequest);
+        emailRequest.validate();
+
+        ClientApp clientApp = clientAppConfig.getClient(emailRequest.getClient());
+        if (clientApp == null)
+        {
+            throw new QuickShareClientNotFoundException("Client was not found [" + emailRequest.getClient() + "]");
+        }
+
+        // Set the details of the person sending the email
+        final String authenticatedUser = AuthenticationUtil.getFullyAuthenticatedUser();
+        final NodeRef senderNodeRef = personService.getPerson(authenticatedUser, false);
+        final Map<QName, Serializable> senderProps = nodeService.getProperties(senderNodeRef);
+        final String senderFirstName = (String) senderProps.get(ContentModel.PROP_FIRSTNAME);
+        final String senderLastName = (String) senderProps.get(ContentModel.PROP_LASTNAME);
+        final String senderFullName = ((senderFirstName != null ? senderFirstName + " " : "") + (senderLastName != null ? senderLastName : "")).trim();
+
+        // Set the default model information
+        Map<String, Serializable> templateModel = new HashMap<>(6);
+        templateModel.put(FTL_SENDER_FIRST_NAME, senderFirstName);
+        templateModel.put(FTL_SENDER_LAST_NAME, senderLastName);
+        final String sharedNodeUrl = getUrl(clientApp.getSharedLinkBaseUrl()) + '/' + emailRequest.getSharedId();
+        templateModel.put(FTL_SHARED_NODE_URL, sharedNodeUrl);
+        templateModel.put(FTL_SHARED_NODE_NAME, emailRequest.getSharedNodeName());
+        templateModel.put(FTL_SENDER_MESSAGE, emailRequest.getSenderMessage());
+        String templateAssetsUrl = getUrl(clientApp.getTemplateAssetsUrl());
+        templateModel.put(FTL_TEMPLATE_ASSETS_URL, templateAssetsUrl);
+
+        // Set the email details
+        Map<String, Serializable> actionParams = new HashMap<>();
+        // Email sender. By default the current-user's email address will not be used to send this mail.
+        // However, current-user's first and lastname will be used as the personal name.
+        actionParams.put(MailActionExecuter.PARAM_FROM, this.defaultEmailSender);
+        actionParams.put(MailActionExecuter.PARAM_FROM_PERSONAL_NAME, senderFullName);
+        actionParams.put(MailActionExecuter.PARAM_SUBJECT, DEFAULT_EMAIL_SUBJECT);
+        actionParams.put(MailActionExecuter.PARAM_SUBJECT_PARAMS, new Object[] { senderFirstName, senderLastName, emailRequest.getSharedNodeName() });
+        actionParams.put(MailActionExecuter.PARAM_IGNORE_SEND_FAILURE, emailRequest.isIgnoreSendFailure());
+        // Pick the template
+        actionParams.put(MailActionExecuter.PARAM_TEMPLATE, EMAIL_TEMPLATE_REF);
+        actionParams.put(MailActionExecuter.PARAM_TEMPLATE_MODEL, (Serializable) templateModel);
+        actionParams.put(MailActionExecuter.PARAM_LOCALE, getDefaultIfNull(getEmailCreatorLocale(authenticatedUser), emailRequest.getLocale()));
+
+        for (String to : emailRequest.getToEmails())
+        {
+            Map<String, Serializable> params = new HashMap<>(actionParams);
+            params.put(MailActionExecuter.PARAM_TO, to);
+            Action mailAction = actionService.createAction(MailActionExecuter.NAME, params);
+            actionService.executeAction(mailAction, null, false, true);
+        }
+    }
+
+    @Override
+    public boolean canDeleteSharedLink(NodeRef nodeRef, String sharedByUserId)
+    {
+        boolean canDeleteSharedLink = false;
+
+        String currentUser = AuthenticationUtil.getFullyAuthenticatedUser();
+        String siteName = getSiteName(nodeRef);
+        boolean isSharedByCurrentUser = currentUser.equals(sharedByUserId);
+
+        if (siteName != null)
+        {
+            // node belongs to a site - current user must be a manager or collaborator or someone who shared the link
+            String role = siteService.getMembersRole(siteName, currentUser);
+            if (isSharedByCurrentUser || (role != null && (role.equals(SiteModel.SITE_MANAGER) || role.equals(SiteModel.SITE_COLLABORATOR))))
+            {
+                canDeleteSharedLink = true;
+            }
+        }
+        else if (isSharedByCurrentUser || (authorityService.isAdminAuthority(currentUser)))
+        {
+            // node does not belongs to a site - current user must be the person who shared the link or an admin
+            canDeleteSharedLink = true;
+        }
+
+        return canDeleteSharedLink;
+    }
+
+    private String getSiteName(NodeRef nodeRef)
+    {
+        NodeRef parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
+        while (parent != null && !nodeService.getType(parent).equals(SiteModel.TYPE_SITE))
+        {
+            // check that we can read parent name
+            String parentName = (String) nodeService.getProperty(parent, ContentModel.PROP_NAME);
+
+            if (nodeService.getPrimaryParent(nodeRef) != null)
+            {
+                parent = nodeService.getPrimaryParent(parent).getParentRef();
+            }
+        }
+
+        if (parent == null)
+        {
+            return null;
+        }
+
+        return nodeService.getProperty(parent, ContentModel.PROP_NAME).toString();
+    }
+
+    private String getUrl(String url)
+    {
+        if (url.endsWith("/"))
+        {
+            return url.substring(0, url.length() - 1);
+        }
+        return url;
+    }
+
+    private <T> T getDefaultIfNull(T defaultValue, T newValue)
+    {
+        return (newValue == null) ? defaultValue : newValue;
+    }
+
+    private Locale getEmailCreatorLocale(String userId)
+    {
+        String localeString = (String) preferenceService.getPreference(userId, "locale");
+        return I18NUtil.parseLocale(localeString);
+    }
+
+    /**
+     * Represents an email request to send a quick share link.
+     */
+    public static class QuickShareEmailRequest
+    {
+        /**
+         * The client's name that must be registered in order to send emails.
+         */
+        private String client;
+        /**
+         * Optional Locale for subject and body text
+         */
+        private Locale locale;
+
+        /**
+         * The email addresses (1 or many) of the recipients.
+         */
+        private Set<String> toEmails;
+
+        /**
+         * The shared id.
+         */
+        private String sharedId;
+
+        /**
+         * The shared content name.
+         */
+        private String sharedNodeName;
+
+        /**
+         * Optional message from the sender.
+         */
+        private String senderMessage;
+
+        /**
+         * Whether to ignore throwing exception or not. The default is false.
+         */
+        private boolean ignoreSendFailure = false;
+
+        public void validate()
+        {
+            ParameterCheck.mandatoryCollection("toEmails", toEmails);
+            ParameterCheck.mandatoryString("sharedId", sharedId);
+            ParameterCheck.mandatoryString("sharedNodeName", sharedNodeName);
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#locale}
+         */
+        public Locale getLocale()
+        {
+            return this.locale;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#locale}
+         */
+        public void setLocale(Locale locale)
+        {
+            this.locale = locale;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#toEmails}
+         */
+        public Set<String> getToEmails()
+        {
+            return this.toEmails;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#toEmails}
+         */
+        public void setToEmails(Collection<String> toEmails)
+        {
+            if (toEmails != null)
+            {
+                this.toEmails = Collections.unmodifiableSet(new HashSet<>(toEmails));
+            }
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#client}
+         */
+        public String getClient()
+        {
+            return client;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#client}
+         */
+        public QuickShareEmailRequest setClient(String client)
+        {
+            this.client = client;
+            return this;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#sharedId}
+         */
+        public String getSharedId()
+        {
+            return sharedId;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#sharedId}
+         */
+        public QuickShareEmailRequest setSharedId(String sharedId)
+        {
+            this.sharedId = sharedId;
+            return this;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#sharedNodeName}
+         */
+        public String getSharedNodeName()
+        {
+            return sharedNodeName;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#sharedNodeName}
+         */
+        public void setSharedNodeName(String sharedNodeName)
+        {
+            this.sharedNodeName = sharedNodeName;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#senderMessage}
+         */
+        public String getSenderMessage()
+        {
+            return senderMessage;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#senderMessage}
+         */
+        public void setSenderMessage(String senderMessage)
+        {
+            this.senderMessage = senderMessage;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#ignoreSendFailure}
+         */
+        public boolean isIgnoreSendFailure()
+        {
+            return ignoreSendFailure;
+        }
+
+        /**
+         * {@link QuickShareEmailRequest#ignoreSendFailure}
+         */
+        public void setIgnoreSendFailure(Boolean ignoreSendFailure)
+        {
+            if (ignoreSendFailure != null)
+            {
+                this.ignoreSendFailure = ignoreSendFailure;
+            }
+        }
+    }
 }
+

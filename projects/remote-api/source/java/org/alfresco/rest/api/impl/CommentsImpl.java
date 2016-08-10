@@ -1,38 +1,27 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
- * Alfresco is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Alfresco is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.rest.api.impl;
 
@@ -48,11 +37,14 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
 import org.alfresco.repo.forum.CommentService;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.rest.api.Comments;
 import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.model.Comment;
 import org.alfresco.rest.framework.core.exceptions.ConstraintViolatedException;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
+import org.alfresco.rest.framework.core.exceptions.PermissionDeniedException;
 import org.alfresco.rest.framework.core.exceptions.UnsupportedResourceOperationException;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.framework.resource.parameters.Paging;
@@ -79,8 +71,6 @@ public class CommentsImpl implements Comments
     private NodeService nodeService;
     private CommentService commentService;
     private ContentService contentService;
-    private LockService lockService;
-    private PermissionService permissionService;
     private TypeConstraint typeConstraint;
 
 	public void setTypeConstraint(TypeConstraint typeConstraint)
@@ -92,17 +82,7 @@ public class CommentsImpl implements Comments
 	{
 		this.nodes = nodes;
 	}
-	
-	public void setLockService(LockService lockService)
-	{
-		this.lockService = lockService;
-	}
-
-	public void setPermissionService(PermissionService permissionService)
-	{
-		this.permissionService = permissionService;
-	}
-
+    
 	public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
@@ -130,45 +110,16 @@ public class CommentsImpl implements Comments
 	        nodeProps.remove(ContentModel.PROP_CONTENT);
         }
 
-        boolean canEdit = true;
-        boolean canDelete = true;
 
-        boolean isNodeLocked = false;
-        boolean isWorkingCopy = false;
+        Map<String, Boolean> map = commentService.getCommentPermissions(nodeRef, commentNodeRef);
+        boolean canEdit = map.get(CommentService.CAN_EDIT);
+        boolean canDelete =  map.get(CommentService.CAN_DELETE);
 
-        if(nodeRef != null)
-        {
-	        Set<QName> aspects = nodeService.getAspects(nodeRef);
-
-	        isWorkingCopy = aspects.contains(ContentModel.ASPECT_WORKING_COPY);
-	        if(!isWorkingCopy)
-	        {
-		        if(aspects.contains(ContentModel.ASPECT_LOCKABLE))
-		        {
-		            LockStatus lockStatus = lockService.getLockStatus(nodeRef);
-		            if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
-		            {
-		            	isNodeLocked = true;
-		            }
-		        }
-	        }
-        }
-
-        if(isNodeLocked || isWorkingCopy)
-        {
-        	canEdit = false;
-        	canDelete = false;
-        }
-        else
-        {
-        	canEdit = permissionService.hasPermission(commentNodeRef, PermissionService.WRITE) == AccessStatus.ALLOWED;
-        	canDelete = permissionService.hasPermission(commentNodeRef, PermissionService.DELETE) == AccessStatus.ALLOWED;
-        }
 
         Comment comment = new Comment(commentNodeRef.getId(), nodeProps, canEdit, canDelete);
         return comment;
     }
-
+    
     public Comment createComment(String nodeId, Comment comment)
     {
 		NodeRef nodeRef = nodes.validateNode(nodeId);
@@ -204,8 +155,8 @@ public class CommentsImpl implements Comments
 			{
 				throw new InvalidArgumentException();
 			}
-			
-	        commentService.updateComment(commentNodeRef, title, content);
+            
+            commentService.updateComment(commentNodeRef, title, content);
 	        return toComment(nodeRef, commentNodeRef);
 		}
 		catch(IllegalArgumentException e)
@@ -249,14 +200,19 @@ public class CommentsImpl implements Comments
     }
 
     @Override
-    // TODO validate that it is a comment of the node
     public void deleteComment(String nodeId, String commentNodeId)
     {
     	try
     	{
-	    	nodes.validateNode(nodeId);
+            NodeRef nodeRef = nodes.validateNode(nodeId);
 	        NodeRef commentNodeRef = nodes.validateNode(commentNodeId);
-	        commentService.deleteComment(commentNodeRef);
+            
+            if (! nodeRef.equals(commentService.getDiscussableAncestor(commentNodeRef)))
+            {
+                throw new InvalidArgumentException("Unexpected "+nodeId+","+commentNodeId);
+            }
+            
+            commentService.deleteComment(commentNodeRef);
 		}
 		catch(IllegalArgumentException e)
 		{

@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.security.person;
 
@@ -841,6 +848,9 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
                 properties.put(ContentModel.PROP_USERNAME, realUserName);
             }
         }
+
+        checkIfPersonShouldBeDisabledAndSetAspect(personNode, properties);
+
         Map<QName, Serializable> update = nodeService.getProperties(personNode);
         update.putAll(properties);
 
@@ -980,6 +990,8 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
             beforeCreateNodeValidationBehaviour.enable();
         }
         
+        checkIfPersonShouldBeDisabledAndSetAspect(personRef, properties);
+        
         if (zones != null)
         {
             for (String zone : zones)
@@ -997,6 +1009,26 @@ public class PersonServiceImpl extends TransactionListenerAdapter implements Per
         return personRef;
     }
     
+    private void checkIfPersonShouldBeDisabledAndSetAspect(NodeRef person, Map<QName, Serializable> properties)
+    {
+        if (properties.get(ContentModel.PROP_ENABLED) != null)
+        {
+            boolean isEnabled = Boolean.parseBoolean(properties.get(ContentModel.PROP_ENABLED).toString());
+
+            if (isEnabled)
+            {
+                if (nodeService.hasAspect(person, ContentModel.ASPECT_PERSON_DISABLED))
+                {
+                    nodeService.removeAspect(person, ContentModel.ASPECT_PERSON_DISABLED);
+                }
+            }
+            else
+            {
+                nodeService.addAspect(person, ContentModel.ASPECT_PERSON_DISABLED, null);
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2012 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.tagging;
 
@@ -408,8 +415,12 @@ public class TaggingServiceImpl implements TaggingService,
             // Queue all the before's for removal to the tag scope
             for (NodeRef beforeNodeRef : beforeNodeRefs)
             {
-                String tagName = getTagName(beforeNodeRef);
-                queueTagUpdate(nodeRef, tagName, false);
+                // Protect against InvalidNodeRefException(MNT-14453)
+                if (this.nodeService.exists(beforeNodeRef))
+                {
+                    String tagName = getTagName(beforeNodeRef);
+                    queueTagUpdate(nodeRef, tagName, false);
+                }
             }
         }
         else if (afterNodeRefs != null && beforeNodeRefs != null)
@@ -423,7 +434,8 @@ public class TaggingServiceImpl implements TaggingService,
                     // remove the node ref from the after list
                     afterNodeRefs.remove(beforeNodeRef);
                 }
-                else
+                // Protect against InvalidNodeRefException(MNT-14453)
+                else if (this.nodeService.exists(beforeNodeRef))
                 {
                     String tagName = getTagName(beforeNodeRef);
                     queueTagUpdate(nodeRef, tagName, false);
@@ -469,6 +481,15 @@ public class TaggingServiceImpl implements TaggingService,
     {
         // Lower the case of the tag
         tag = tag.toLowerCase();
+        
+        // Find nodes which are tagged with the 'soon to be deleted' tag.
+        List<NodeRef> taggedNodes = this.findTaggedNodes(storeRef, tag);
+        
+        // Clear the tag from the found nodes
+        for (NodeRef taggedNode : taggedNodes)
+        {
+            this.removeTag(taggedNode, tag);
+        }
         
         NodeRef tagNodeRef = getTagNodeRef(storeRef, tag);
         if (tagNodeRef != null)

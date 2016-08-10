@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2011 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.domain.node.ibatis;
 
@@ -28,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.ibatis.IdsEntity;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.domain.node.AbstractNodeDAOImpl;
@@ -37,6 +45,7 @@ import org.alfresco.repo.domain.node.Node;
 import org.alfresco.repo.domain.node.NodeAspectsEntity;
 import org.alfresco.repo.domain.node.NodeAssocEntity;
 import org.alfresco.repo.domain.node.NodeEntity;
+import org.alfresco.repo.domain.node.NodeExistsException;
 import org.alfresco.repo.domain.node.NodeIdAndAclId;
 import org.alfresco.repo.domain.node.NodePropertyEntity;
 import org.alfresco.repo.domain.node.NodePropertyKey;
@@ -105,6 +114,7 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     private static final String DELETE_NODE_PROPERTIES = "alfresco.node.delete_NodeProperties";
     private static final String SELECT_NODE_MIN_ID = "alfresco.node.select_NodeMinId";
     private static final String SELECT_NODE_MAX_ID = "alfresco.node.select_NodeMaxId";
+    private static final String SELECT_NODE_INTERVAL_BY_TYPE = "alfresco.node.select_MinMaxNodeIdForNodeType";
     private static final String SELECT_NODES_WITH_ASPECT_IDS = "alfresco.node.select_NodesWithAspectIds";
     private static final String INSERT_NODE_ASSOC = "alfresco.node.insert.insert_NodeAssoc";
     private static final String UPDATE_NODE_ASSOC = "alfresco.node.update_NodeAssoc";
@@ -129,6 +139,8 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     private static final String SELECT_CHILD_ASSOC_OF_PARENT_BY_NAME = "alfresco.node.select_ChildAssocOfParentByName";
     private static final String SELECT_CHILD_ASSOCS_OF_PARENT_WITHOUT_PARENT_ASSOCS_OF_TYPE =
             "alfresco.node.select_ChildAssocsOfParentWithoutParentAssocsOfType";
+    private static final String SELECT_CHILD_ASSOCS_OF_PARENT_WITHOUT_NODE_ASSOCS_OF_TYPE =
+            "alfresco.node.select_ChildAssocsOfParentWithoutNodeAssocsOfType";
     private static final String SELECT_PARENT_ASSOCS_OF_CHILD = "alfresco.node.select_ParentAssocsOfChild";
     private static final String UPDATE_PARENT_ASSOCS_OF_CHILD = "alfresco.node.update_ParentAssocsOfChild";
     private static final String DELETE_SUBSCRIPTIONS = "alfresco.node.delete_NodeSubscriptions";
@@ -362,6 +374,38 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     public Long getMaxNodeId()
     {
         return (Long) template.selectOne(SELECT_NODE_MAX_ID);
+    }
+
+    @Override
+    public Pair<Long, Long> getNodeIdsIntervalForType(QName type, Long startTxnTime, Long endTxnTime)
+    {
+        final Pair<Long, Long> intervalPair = new Pair<Long, Long>(LONG_ZERO, LONG_ZERO);
+        Pair<Long, QName> typePair = qnameDAO.getQName(type);
+        if (typePair == null)
+        {
+            // Return default
+            return intervalPair;
+        }
+        TransactionQueryEntity txnQuery = new TransactionQueryEntity();
+        txnQuery.setTypeQNameId(typePair.getFirst());
+        txnQuery.setMinCommitTime(startTxnTime);
+        txnQuery.setMaxCommitTime(endTxnTime);
+        
+        ResultHandler resultHandler = new ResultHandler()
+        {
+            @SuppressWarnings("unchecked")
+            public void handleResult(ResultContext context)
+            {
+                Map<Long, Long> result = (Map<Long, Long>) context.getResultObject();
+                if (result != null)
+                {
+                    intervalPair.setFirst(result.get("minId"));
+                    intervalPair.setSecond(result.get("maxId"));
+                }
+            }
+        };
+        template.select(SELECT_NODE_INTERVAL_BY_TYPE, txnQuery, resultHandler);
+        return intervalPair;
     }
 
     @Override
@@ -1376,7 +1420,30 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
         resultsCallback.done();
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public List<Node> selectChildAssocsWithoutNodeAssocsOfTypes(Long parentNodeId, Long minNodeId, Long maxNodeId, Set<QName> assocTypeQNames)
+    {
+        IdsEntity idsEntity = new IdsEntity();
+        
+        // Parent node id
+        Assert.notNull(parentNodeId, "The parent node id must not be null.");
+        idsEntity.setIdOne(parentNodeId);
+        // Node ids selection interval
+        idsEntity.setIdTwo(minNodeId);
+        idsEntity.setIdThree(maxNodeId);
+        // Associations types to exclude
+        if (assocTypeQNames != null)
+        {
+            Set<Long> childNodeTypeQNameIds = qnameDAO.convertQNamesToIds(assocTypeQNames, false);
+            if (childNodeTypeQNameIds.size() > 0)
+            {
+                idsEntity.setIds(new ArrayList<Long>(childNodeTypeQNameIds)); 
+            }
+        }
+        
+        return template.selectList(SELECT_CHILD_ASSOCS_OF_PARENT_WITHOUT_NODE_ASSOCS_OF_TYPE, idsEntity);
+    }
+
     @Override
     protected List<ChildAssocEntity> selectPrimaryParentAssocs(Long childNodeId)
     {
@@ -1656,7 +1723,7 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
         if (deletedTypePair == null)
         {
             // Nothing to do
-            return 0L;
+            return LONG_ZERO;
         }
         TransactionQueryEntity txnQuery = new TransactionQueryEntity();
         txnQuery.setTypeQNameId(deletedTypePair.getFirst());
@@ -1719,7 +1786,7 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
     }
     
     /**
-     * MySQL-specific DAO overrides
+     * MySQL (InnoDB) specific DAO overrides
      */
     public static class MySQL extends NodeDAOImpl
     {
@@ -1741,6 +1808,94 @@ public class NodeDAOImpl extends AbstractNodeDAOImpl
             txnQuery.setMaxCommitTime(toCommitTime);
             int numDeleted = template.delete(DELETE_TXNS_UNUSED_MYSQL, txnQuery);
             return numDeleted;
+        }
+    }
+    
+    /**
+     * MySQL Cluster NDB specific DAO overrides
+     *
+     * WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect !
+     * 
+     * @author janv
+     */
+    public static class MySQLClusterNDB extends MySQL
+    {
+        @Override
+        protected Long newNodeImplInsert(NodeEntity node)
+        {
+        	Long id = null;
+            try
+            {
+            	// We need to handle existing deleted nodes.
+                NodeRef targetNodeRef = node.getNodeRef();
+                Node dbTargetNode = selectNodeByNodeRef(targetNodeRef);
+                if (dbTargetNode != null)
+                {
+	                if (dbTargetNode.getDeleted(qnameDAO))
+	                {
+	                    Long dbTargetNodeId = dbTargetNode.getId();
+	                    // This is OK.  It happens when we create a node that existed in the past.
+	                    // Remove the row completely
+	                    deleteNodeProperties(dbTargetNodeId, (Set<Long>) null);
+	                    deleteNodeById(dbTargetNodeId);
+	                }
+	                else
+	                {
+	                    // A live node exists.
+	                	throw new NodeExistsException(dbTargetNode.getNodePair(), null);
+	                }
+                }
+                
+                id = insertNode(node);
+            }
+            catch (Throwable e)
+            {
+            	if (e instanceof NodeExistsException)
+            	{
+            		throw e;
+            	}
+            	
+                // There does not appear to be any row that could prevent an insert
+                throw new AlfrescoRuntimeException("Failed to insert new node: " + node, e);
+            }
+            
+            return id;
+        }
+        
+        @Override
+        protected Long newChildAssocInsert(ChildAssocEntity assoc, QName assocTypeQName, String childNodeName)
+        {
+            // no in-txn retry / full rollback on sql exception
+            return newChildAssocInsertImpl(assoc, assocTypeQName, childNodeName);
+        }
+        
+        @Override
+        protected int setChildAssocsUniqueNameImpl(Long childNodeId, String childName)
+        {
+            // no in-txn retry / full rollback on sql exception
+            return updateChildAssocUniqueNameImpl(childNodeId, childName);
+        }
+        
+        @Override
+        protected void updatePrimaryParentAssocs(
+                    ChildAssocEntity primaryParentAssoc,
+                    Node newParentNode,
+                    Node childNode,
+                    Long newChildNodeId,
+                    String childNodeName,
+                    Long oldParentNodeId,
+                    QName assocTypeQName,
+                    QName assocQName)
+        {
+            // no in-txn retry / full rollback on sql exception
+            updatePrimaryParentAssocsImpl(primaryParentAssoc,
+                                newParentNode,
+                                childNode,
+                                newChildNodeId,
+                                childNodeName,
+                                oldParentNodeId,
+                                assocTypeQName,
+                                assocQName);
         }
     }
 

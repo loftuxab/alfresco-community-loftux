@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.node;
 
@@ -75,7 +82,6 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
-import org.alfresco.util.Pair;
 import org.hibernate.dialect.DB2Dialect;
 import org.hibernate.dialect.Dialect;
 import org.springframework.context.ApplicationContext;
@@ -1451,7 +1457,7 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
                 pathARef.getChildRef(),
                 ASSOC_TYPE_QNAME_TEST_CHILDREN,
                 QName.createQName("pathC"));
-        
+
         // remove the path B association
         boolean removedB = nodeService.removeChildAssociation(pathBRef);
         assertTrue("Association was not removed", removedB);
@@ -1461,19 +1467,58 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         // remove the path C association
         boolean removedC = nodeService.removeChildAssociation(pathCRef);
         assertTrue("Association was not removed", removedC);
-        removedC = nodeService.removeSeconaryChildAssociation(pathCRef);
+        removedC = nodeService.removeSecondaryChildAssociation(pathCRef);
         assertFalse("Non-existent association was apparently removed", removedC);
         
         // Now verify that primary associations are caught
         try
         {
-            nodeService.removeSeconaryChildAssociation(pathPrimaryRef);
+            nodeService.removeSecondaryChildAssociation(pathPrimaryRef);
             fail("Primary association not detected");
         }
         catch (IllegalArgumentException e)
         {
             // Expected
         }
+    }
+
+    public void testRemoveChildPolicyFires() throws Exception
+    {
+        ChildAssociationRef pathPrimaryRef = nodeService.createNode(
+                rootNodeRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("parent_child"),
+                ContentModel.TYPE_CONTAINER);
+        NodeRef parentRef = pathPrimaryRef.getParentRef();
+        ChildAssociationRef pathARef = nodeService.createNode(
+                parentRef,
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("patha"),
+                ContentModel.TYPE_CONTAINER);
+        ChildAssociationRef pathBRef = nodeService.addChild(
+                parentRef,
+                pathARef.getChildRef(),
+                ContentModel.ASSOC_ARCHIVED_LINK,
+                QName.createQName("pathb"));
+        ChildAssociationRef pathCRef = nodeService.addChild(
+                parentRef,
+                pathARef.getChildRef(),
+                ASSOC_TYPE_QNAME_TEST_CHILDREN,
+                QName.createQName("pathc"));
+
+        BeforeDeletePolicyTester beforeDeletePolicy = new BeforeDeletePolicyTester();
+        this.policyComponent.bindAssociationBehaviour(
+                NodeServicePolicies.BeforeDeleteChildAssociationPolicy.QNAME,
+                beforeDeletePolicy,
+                new JavaBehaviour(beforeDeletePolicy,  "beforeDeleteChildAssociation"));
+
+        boolean removed = nodeService.removeSecondaryChildAssociation(pathBRef);
+        assertTrue("Association was removed", removed);
+        assertEquals("The BeforeDeleteChildAssociationPolicy must fire on removeSecondaryChildAssociation",pathBRef, beforeDeletePolicy.childRef);
+
+        removed = nodeService.removeChildAssociation(pathCRef);
+        assertTrue("Association was removed", removed);
+        assertEquals("The BeforeDeleteChildAssociationPolicy must fire on removeChildAssociation", pathCRef, beforeDeletePolicy.childRef);
     }
     
     public void testRemoveChildByRef() throws Exception
@@ -2572,7 +2617,17 @@ public abstract class BaseNodeServiceTest extends BaseSpringTest
         }
     };
 
-    
+    public static class BeforeDeletePolicyTester implements NodeServicePolicies.BeforeDeleteChildAssociationPolicy
+    {
+        ChildAssociationRef childRef;
+
+        @Override
+        public void beforeDeleteChildAssociation(ChildAssociationRef childAssocRef)
+        {
+            this.childRef = childAssocRef;
+        }
+    }
+
     public void testMoveNode() throws Exception
     {
         Map<QName, ChildAssociationRef> assocRefs = buildNodeGraph();

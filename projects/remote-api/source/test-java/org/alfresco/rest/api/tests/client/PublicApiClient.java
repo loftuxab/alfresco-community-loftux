@@ -1,4 +1,31 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 package org.alfresco.rest.api.tests.client;
+
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,6 +33,8 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +43,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl;
 import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
+import org.alfresco.rest.api.tests.client.PublicApiHttpClient.BinaryPayload;
+import org.alfresco.rest.api.tests.client.PublicApiHttpClient.RequestBuilder;
 import org.alfresco.rest.api.tests.client.data.Activities;
 import org.alfresco.rest.api.tests.client.data.Activity;
 import org.alfresco.rest.api.tests.client.data.CMISNode;
@@ -451,6 +482,18 @@ public class PublicApiClient
         return response;
     }
 
+
+	public HttpResponse post(String scope, String entityCollectionName, Object entityId, String relationCollectionName, Object relationshipEntityId,
+							 byte[] body, String contentType) throws IOException
+	{
+		HttpResponse response = client.post(getRequestContext(), scope, entityCollectionName, entityId, relationCollectionName,
+				relationshipEntityId != null ? relationshipEntityId.toString() : null, body, contentType);
+
+		logger.debug(response.toString());
+
+		return response;
+	}
+
 	public HttpResponse post(String urlSuffix, String body) throws IOException
 	{
 		HttpResponse response = client.post(getRequestContext(), urlSuffix, body);
@@ -523,10 +566,26 @@ public class PublicApiClient
 
 		return response;
 	}
-	
+
+    public HttpResponse putBinary(String scope, int version, String entityCollectionName, Object entityId, String relationCollectionName,
+                Object relationshipEntityId, BinaryPayload payload, Map<String, String> params) throws IOException
+    {
+        HttpResponse response = client.putBinary(getRequestContext(), scope, version, entityCollectionName, entityId, relationCollectionName, relationshipEntityId,
+                                payload, params);
+
+        logger.debug(response.toString());
+
+        return response;
+    }
+
 	public HttpResponse delete(String scope, String entityCollectionName, Object entityId, String relationCollectionName, Object relationshipEntityId) throws IOException
 	{
-		HttpResponse response = client.delete(getRequestContext(), scope, entityCollectionName, entityId, relationCollectionName, relationshipEntityId);
+		return delete(scope, 1, entityCollectionName, entityId, relationCollectionName, relationshipEntityId, null);
+	}
+
+	public HttpResponse delete(String scope, int version, String entityCollectionName, Object entityId, String relationCollectionName, Object relationshipEntityId, Map<String, String> params) throws IOException
+	{
+		HttpResponse response = client.delete(getRequestContext(), scope, version, entityCollectionName, entityId, relationCollectionName, relationshipEntityId, params);
 		
 		logger.debug(response.toString());
 
@@ -541,6 +600,19 @@ public class PublicApiClient
 
 		return response;
 	}
+
+    public HttpResponse execute(RequestBuilder requestBuilder) throws IOException
+    {
+        if (requestBuilder.getRequestContext() == null)
+        {
+            throw new RuntimeException("Must set a request context");
+        }
+        HttpResponse response = client.execute(requestBuilder);
+
+        logger.debug(response.toString());
+
+        return response;
+    }
 
 	public HttpResponse index(Map<String, String> params) throws IOException
 	{
@@ -604,23 +676,19 @@ public class PublicApiClient
 		        throw new PublicApiException(e);
 			}
 		}
-		
-		public HttpResponse getSingle(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage) throws PublicApiException
+
+        public HttpResponse getSingle(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage) throws PublicApiException
+        {
+            return getSingle(entityCollectionName, entityId, relationCollectionName, relationId, errorMessage, HttpServletResponse.SC_OK);
+        }
+
+        public HttpResponse getSingle(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage, int expectedStatus) throws PublicApiException
 		{
 	        try
 	        {
 		        HttpResponse response = get("public", entityCollectionName, entityId, relationCollectionName, relationId, null);
-		        
-		        if (HttpServletResponse.SC_OK != response.getStatusCode())
-		        {
-		            String msg = errorMessage + ": \n" +
-		                    "   Response: " + response;
-		            throw new PublicApiException(msg, response);
-		        }
-		        else
-		        {
-		        	return response;
-		        }
+                checkStatus(errorMessage, expectedStatus, response);
+                return response;
 			}
 			catch(IOException e)
 			{
@@ -655,50 +723,63 @@ public class PublicApiClient
 		        throw new PublicApiException(e);
 			}
 		}
+
+        public HttpResponse create(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, String errorMessage) throws PublicApiException
+        {
+            return create(entityCollectionName, entityId, relationCollectionName, relationId, body, errorMessage, HttpServletResponse.SC_CREATED);
+        }
 		
-		public HttpResponse create(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, String errorMessage) throws PublicApiException
+		public HttpResponse create(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, String errorMessage, int expectedStatus) throws PublicApiException
 		{
 	        try
 	        {
 		        HttpResponse response = post("public", entityCollectionName, entityId, relationCollectionName, relationId, body);
+                checkStatus(errorMessage, expectedStatus, response);
+                return response;
+			}
+			catch (IOException e)
+			{
+		        throw new PublicApiException(e);
+			}
+		}
 
-		        if (HttpServletResponse.SC_CREATED != response.getStatusCode())
-		        {
-		            String msg = errorMessage + ": \n" +
-		                    "   Response: " + response;
-		            throw new PublicApiException(msg, response);
-		        }
-		        else
-		        {
-		        	return response;
-		        }
+        public HttpResponse remove(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage) throws PublicApiException
+        {
+            return remove(entityCollectionName, entityId, relationCollectionName, relationId, null, errorMessage, HttpServletResponse.SC_NO_CONTENT);
+        }
+		
+		public HttpResponse remove(String entityCollectionName, String entityId, String relationCollectionName, String relationId, Map<String,String> params, String errorMessage, int expectedStatus) throws PublicApiException
+		{
+	        try
+	        {
+		        HttpResponse response = delete("public", 1, entityCollectionName, entityId, relationCollectionName, relationId, params);
+                checkStatus(errorMessage, expectedStatus, response);
+                return response;
 			}
 			catch(IOException e)
 			{
 		        throw new PublicApiException(e);
 			}
 		}
-		
-		public HttpResponse remove(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage) throws PublicApiException
-		{
-	        try
-	        {
-		        HttpResponse response = delete("public", entityCollectionName, entityId, relationCollectionName, relationId);
 
-		        if (HttpServletResponse.SC_NO_CONTENT != response.getStatusCode())
-		        {
-		            String msg = errorMessage + ": \n" +
-		                    "   Response: " + response;
-		            throw new PublicApiException(msg, response);
-		        }
-		        else
-		        {
-		        	return response;
-		        }
-			}
-			catch(IOException e)
+		public JSONObject parseListSource(JSONObject jsonResponse)
+		{
+			JSONObject jsonList = (JSONObject)jsonResponse.get("list");
+			assertNotNull(jsonList);
+
+			JSONObject source = (JSONObject)jsonList.get("source");
+			assertNotNull(source);
+			return source;
+		}
+
+		public void checkStatus(String errorMessage, int expectedStatus, HttpResponse response) throws PublicApiException
+		{
+            int actualStatus = response.getStatusCode();
+			if ((expectedStatus > 0) && (expectedStatus != actualStatus))
 			{
-		        throw new PublicApiException(e);
+                String msg = "Status code " + actualStatus + " returned, but expected " + expectedStatus + ": \n"+
+                        errorMessage + ": \n" + "   Response: " + response;
+				throw new PublicApiException(msg, response);
 			}
 		}
 	}
@@ -733,12 +814,50 @@ public class PublicApiClient
 			HttpResponse response = getAll("sites", null, null, null, params, "Failed to get sites");
 			return SiteImpl.parseSites(response.getJsonResponse());
 		}
+
+        public Site getSite(String siteId) throws PublicApiException
+        {
+            return getSite(siteId, 200);
+        }
 		
-		public Site getSite(String siteId) throws PublicApiException
+		public Site getSite(String siteId, int expectedStatus) throws PublicApiException
 		{
-			HttpResponse response = getSingle("sites", siteId, null, null, "Failed to get site " + siteId);
-			return SiteImpl.parseSite((JSONObject)response.getJsonResponse().get("entry"));
+			HttpResponse response = getSingle("sites", siteId, null, null, "Failed to get site " + siteId, expectedStatus);
+            if ((response != null) && (response.getJsonResponse() != null))
+            {
+                return SiteImpl.parseSite((JSONObject)response.getJsonResponse().get("entry"));
+            }
+            else
+            {
+                return null;
+            }
 		}
+
+        public Site createSite(Site site) throws PublicApiException
+        {
+            return createSite(site, 201);
+        }
+
+		public Site createSite(Site site, int expectedStatus) throws PublicApiException
+		{
+			HttpResponse response = create("sites", null, null, null, site.toJSON().toString(), "Failed to create site "+site.getTitle(), expectedStatus);
+            return SiteImpl.parseSite((JSONObject)response.getJsonResponse().get("entry"));
+		}
+
+        public void removeSite(String siteId) throws PublicApiException
+        {
+            removeSite(siteId, false, 204);
+        }
+
+        public void removeSite(String siteId, boolean permanent, int expectedStatus) throws PublicApiException
+        {
+			Map<String, String> params = null;
+			if (permanent)
+			{
+				params = Collections.singletonMap("permanent", "true");
+			}
+            remove("sites", siteId, null, null, params, "Failed to remove site", expectedStatus);
+        }
 
 		public ListResponse<SiteContainer> getSiteContainers(String siteId, Map<String, String> params) throws PublicApiException
 		{
@@ -1943,4 +2062,125 @@ public class PublicApiClient
 					+ (maxItems != null ? "maxItems=" + maxItems : "") + "]";
 		}
 	}
+
+    /**
+     * Representation of an error response.
+     *
+     * @author Jamal Kaabi-Mofrad
+     */
+    public static class ExpectedErrorResponse
+    {
+        private String errorKey;
+        private int statusCode;
+        private String briefSummary;
+        private String stackTrace;
+        private Map<String, Object> additionalState;
+        private String descriptionURL;
+        private String logId;
+
+        public ExpectedErrorResponse()
+        {
+        }
+
+        public ExpectedErrorResponse(String errorKey, int statusCode, String briefSummary, StackTraceElement[] stackTrace,
+                    Map<String, Object> additionalState, String logId)
+        {
+            super();
+            this.errorKey = errorKey;
+            this.statusCode = statusCode;
+            this.briefSummary = briefSummary;
+            this.stackTrace = Arrays.toString(stackTrace);
+            this.additionalState = additionalState;
+            this.logId = logId;
+        }
+
+        public String getErrorKey()
+        {
+            return errorKey;
+        }
+
+        public ExpectedErrorResponse setErrorKey(String errorKey)
+        {
+            this.errorKey = errorKey;
+            return this;
+        }
+
+        public int getStatusCode()
+        {
+            return statusCode;
+        }
+
+        public ExpectedErrorResponse setStatusCode(int statusCode)
+        {
+            this.statusCode = statusCode;
+            return this;
+        }
+
+        public String getBriefSummary()
+        {
+            return briefSummary;
+        }
+
+        public ExpectedErrorResponse setBriefSummary(String briefSummary)
+        {
+            this.briefSummary = briefSummary;
+            return this;
+        }
+
+        public String getLogId() {
+            return logId;
+        }
+
+        public void setLogId(String logId) {
+			this.logId = logId;
+		}
+
+        public String getStackTrace()
+        {
+            return stackTrace;
+        }
+
+        public ExpectedErrorResponse setStackTrace(String stackTrace)
+        {
+            this.stackTrace = stackTrace;
+            return this;
+        }
+
+        public Map<String, Object> getAdditionalState()
+        {
+            return additionalState;
+        }
+
+        public ExpectedErrorResponse setAdditionalState(Map<String, Object> additionalState)
+        {
+            this.additionalState = additionalState;
+            return this;
+        }
+
+        public String getDescriptionURL()
+        {
+            return descriptionURL;
+        }
+
+        public ExpectedErrorResponse setDescriptionURL(String descriptionURL)
+        {
+            this.descriptionURL = descriptionURL;
+            return this;
+        }
+
+        @Override
+        public String toString()
+        {
+            final StringBuilder sb = new StringBuilder(250);
+            sb.append("ExpectedErrorResponse [errorKey='").append(errorKey)
+                        .append(", statusCode=").append(statusCode)
+                        .append(", briefSummary='").append(briefSummary)
+                        .append(", logId='").append(logId)
+                        .append(", stackTrace='").append(stackTrace)
+                        .append(", additionalState=").append(additionalState)
+                        .append(", descriptionURL='").append(descriptionURL)
+                        .append(']');
+            return sb.toString();
+        }
+    }
 }

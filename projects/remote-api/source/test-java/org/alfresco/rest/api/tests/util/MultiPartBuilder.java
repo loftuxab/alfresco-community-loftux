@@ -1,25 +1,31 @@
 /*
- *  Copyright (C) 2005-2015 Alfresco Software Limited.
- *
- *  This file is part of Alfresco
- *
- *   Alfresco is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Alfresco is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.rest.api.tests.util;
 
-import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -31,7 +37,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * <i><b>multipart/form-data</b></i> builder.
@@ -41,16 +51,17 @@ import java.util.List;
 public class MultiPartBuilder
 {
     private FileData fileData;
-    private String siteId;
-    private String containerId;
-    private String destination;
-    private String uploadDirectory;
+    private String relativePath;
     private String updateNodeRef;
     private String description;
     private String contentTypeQNameStr;
-    private List<String> aspects;
-    private boolean majorVersion;
-    private boolean overwrite = true; // If a fileName clashes for a versionable file
+    private List<String> aspects = Collections.emptyList();
+    private Boolean majorVersion;
+    private Boolean overwrite;
+    private Boolean autoRename;
+    private String nodeType;
+    private List<String> renditionIds = Collections.emptyList(); // initially single rendition name/id (in the future we may support multiple)
+    private Map<String, String> properties = Collections.emptyMap();
 
     private MultiPartBuilder()
     {
@@ -59,16 +70,17 @@ public class MultiPartBuilder
     private MultiPartBuilder(MultiPartBuilder that)
     {
         this.fileData = that.fileData;
-        this.siteId = that.siteId;
-        this.containerId = that.containerId;
-        this.destination = that.destination;
-        this.uploadDirectory = that.uploadDirectory;
+        this.relativePath = that.relativePath;
         this.updateNodeRef = that.updateNodeRef;
         this.description = that.description;
         this.contentTypeQNameStr = that.contentTypeQNameStr;
-        this.aspects = that.aspects;
+        this.aspects = new ArrayList<>(that.aspects);
         this.majorVersion = that.majorVersion;
         this.overwrite = that.overwrite;
+        this.autoRename = that.autoRename;
+        this.nodeType = that.nodeType;
+        this.renditionIds = that.renditionIds;
+        this.properties = new HashMap<>(that.properties);
     }
 
     public static MultiPartBuilder create()
@@ -87,27 +99,9 @@ public class MultiPartBuilder
         return this;
     }
 
-    public MultiPartBuilder setSiteId(String siteId)
+    public MultiPartBuilder setRelativePath(String relativePath)
     {
-        this.siteId = siteId;
-        return this;
-    }
-
-    public MultiPartBuilder setContainerId(String containerId)
-    {
-        this.containerId = containerId;
-        return this;
-    }
-
-    public MultiPartBuilder setDestination(String destination)
-    {
-        this.destination = destination;
-        return this;
-    }
-
-    public MultiPartBuilder setUploadDirectory(String uploadDirectory)
-    {
-        this.uploadDirectory = uploadDirectory;
+        this.relativePath = relativePath;
         return this;
     }
 
@@ -137,22 +131,46 @@ public class MultiPartBuilder
 
     public MultiPartBuilder setMajorVersion(boolean majorVersion)
     {
-        this.majorVersion = majorVersion;
+        this.majorVersion = Boolean.valueOf(majorVersion);
         return this;
     }
 
     public MultiPartBuilder setOverwrite(boolean overwrite)
     {
-        this.overwrite = overwrite;
+        this.overwrite = Boolean.valueOf(overwrite);
         return this;
     }
 
-    private String getAspects(List<String> aspects)
+    public MultiPartBuilder setAutoRename(boolean autoRename)
     {
-        if (aspects != null)
+        this.autoRename = Boolean.valueOf(autoRename);
+        return this;
+    }
+
+    public MultiPartBuilder setNodeType(String nodeType)
+    {
+        this.nodeType = nodeType;
+        return this;
+    }
+
+    public MultiPartBuilder setProperties(Map<String, String> properties)
+    {
+        this.properties = properties;
+        return this;
+    }
+
+    public MultiPartBuilder setRenditions(List<String> renditionIds)
+    {
+        this.renditionIds = renditionIds;
+        return this;
+    }
+
+    private String getCommaSeparated(List<String> names)
+    {
+        if (! names.isEmpty())
         {
-            StringBuilder sb = new StringBuilder(aspects.size() * 2);
-            for (String str : aspects)
+            StringBuilder sb = new StringBuilder(names.size() * 2);
+            for (String str : names)
             {
                 sb.append(str).append(',');
             }
@@ -170,12 +188,24 @@ public class MultiPartBuilder
         private final String fileName;
         private final File file;
         private final String mimetype;
+        private final String encoding;
+
+        public FileData(String fileName, File file)
+        {
+            this(fileName, file, null, null);
+        }
 
         public FileData(String fileName, File file, String mimetype)
+        {
+            this(fileName, file, mimetype, null);
+        }
+
+        public FileData(String fileName, File file, String mimetype, String encoding)
         {
             this.fileName = fileName;
             this.file = file;
             this.mimetype = mimetype;
+            this.encoding = encoding;
         }
 
         public String getFileName()
@@ -191,6 +221,11 @@ public class MultiPartBuilder
         public String getMimetype()
         {
             return mimetype;
+        }
+
+        public String getEncoding()
+        {
+            return encoding;
         }
     }
 
@@ -225,21 +260,35 @@ public class MultiPartBuilder
 
     public MultiPartRequest build() throws IOException
     {
-        assertNotNull(fileData);
         List<Part> parts = new ArrayList<>();
 
-        parts.add(new FilePart("filedata", fileData.getFileName(), fileData.getFile(), fileData.getMimetype(), null));
-        addPartIfNotNull(parts, "filename", fileData.getFileName());
-        addPartIfNotNull(parts, "siteid", siteId);
-        addPartIfNotNull(parts, "containerid", containerId);
-        addPartIfNotNull(parts, "destination", destination);
-        addPartIfNotNull(parts, "uploaddirectory", uploadDirectory);
+        if (fileData != null)
+        {
+            FilePart fp = new FilePart("filedata", fileData.getFileName(), fileData.getFile(), fileData.getMimetype(), null);
+            // Get rid of the default values added upon FilePart instantiation
+            fp.setCharSet(fileData.getEncoding());
+            fp.setContentType(fileData.getMimetype());
+            parts.add(fp);
+            addPartIfNotNull(parts, "name", fileData.getFileName());
+        }
+        addPartIfNotNull(parts, "relativepath", relativePath);
         addPartIfNotNull(parts, "updatenoderef", updateNodeRef);
         addPartIfNotNull(parts, "description", description);
         addPartIfNotNull(parts, "contenttype", contentTypeQNameStr);
-        addPartIfNotNull(parts, "aspects", getAspects(aspects));
-        addPartIfNotNull(parts, "majorversion", Boolean.toString(majorVersion));
-        addPartIfNotNull(parts, "overwrite", Boolean.toString(overwrite));
+        addPartIfNotNull(parts, "aspects", getCommaSeparated(aspects));
+        addPartIfNotNull(parts, "majorversion", majorVersion);
+        addPartIfNotNull(parts, "overwrite", overwrite);
+        addPartIfNotNull(parts, "autorename", autoRename);
+        addPartIfNotNull(parts, "nodetype", nodeType);
+        addPartIfNotNull(parts, "renditions", getCommaSeparated(renditionIds));
+
+        if (!properties.isEmpty())
+        {
+            for (Entry<String, String> prop : properties.entrySet())
+            {
+                parts.add(new StringPart(prop.getKey(), prop.getValue()));
+            }
+        }
 
         MultipartRequestEntity req = new MultipartRequestEntity(parts.toArray(new Part[parts.size()]), new HttpMethodParams());
 
@@ -249,11 +298,11 @@ public class MultiPartBuilder
         return new MultiPartRequest(os.toByteArray(), req.getContentType(), req.getContentLength());
     }
 
-    private void addPartIfNotNull(List<Part> list, String partName, String partValue)
+    private void addPartIfNotNull(List<Part> list, String partName, Object partValue)
     {
         if (partValue != null)
         {
-            list.add(new StringPart(partName, partValue));
+            list.add(new StringPart(partName, partValue.toString()));
         }
     }
 }

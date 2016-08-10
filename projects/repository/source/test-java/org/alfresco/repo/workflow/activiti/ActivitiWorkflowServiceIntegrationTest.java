@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 
 package org.alfresco.repo.workflow.activiti;
@@ -28,11 +35,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.workflow.AbstractWorkflowServiceIntegrationTest;
+import org.alfresco.repo.workflow.WorkflowBuilder;
 import org.alfresco.repo.workflow.WorkflowModel;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
@@ -631,6 +640,26 @@ public class ActivitiWorkflowServiceIntegrationTest extends AbstractWorkflowServ
         assertNotNull(completed);
     }
 
+    public void testBuildWorkflowWithNoUserTasks() throws Exception 
+    {
+        // Deploy a definition containing only a service task
+        WorkflowDefinition testDefinition = deployDefinition("activiti/testWorkflowNoUserTasks.bpmn20.xml");
+        WorkflowBuilder builder = new WorkflowBuilder(testDefinition, workflowService, nodeService, null);
+        // Build a workflow
+        WorkflowInstance builtInstance = builder.build();
+        assertNotNull(builtInstance);
+        
+        // Check that there is no active workflow for the deployed definition(it should have finished already due to absence of user tasks)
+        List<WorkflowInstance> activeInstances = workflowService.getActiveWorkflows(testDefinition.getId());
+        assertNotNull(activeInstances);
+        assertEquals(0, activeInstances.size());
+        
+        // Check that there's a historic record of our 'only service task' workflow being run.
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .finishedAfter(builtInstance.getStartDate())
+                .singleResult();
+        assertNotNull(historicProcessInstance);
+    }
 
     @Override
     protected String getEngine()

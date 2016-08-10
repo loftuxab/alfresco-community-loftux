@@ -1,3 +1,28 @@
+/*
+ * #%L
+ * Alfresco Remote API
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
+ * Alfresco is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Alfresco is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
 
 package org.alfresco.rest.framework.tests.core;
 
@@ -19,13 +44,16 @@ import org.alfresco.rest.framework.core.ResourceInspector;
 import org.alfresco.rest.framework.core.ResourceLocator;
 import org.alfresco.rest.framework.core.ResourceLookupDictionary;
 import org.alfresco.rest.framework.core.ResourceMetadata;
+import org.alfresco.rest.framework.core.ResourceOperation;
 import org.alfresco.rest.framework.core.ResourceWithMetadata;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
+import org.alfresco.rest.framework.core.exceptions.NotFoundException;
 import org.alfresco.rest.framework.core.exceptions.UnsupportedResourceOperationException;
 import org.alfresco.rest.framework.resource.EntityResource;
 import org.alfresco.rest.framework.resource.RelationshipResource;
 import org.alfresco.rest.framework.tests.api.mocks.Farmer;
 import org.alfresco.rest.framework.tests.api.mocks.GoatEntityResource;
+import org.alfresco.rest.framework.tests.api.mocks.GrassEntityResource;
 import org.alfresco.rest.framework.tests.api.mocks.SheepBaaaahResource;
 import org.alfresco.rest.framework.tests.api.mocks.SheepBlackSheepResource;
 import org.alfresco.rest.framework.tests.api.mocks.SheepEntityResource;
@@ -103,27 +131,59 @@ public class ResourceLocatorTests
         templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "sheep");
         ResourceWithMetadata collResource = locator.locateResource(api, templateVars, HttpMethod.GET);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.GET));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
 
         collResource = locator.locateResource(api, templateVars, HttpMethod.POST);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.POST));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.POST));
         
         templateVars.put(ResourceLocator.ENTITY_ID, "farmersUniqueId");
         ResourceWithMetadata entityResource = locator.locateResource(api,templateVars, HttpMethod.GET);
         assertNotNull(entityResource);
-        assertTrue(entityResource.getMetaData().supports(HttpMethod.GET));
+        assertNotNull(entityResource.getMetaData().getOperation(HttpMethod.GET));
         
         entityResource = locator.locateResource(api, templateVars, HttpMethod.PUT);
         assertNotNull(entityResource);
-        assertTrue(entityResource.getMetaData().supports(HttpMethod.PUT));    
+        assertNotNull(entityResource.getMetaData().getOperation(HttpMethod.PUT));
         
         templateVars.clear();
         templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "sheepnoaction");
         collResource = locator.locateResource(api,templateVars, HttpMethod.GET);
         
     }
-    
+
+    @Test
+    public void testLocateActions()
+    {
+        Map<String, String> templateVars = new HashMap<String, String>();
+        ResourceWithMetadata collResource = null;
+        templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "grass");
+        templateVars.put(ResourceLocator.ENTITY_ID, "grassId");
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "cut");
+        try
+        {
+            collResource = locator.locateResource(api, templateVars, HttpMethod.GET);
+            fail("Should throw an UnsupportedResourceOperationException");
+        }
+        catch (UnsupportedResourceOperationException error)
+        {
+            //this is correct
+        }
+
+        collResource = locator.locateResource(api, templateVars, HttpMethod.POST);
+        assertEquals(GrassEntityResource.class, collResource.getResource().getClass());
+        assertEquals(ResourceMetadata.RESOURCE_TYPE.OPERATION, collResource.getMetaData().getType());
+
+        templateVars = new HashMap<String, String>();
+        templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "sheep");
+        templateVars.put(ResourceLocator.ENTITY_ID, "sheepId");
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "baaahh");
+        templateVars.put(ResourceLocator.PROPERTY, "chew");
+        collResource = locator.locateResource(api, templateVars, HttpMethod.POST);
+        assertEquals(SheepBaaaahResource.class, collResource.getResource().getClass());
+        assertEquals(ResourceMetadata.RESOURCE_TYPE.OPERATION, collResource.getMetaData().getType());
+    }
+
     @Test
     public void testLocateProperties()
     {
@@ -134,7 +194,7 @@ public class ResourceLocatorTests
         templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "photo");
         ResourceWithMetadata collResource = locator.locateResource(api3, templateVars, HttpMethod.GET);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.GET));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
         assertEquals(FlockEntityResource.class, collResource.getResource().getClass());
         
         templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "flocket");
@@ -159,7 +219,7 @@ public class ResourceLocatorTests
         }
         collResource = locator.locateResource(api3, templateVars, HttpMethod.GET);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.GET));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
         assertEquals(FlocketEntityResource.class, collResource.getResource().getClass());
         
         templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "album");
@@ -174,12 +234,62 @@ public class ResourceLocatorTests
         }
         collResource = locator.locateResource(api3, templateVars, HttpMethod.GET);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.GET));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
         assertEquals(FlocketEntityResource.class, collResource.getResource().getClass());
         collResource = locator.locateResource(api3, templateVars, HttpMethod.PUT);
         assertNotNull(collResource);
-        assertTrue(collResource.getMetaData().supports(HttpMethod.PUT));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.PUT));
         assertEquals(FlocketEntityResource.class, collResource.getResource().getClass());
+    }
+
+    @Test
+    public void testLocateRelationshipProperties()
+    {
+        Api api3 = Api.valueOf("alfrescomock", "private", "3");
+        Map<String, String> templateVars = new HashMap<String, String>();
+        templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "goat");
+        templateVars.put(ResourceLocator.ENTITY_ID, "herdId");
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "herd");
+
+        ResourceWithMetadata collResource;
+        try
+        {
+            collResource = locator.locateResource(api3, templateVars, HttpMethod.PUT);
+            fail("Should throw an UnsupportedResourceOperationException");
+        }
+        catch (UnsupportedResourceOperationException error)
+        {
+            //this is correct
+        }
+
+        templateVars.put(ResourceLocator.PROPERTY, "content");
+        collResource = locator.locateResource(api3, templateVars, HttpMethod.GET);
+        assertNotNull(collResource);
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
+
+        templateVars = new HashMap<String, String>();
+        templateVars.put(ResourceLocator.COLLECTION_RESOURCE, "sheep");
+        templateVars.put(ResourceLocator.ENTITY_ID, "sheepId");
+        templateVars.put(ResourceLocator.RELATIONSHIP_RESOURCE, "baaahh");
+        templateVars.put(ResourceLocator.PROPERTY, "content");
+
+        try
+        {
+            //Tests by passing invalid propery
+            collResource = locator.locateResource(api, templateVars, HttpMethod.GET);
+            fail("Should throw an NotFoundException");
+        }
+        catch (NotFoundException error)
+        {
+            //this is correct
+        }
+
+        templateVars.put(ResourceLocator.PROPERTY, "photo");
+        collResource = locator.locateResource(api, templateVars, HttpMethod.GET);
+        assertNotNull(collResource);
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.GET));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.PUT));
+        assertNotNull(collResource.getMetaData().getOperation(HttpMethod.DELETE));
     }
     
     @Test
@@ -244,9 +354,9 @@ public class ResourceLocatorTests
         try
         {
             entityResource = locator.locateEntityResource(Api.valueOf("alfrescomock", "public", "1"),"sheep", HttpMethod.GET);
-            fail("Should throw an InvalidArgumentException");
+            fail("Should throw an NotFoundException");
         }
-        catch (InvalidArgumentException error)
+        catch (NotFoundException error)
         {
             //this is correct
         }
@@ -254,9 +364,9 @@ public class ResourceLocatorTests
         try
         {
             entityResource = locator.locateEntityResource(Api.valueOf("alfrescomock", "public", "999"),"sheep", HttpMethod.GET);
-            fail("Should throw an InvalidArgumentException");
+            fail("Should throw an NotFoundException");
         }
-        catch (InvalidArgumentException error)
+        catch (NotFoundException error)
         {
             //this is correct
         }
@@ -274,9 +384,9 @@ public class ResourceLocatorTests
         try
         {
             aResource = locator.locateEntityResource(api, "sheepnoaction", HttpMethod.GET);
-            fail("Should throw an InvalidArgumentException");
+            fail("Should throw an NotFoundException");
         }
-        catch (InvalidArgumentException error)
+        catch (NotFoundException error)
         {
             //this is correct
         }
@@ -296,7 +406,7 @@ public class ResourceLocatorTests
             aResource = locator.locateRelationResource(api, "sheepnoaction","v3isaresource", HttpMethod.GET);
             fail("Only available in v3");
         }
-        catch (InvalidArgumentException error)
+        catch (NotFoundException error)
         {
             //this is correct
         }
@@ -307,7 +417,7 @@ public class ResourceLocatorTests
             aResource = locator.locateRelationResource(v2, "sheepnoaction","v3isaresource", HttpMethod.GET);
             fail("Only available in v3");
         }
-        catch (InvalidArgumentException error)
+        catch (NotFoundException error)
         {
             //this is correct
         }
@@ -365,7 +475,7 @@ public class ResourceLocatorTests
         assertEquals ("sheepnoaction", name);
     }
     
-    @Test(expected=org.alfresco.rest.framework.core.exceptions.InvalidArgumentException.class)
+    @Test(expected=org.alfresco.rest.framework.core.exceptions.NotFoundException.class)
     public void testLocateRelationResource()
     {
         Collection<String> relKeys = Arrays.asList("blacksheep","baaahh");

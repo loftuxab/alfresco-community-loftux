@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2014 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.domain.schema.script;
 
@@ -35,6 +42,7 @@ import javax.sql.DataSource;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.content.filestore.FileContentWriter;
+import org.alfresco.repo.domain.hibernate.dialect.AlfrescoMySQLClusterNDBDialect;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.util.LogUtil;
 import org.alfresco.util.TempFileProvider;
@@ -70,6 +78,7 @@ public class ScriptExecutorImpl implements ScriptExecutor
     private static final String ERR_DELIMITER_SET_BEFORE_SQL = "schema.update.err.delimiter_set_before_sql";
     private static final String ERR_DELIMITER_INVALID = "schema.update.err.delimiter_invalid";
     private static final int DEFAULT_MAX_STRING_LENGTH = 1024;
+    private static final int DEFAULT_MAX_STRING_LENGTH_NDB = 400;
     private static volatile int maxStringLength = DEFAULT_MAX_STRING_LENGTH;
     private Dialect dialect;
     private ResourcePatternResolver rpr = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
@@ -535,6 +544,23 @@ public class ScriptExecutorImpl implements ScriptExecutor
                         {
                             // note: enable bootstrap on MySQL 5.5 (eg. for auto-generated SQL, such as JBPM)
                             sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=InnoDB");
+                        }
+                        
+                        if (this.dialect != null && this.dialect instanceof AlfrescoMySQLClusterNDBDialect)
+                        {
+                            // note: enable bootstrap on MySQL Cluster NDB
+                            /*
+                        	 * WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect !
+                    		 */
+                        	sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=NDB"); // belts-and-braces
+                            sql = sql.replaceAll("(?i)ENGINE=InnoDB", "ENGINE=NDB");
+                            
+                            sql = sql.replaceAll("(?i) BIT ", " BOOLEAN ");
+                            sql = sql.replaceAll("(?i) BIT,", " BOOLEAN,");
+                            
+                            sql = sql.replaceAll("(?i) string_value text", " string_value VARCHAR("+DEFAULT_MAX_STRING_LENGTH_NDB+")");
+                            
+                            sql = sql.replaceAll("(?i) VARCHAR(4000)", "TEXT(4000)");
                         }
                         
                         Object fetchedVal = executeStatement(connection, sql, fetchColumnName, optional, line, scriptFile);

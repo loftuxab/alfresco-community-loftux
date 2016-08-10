@@ -1,20 +1,27 @@
 /*
- * Copyright (C) 2005-2010 Alfresco Software Limited.
- *
- * This file is part of Alfresco
- *
+ * #%L
+ * Alfresco Repository
+ * %%
+ * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * %%
+ * This file is part of the Alfresco software. 
+ * If the software was purchased under a paid Alfresco license, the terms of 
+ * the paid license agreement will prevail.  Otherwise, the software is 
+ * provided under the following open source license terms:
+ * 
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
+ * #L%
  */
 package org.alfresco.repo.security.permissions.impl;
 
@@ -34,6 +41,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.permissions.AclDAO;
 import org.alfresco.repo.node.db.traitextender.NodeServiceTrait;
+import org.alfresco.repo.domain.permissions.FixedAclUpdater;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -148,6 +156,8 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     protected AclDAO aclDaoComponent;
     
     protected PermissionReference allPermissionReference;
+    
+    protected FixedAclUpdater fixedAclUpdater;
 
     protected boolean anyDenyDenies = false;
 
@@ -271,7 +281,12 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     {
         this.aclDaoComponent = aclDaoComponent;
     }
-
+    
+    public void setFixedAclUpdater(FixedAclUpdater fixedAclUpdater)
+    {
+        this.fixedAclUpdater = fixedAclUpdater;
+    }
+    
     /**
      * Set the permissions access cache.
      * 
@@ -1032,6 +1047,33 @@ public class PermissionServiceImpl extends AbstractLifecycleBean implements Perm
     {
         NodeRef actualRef = tenantService.getName(nodeRef);
         permissionsDaoComponent.setInheritParentPermissions(actualRef, inheritParentPermissions);
+        accessCache.clear();
+    }
+    
+    @Override
+    @Extend(traitAPI = PermissionServiceTrait.class, extensionAPI = PermissionServiceExtension.class)
+    public void setInheritParentPermissions(NodeRef nodeRef, final boolean inheritParentPermissions, boolean asyncCall)
+    {
+        final NodeRef actualRef = tenantService.getName(nodeRef);
+        if (asyncCall)
+        {
+            //use transaction resource to determine later on in ADMAccessControlListDAO.setFixedAcl if asynchronous call may be required
+            AlfrescoTransactionSupport.bindResource(FixedAclUpdater.FIXED_ACL_ASYNC_CALL_KEY, true);
+            permissionsDaoComponent.setInheritParentPermissions(actualRef, inheritParentPermissions);
+            //check if asynchronous call was required
+            Boolean asyncCallRequired = (Boolean) AlfrescoTransactionSupport.getResource(FixedAclUpdater.FIXED_ACL_ASYNC_REQUIRED_KEY);
+            if (asyncCallRequired != null && asyncCallRequired)
+            {
+                //after transaction is committed FixedAclUpdater will be started in a new thread to process pending nodes 
+                AlfrescoTransactionSupport.bindListener(fixedAclUpdater);
+            }
+        }
+        else
+        {
+            //regular method call
+            permissionsDaoComponent.setInheritParentPermissions(actualRef, inheritParentPermissions);
+        }
+        
         accessCache.clear();
     }
 
