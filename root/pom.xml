@@ -1437,7 +1437,7 @@
         </dependencies>
     </profile>
     
-  <!--  <profile>
+    <profile>
         <id>doclint-java8-max</id>
         <activation>
             <jdk>[1.8,)</jdk>
@@ -1447,12 +1447,13 @@
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
-                        <additionalparam>-Xmaxwarns 10000 -Xmaxerrs 10000</additionalparam>
+                        <!-- <additionalparam>-Xmaxwarns 10000 -Xmaxerrs 10000</additionalparam> to detect more than 100 error -->
+                        <additionalparam>-Xdoclint:none</additionalparam>
                     </configuration>
                 </plugin>
             </plugins>
         </build>
-    </profile> -->
+    </profile>
     
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
