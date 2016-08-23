@@ -10,7 +10,7 @@
   </parent>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
-  <version>5.2-SNAPSHOT</version>
+  <version>5.2.b-EA</version>
   <name>Alfresco</name>
 
   <licenses>
