@@ -41,14 +41,19 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        
     NodeApiTest.class,
     NodeAssociationsApiTest.class,
-    QueriesApiTest.class,
+    NodeVersionsApiTest.class,
+    QueriesNodesApiTest.class,
+    QueriesPeopleApiTest.class,
+    QueriesSitesApiTest.class,
     RenditionsTest.class,
     SharedLinkApiTest.class,
     ActivitiesPostingTest.class,
     DeletedNodesTest.class,
     AuthenticationsTest.class,
+    ModulePackagesApiTest.class,
     TestSites.class,
     TestNodeComments.class,
     TestCMIS.class,
@@ -66,8 +71,7 @@ import org.junit.runners.Suite;
     TestFavourites.class,
     TestRemovePermissions.class,
     TestPublicApi128.class,
-    TestPublicApiCaching.class,
-    ModulePackagesApiTest.class
+    TestPublicApiCaching.class
 })
 public class ApiTest
 {

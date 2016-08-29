@@ -857,6 +857,14 @@ public class OpenCmisQueryTest extends BaseCMISTest
 
     }
 
+    public void test_IS_PRIVATE_WORKING_COPY() throws Exception
+    {
+        // not allowed
+        testQuery("SELECT cmis:isPrivateWorkingCopy FROM cmis:document WHERE cmis:isPrivateWorkingCopy =  TRUE", 0, false, "cmis:objectId", new String(), true);
+        // not allowed in predicate
+        testQuery("SELECT cmis:objectId FROM cmis:document WHERE cmis:isPrivateWorkingCopy =  TRUE", 0, false, "cmis:objectId", new String(), true);
+    }
+
     public void test_CONTENT_STREAM_FILENAME() throws Exception
     {
         CMISQueryOptions options = new CMISQueryOptions("SELECT * FROM cmis:document", rootNodeRef.getStoreRef());
@@ -5737,6 +5745,21 @@ public class OpenCmisQueryTest extends BaseCMISTest
         testQuery("SELECT * FROM cmis:relationship ", 0, false, "cmis:name", new String(), true);
         testQuery("SELECT * FROM cm:ownable ", 0, false, "cmis:name", new String(), true);
         testExtendedQuery("SELECT * FROM cm:ownable ", 1, false, "cmis:name", new String(), false);
+    }
+    
+    public void testTitled() throws Exception
+    {
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is null ", 0, false, "cmis:name", new String(), false);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is not null ", 11, false, "cmis:name", new String(), false);
+    	 nodeService.setProperty(c10, ContentModel.PROP_TITLE, null);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is null ", 1, false, "cmis:name", new String(), false);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is not null ", 10, false, "cmis:name", new String(), false);
+    	 nodeService.setProperty(c10, ContentModel.PROP_TITLE, "meep");
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is null ", 0, false, "cmis:name", new String(), false);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is not null ", 11, false, "cmis:name", new String(), false);
+    	 nodeService.removeProperty(c10, ContentModel.PROP_TITLE);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is null ", 1, false, "cmis:name", new String(), false);
+    	 testExtendedQuery("SELECT * FROM cm:titled where cm:title is not null ", 10, false, "cmis:name", new String(), false);
     }
     
     public void testNotKeyword() throws Exception

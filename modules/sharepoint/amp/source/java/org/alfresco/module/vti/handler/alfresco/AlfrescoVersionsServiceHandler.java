@@ -364,7 +364,7 @@ public class AlfrescoVersionsServiceHandler implements VersionsServiceHandler
      * Returns DocumentVersionBean list for file info
      * 
      * @param documentFileInfo file info ({@link FileInfo})
-     * @return List<DocumentVersionBean> list of DocumentVersionBean
+     * @return list of DocumentVersionBean
      */
     protected List<DocumentVersionBean> getVersions(FileInfo documentFileInfo)
     {

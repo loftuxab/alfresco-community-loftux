@@ -57,7 +57,6 @@ import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.QuickShareLinks;
 import org.alfresco.rest.api.model.AssocChild;
 import org.alfresco.rest.api.model.AssocTarget;
-import org.alfresco.rest.api.model.ContentInfo;
 import org.alfresco.rest.api.model.Document;
 import org.alfresco.rest.api.model.Folder;
 import org.alfresco.rest.api.model.Node;
@@ -107,7 +106,6 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
-import org.alfresco.service.cmr.repository.CyclicChildRelationshipException;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.MimetypeService;
@@ -137,8 +135,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.extensions.surf.util.Content;
 import org.springframework.extensions.webscripts.servlet.FormData;
-import org.springframework.http.InvalidMediaTypeException;
-import org.springframework.http.MediaType;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -362,6 +358,12 @@ public class NodesImpl implements Nodes
     @Override
     public NodeRef validateNode(String nodeId)
     {
+        //belts-and-braces
+        if (nodeId == null)
+        {
+            throw new InvalidArgumentException("Missing nodeId");
+        }
+
         return validateNode(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, nodeId);
     }
 
@@ -901,9 +903,9 @@ public class NodesImpl implements Nodes
                 String perm = kv.getKey();
                 String op = kv.getValue();
 
-                if (perm.equals(PermissionService.ADD_CHILDREN) && type.equals(Type.DOCUMENT))
+                if (perm.equals(PermissionService.ADD_CHILDREN) && Type.DOCUMENT.equals(type))
                 {
-                    // special case: do not return "create" (as an allowable op) for file/content types
+                    // special case: do not return "create" (as an allowable op) for file/content types - note: 'type' can be null
                     continue;
                 }
                 else if (perm.equals(PermissionService.DELETE) && (isSpecialNodeDoNotDelete(nodeRef, nodeTypeQName)))
@@ -1587,6 +1589,10 @@ public class NodesImpl implements Nodes
             props = mapToNodeProperties(nodeInfo.getProperties());
         }
 
+        // Optionally, lookup by relative path
+        String relativePath = nodeInfo.getRelativePath();
+        parentNodeRef = getOrCreatePath(parentNodeRef, relativePath);
+
         // Existing file/folder name handling
         boolean autoRename = Boolean.valueOf(parameters.getParameter(PARAM_AUTO_RENAME));
         if (autoRename && (isContent || isSubClass(nodeTypeQName, ContentModel.TYPE_FOLDER)))
@@ -1599,17 +1605,33 @@ public class NodesImpl implements Nodes
             }
         }
 
-        String relativePath = nodeInfo.getRelativePath();
-        parentNodeRef = getOrCreatePath(parentNodeRef, relativePath);
-
         QName assocTypeQName = ContentModel.ASSOC_CONTAINS;
         if ((nodeInfo.getAssociation() != null) && (nodeInfo.getAssociation().getAssocType() != null))
         {
             assocTypeQName = getAssocType(nodeInfo.getAssociation().getAssocType());
         }
+        
+        Boolean versionMajor = null;
+        String str = parameters.getParameter(PARAM_VERSION_MAJOR);
+        if (str != null)
+        {
+            versionMajor = new Boolean(str);
+        }
+        String versionComment = parameters.getParameter(PARAM_VERSION_COMMENT);
 
         // Create the node
-        NodeRef nodeRef = createNodeImpl(parentNodeRef, nodeName, nodeTypeQName, props, assocTypeQName);
+        NodeRef nodeRef;
+
+        if (isContent)
+        {
+            // create empty file node - note: currently will be set to default encoding only (UTF-8)
+            nodeRef = createNewFile(parentNodeRef, nodeName, nodeTypeQName, null, props, assocTypeQName, parameters, versionMajor, versionComment);
+        }
+        else
+        {
+            // create non-content node
+            nodeRef = createNodeImpl(parentNodeRef, nodeName, nodeTypeQName, props, assocTypeQName);
+        }
 
         List<String> aspectNames = nodeInfo.getAspectNames();
         if (aspectNames != null)
@@ -1626,13 +1648,7 @@ public class NodesImpl implements Nodes
                 nodeService.addAspect(nodeRef, aspectQName, null);
             }
         }
-
-        if (isContent)
-        {
-            // add empty file - note: currently will be set to default encoding only (UTF-8)
-            writeContent(nodeRef, nodeName, new ByteArrayInputStream("".getBytes()), false);
-        }
-
+        
         // eg. to create mandatory assoc(s)
 
         if (nodeInfo.getTargets() != null)
@@ -1679,11 +1695,17 @@ public class NodesImpl implements Nodes
 
         for (AssocChild assoc : entities)
         {
+            String childId = assoc.getChildId();
+            if (childId == null)
+            {
+                throw new InvalidArgumentException("Missing childId");
+            }
+
             QName assocTypeQName = getAssocType(assoc.getAssocType());
 
             try
             {
-                NodeRef childNodeRef = validateNode(assoc.getChildId());
+                NodeRef childNodeRef = validateNode(childId);
 
                 String nodeName = (String)nodeService.getProperty(childNodeRef, ContentModel.PROP_NAME);
                 QName assocChildQName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(nodeName));
@@ -1713,11 +1735,14 @@ public class NodesImpl implements Nodes
 
         for (AssocTarget assoc : entities)
         {
+            String targetNodeId = assoc.getTargetId();
+            if (targetNodeId == null)
+            {
+                throw new InvalidArgumentException("Missing targetId");
+            }
+
             String assocTypeStr = assoc.getAssocType();
             QName assocTypeQName = getAssocType(assocTypeStr);
-
-            String targetNodeId = assoc.getTargetId();
-
             try
             {
                 NodeRef tgtNodeRef = validateNode(targetNodeId);
@@ -1946,6 +1971,31 @@ public class NodesImpl implements Nodes
     @Override
     public Node updateNode(String nodeId, Node nodeInfo, Parameters parameters)
     {
+        retryingTransactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        {
+            @Override
+            public Void execute() throws Throwable
+            {
+                NodeRef nodeRef = updateNodeImpl(nodeId, nodeInfo, parameters);
+                ActivityInfo activityInfo =  getActivityInfo(getParentNodeRef(nodeRef), nodeRef);
+                postActivity(Activity_Type.UPDATED, activityInfo, false);
+                
+                return null;
+            }
+        }, false, true);
+
+        return retryingTransactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Node>()
+        {
+            @Override
+            public Node execute() throws Throwable
+            {
+                return getFolderOrDocument(nodeId, parameters);
+            }
+        }, false, false);
+    }
+    
+    protected NodeRef updateNodeImpl(String nodeId, Node nodeInfo, Parameters parameters)
+    {
         final NodeRef nodeRef = validateNode(nodeId);
 
         QName nodeTypeQName = getNodeType(nodeRef);
@@ -2086,11 +2136,8 @@ public class NodesImpl implements Nodes
                 throw new ConstraintViolatedException(dcne.getMessage());
             }
         }
-
-        ActivityInfo activityInfo =  getActivityInfo(getParentNodeRef(nodeRef), nodeRef);
-        postActivity(Activity_Type.UPDATED, activityInfo, false);
-
-        return getFolderOrDocument(nodeRef.getId(), parameters);
+        
+        return nodeRef;
     }
 
     @Override
@@ -2161,10 +2208,6 @@ public class NodesImpl implements Nodes
         catch (FileFolderServiceImpl.InvalidTypeException ite)
         {
             throw new InvalidArgumentException("Invalid type of target parent: "+targetParentId);
-        }
-        catch (CyclicChildRelationshipException ccre)
-        {
-            throw new InvalidArgumentException("Parent/child cycle detected: "+targetParentId);
         }
     }
 
@@ -2247,7 +2290,17 @@ public class NodesImpl implements Nodes
         }
         String versionComment = parameters.getParameter(PARAM_VERSION_COMMENT);
 
-        final String fileName = (String) nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+        String fileName = parameters.getParameter(PARAM_NAME);
+        if (fileName != null)
+        {
+            // optionally rename, before updating the content
+            nodeService.setProperty(nodeRef, ContentModel.PROP_NAME, fileName);
+        }
+        else
+        {
+            fileName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+        }
+        
         return updateExistingFile(null, nodeRef, fileName, contentInfo, stream, parameters, versionMajor, versionComment);
     }
 
@@ -2262,11 +2315,24 @@ public class NodesImpl implements Nodes
 
             if ((isVersioned) || (versionMajor != null) || (versionComment != null) )
             {
-                VersionType versionType = VersionType.MINOR;
-                if ((versionMajor != null) && (versionMajor == true))
+                VersionType versionType = null;
+                if (versionMajor != null)
                 {
-                    versionType = VersionType.MAJOR;
+                    versionType = (versionMajor ? VersionType.MAJOR : VersionType.MINOR);
                 }
+                else
+                {
+                    // note: it is possible to have versionable aspect but no versions (=> no version label)
+                    if ((! isVersioned) || (nodeService.getProperty(nodeRef, ContentModel.PROP_VERSION_LABEL) == null))
+                    {
+                        versionType = VersionType.MAJOR;
+                    }
+                    else
+                    {
+                        versionType = VersionType.MINOR;
+                    }
+                }
+
                 createVersion(nodeRef, isVersioned, versionType, versionComment);
             }
 
@@ -2288,7 +2354,16 @@ public class NodesImpl implements Nodes
         ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
 
         String mimeType = mimetypeService.guessMimetype(fileName);
-        writer.setMimetype(mimeType);
+        if ((mimeType != null) && (! mimeType.equals(MimetypeMap.MIMETYPE_BINARY)))
+        {
+            // quick/weak guess based on file extension
+            writer.setMimetype(mimeType);
+        }
+        else
+        {
+            // stronger guess based on file stream
+            writer.guessMimetype(fileName);
+        }
 
         InputStream is = null;
 
@@ -2352,20 +2427,22 @@ public class NodesImpl implements Nodes
     {
         if (! isVersioned)
         {
-            // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
-            ensureVersioningEnabled(nodeRef, true, false);
-        }
-        else
-        {
-            Map<String, Serializable> versionProperties = new HashMap<>(2);
-            versionProperties.put(VersionModel.PROP_VERSION_TYPE, versionType);
-            if (reason != null)
-            {
-                versionProperties.put(VersionModel.PROP_DESCRIPTION, reason);
-            }
+            // Ensure versioning is enabled for the file (autoVersion = true, autoVersionProps = false)
+            Map<QName, Serializable> props = new HashMap<>(2);
+            props.put(ContentModel.PROP_AUTO_VERSION, true);
+            props.put(ContentModel.PROP_AUTO_VERSION_PROPS, false);
 
-            versionService.createVersion(nodeRef, versionProperties);
+            nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, props);
         }
+
+        Map<String, Serializable> versionProperties = new HashMap<>(2);
+        versionProperties.put(VersionModel.PROP_VERSION_TYPE, versionType);
+        if (reason != null)
+        {
+            versionProperties.put(VersionModel.PROP_DESCRIPTION, reason);
+        }
+
+        versionService.createVersion(nodeRef, versionProperties);
     }
 
     @Override
@@ -2385,9 +2462,9 @@ public class NodesImpl implements Nodes
         String fileName = null;
         Content content = null;
         boolean autoRename = false;
-        QName nodeTypeQName = null;
+        QName nodeTypeQName = ContentModel.TYPE_CONTENT;
         boolean overwrite = false; // If a fileName clashes for a versionable file
-        Boolean majorVersion = null;
+        Boolean versionMajor = null;
         String versionComment = null;
         String relativePath = null;
         String renditionNames = null;
@@ -2432,7 +2509,7 @@ public class NodesImpl implements Nodes
                     break;
 
                 case "majorversion":
-                    majorVersion = Boolean.valueOf(field.getValue());
+                    versionMajor = Boolean.valueOf(field.getValue());
                     break;
 
                 case "comment":
@@ -2507,7 +2584,7 @@ public class NodesImpl implements Nodes
                 {
                     // overwrite existing (versionable) file
                     BasicContentInfo contentInfo = new ContentInfoImpl(content.getMimetype(), content.getEncoding(), -1, null);
-                    return updateExistingFile(parentNodeRef, existingFile, fileName, contentInfo, content.getInputStream(), parameters, majorVersion, versionComment);
+                    return updateExistingFile(parentNodeRef, existingFile, fileName, contentInfo, content.getInputStream(), parameters, versionMajor, versionComment);
                 }
                 else
                 {
@@ -2515,9 +2592,18 @@ public class NodesImpl implements Nodes
                     throw new ConstraintViolatedException(fileName + " already exists.");
                 }
             }
+            
+            // Note: pending REPO-159, we currently auto-enable versioning on new upload (but not when creating empty file)
+            if (versionMajor == null)
+            {
+                versionMajor = true;
+            }
 
             // Create a new file.
-            final Node fileNode = createNewFile(parentNodeRef, fileName, nodeTypeQName, content, properties, assocTypeQName, parameters);
+            NodeRef nodeRef = createNewFile(parentNodeRef, fileName, nodeTypeQName, content, properties, assocTypeQName, parameters, versionMajor, versionComment);
+            
+            // Create the response
+            final Node fileNode = getFolderOrDocumentFullInfo(nodeRef, parentNodeRef, nodeTypeQName, parameters);
 
             // RA-1052
             try
@@ -2569,26 +2655,44 @@ public class NodesImpl implements Nodes
         }
     }
 
-    private Node createNewFile(NodeRef parentNodeRef, String fileName, QName nodeType, Content content, Map<QName, Serializable> props, QName assocTypeQName, Parameters params)
+    private NodeRef createNewFile(NodeRef parentNodeRef, String fileName, QName nodeType, Content content, Map<QName, Serializable> props, QName assocTypeQName, Parameters params,
+                                  Boolean versionMajor, String versionComment)
     {
-        if (nodeType == null)
+        NodeRef nodeRef = createNodeImpl(parentNodeRef, fileName, nodeType, props, assocTypeQName);
+        
+        if (content == null)
         {
-            nodeType = ContentModel.TYPE_CONTENT;
+            // Write "empty" content
+            writeContent(nodeRef, fileName, new ByteArrayInputStream("".getBytes()), false);
+        }
+        else
+        {
+            // Write content
+            writeContent(nodeRef, fileName, content.getInputStream(), true);
+        }
+        
+        if ((versionMajor != null) || (versionComment != null))
+        {
+            behaviourFilter.disableBehaviour(nodeRef, ContentModel.ASPECT_VERSIONABLE);
+            try
+            {
+                // by default, first version is major, unless specified otherwise
+                VersionType versionType = VersionType.MAJOR;
+                if ((versionMajor != null) && (!versionMajor))
+                {
+                    versionType = VersionType.MINOR;
+                }
+
+                createVersion(nodeRef, false, versionType, versionComment);
+
+                extractMetadata(nodeRef);
+            } finally
+            {
+                behaviourFilter.enableBehaviour(nodeRef, ContentModel.ASPECT_VERSIONABLE);
+            }
         }
 
-        NodeRef nodeRef = createNodeImpl(parentNodeRef, fileName, nodeType, props, assocTypeQName);
-
-        // Write content
-        writeContent(nodeRef, fileName, content.getInputStream(), true);
-
-        // Ensure the file is versionable (autoVersion = true, autoVersionProps = false)
-        ensureVersioningEnabled(nodeRef, true, false);
-
-        // Extract the metadata
-        extractMetadata(nodeRef);
-
-        // Create the response
-        return getFolderOrDocumentFullInfo(nodeRef, parentNodeRef, nodeType, params);
+        return nodeRef;
     }
 
     private String getStringOrNull(String value)
@@ -2683,25 +2787,6 @@ public class NodesImpl implements Nodes
                 actionService.executeAction(action, sourceNodeRef, true, true);
             }
         }
-    }
-
-    /**
-     * Ensures the given node has the {@code cm:versionable} aspect applied to it, and
-     * that it has the initial version in the version store.
-     *
-     * @param nodeRef          the reference to the node to be checked
-     * @param autoVersion      If the {@code cm:versionable} aspect is applied, should auto
-     *                         versioning be requested?
-     * @param autoVersionProps If the {@code cm:versionable} aspect is applied, should
-     *                         auto versioning of properties be requested?
-     */
-    protected void ensureVersioningEnabled(NodeRef nodeRef, boolean autoVersion, boolean autoVersionProps)
-    {
-        Map<QName, Serializable> props = new HashMap<>(2);
-        props.put(ContentModel.PROP_AUTO_VERSION, autoVersion);
-        props.put(ContentModel.PROP_AUTO_VERSION_PROPS, autoVersionProps);
-
-        versionService.ensureVersioningEnabled(nodeRef, props);
     }
 
     /**

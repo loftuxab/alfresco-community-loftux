@@ -38,9 +38,6 @@ public interface LuceneQueryBuilderComponent<Q, S, E extends Throwable>
 {
     /**
      * Generate the lucene query from the query component
-     * @param selectors Set<String>
-     * @param functionArgs Map<String, Argument>
-     * @param luceneContext LuceneQueryBuilderContext<Q, S, E>
      * @param functionContext FunctionEvaluationContext
      * @return - the lucene query fragment for this component
      * @throws E

@@ -8,7 +8,7 @@
     <description>Downloads bits and pieces</description>
     <properties>
       <alfresco.version>${project.version}</alfresco.version>
-      <explorer.version>1.1-SNAPSHOT</explorer.version>
+      <explorer.version>1.2-SNAPSHOT</explorer.version>
     </properties>
     <licenses>
       <license>

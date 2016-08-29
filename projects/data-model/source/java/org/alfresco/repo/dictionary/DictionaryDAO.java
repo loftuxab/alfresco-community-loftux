@@ -99,7 +99,6 @@ public interface DictionaryDAO extends ModelQuery
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub types only
-     * @return Collection<QName>
      */
     Collection<QName> getSubTypes(QName superType, boolean follow);
 
@@ -122,7 +121,6 @@ public interface DictionaryDAO extends ModelQuery
      * @param follow
      *            true => follow up the super-class hierarchy, false =>
      *            immediate sub aspects only
-     * @return Collection<QName>
      */
     Collection<QName> getSubAspects(QName superAspect, boolean follow);
 
@@ -196,7 +194,6 @@ public interface DictionaryDAO extends ModelQuery
      * Get all properties for all models of the given data type.
      * 
      * @param dataType QName
-     * @return Collection<PropertyDefinition>
      */
     Collection<PropertyDefinition> getPropertiesOfDataType(QName dataType);
 

@@ -72,7 +72,6 @@ public interface FunctionEvaluationContext
     public Float getScore();
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -84,7 +83,6 @@ public interface FunctionEvaluationContext
 
     /**
      * Note: null and not null are not required to support functions from the spec
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param not Boolean
      * @return the query
@@ -93,7 +91,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneExists(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Boolean not) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -104,7 +101,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -115,7 +111,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneGreaterThanOrEquals(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -126,7 +121,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneLessThan(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, PredicateMode mode, LuceneFunction luceneFunction) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -138,7 +132,6 @@ public interface FunctionEvaluationContext
 
     /**
      * Note: Like is not required to support functions from the spec
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param not Boolean
@@ -148,7 +141,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneLike(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Serializable value, Boolean not) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @param value Serializable
      * @param mode PredicateMode
@@ -160,9 +152,7 @@ public interface FunctionEvaluationContext
 
     /**
      * Note: In is not required to support functions from the spec
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
-     * @param values Collection<Serializable> values
      * @param not Boolean
      * @param mode PredicateMode
      * @return the query
@@ -171,7 +161,6 @@ public interface FunctionEvaluationContext
     public <Q, S, E extends Throwable> Q buildLuceneIn(LuceneQueryParserAdaptor<Q, S, E> lqpa, String propertyName, Collection<Serializable> values, Boolean not, PredicateMode mode) throws E;
 
     /**
-     * @param lqpa LuceneQueryParserAdaptor<Q, S, E>
      * @param propertyName String
      * @return the field used for sorting the given property
      * @throws E 

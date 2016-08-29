@@ -327,7 +327,7 @@
           <protected>true</protected>
           <mandatory>false</mandatory>
           <multiple>false</multiple>
-          <index enabled="true" />
+          <index enabled="false" />
         </property>
       </properties>
     </type>

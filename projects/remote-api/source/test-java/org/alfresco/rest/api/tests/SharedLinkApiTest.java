@@ -26,31 +26,21 @@
 package org.alfresco.rest.api.tests;
 
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.rest.api.People;
 import org.alfresco.rest.api.QuickShareLinks;
 import org.alfresco.rest.api.impl.QuickShareLinksImpl;
 import org.alfresco.rest.api.model.QuickShareLink;
 import org.alfresco.rest.api.nodes.NodesEntityResource;
 import org.alfresco.rest.api.quicksharelinks.QuickShareLinkEntityResource;
-import org.alfresco.rest.api.tests.RepoService.TestNetwork;
-import org.alfresco.rest.api.tests.RepoService.TestPerson;
-import org.alfresco.rest.api.tests.RepoService.TestSite;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.PublicApiClient.Paging;
 import org.alfresco.rest.api.tests.client.data.Document;
 import org.alfresco.rest.api.tests.client.data.Node;
 import org.alfresco.rest.api.tests.client.data.QuickShareLinkEmailRequest;
 import org.alfresco.rest.api.tests.client.data.Rendition;
+import org.alfresco.rest.api.tests.client.data.UserInfo;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder;
 import org.alfresco.rest.api.tests.util.RestApiUtil;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.MutableAuthenticationService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.site.SiteVisibility;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -68,7 +58,8 @@ import static org.alfresco.rest.api.tests.util.RestApiUtil.toJsonAsStringNonNull
 import static org.junit.Assert.*;
 
 /**
- * API tests for:
+ * V1 REST API tests for Shared Links (aka public "quick shares")
+ *
  * <ul>
  * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/shared-links} </li>
  * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/shared-links/<sharedId>} </li>
@@ -79,75 +70,7 @@ import static org.junit.Assert.*;
 public class SharedLinkApiTest extends AbstractBaseApiTest
 {
     private static final String URL_SHARED_LINKS = "shared-links";
-
-    TestNetwork networkOne;
-
-    /**
-     * User one from network one
-     */
-    private TestPerson userOneN1;
-
-    /**
-     * User two from network one
-     */
-    private TestPerson userTwoN1;
-    private TestSite userOneN1Site;
-
-    private String user1;
-    private String user2;
-    private List<String> users = new ArrayList<>();
-
-    protected MutableAuthenticationService authenticationService;
-    protected PersonService personService;
-
-    private final String RUNID = System.currentTimeMillis()+"";
-
-    @Before
-    public void setup() throws Exception
-    {
-        authenticationService = applicationContext.getBean("authenticationService", MutableAuthenticationService.class);
-        personService = applicationContext.getBean("personService", PersonService.class);
-
-        // note: createUser currently relies on repoService
-        user1 = createUser("user1-" + RUNID);
-        user2 = createUser("user2-" + RUNID);
-
-        // We just need to clean the on-premise-users,
-        // so the tests for the specific network would work.
-        users.add(user1);
-        users.add(user2);
-
-        networkOne = getTestFixture().getRandomNetwork();
-        userOneN1 = networkOne.createUser();
-        userTwoN1 = networkOne.createUser();
-
-        userOneN1Site = createSite(networkOne, userOneN1, SiteVisibility.PRIVATE);
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
-        for (final String user : users)
-        {
-            transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>()
-            {
-                @Override
-                public Void execute() throws Throwable
-                {
-                    if (personService.personExists(user))
-                    {
-                        authenticationService.deleteAuthentication(user);
-                        personService.deletePerson(user);
-                    }
-                    return null;
-                }
-            });
-        }
-        users.clear();
-        AuthenticationUtil.clearCurrentSecurityContext();
-    }
-
+    
     /**
      * Tests shared links to file (content)
      *
@@ -169,9 +92,10 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
     public void testSharedLinkCreateGetDelete() throws Exception
     {
         // As user 1 ...
+        setRequestContext(user1);
 
         // create doc d1 - pdf
-        String sharedFolderNodeId = getSharedNodeId(user1);
+        String sharedFolderNodeId = getSharedNodeId();
 
         String fileName1 = "quick"+RUNID+"_1.pdf";
         File file1 = getResourceFile("quick.pdf");
@@ -184,25 +108,26 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
                 .setFileData(new MultiPartBuilder.FileData(fileName1, file1, file1_MimeType));
         MultiPartBuilder.MultiPartRequest reqBody = multiPartBuilder.build();
 
-        HttpResponse response = post(getNodeChildrenUrl(sharedFolderNodeId), user1, reqBody.getBody(), null, reqBody.getContentType(), 201);
+        HttpResponse response = post(getNodeChildrenUrl(sharedFolderNodeId), reqBody.getBody(), null, reqBody.getContentType(), 201);
         Document doc1 = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
 
         String d1Id = doc1.getId();
 
         // create doc d2 - plain text
-        String myFolderNodeId = getMyNodeId(user1);
+        String myFolderNodeId = getMyNodeId();
 
         String content2Text = "The quick brown fox jumps over the lazy dog 2.";
         String fileName2 = "content" + RUNID + "_2.txt";
 
-        Document doc2 = createTextFile(user1, myFolderNodeId, fileName2, content2Text);
+        Document doc2 = createTextFile(myFolderNodeId, fileName2, content2Text);
         String d2Id = doc2.getId();
 
         String file2_MimeType = MimetypeMap.MIMETYPE_TEXT_PLAIN;
 
         // As user 2 ...
+        setRequestContext(user2);
 
-        response = getSingle(NodesEntityResource.class, user2, d1Id, null, 200);
+        response = getSingle(NodesEntityResource.class, d1Id, null, 200);
         Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         Date docModifiedAt = nodeResp.getModifiedAt();
         String docModifiedBy = nodeResp.getModifiedByUser().getId();
@@ -212,7 +137,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         Map<String, String> body = new HashMap<>();
         body.put("nodeId", d1Id);
 
-        response = post(URL_SHARED_LINKS, user2, toJsonAsStringNonNull(body), 201);
+        response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         QuickShareLink resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
 
         String shared1Id = resp.getId();
@@ -229,22 +154,23 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
 
         assertEquals(docModifiedAt.getTime(), resp.getModifiedAt().getTime()); // not changed
         assertEquals(docModifiedBy, resp.getModifiedByUser().getId()); // not changed (ie. not user2)
-        assertEquals(docModifiedBy+" "+docModifiedBy, resp.getModifiedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(docModifiedBy), resp.getModifiedByUser().getDisplayName());
 
         assertEquals(user2, resp.getSharedByUser().getId());
-        assertEquals(user2+" "+user2, resp.getSharedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user2), resp.getSharedByUser().getDisplayName());
 
         // -ve test - try to create again (same user) - already exists
-        post(URL_SHARED_LINKS, user2, toJsonAsStringNonNull(body), 409);
+        post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 409);
 
 
         // As user 1 ...
+        setRequestContext(user1);
 
         // create shared link to document 2
         body = new HashMap<>();
         body.put("nodeId", d2Id);
 
-        response = post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 201);
+        response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         String shared2Id = resp.getId();
 
@@ -253,7 +179,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
 
         // access to get shared link info - pass user1 (but ignore in non-MT)
         Map<String, String> params = Collections.singletonMap("include", "allowableOperations");
-        response = getSingle(QuickShareLinkEntityResource.class, user1, shared1Id, params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, params, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
 
         assertEquals(shared1Id, resp.getId());
@@ -262,13 +188,13 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNull(resp.getAllowableOperations()); // include is ignored
 
         assertNull(resp.getModifiedByUser().getId()); // userId not returned
-        assertEquals(user1+" "+user1, resp.getModifiedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user1), resp.getModifiedByUser().getDisplayName());
         assertNull(resp.getSharedByUser().getId()); // userId not returned
-        assertEquals(user2+" "+user2, resp.getSharedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user2), resp.getSharedByUser().getDisplayName());
 
         // access to get shared link info - pass user2 (but ignore in non-MT)
         params = Collections.singletonMap("include", "allowableOperations");
-        response = getSingle(QuickShareLinkEntityResource.class, user2, shared1Id, params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, params, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
 
         assertEquals(shared1Id, resp.getId());
@@ -277,20 +203,21 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNull(resp.getAllowableOperations()); // include is ignored
 
         assertNull(resp.getModifiedByUser().getId()); // userId not returned
-        assertEquals(user1+" "+user1, resp.getModifiedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user1), resp.getModifiedByUser().getDisplayName());
         assertNull(resp.getSharedByUser().getId()); // userId not returned
-        assertEquals(user2+" "+user2, resp.getSharedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user2), resp.getSharedByUser().getDisplayName());
 
 
         // allowable operations not included - no params
-        response = getSingle(QuickShareLinkEntityResource.class, user2, shared1Id, null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, null, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         assertNull(resp.getAllowableOperations());
 
+        setRequestContext(null);
 
         // unauth access to get shared link info
         params = Collections.singletonMap("include", "allowableOperations"); // note: this will be ignore for unauth access
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id, params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, params, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
 
         assertEquals(shared1Id, resp.getId());
@@ -299,12 +226,12 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNull(resp.getAllowableOperations()); // include is ignored
 
         assertNull(resp.getModifiedByUser().getId()); // userId not returned
-        assertEquals(user1+" "+user1, resp.getModifiedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user1), resp.getModifiedByUser().getDisplayName());
         assertNull(resp.getSharedByUser().getId()); // userId not returned
-        assertEquals(user2+" "+user2, resp.getSharedByUser().getDisplayName());
+        assertEquals(UserInfo.getTestDisplayName(user2), resp.getSharedByUser().getDisplayName());
 
         // unauth access to file 1 content (via shared link)
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/content", null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/content", null, 200);
         assertArrayEquals(file1_originalBytes, response.getResponseAsBytes());
         Map<String, String> responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -315,12 +242,12 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNotNull(lastModifiedHeader);
         // Test 304 response
         Map<String, String> headers = Collections.singletonMap(IF_MODIFIED_SINCE_HEADER, lastModifiedHeader);
-        getSingle(URL_SHARED_LINKS, null, shared1Id + "/content", null, headers, 304);
+        getSingle(URL_SHARED_LINKS, shared1Id + "/content", null, headers, 304);
 
         // unauth access to file 1 content (via shared link) - without Content-Disposition header (attachment=false)
         params = new HashMap<>();
         params.put("attachment", "false");
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/content", params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/content", params, 200);
         assertArrayEquals(file1_originalBytes, response.getResponseAsBytes());
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -331,7 +258,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
 
 
         // unauth access to file 2 content (via shared link)
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared2Id + "/content", null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared2Id + "/content", null, 200);
         assertArrayEquals(content2Text.getBytes(), response.getResponseAsBytes());
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -343,37 +270,42 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // -ve test - unauth access to get shared link file content - without Content-Disposition header (attachment=false) - header ignored (plain text is not in white list)
         params = new HashMap<>();
         params.put("attachment", "false");
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared2Id + "/content", params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared2Id + "/content", params, 200);
         assertEquals("attachment; filename=\"" + fileName2 + "\"; filename*=UTF-8''" + fileName2 + "", response.getHeaders().get("Content-Disposition"));
 
         // -ve shared link rendition tests
         {
             // -ve test - try to get non-existent rendition content
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", null, 404);
 
             // -ve test - try to get unregistered rendition content
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/dummy/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/dummy/content", null, 404);
         }
 
         // unauth access to get shared link renditions info (available => CREATED renditions only)
-        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, null, 200);
+        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, 200);
         List<Rendition> renditions = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Rendition.class);
         assertEquals(0, renditions.size());
 
         // create rendition of pdf doc - note: for some reason create rendition of txt doc fail on build m/c (TBC) ?
-        Rendition rendition = createAndGetRendition(user2, d1Id, "doclib");
+        setRequestContext(user2);
+        
+        Rendition rendition = createAndGetRendition(d1Id, "doclib");
         assertNotNull(rendition);
         assertEquals(Rendition.RenditionStatus.CREATED, rendition.getStatus());
 
+        setRequestContext(null);
+
+
         // unauth access to get shared link renditions info (available => CREATED renditions only)
-        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, null, 200);
+        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, 200);
         renditions = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Rendition.class);
         assertEquals(1, renditions.size());
         assertEquals(Rendition.RenditionStatus.CREATED, renditions.get(0).getStatus());
         assertEquals("doclib", renditions.get(0).getId());
 
         // unauth access to get shared link file rendition content
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", null, 200);
         assertTrue(response.getResponseAsBytes().length > 0);
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -386,7 +318,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // unauth access to get shared link file rendition content - without Content-Disposition header (attachment=false)
         params = new HashMap<>();
         params.put("attachment", "false");
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", params, 200);
         assertTrue(response.getResponseAsBytes().length > 0);
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -397,19 +329,22 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNotNull(lastModifiedHeader);
         // Test 304 response
         headers = Collections.singletonMap(IF_MODIFIED_SINCE_HEADER, lastModifiedHeader);
-        getSingle(URL_SHARED_LINKS, null, shared1Id + "/renditions/doclib/content", null, headers, 304);
+        getSingle(URL_SHARED_LINKS, shared1Id + "/renditions/doclib/content", null, headers, 304);
 
 
         // -ve delete tests
         {
-            // -ve test - user1 cannot delete shared link
-            delete(URL_SHARED_LINKS, user1, shared1Id, 403);
-
             // -ve test - unauthenticated
-            delete(URL_SHARED_LINKS, null, shared1Id, 401);
+            setRequestContext(null);
+            deleteSharedLink(shared1Id, 401);
+            
+            setRequestContext(user1);
 
+            // -ve test - user1 cannot delete shared link
+            deleteSharedLink(shared1Id, 403);
+            
             // -ve test - delete - cannot delete non-existent link
-            delete(URL_SHARED_LINKS, user1, "dummy", 404);
+            deleteSharedLink("dummy", 404);
         }
 
 
@@ -420,43 +355,48 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
             // -ve test - try to create again (different user, that has read permission) - already exists
             body = new HashMap<>();
             body.put("nodeId", d1Id);
-            post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 409);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 409);
 
             // -ve - create - missing nodeId
             body = new HashMap<>();
-            post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 400);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 400);
 
             // -ve - create - unknown nodeId
             body = new HashMap<>();
             body.put("nodeId", "dummy");
-            post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 404);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 404);
 
             // -ve - create - try to link to folder (ie. not a file)
-            String f1Id = createFolder(user1, myFolderNodeId, "f1 " + RUNID).getId();
+            String f1Id = createFolder(myFolderNodeId, "f1 " + RUNID).getId();
             body = new HashMap<>();
             body.put("nodeId", f1Id);
-            post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 400);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 400);
 
             // -ve test - cannot create if user does not have permission to read
+            setRequestContext(user2);
             body = new HashMap<>();
             body.put("nodeId", d2Id);
-            post(URL_SHARED_LINKS, user2, toJsonAsStringNonNull(body), 403);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 403);
 
             // -ve test - unauthenticated
+            setRequestContext(null);
             body = new HashMap<>();
             body.put("nodeId", d1Id);
-            post(URL_SHARED_LINKS, null, toJsonAsStringNonNull(body), 401);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 401);
         }
 
 
         // delete shared link
-        delete(URL_SHARED_LINKS, user2, shared1Id, 204);
+        setRequestContext(user2);
+        deleteSharedLink(shared1Id);
 
         // -ve test - delete - cannot delete non-existent link
-        delete(URL_SHARED_LINKS, user1, shared1Id, 404);
+        setRequestContext(user1);
+        deleteSharedLink(shared1Id, 404);
 
+        setRequestContext(user2);
 
-        response = getSingle(NodesEntityResource.class, user2, d1Id, null, 200);
+        response = getSingle(NodesEntityResource.class, d1Id, null, 200);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
 
         assertEquals(docModifiedAt.getTime(), nodeResp.getModifiedAt().getTime()); // not changed
@@ -466,12 +406,12 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // -ve get tests
         {
             // try to get link that has been deleted (see above)
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id, null, 404);
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id, null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id + "/content", null, 404);
 
             // try to get non-existent link
-            getSingle(QuickShareLinkEntityResource.class, null, "dummy", null, 404);
-            getSingle(QuickShareLinkEntityResource.class, null, "dummy/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, "dummy", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, "dummy/content", null, 404);
         }
 
         // TODO if and when these tests are optionally runnable via remote env then we could skip this part of the test
@@ -482,13 +422,18 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         {
             quickShareLinks.setEnabled(false);
 
+            setRequestContext(user1);
+
             // -ve - disabled service tests
             body.put("nodeId", "dummy");
-            post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 501);
+            post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 501);
 
-            getSingle(QuickShareLinkEntityResource.class, null, "dummy", null, 501);
-            getSingle(QuickShareLinkEntityResource.class, null, "dummy/content", null, 501);
-            delete(URL_SHARED_LINKS, user1, "dummy", 501);
+            setRequestContext(null);
+            getSingle(QuickShareLinkEntityResource.class, "dummy", null, 501);
+            getSingle(QuickShareLinkEntityResource.class, "dummy/content", null, 501);
+
+            setRequestContext(user1);
+            deleteSharedLink("dummy", 501);
         }
         finally
         {
@@ -507,45 +452,44 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
     @Test
     public void testSharedLinkFind() throws Exception
     {
+        // As user 1 ...
+        setRequestContext(user1);
+        
         Paging paging = getPaging(0, 100);
 
         // Get all shared links visible to user 1 (note: for now assumes clean repo)
-        HttpResponse response = getAll(URL_SHARED_LINKS, user1, paging, 200);
+        HttpResponse response = getAll(URL_SHARED_LINKS, paging, 200);
         List<QuickShareLink> sharedLinks = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(0, sharedLinks.size());
-
-        // As user 1 ...
-
+        
         // create doc d1 - in "My" folder
-        String myFolderNodeId = getMyNodeId(user1);
+        String myFolderNodeId = getMyNodeId();
         String content1Text = "The quick brown fox jumps over the lazy dog 1.";
         String docName1 = "content" + RUNID + "_1.txt";
-        Document doc1 = createTextFile(user1, myFolderNodeId, docName1, content1Text);
+        Document doc1 = createTextFile(myFolderNodeId, docName1, content1Text);
         String d1Id = doc1.getId();
 
         // create doc d2 - in "Shared" folder
-        String sharedFolderNodeId = getSharedNodeId(user1);
+        String sharedFolderNodeId = getSharedNodeId();
         String content2Text = "The quick brown fox jumps over the lazy dog 2.";
         String docName2 = "content" + RUNID + "_2.txt";
-        Document doc2 = createTextFile(user1, sharedFolderNodeId, docName2, content1Text);
+        Document doc2 = createTextFile(sharedFolderNodeId, docName2, content1Text);
         String d2Id = doc2.getId();
-
-
-        // As user 1 ...
 
         // create shared link to doc 1
         Map<String, String> body = new HashMap<>();
         body.put("nodeId", d1Id);
-        response = post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 201);
+        response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         QuickShareLink resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         String shared1Id = resp.getId();
 
         // As user 2 ...
+        setRequestContext(user2);
 
         // create shared link to doc 2
         body = new HashMap<>();
         body.put("nodeId", d2Id);
-        response = post(URL_SHARED_LINKS, user2, toJsonAsStringNonNull(body), 201);
+        response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         String shared2Id = resp.getId();
 
@@ -554,7 +498,9 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // find links
         //
 
-        response = getAll(URL_SHARED_LINKS, user1, paging, 200);
+        setRequestContext(user1);
+
+        response = getAll(URL_SHARED_LINKS, paging, 200);
         sharedLinks = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(2, sharedLinks.size());
         assertEquals(shared2Id, sharedLinks.get(0).getId());
@@ -562,17 +508,21 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertEquals(shared1Id, sharedLinks.get(1).getId());
         assertEquals(d1Id, sharedLinks.get(1).getNodeId());
 
-        response = getAll(URL_SHARED_LINKS, user2, paging, 200);
+        setRequestContext(user2);
+
+        response = getAll(URL_SHARED_LINKS, paging, 200);
         sharedLinks = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(1, sharedLinks.size());
         assertEquals(shared2Id, sharedLinks.get(0).getId());
         assertEquals(d2Id, sharedLinks.get(0).getNodeId());
 
+        setRequestContext(user1);
+
         // find my links
         Map<String, String> params = new HashMap<>();
         params.put("where", "("+ QuickShareLinks.PARAM_SHAREDBY+"='"+People.DEFAULT_USER+"')");
 
-        response = getAll(URL_SHARED_LINKS, user1, paging, params, 200);
+        response = getAll(URL_SHARED_LINKS, paging, params, 200);
         sharedLinks = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(1, sharedLinks.size());
         assertEquals(shared1Id, sharedLinks.get(0).getId());
@@ -582,32 +532,38 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         params = new HashMap<>();
         params.put("where", "("+ QuickShareLinks.PARAM_SHAREDBY+"='"+user2+"')");
 
-        response = getAll(URL_SHARED_LINKS, user1, paging, params, 200);
+        response = getAll(URL_SHARED_LINKS, paging, params, 200);
         sharedLinks = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(1, sharedLinks.size());
         assertEquals(shared2Id, sharedLinks.get(0).getId());
         assertEquals(d2Id, sharedLinks.get(0).getNodeId());
 
+        setRequestContext(null);
 
         // -ve test - unauthenticated
-        getAll(URL_SHARED_LINKS, null, paging, params, 401);
+        getAll(URL_SHARED_LINKS, paging, params, 401);
 
 
         // delete the shared links
-        delete(URL_SHARED_LINKS, user1, shared1Id, 204);
-        delete(URL_SHARED_LINKS, user2, shared2Id, 204);
+        setRequestContext(user1);
+        deleteSharedLink(shared1Id);
+
+        setRequestContext(user2);
+        deleteSharedLink(shared2Id);
 
 
         // TODO if and when these tests are optionally runnable via remote env then we could skip this part of the test
         // (else need to verify test mechanism for enterprise admin via jmx ... etc)
 
+        setRequestContext(user1);
+        
         QuickShareLinksImpl quickShareLinks = applicationContext.getBean("quickShareLinks", QuickShareLinksImpl.class);
         try
         {
             quickShareLinks.setEnabled(false);
 
             // -ve - disabled service tests
-            getAll(URL_SHARED_LINKS, user1, paging, 501);
+            getAll(URL_SHARED_LINKS, paging, 501);
         }
         finally
         {
@@ -623,16 +579,18 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
     @Test
     public void testEmailSharedLink() throws Exception
     {
+        setRequestContext(user1);
+        
         // Create plain text document
-        String myFolderNodeId = getMyNodeId(user1);
+        String myFolderNodeId = getMyNodeId();
         String contentText = "The quick brown fox jumps over the lazy dog.";
         String fileName = "file-" + RUNID + ".txt";
-        Document doc = createTextFile(user1, myFolderNodeId, fileName, contentText);
+        Document doc = createTextFile(myFolderNodeId, fileName, contentText);
         String docId = doc.getId();
 
         // Create shared link to document
         Map<String, String> body = Collections.singletonMap("nodeId", docId);
-        HttpResponse response = post(URL_SHARED_LINKS, user1, toJsonAsStringNonNull(body), 201);
+        HttpResponse response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         QuickShareLink resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         String sharedId = resp.getId();
         assertNotNull(sharedId);
@@ -645,7 +603,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         recipients.add(user2 + "@acme.test");
         recipients.add(user2 + "@ping.test");
         request.setRecipientEmails(recipients);
-        post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 202);
+        post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 202);
 
         // Email request with all the properties
         request = new QuickShareLinkEmailRequest();
@@ -654,27 +612,27 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         request.setLocale(Locale.UK.toString());
         recipients = Collections.singletonList(user2 + "@acme.test");
         request.setRecipientEmails(recipients);
-        post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 202);
+        post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 202);
 
         // -ve tests
         // sharedId path parameter does not exist
-        post(getEmailSharedLinkUrl(sharedId + System.currentTimeMillis()), user1, RestApiUtil.toJsonAsString(request), 404);
+        post(getEmailSharedLinkUrl(sharedId + System.currentTimeMillis()), RestApiUtil.toJsonAsString(request), 404);
 
         // Unregistered client
         request = new QuickShareLinkEmailRequest();
         request.setClient("VeryCoolClient" + System.currentTimeMillis());
         List<String> user2Email = Collections.singletonList(user2 + "@acme.test");
         request.setRecipientEmails(user2Email);
-        post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 400);
+        post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 400);
 
         // client is mandatory
         request.setClient(null);
-        post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 400);
+        post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 400);
 
         // recipientEmails is mandatory
         request.setClient("sfs");
         request.setRecipientEmails(null);
-        post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 400);
+        post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 400);
 
         // TODO if and when these tests are optionally runnable via remote env then we could skip this part of the test
         // (else need to verify test mechanism for enterprise admin via jmx ... etc)
@@ -685,7 +643,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
             request = new QuickShareLinkEmailRequest();
             request.setClient("sfs");
             request.setRecipientEmails(user2Email);
-            post(getEmailSharedLinkUrl(sharedId), user1, RestApiUtil.toJsonAsString(request), 501);
+            post(getEmailSharedLinkUrl(sharedId), RestApiUtil.toJsonAsString(request), 501);
         }
         finally
         {
@@ -710,16 +668,17 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
      * {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/shared-links/<sharedId>/renditions/<renditionId>/content}
      *
      */
+    // TODO now covered by testSharedLinkCreateGetDelete ? (since base class now uses tenant context by default)
     @Test
     public void testSharedLinkCreateGetDelete_MultiTenant() throws Exception
     {
-        // As userOneN1
-        AuthenticationUtil.setFullyAuthenticatedUser(userOneN1.getId());
-        NodeRef docLibNodeRef = userOneN1Site.getContainerNodeRef(("documentLibrary"));
-        String docLibNodeId = docLibNodeRef.getId();
+        // As user1
+        setRequestContext(user1);
 
+        String docLibNodeId = getSiteContainerNodeId(tSiteId, "documentLibrary");
+        
         String folderName = "folder" + System.currentTimeMillis() + "_1";
-        String folderId = createFolder(userOneN1.getId(), docLibNodeId, folderName, null).getId();
+        String folderId = createFolder(docLibNodeId, folderName, null).getId();
 
         // create doc d1 - pdf
         String fileName1 = "quick" + RUNID + "_1.pdf";
@@ -733,7 +692,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
                     .setFileData(new MultiPartBuilder.FileData(fileName1, file1, file1_MimeType))
                     .build();
 
-        HttpResponse response = post(getNodeChildrenUrl(folderId), userOneN1.getId(), reqBody.getBody(), null, reqBody.getContentType(), 201);
+        HttpResponse response = post(getNodeChildrenUrl(folderId), reqBody.getBody(), null, reqBody.getContentType(), 201);
         Document doc1 = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
         String d1Id = doc1.getId();
         assertNotNull(d1Id);
@@ -741,23 +700,25 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // create shared link to document 1
         Map<String, String> body = new HashMap<>();
         body.put("nodeId", d1Id);
-        response = post(URL_SHARED_LINKS, userOneN1.getId(), toJsonAsStringNonNull(body), 201);
+        response = post(URL_SHARED_LINKS, toJsonAsStringNonNull(body), 201);
         QuickShareLink resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         String shared1Id = resp.getId();
         assertNotNull(shared1Id);
         assertEquals(d1Id, resp.getNodeId());
         assertEquals(fileName1, resp.getName());
         assertEquals(file1_MimeType, resp.getContent().getMimeType());
-        assertEquals(userOneN1.getId(), resp.getSharedByUser().getId());
+        assertEquals(user1, resp.getSharedByUser().getId());
 
         // allowable operations not included - no params
-        response = getSingle(QuickShareLinkEntityResource.class, userOneN1.getId(), shared1Id, null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, null, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         assertNull(resp.getAllowableOperations());
 
+        setRequestContext(null);
+
         // unauth access to get shared link info
         Map<String, String> params = Collections.singletonMap("include", "allowableOperations"); // note: this will be ignore for unauth access
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id, params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id, params, 200);
         resp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), QuickShareLink.class);
         assertEquals(shared1Id, resp.getId());
         assertEquals(fileName1, resp.getName());
@@ -765,7 +726,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNull(resp.getAllowableOperations()); // include is ignored
 
         // unauth access to file 1 content (via shared link)
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/content", null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/content", null, 200);
         assertArrayEquals(file1_originalBytes, response.getResponseAsBytes());
         Map<String, String> responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -776,12 +737,12 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNotNull(lastModifiedHeader);
         // Test 304 response
         Map<String, String> headers = Collections.singletonMap(IF_MODIFIED_SINCE_HEADER, lastModifiedHeader);
-        getSingle(URL_SHARED_LINKS, null, shared1Id + "/content", null, headers, 304);
+        getSingle(URL_SHARED_LINKS, shared1Id + "/content", null, headers, 304);
 
         // unauth access to file 1 content (via shared link) - without Content-Disposition header (attachment=false)
         params = new HashMap<>();
         params.put("attachment", "false");
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/content", params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/content", params, 200);
         assertArrayEquals(file1_originalBytes, response.getResponseAsBytes());
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -793,31 +754,35 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // -ve shared link rendition tests
         {
             // -ve test - try to get non-existent rendition content
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", null, 404);
 
             // -ve test - try to get unregistered rendition content
-            getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/dummy/content", null, 404);
+            getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/dummy/content", null, 404);
         }
 
         // unauth access to get shared link renditions info (available => CREATED renditions only)
-        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, null, 200);
+        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, 200);
         List<Rendition> renditions = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Rendition.class);
         assertEquals(0, renditions.size());
 
         // create rendition of pdf doc - note: for some reason create rendition of txt doc fail on build m/c (TBC) ?
-        Rendition rendition = createAndGetRendition(userOneN1.getId(), d1Id, "doclib");
+        setRequestContext(user1);
+
+        Rendition rendition = createAndGetRendition(d1Id, "doclib");
         assertNotNull(rendition);
         assertEquals(Rendition.RenditionStatus.CREATED, rendition.getStatus());
 
+        setRequestContext(null);
+
         // unauth access to get shared link renditions info (available => CREATED renditions only)
-        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, null, 200);
+        response = getAll(URL_SHARED_LINKS + "/" + shared1Id + "/renditions", null, 200);
         renditions = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Rendition.class);
         assertEquals(1, renditions.size());
         assertEquals(Rendition.RenditionStatus.CREATED, renditions.get(0).getStatus());
         assertEquals("doclib", renditions.get(0).getId());
 
         // unauth access to get shared link file rendition content
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", null, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", null, 200);
         assertTrue(response.getResponseAsBytes().length > 0);
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -830,7 +795,7 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         // unauth access to get shared link file rendition content - without Content-Disposition header (attachment=false)
         params = new HashMap<>();
         params.put("attachment", "false");
-        response = getSingle(QuickShareLinkEntityResource.class, null, shared1Id + "/renditions/doclib/content", params, 200);
+        response = getSingle(QuickShareLinkEntityResource.class, shared1Id + "/renditions/doclib/content", params, 200);
         assertTrue(response.getResponseAsBytes().length > 0);
         responseHeaders = response.getHeaders();
         assertNotNull(responseHeaders);
@@ -841,16 +806,19 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
         assertNotNull(lastModifiedHeader);
         // Test 304 response
         headers = Collections.singletonMap(IF_MODIFIED_SINCE_HEADER, lastModifiedHeader);
-        getSingle(URL_SHARED_LINKS, null, shared1Id + "/renditions/doclib/content", null, headers, 304);
-
+        getSingle(URL_SHARED_LINKS, shared1Id + "/renditions/doclib/content", null, headers, 304);
+        
         // -ve test - userTwoN1 cannot delete shared link
-        delete(URL_SHARED_LINKS, userTwoN1.getId(), shared1Id, 403);
+        setRequestContext(user2);
+        deleteSharedLink(shared1Id, 403);
 
         // -ve test - unauthenticated
-        delete(URL_SHARED_LINKS, null, shared1Id, 401);
+        setRequestContext(null);
+        deleteSharedLink(shared1Id, 401);
 
         // delete shared link
-        delete(URL_SHARED_LINKS, userOneN1.getId(), shared1Id, 204);
+        setRequestContext(user1);
+        deleteSharedLink(shared1Id);
     }
 
     @Override
@@ -862,5 +830,15 @@ public class SharedLinkApiTest extends AbstractBaseApiTest
     private String getEmailSharedLinkUrl(String sharedId)
     {
         return URL_SHARED_LINKS + '/' + sharedId + "/email";
+    }
+
+    private void deleteSharedLink(String sharedId) throws Exception
+    {
+        deleteSharedLink(sharedId, 204);
+    }
+
+    private void deleteSharedLink(String sharedId, int expectedStatus) throws Exception
+    {
+        delete(URL_SHARED_LINKS, sharedId, expectedStatus);
     }
 }

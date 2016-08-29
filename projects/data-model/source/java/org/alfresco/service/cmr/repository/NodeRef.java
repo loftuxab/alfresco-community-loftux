@@ -100,7 +100,7 @@ public final class NodeRef implements EntityRef, Serializable
      * Construct a Node Reference from a string representation of a Node Reference.
      * <p>
      * The string representation of a Node Reference is as follows:
-     * <p>
+     * </p>
      * <pre><storeref>/<nodeId></pre>
      * 
      * @param nodeRef the string representation of a node ref

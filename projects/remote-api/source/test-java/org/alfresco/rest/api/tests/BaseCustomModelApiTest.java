@@ -90,10 +90,11 @@ public class BaseCustomModelApiTest extends AbstractBaseApiTest
 
         final AuthorityService authorityService = applicationContext.getBean("authorityService", AuthorityService.class);
 
-        this.nonAdminUserName = createUser("nonAdminUser" + System.currentTimeMillis());
-        this.customModelAdmin = createUser("customModelAdmin" + System.currentTimeMillis());
+        this.nonAdminUserName = createUser("nonAdminUser" + System.currentTimeMillis(), "password", null);
+        this.customModelAdmin = createUser("customModelAdmin" + System.currentTimeMillis(), "password", null);
         users.add(nonAdminUserName);
         users.add(customModelAdmin);
+        
         // Add 'customModelAdmin' user into 'ALFRESCO_MODEL_ADMINISTRATORS' group
         transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>()
         {
@@ -117,8 +118,7 @@ public class BaseCustomModelApiTest extends AbstractBaseApiTest
                 @Override
                 public Void execute() throws Throwable
                 {
-                    authenticationService.deleteAuthentication(user);
-                    personService.deletePerson(user);
+                    deleteUser(user, null);
                     return null;
                 }
             });
@@ -142,9 +142,9 @@ public class BaseCustomModelApiTest extends AbstractBaseApiTest
         customModel.setDescription(desc);
         customModel.setStatus(status);
         customModel.setAuthor(author);
-
+        
         // Create the model as a Model Administrator
-        HttpResponse response = post("cmm", customModelAdmin, RestApiUtil.toJsonAsString(customModel), 201);
+        HttpResponse response = post("cmm", RestApiUtil.toJsonAsString(customModel), 201);
         CustomModel returnedModel = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), CustomModel.class);
         if (author == null)
         {
@@ -181,7 +181,7 @@ public class BaseCustomModelApiTest extends AbstractBaseApiTest
         classModel.setParentName(parent);
 
         // Create type as a Model Administrator
-        HttpResponse response = post(uri, customModelAdmin, RestApiUtil.toJsonAsString(classModel), 201);
+        HttpResponse response = post(uri, RestApiUtil.toJsonAsString(classModel), 201);
         T returnedClassModel = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), glazz);
 
         compareCustomTypesAspects(classModel, returnedClassModel, "prefixedName");

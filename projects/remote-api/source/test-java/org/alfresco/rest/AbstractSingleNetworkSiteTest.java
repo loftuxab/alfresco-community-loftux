@@ -26,99 +26,71 @@
 
 package org.alfresco.rest;
 
-import static org.alfresco.rest.api.tests.util.RestApiUtil.toJsonAsStringNonNull;
-
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.rest.api.tests.AbstractBaseApiTest;
-import org.alfresco.rest.api.tests.NodeApiTest;
-import org.alfresco.rest.api.tests.RepoService;
-import org.alfresco.rest.api.tests.client.HttpResponse;
-import org.alfresco.rest.api.tests.client.data.ContentInfo;
-import org.alfresco.rest.api.tests.client.data.Document;
-import org.alfresco.rest.api.tests.client.data.Folder;
-import org.alfresco.rest.api.tests.util.JacksonUtil;
-import org.alfresco.rest.api.tests.util.RestApiUtil;
-import org.alfresco.rest.framework.jacksonextensions.JacksonHelper;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.MutableAuthenticationService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.site.SiteVisibility;
 import org.junit.After;
 import org.junit.Before;
 
 /**
+ * Overrides AbstractBaseApiTest so that only a single network & site is created per test 
+ * (instead of pre-creating multiple networks & sites)
+ * 
+ * Can also be optionally tweaked locally to:
+ * 
+ * - use the default network (ie. super tenant) => instead of creating a new tenant
+ * 
+ * - re-use a single setup across test methods => although this does mean that each individual test method must either rely on uniquely created test data and/or cleanup
+ * 
+ * Note: For now, these can be explicitly tweaked by a dev (do not commit) 
+ * but in the future we could consider making these runtime options.
+ * 
  * @author Gethin James
+ * @author janv
  */
 public class AbstractSingleNetworkSiteTest extends AbstractBaseApiTest
 {
-    protected MutableAuthenticationService authenticationService;
-    protected PersonService personService;
-
-    protected RepoService.TestNetwork networkOne;
-    protected RepoService.TestPerson u1;
-    protected RepoService.TestSite tSite;
-    protected NodeRef docLibNodeRef;
-
-    protected JacksonUtil jacksonUtil;
-
+    // note: experimental - for local/dev-use only (YMMV) ;-)
+    // - setting both to true should make the related tests run faster
+    // - if singleSetupNoTearDown=true then each individual test method should create unique data (or cleanup) to avoid interdependent test/run failures
+    // - if useDefaultNetwork=true then no tenant will be created (ie. will use default/super tenant)
+    protected static boolean singleSetupNoTearDown = false;
+    protected static boolean useDefaultNetwork = false;
+    
+    private static boolean isSetup = false;
+    
     @Override
     public String getScope()
     {
         return "public";
     }
-
+    
+    @Override
     @Before
     public void setup() throws Exception
     {
-        authenticationService = applicationContext.getBean("authenticationService", MutableAuthenticationService.class);
-        personService = applicationContext.getBean("personService", PersonService.class);
-
-        jacksonUtil = new JacksonUtil(applicationContext.getBean("jsonHelper", JacksonHelper.class));
-
-        getTestFixture(false);
-        networkOne = getRepoService().createNetwork(this.getClass().getName().toLowerCase(), true);
-        networkOne.create();
-        u1 = networkOne.createUser();
-        tSite = createSite(networkOne, u1, SiteVisibility.PRIVATE);
-
-        AuthenticationUtil.setFullyAuthenticatedUser(u1.getId());
-        docLibNodeRef = tSite.getContainerNodeRef("documentLibrary");
-        AuthenticationUtil.clearCurrentSecurityContext();
+        if ((! isSetup) || (! singleSetupNoTearDown))
+        {
+            if (! useDefaultNetwork)
+            {
+                networkOne = getRepoService().createNetwork(this.getClass().getName().toLowerCase(), true);
+                networkOne.create();
+            }
+            else
+            {
+                networkOne = getRepoService().getSystemNetwork();
+            }
+            
+            super.setup();
+            isSetup = true;
+        }
     }
 
+    @Override
     @After
     public void tearDown() throws Exception
     {
-        AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
-        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        if (! singleSetupNoTearDown)
         {
-            @Override
-            public Void execute() throws Throwable
-            {
-                if (personService.personExists(u1.getId()))
-                {
-                    authenticationService.deleteAuthentication(u1.getId());
-                    personService.deletePerson(u1.getId());
-                }
-                return null;
-            }
-        });
-        AuthenticationUtil.clearCurrentSecurityContext();
-    }
-
-
-    protected Document createDocument(Folder parentFolder, String docName) throws Exception
-    {
-        Document d1 = new Document();
-        d1.setName(docName);
-        d1.setNodeType("cm:content");
-        ContentInfo ci = new ContentInfo();
-        ci.setMimeType("text/plain");
-        d1.setContent(ci);
-
-        // create empty file
-        HttpResponse response = post(getNodeChildrenUrl(parentFolder.getId()), u1.getId(), toJsonAsStringNonNull(d1), 201);
-        return RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+            super.tearDown();
+        }
     }
 }

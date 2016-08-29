@@ -42,7 +42,6 @@ public class LuceneConjunction<Q, S, E extends Throwable> extends BaseConjunctio
 {
 
     /**
-     * @param constraints List<Constraint>
      */
     public LuceneConjunction(List<Constraint> constraints)
     {

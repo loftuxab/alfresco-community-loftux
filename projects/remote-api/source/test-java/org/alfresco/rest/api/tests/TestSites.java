@@ -29,14 +29,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.tenant.TenantUtil.TenantRunAsWork;
-import org.alfresco.rest.api.tests.RepoService.SiteInformation;
 import org.alfresco.rest.api.tests.RepoService.TestNetwork;
 import org.alfresco.rest.api.tests.RepoService.TestSite;
 import org.alfresco.rest.api.tests.client.PublicApiClient.ListResponse;
@@ -50,10 +48,14 @@ import org.alfresco.rest.api.tests.client.data.SiteRole;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.util.GUID;
 import org.apache.commons.httpclient.HttpStatus;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * V1 REST API tests for managing Sites
+ * 
  * @author sglover
  * @author janv
  */
@@ -66,10 +68,15 @@ public class TestSites extends EnterpriseTestApi
     private Site site1;
     private Site site2;
     private Site site3;
-	
+
+    @Override
 	@Before
-	public void setup() throws Exception
+	public void 
+    setup() throws Exception
 	{
+        // init networks
+        super.setup();
+        
 		// Test: user is member of an account
 		this.network1 = getTestFixture().getRandomNetwork();
 
@@ -289,6 +296,41 @@ public class TestSites extends EnterpriseTestApi
             sitesProxy.createSite(site);
         }
 
+        // -ve - minor: error code if updating via nodes api (REPO-512)
+        {
+            String siteId = "zzz";
+            String siteTitle = "ZZZ site";
+
+            Site site = new SiteImpl(null, siteId, null, siteTitle, null, SiteVisibility.PRIVATE.toString(), null, null);
+            String siteNodeId = sitesProxy.createSite(site).getGuid();
+
+            // try to update to invalid site visibility
+            JSONObject prop = new JSONObject();
+            prop.put("st:siteVisibility","INVALID");
+            JSONObject properties = new JSONObject();
+            properties.put("properties", new JSONObject(prop));
+            try
+            {
+                sitesProxy.update("nodes", siteNodeId, null, null, properties.toJSONString(), null);
+                fail();
+            } catch (PublicApiException e)
+            {
+                assertEquals(HttpStatus.SC_BAD_REQUEST, e.getHttpResponse().getStatusCode());
+            }
+
+            sitesProxy.removeSite(siteId); // cleanup
+        }
+        
+        // -ve test - cannot create multiple sites in single POST call (unsupported)
+        {
+            List<Site> sites = new ArrayList<>(2);
+            sites.add(new SiteImpl(null, "siteA1", null, "siteA1", null, SiteVisibility.PRIVATE.toString(), null, null));
+            sites.add(new SiteImpl(null, "siteB1", null, "siteB1", null, SiteVisibility.PRIVATE.toString(), null, null));
+            
+            sitesProxy.create("sites", null, null, null, JSONArray.toJSONString(sites), null, 405);
+        }
+
+        // -ve tests - belts-and-braces for unsupported methods
         {
             publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
 

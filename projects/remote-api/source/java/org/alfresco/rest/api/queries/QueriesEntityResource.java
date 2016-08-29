@@ -26,8 +26,8 @@
 package org.alfresco.rest.api.queries;
 
 import org.alfresco.rest.api.Queries;
-import org.alfresco.rest.api.model.Node;
 import org.alfresco.rest.framework.WebApiDescription;
+import org.alfresco.rest.framework.core.exceptions.NotFoundException;
 import org.alfresco.rest.framework.resource.EntityResource;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
@@ -39,10 +39,17 @@ import org.springframework.beans.factory.InitializingBean;
  * An implementation of an Entity Resource for Queries.
  *
  * @author janv
+ * @author Alan Davis
  */
 @EntityResource(name="queries", title = "Queries")
-public class QueriesEntityResource implements EntityResourceAction.ReadById<CollectionWithPagingInfo<Node>>, InitializingBean
+public class QueriesEntityResource implements
+        EntityResourceAction.ReadById<CollectionWithPagingInfo<? extends Object>>,
+        InitializingBean
 {
+    private final static String QUERY_NODES = "nodes";
+    private final static String QUERY_PEOPLE = "people";
+    private final static String QUERY_SITES = "sites";
+
     private Queries queries;
 
     public void setQueries(Queries queries)
@@ -59,8 +66,18 @@ public class QueriesEntityResource implements EntityResourceAction.ReadById<Coll
     // hmm - a little unorthodox
     @Override
     @WebApiDescription(title="Find results", description = "Find & list search results for given query id")
-    public CollectionWithPagingInfo<Node> readById(String queryId, Parameters parameters)
+    public CollectionWithPagingInfo<? extends Object> readById(String queryId, Parameters parameters)
     {
-        return queries.findNodes(queryId, parameters);
+        switch (queryId)
+        {
+        case QUERY_NODES:
+            return queries.findNodes(parameters);
+        case QUERY_PEOPLE:
+            return queries.findPeople(parameters);
+        case QUERY_SITES:
+            return queries.findSites(parameters);
+        default:
+            throw new NotFoundException(queryId);
+        }
     }
 }

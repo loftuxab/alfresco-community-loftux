@@ -30,10 +30,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import javax.transaction.NotSupportedException;
 import javax.transaction.SystemException;
@@ -54,7 +63,6 @@ import org.alfresco.service.cmr.rule.Rule;
 import org.alfresco.service.cmr.rule.RuleType;
 import org.alfresco.service.cmr.version.Version;
 import org.alfresco.service.cmr.version.VersionHistory;
-import org.alfresco.test_category.BaseSpringTestsCategory;
 import org.alfresco.test_category.OwnJVMTestsCategory;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -264,7 +272,7 @@ public class BulkImportTest extends AbstractBulkImportTests
 
         System.out.println(bulkImporter.getStatus());
 
-        assertEquals("", 74, bulkImporter.getStatus().getNumberOfContentNodesCreated());
+        assertEquals(74, bulkImporter.getStatus().getNumberOfContentNodesCreated());
 
         checkFiles(folderNode, null, 2, 9, new ExpectedFile[] {
                 new ExpectedFile("quickImg1.xls", MimetypeMap.MIMETYPE_EXCEL),
@@ -606,6 +614,76 @@ public class BulkImportTest extends AbstractBulkImportTests
         assertNotNull(contentReader);
         assertEquals("This is version 1 of fileWithVersions.txt.", contentReader.getContentString());
 
+    }
+    
+    /**
+     * MNT-15367: Unable to bulk import filenames with Portuguese characters in a Linux environment
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testImportFilesWithSpecialCharacters() throws Throwable
+    {
+        NodeRef folderNode = topLevelFolder.getNodeRef();
+        NodeImporter nodeImporter = null;
+
+        File source = ResourceUtils.getFile("classpath:bulkimport4");
+        //Simulate the name of the file with an invalid encoding.
+        String fileName = new String("135 CarbonÔÇô13 NMR spectroscopy_DS_NS_final_cau.txt".getBytes(Charset.forName("ISO-8859-1")), 
+                                      Charset.forName("UTF-8"));
+        Path dest = source.toPath().resolve("encoding");
+        try
+        {
+            dest = Files.createDirectory(dest);
+        }
+        catch (FileAlreadyExistsException ex)
+        {
+            //It is fine if the folder already exists, though it should not.
+        }
+        Path destFile = dest.resolve(fileName);
+
+        unpack(source.toPath(), destFile);
+        
+        txn = transactionService.getUserTransaction();
+        txn.begin();
+
+        nodeImporter = streamingNodeImporterFactory.getNodeImporter(ResourceUtils.getFile("classpath:bulkimport4/encoding"));
+
+        BulkImportParameters bulkImportParameters = new BulkImportParameters();
+        bulkImportParameters.setTarget(folderNode);
+        bulkImportParameters.setReplaceExisting(true);
+        bulkImportParameters.setDisableRulesService(true);
+        bulkImportParameters.setBatchSize(40);
+        bulkImporter.bulkImport(bulkImportParameters, nodeImporter);
+
+        assertEquals(1, bulkImporter.getStatus().getNumberOfContentNodesCreated());
+
+        checkFiles(folderNode, null, 0, 1, 
+                   new ExpectedFile[] { new ExpectedFile(fileName, MimetypeMap.MIMETYPE_TEXT_PLAIN)}, 
+                   null);
+
+         Files.deleteIfExists(destFile);
+         Files.deleteIfExists(dest);
+    }
+    
+    private void unpack(Path source, Path destFile)
+    {
+        Path archive = source.resolve("testbulk.gz");
+            
+        try (GZIPInputStream gzis = new GZIPInputStream(Files.newInputStream(archive));
+             OutputStream out = Files.newOutputStream(destFile, StandardOpenOption.CREATE))
+        {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = gzis.read(buffer)) > 0) 
+            {
+                out.write(buffer, 0, len);
+            }
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();   
+        }
     }
 
 }

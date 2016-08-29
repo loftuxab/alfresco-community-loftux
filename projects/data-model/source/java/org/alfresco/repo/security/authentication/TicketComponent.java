@@ -117,7 +117,6 @@ public interface TicketComponent
 	 * This may be lower than the ticket count, since a user can have more than one ticket/session
 	 *
 	 * @param nonExpiredOnly  true for non expired tickets, false for all (including expired) tickets
-	 * @return Set<String>   set of users with (one or more) tickets
 	 */
     public Set<String> getUsersWithTickets(boolean nonExpiredOnly);
 

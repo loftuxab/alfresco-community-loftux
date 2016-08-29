@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.alfresco</groupId>
     <artifactId>alfresco-super-pom</artifactId>
-    <version>6</version>
+    <version>7</version>
   </parent>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
@@ -59,7 +59,7 @@
           <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-staging</url>
       </repository>
       <snapshotRepository>
-          <id>alfresco-internal-snapshots</id>
+          <id>${maven.distributionManagement.snapshot.id}</id>
           <url>${maven.distributionManagement.snapshot.url}</url>
       </snapshotRepository>
   </distributionManagement>
@@ -109,7 +109,6 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.build.sourceVersion>1.8</maven.build.sourceVersion>
 
     <!-- Arguments for test execution in surefire -->
     <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
@@ -120,6 +119,7 @@
     <maven.scm.developerConnection>scm:svn:https://svn.alfresco.com/repos/alfresco-enterprise/alfresco/HEAD</maven.scm.developerConnection>
     <maven.scm.url>https://fisheye.alfresco.com/changelog/alfresco-enterprise</maven.scm.url>
     <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/public</maven.repository.url>
+    <maven.distributionManagement.snapshot.id>alfresco-internal-snapshots</maven.distributionManagement.snapshot.id>
     <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
@@ -132,7 +132,7 @@
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
     <dependency.truezip.version>7.7.9</dependency.truezip.version>
     <dependency.jibx.version>1.2.6</dependency.jibx.version>
-    <dependency.tika.version>1.6-20160412-alfresco-patched</dependency.tika.version>
+    <dependency.tika.version>1.6-20160727-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
@@ -145,14 +145,14 @@
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.2</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.8</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.4-SNAPSHOT</dependency.alfresco-core.version>
-    <dependency.alfresco-jlan.version>6.2-SNAPSHOT</dependency.alfresco-jlan.version>
+    <dependency.alfresco-core.version>6.4</dependency.alfresco-core.version>
+    <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
-    <dependency.api-explorer.version>1.1-SNAPSHOT</dependency.api-explorer.version>
+    <dependency.api-explorer.version>1.2-SNAPSHOT</dependency.api-explorer.version>
 
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1.2-SNAPSHOT</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.3</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
@@ -585,7 +585,6 @@
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.8</version>
             <configuration>
                 <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
                 <organizationName>Alfresco Software Limited</organizationName>
@@ -689,27 +688,25 @@
             </executions>
         </plugin>
 
+                <!-- Configure deployment of releases to Staging area of Nexus -->
         <plugin>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <phase>deploy</phase>
-                    <goals><goal>jar-no-fork</goal></goals>
-                </execution>
-            </executions>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+                <serverId>alfresco-internal-staging</serverId>
+                <nexusUrl>https://artifacts.alfresco.com/nexus</nexusUrl>
+                <stagingProfileId>${release.staging.profile}</stagingProfileId>
+                <stagingDescription>Staging Platform ${project.version} (${bamboo_buildResultKey} ${bamboo_planRepository_revision})</stagingDescription>
+                <tags>
+                    <build.number>${bamboo_buildNumber}</build.number>
+                    <build.key>${bamboo_buildKey}</build.key>
+                    <build.revision>${bamboo_planRepository_revision}</build.revision>
+                </tags>
+            </configuration>
         </plugin>
-        <plugin>
-            <!-- explicitly define maven-deploy-plugin after other to force exec order -->
-            <artifactId>maven-deploy-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>deploy</id>
-                    <phase>deploy</phase>
-                    <goals><goal>deploy</goal></goals>
-                </execution>
-            </executions>
-        </plugin>
+
+
 
     </plugins>
 
@@ -754,6 +751,9 @@
                 <configuration>
                     <javadocDirectory>source/javadoc</javadocDirectory>
                     <excludePackageNames>org.customer,org.apache</excludePackageNames>
+                    <links>
+                        <link>http://docs.oracle.com/javaee/7/api</link>
+                    </links>
                 </configuration>
             </plugin>
             <plugin>
@@ -1440,8 +1440,9 @@
             </dependency>
         </dependencies>
     </profile>
+    
     <profile>
-        <id>doclint-java8-disable</id>
+        <id>doclint-java8-max</id>
         <activation>
             <jdk>[1.8,)</jdk>
         </activation>
@@ -1450,12 +1451,14 @@
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
+                        <!-- <additionalparam>-Xmaxwarns 10000 -Xmaxerrs 10000</additionalparam> to detect more than 100 error -->
                         <additionalparam>-Xdoclint:none</additionalparam>
                     </configuration>
                 </plugin>
             </plugins>
         </build>
     </profile>
+    
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>

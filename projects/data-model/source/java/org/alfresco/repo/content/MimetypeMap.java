@@ -186,6 +186,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String MIMETYPE_APPLICATION_EPS = "application/eps";
 
+    public static final String MIMETYPE_APPLICATION_PS = "application/postscript";
+
     public static final String MIMETYPE_JAVASCRIPT = "application/x-javascript";
 
     public static final String MIMETYPE_ZIP = "application/zip";
@@ -768,6 +770,17 @@ public class MimetypeMap implements MimetypeService
             // Probably close enough
             return null;
         }
+        
+        // Check through known aliases of the type
+        SortedSet<MediaType> aliases = tikaConfig.getMediaTypeRegistry().getAliases(type);
+        for (MediaType alias : aliases)
+        {
+            String aliasType = alias.toString();
+            if (aliasType.equals(claimed.toString())) 
+            {
+                return null; 
+            }
+        }
 
         // If we get here, then most likely the type is wrong
         return type.toString();
@@ -835,7 +848,10 @@ public class MimetypeMap implements MimetypeService
 
         // If Tika has supplied a very generic type, go with the filename one,
         // as it's probably a custom Text or XML format known only to Alfresco
-        if (MediaType.TEXT_PLAIN.equals(type) || MediaType.APPLICATION_XML.equals(type)) { return filenameGuess; }
+        if ((MediaType.TEXT_PLAIN.equals(type) || MediaType.APPLICATION_XML.equals(type)) && (! filenameGuess.equals(MIMETYPE_BINARY)))
+        { 
+            return filenameGuess; 
+        }
 
         // Alfresco doesn't support mimetype parameters
         // Use the form of the mimetype without any

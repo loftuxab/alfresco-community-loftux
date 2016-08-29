@@ -25,15 +25,22 @@
  */
 package org.alfresco.repo.bulkimport;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.alfresco.repo.bulkimport.impl.FileUtils;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class is a DTO that represents an "importable item" - a series of files
@@ -51,6 +58,8 @@ public final class ImportableItem
         OTHER
     };
 
+    protected static final Log logger = LogFactory.getLog(ImportableItem.class);
+    
     private ContentAndMetadata headRevision = new ContentAndMetadata();
     private SortedSet<VersionedContentAndMetadata> versionEntries = null;
     private NodeRef nodeRef;
@@ -68,45 +77,45 @@ public final class ImportableItem
     }
     
     public void setNodeRef(NodeRef nodeRef)
-	{
-		this.nodeRef = nodeRef;
-	}
+    {
+        this.nodeRef = nodeRef;
+    }
     
     public NodeRef getNodeRef()
-	{
-		return nodeRef;
-	}
-    
+    {
+        return nodeRef;
+    }
+
     public void clearParent()
     {
-    	numChildren--;
-    	if(numChildren <= 0)
-    	{
-    		numChildren = 0;
-    		parent = null;
-    	}
+        numChildren--;
+        if (numChildren <= 0)
+        {
+            numChildren = 0;
+            parent = null;
+        }
     }
 
     public void setParent(ImportableItem parent)
-	{
-    	if(parent == null)
-    	{
-    		throw new IllegalArgumentException("Parent cannot be null");
-    	}
-		this.parent = parent;
-	}
+    {
+        if (parent == null)
+        {
+            throw new IllegalArgumentException("Parent cannot be null");
+        }
+        this.parent = parent;
+    }
     
     public ImportableItem getParent()
-	{
-		return parent;
-	}
+    {
+        return parent;
+    }
 
-	/**
+    /**
      * @return True if this ImportableItem has version entries.
      */
     public boolean hasVersionEntries()
     {
-        return(versionEntries != null && versionEntries.size() > 0);
+        return (versionEntries != null && versionEntries.size() > 0);
     }
     
     public Set<VersionedContentAndMetadata> getVersionEntries()
@@ -138,49 +147,58 @@ public final class ImportableItem
     
     public class ContentAndMetadata
     {
-        private File     contentFile           = null;
+        private Path     contentFile           = null;
         private boolean  contentFileExists     = false;
         private boolean  contentFileIsReadable = false;
         private FileType contentFileType       = null;
         private long     contentFileSize       = -1;
         private Date     contentFileCreated    = null;
         private Date     contentFileModified   = null;
-        private File     metadataFile          = null;
+        private Path     metadataFile          = null;
         private long     metadataFileSize      = -1;
 
         
-        public final File getContentFile()
+        public final Path getContentFile()
         {
-            return(contentFile);
+            return contentFile;
         }
         
-        public final void setContentFile(final File contentFile)
+        public final void setContentFile(final Path contentFile)
         {
             this.contentFile = contentFile;
             
             if (contentFile != null)
             {
                 // stat the file, to find out a few key details
-                contentFileExists = contentFile.exists();
+                contentFileExists = Files.exists(contentFile, LinkOption.NOFOLLOW_LINKS);
                 
                 if (contentFileExists)
                 {
-                    contentFileIsReadable = contentFile.canRead();
-                    contentFileSize       = contentFile.length();
-                    contentFileModified   = new Date(contentFile.lastModified());
-                    contentFileCreated    = contentFileModified;    //TODO: determine proper file creation time (awaiting JDK 1.7 NIO2 library)
-                    
-                    if (contentFile.isFile())
+                    try
                     {
-                        contentFileType = FileType.FILE;
+                        BasicFileAttributes attrs = Files.readAttributes(contentFile, BasicFileAttributes.class);
+
+                        contentFileIsReadable = Files.isReadable(contentFile);
+                        contentFileSize       = attrs.size();
+                        contentFileModified   = new Date(attrs.lastModifiedTime().toMillis());
+                        contentFileCreated    = new Date(attrs.creationTime().toMillis());
+
+                        if (Files.isRegularFile(contentFile, LinkOption.NOFOLLOW_LINKS))
+                        {
+                            contentFileType = FileType.FILE;
+                        }
+                        else if (Files.isDirectory(contentFile, LinkOption.NOFOLLOW_LINKS))
+                        {
+                            contentFileType = FileType.DIRECTORY;
+                        }
+                        else
+                        {
+                            contentFileType = FileType.OTHER;
+                        }
                     }
-                    else if (contentFile.isDirectory())
+                    catch (IOException e)
                     {
-                        contentFileType = FileType.DIRECTORY;
-                    }
-                    else
-                    {
-                        contentFileType = FileType.OTHER;
+                        logger.error("Attributes for file '" + FileUtils.getFileName(contentFile) + "' could not be read.", e);
                     }
                 }
             }
@@ -241,17 +259,27 @@ public final class ImportableItem
             return(metadataFile != null);
         }
         
-        public final File getMetadataFile()
+        public final Path getMetadataFile()
         {
-            return(metadataFile);
+            return metadataFile;
         }
         
-        public final void setMetadataFile(final File metadataFile)
+        public final void setMetadataFile(final Path metadataFile)
         {
-            if (metadataFile != null && metadataFile.exists())
+            if (metadataFile != null && Files.exists(metadataFile))
             {
-                this.metadataFile     = metadataFile;
-                this.metadataFileSize = metadataFile.length();
+                this.metadataFile = metadataFile;
+                try
+                {
+                    this.metadataFileSize = Files.size(metadataFile);
+                }
+                catch (IOException e)
+                {
+                    if (logger.isWarnEnabled()) 
+                    {
+                        logger.warn("Size for the metadata file '" + FileUtils.getFileName(metadataFile) + "' could not be retrieved.", e);
+                    }
+                }
             }
         }
         

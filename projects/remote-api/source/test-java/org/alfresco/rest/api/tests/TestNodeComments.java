@@ -64,6 +64,10 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * V1 REST API tests for Node Comments
+ *
+ */
 public class TestNodeComments extends EnterpriseTestApi
 {
 	private TestNetwork network1;
@@ -88,9 +92,13 @@ public class TestNodeComments extends EnterpriseTestApi
 	private NodeRef cmObjectNodeRef;
 	private NodeRef customTypeObject;
 	
+	@Override
 	@Before
 	public void setup() throws Exception
 	{
+		// init networks
+		super.setup();
+		
 		Iterator<TestNetwork> accountsIt = getTestFixture().getNetworksIt();
 		this.network1 = accountsIt.next();
 		this.network2 = accountsIt.next();

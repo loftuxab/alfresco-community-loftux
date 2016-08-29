@@ -25,8 +25,7 @@
  */
 package org.alfresco.rest.api.tests;
 
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.rest.AbstractSingleNetworkSiteTest;
 import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.Queries;
 import org.alfresco.rest.api.tests.client.HttpResponse;
@@ -38,10 +37,6 @@ import org.alfresco.rest.api.tests.client.data.Folder;
 import org.alfresco.rest.api.tests.client.data.Node;
 import org.alfresco.rest.api.tests.client.data.Tag;
 import org.alfresco.rest.api.tests.util.RestApiUtil;
-import org.alfresco.service.cmr.security.MutableAuthenticationService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -56,66 +51,18 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 /**
- * API tests for:
+* V1 REST API tests for pre-defined 'live' search Queries on Nodes
+ * 
  * <ul>
- * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/queries} </li>
+ * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/queries/nodes} </li>
  * </ul>
  *
  * @author janv
  */
-public class QueriesApiTest extends AbstractBaseApiTest
+public class QueriesNodesApiTest extends AbstractSingleNetworkSiteTest
 {
-    private static final String URL_QUERIES_LSN = "queries/live-search-nodes";
-
-    private String user1;
-    private String user2;
-    private List<String> users = new ArrayList<>();
-
-    protected MutableAuthenticationService authenticationService;
-    protected PersonService personService;
-
-    private final String RUNID = System.currentTimeMillis()+"";
-
-    @Before
-    public void setup() throws Exception
-    {
-        authenticationService = applicationContext.getBean("authenticationService", MutableAuthenticationService.class);
-        personService = applicationContext.getBean("personService", PersonService.class);
-
-        // note: createUser currently relies on repoService
-        user1 = createUser("user1-" + RUNID);
-        user2 = createUser("user2-" + RUNID);
-
-        // We just need to clean the on-premise-users,
-        // so the tests for the specific network would work.
-        users.add(user1);
-        users.add(user2);
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
-        for (final String user : users)
-        {
-            transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>()
-            {
-                @Override
-                public Void execute() throws Throwable
-                {
-                    if (personService.personExists(user))
-                    {
-                        authenticationService.deleteAuthentication(user);
-                        personService.deletePerson(user);
-                    }
-                    return null;
-                }
-            });
-        }
-        users.clear();
-        AuthenticationUtil.clearCurrentSecurityContext();
-    }
-
+    private static final String URL_QUERIES_LSN = "queries/nodes";
+    
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue( Map<K, V> map )
     {
         List<Map.Entry<K, V>> list =
@@ -140,11 +87,13 @@ public class QueriesApiTest extends AbstractBaseApiTest
      * Tests basic api for nodes live search - metadata (name, title, description) &/or full text search of file/content
      *
      * <p>GET:</p>
-     * {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/queries/live-search-nodes}
+     * {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/queries/nodes}
      */
     @Test
     public void testLiveSearchNodes_FTS_and_Metadata() throws Exception
     {
+        setRequestContext(user1);
+        
         int f1Count = 5;
         List<String> f1NodeIds = new ArrayList<>(f1Count);
 
@@ -169,14 +118,14 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params.put(Queries.PARAM_TERM, testTerm);
 
             // Try to get nodes with search term 'abc123' - assume clean repo (ie. none to start with)
-            HttpResponse response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            HttpResponse response = getAll(URL_QUERIES_LSN, paging, params, 200);
             List<Node> nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(0, nodes.size());
 
-            String myFolderNodeId = getMyNodeId(user1);
+            String myFolderNodeId = getMyNodeId();
 
-            String f1Id = createFolder(user1, myFolderNodeId, "folder 1").getId();
-            String f2Id = createFolder(user1, myFolderNodeId, "folder 2").getId();
+            String f1Id = createFolder(myFolderNodeId, "folder 1").getId();
+            String f2Id = createFolder(myFolderNodeId, "folder 2").getId();
 
             String name = "name";
             String title = "title";
@@ -200,7 +149,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 docProps.put("cm:title", title+num+title);
                 docProps.put("cm:description", descrip+num+descrip);
 
-                Document doc = createTextFile(user1, f1Id, docName, contentText, "UTF-8", docProps);
+                Document doc = createTextFile(f1Id, docName, contentText, "UTF-8", docProps);
 
                 f1NodeIds.add(doc.getId());
                 idNameMap.put(doc.getId(), docName);
@@ -221,7 +170,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 props.put("cm:title", title+num+title);
                 props.put("cm:description", descrip+num+descrip);
 
-                Document doc = createTextFile(user1, f2Id, docName, contentText, "UTF-8", props);
+                Document doc = createTextFile(f2Id, docName, contentText, "UTF-8", props);
 
                 f2NodeIds.add(doc.getId());
                 idNameMap.put(doc.getId(), docName);
@@ -240,7 +189,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 props.put("cm:title", title+num+title);
                 props.put("cm:description", descrip+num+descrip);
 
-                Node node = createFolder(user1, myFolderNodeId, folderName, props);
+                Node node = createFolder(myFolderNodeId, folderName, props);
 
                 f3NodeIds.add(node.getId());
                 idNameMap.put(node.getId(), folderName);
@@ -257,7 +206,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             // Search hits based on FTS (content) and also name (in case of folder nodes)
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, null);
             for (Node node : nodes)
@@ -271,8 +220,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
             // Search - include optional fields - eg. aspectNames, properties, path, isLink
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("include", "aspectNames,properties,path,isLink");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_INCLUDE, "aspectNames,properties,path,isLink");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, null);
             for (Node node : nodes)
@@ -287,7 +236,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
             params.put(Queries.PARAM_NODE_TYPE, "cm:folder");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f3NodeIds, null);
 
@@ -295,7 +244,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
             params.put(Queries.PARAM_ROOT_NODE_ID, Nodes.PATH_ROOT);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, null);
 
@@ -303,7 +252,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
             params.put(Queries.PARAM_ROOT_NODE_ID, Nodes.PATH_SHARED);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(0, nodes.size());
 
@@ -311,7 +260,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
             params.put(Queries.PARAM_ROOT_NODE_ID, f1Id);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f1NodeIds, null);
 
@@ -319,7 +268,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
             params.put(Queries.PARAM_ROOT_NODE_ID, f2Id);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f2NodeIds, null);
 
@@ -327,7 +276,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, name+"*");
             params.put(Queries.PARAM_ROOT_NODE_ID, Nodes.PATH_MY);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, null);
 
@@ -335,7 +284,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             String term = name+String.format("%05d", 1)+name;
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, "\""+term+"\"");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(3, nodes.size());
             for (Node node : nodes)
@@ -354,7 +303,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             term = name+String.format("%05d", 1)+name+txtSuffix;
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, term);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(2, nodes.size());
 
@@ -362,7 +311,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
             term = name+String.format("%05d", 1)+name+txtSuffix;
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, "\""+term+"\"");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(2, nodes.size());
 
@@ -370,8 +319,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
             term = title+String.format("%05d", 2)+title;
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, "\""+term+"\"");
-            params.put("include", "properties");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_INCLUDE, "properties");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(3, nodes.size());
             assertEquals(term, nodes.get(0).getProperties().get("cm:title"));
@@ -382,8 +331,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
             term = descrip+String.format("%05d", 3)+descrip;
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, "\""+term+"\"");
-            params.put("include", "properties");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_INCLUDE, "properties");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             assertEquals(3, nodes.size());
             assertEquals(term, nodes.get(0).getProperties().get("cm:description"));
@@ -393,44 +342,46 @@ public class QueriesApiTest extends AbstractBaseApiTest
             // TODO sanity check tag search
 
             // -ve test - no params (ie. no term)
-            getAll(URL_QUERIES_LSN, user1, paging, null, 400);
+            getAll(URL_QUERIES_LSN, paging, null, 400);
 
             // -ve test - no term
             params = new HashMap<>(1);
             params.put(Queries.PARAM_ROOT_NODE_ID, f1Id);
-            getAll(URL_QUERIES_LSN, user1, paging, params, 400);
+            getAll(URL_QUERIES_LSN, paging, params, 400);
 
             // -ve test - unknown root node id
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, "abc");
             params.put(Queries.PARAM_ROOT_NODE_ID, "dummy");
-            getAll(URL_QUERIES_LSN, user1, paging, params, 404);
+            getAll(URL_QUERIES_LSN, paging, params, 404);
 
             // -ve test - unknown node type
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, "abc");
             params.put(Queries.PARAM_NODE_TYPE, "cm:dummy");
-            getAll(URL_QUERIES_LSN, user1, paging, params, 400);
+            getAll(URL_QUERIES_LSN, paging, params, 400);
 
             // -ve test - term too short
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, "ab");
-            getAll(URL_QUERIES_LSN, user1, paging, params, 400);
+            getAll(URL_QUERIES_LSN, paging, params, 400);
 
             // -ve test - term is still too short
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, "  \"a b *\"  ");
-            getAll(URL_QUERIES_LSN, user1, paging, params, 400);
+            getAll(URL_QUERIES_LSN, paging, params, 400);
 
             // -ve test - unauthenticated - belts-and-braces ;-)
-            getAll(URL_QUERIES_LSN, null, paging, params, 401);
+            setRequestContext(null);
+            getAll(URL_QUERIES_LSN, paging, params, 401);
         }
         finally
         {
             // some cleanup
+            setRequestContext(user1);
             for (String docId : allIds)
             {
-                delete(URL_NODES, user1, docId, 204);
+                deleteNode(docId, true, 204);
             }
         }
     }
@@ -438,6 +389,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
     @Test
     public void testLiveSearchNodes_SortPage() throws Exception
     {
+        setRequestContext(user1);
+        
         int f1Count = 5;
         List<String> f1NodeIds = new ArrayList<>(f1Count);
 
@@ -458,10 +411,10 @@ public class QueriesApiTest extends AbstractBaseApiTest
             Map<String, String> params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
 
-            String myFolderNodeId = getMyNodeId(user1);
+            String myFolderNodeId = getMyNodeId();
 
-            String f1Id = createFolder(user1, myFolderNodeId, "folder sort 1").getId();
-            String f2Id = createFolder(user1, myFolderNodeId, "folder sort 2").getId();
+            String f1Id = createFolder(myFolderNodeId, "folder sort 1").getId();
+            String f2Id = createFolder(myFolderNodeId, "folder sort 2").getId();
 
             String name = "name";
 
@@ -476,7 +429,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 String num = String.format("%05d", nameIdx);
                 String docName = name+num+name+".txt";
 
-                Document doc = createTextFile(user1, f1Id, docName, contentText, "UTF-8", null);
+                Document doc = createTextFile(f1Id, docName, contentText, "UTF-8", null);
 
                 f1NodeIds.add(doc.getId());
                 idNameMap.put(doc.getId(), docName);
@@ -493,7 +446,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 String num = String.format("%05d", nameIdx);
                 String docName = name+num+name+".txt";
 
-                Document doc = createTextFile(user1, f2Id, docName, contentText, "UTF-8", null);
+                Document doc = createTextFile(f2Id, docName, contentText, "UTF-8", null);
 
                 f2NodeIds.add(doc.getId());
                 idNameMap.put(doc.getId(), docName);
@@ -523,71 +476,71 @@ public class QueriesApiTest extends AbstractBaseApiTest
             // default sort order (modifiedAt desc)
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            HttpResponse response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            HttpResponse response = getAll(URL_QUERIES_LSN, paging, params, 200);
             List<Node> nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, false);
 
             // sort order - modifiedAt asc
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "modifiedAt asc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "modifiedAt asc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, false);
 
             // sort order - modifiedAt desc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "modifiedAt desc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "modifiedAt desc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, true);
 
             // sort order - createdAt asc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "createdAt asc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "createdAt asc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, true);
 
             // sort order - createdAt desc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "createdAt desc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "createdAt desc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, false);
 
             // sort order - name asc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "name asc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "name asc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, idsSortedByNameAsc, true);
 
             // sort order - name desc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "name desc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "name desc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, idsSortedByNameAsc, false);
 
             // sort order - name desc, createdAt asc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "name desc, createdAt asc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "name desc, createdAt asc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, idsSortedByNameDescCreatedAtAsc, false);
 
             // sort order - name asc, createdAt asc
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "name asc, createdAt desc");
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            params.put(Queries.PARAM_ORDERBY, "name asc, createdAt desc");
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, idsSortedByNameDescCreatedAtAsc, true);
 
@@ -597,21 +550,21 @@ public class QueriesApiTest extends AbstractBaseApiTest
 
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, false);
 
             paging = getPaging(0, f1Count);
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f1NodeIds, false);
 
             paging = getPaging(f1Count, f2Count);
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTerm);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f2NodeIds, false);
 
@@ -621,18 +574,20 @@ public class QueriesApiTest extends AbstractBaseApiTest
             // -ve test - invalid sort field
             params = new HashMap<>(2);
             params.put(Queries.PARAM_TERM, testTerm);
-            params.put("orderBy", "invalid asc");
-            getAll(URL_QUERIES_LSN, user1, paging, params, 400);
+            params.put(Queries.PARAM_ORDERBY, "invalid asc");
+            getAll(URL_QUERIES_LSN, paging, params, 400);
 
             // -ve test - unauthenticated - belts-and-braces ;-)
-            getAll(URL_QUERIES_LSN, null, paging, params, 401);
+            setRequestContext(null);
+            getAll(URL_QUERIES_LSN, paging, params, 401);
         }
         finally
         {
             // some cleanup
+            setRequestContext(user1);
             for (String docId : allIds)
             {
-                delete(URL_NODES, user1, docId, 204);
+                deleteNode(docId, true, 204);
             }
         }
     }
@@ -640,6 +595,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
     @Test
     public void testLiveSearchNodes_Tags() throws Exception
     {
+        setRequestContext(user1);
+        
         PublicApiClient.Nodes nodesProxy = publicApiClient.nodes();
 
         int f1Count = 5;
@@ -661,8 +618,8 @@ public class QueriesApiTest extends AbstractBaseApiTest
 
             Paging paging = getPaging(0, 100);
 
-            String f1Id = createFolder(user1, Nodes.PATH_MY, "folder tag 1").getId();
-            String f2Id = createFolder(user1, Nodes.PATH_MY, "folder tag 2").getId();
+            String f1Id = createFolder(Nodes.PATH_MY, "folder tag 1").getId();
+            String f2Id = createFolder(Nodes.PATH_MY, "folder tag 2").getId();
 
             String name = "name";
 
@@ -672,7 +629,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 String contentText = "f1 test document " + user1 + " document " + i;
                 String docName = name+i;
 
-                Document doc = createTextFile(user1, f1Id, docName, contentText, "UTF-8", null);
+                Document doc = createTextFile(f1Id, docName, contentText, "UTF-8", null);
 
                 publicApiClient.setRequestContext(new RequestContext("", user1));
 
@@ -687,7 +644,7 @@ public class QueriesApiTest extends AbstractBaseApiTest
                 // create folder - in folder 2
                 String folderName = name+i;
 
-                Folder folder = createFolder(user1, f2Id, folderName, null);
+                Folder folder = createFolder(f2Id, folderName, null);
 
                 publicApiClient.setRequestContext(new RequestContext("", user1));
 
@@ -704,28 +661,29 @@ public class QueriesApiTest extends AbstractBaseApiTest
 
             Map<String, String> params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testTag);
-            HttpResponse response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            HttpResponse response = getAll(URL_QUERIES_LSN, paging, params, 200);
             List<Node> nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, allIds, null);
 
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testFileTag);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f1NodeIds, null);
 
             params = new HashMap<>(1);
             params.put(Queries.PARAM_TERM, testFolderTag);
-            response = getAll(URL_QUERIES_LSN, user1, paging, params, 200);
+            response = getAll(URL_QUERIES_LSN, paging, params, 200);
             nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
             checkNodeIds(nodes, f2NodeIds, null);
         }
         finally
         {
             // some cleanup
+            setRequestContext(user1);
             for (String nodeId : allIds)
             {
-                delete(URL_NODES, user1, nodeId, 204);
+                deleteNode(nodeId, true, 204);
             }
         }
     }

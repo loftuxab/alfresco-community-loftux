@@ -54,10 +54,8 @@ public class LuceneQuery<Q, S, E extends Throwable> extends BaseQuery implements
 {
 
     /**
-     * @param columns List<Column>
      * @param source Source
      * @param constraint Constraint
-     * @param orderings List<Ordering>
      */
     public LuceneQuery(List<Column> columns, Source source, Constraint constraint, List<Ordering> orderings)
     {

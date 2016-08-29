@@ -59,6 +59,9 @@ public class EMLTransformerTest extends AbstractContentTransformerTest
 
     private EMLTransformer transformer;
 
+    private ContentTransformerRegistry registry;
+    private ContentTransformerWorker ooWorker;
+
     @Override
     public void setUp() throws Exception
     {
@@ -68,6 +71,10 @@ public class EMLTransformerTest extends AbstractContentTransformerTest
         transformer.setMimetypeService(mimetypeService);
         transformer.setTransformerDebug(transformerDebug);
         transformer.setTransformerConfig(transformerConfig);
+        
+        registry = (ContentTransformerRegistry) ctx.getBean("contentTransformerRegistry");
+
+        ooWorker = (ContentTransformerWorker) ctx.getBean("transformer.worker.OpenOffice");
     }
 
     @Override
@@ -101,6 +108,46 @@ public class EMLTransformerTest extends AbstractContentTransformerTest
         ContentReader reader2 = new FileContentReader(txtTargetFile);
         reader2.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         assertTrue(reader2.getContentString().contains(QUICK_EML_CONTENT));
+    }
+
+    /**
+     * Test transforming a valid eml file to pdf using complex transformer ("Rfc822ToPdf") - eg. for HTML5 preview
+     */
+    public void testRFC822ToPdf() throws Exception
+    {
+        assertNotNull(registry.getTransformer("transformer.complex.Rfc822ToPdf"));
+                
+        // workaround for build machines (borrowed from OpenOfficeContentTransformerTest)
+        if (!ooWorker.isAvailable())
+        {
+            // no connection
+            return;
+        }
+        
+        String sourceMimetype = MimetypeMap.MIMETYPE_RFC822;
+        String targetMimetype = MimetypeMap.MIMETYPE_PDF;
+
+        String sourceExtension = mimetypeService.getExtension(sourceMimetype);
+        String targetExtension = mimetypeService.getExtension(targetMimetype);
+
+        File emlSourceFile = loadQuickTestFile("eml");
+        ContentReader sourceReader = new FileContentReader(emlSourceFile);
+
+        ContentTransformer transformer = registry.getTransformer(sourceMimetype, -1, targetMimetype, null);
+        assertNotNull(transformer);
+
+        // make a writer for the target file
+        File targetFile = TempFileProvider.createTempFile(getClass().getSimpleName() + "_"
+                + getName() + "_" + sourceExtension + "_", "." + targetExtension);
+        ContentWriter targetWriter = new FileContentWriter(targetFile);
+
+        // do the transformation
+        sourceReader.setMimetype(sourceMimetype);
+        targetWriter.setMimetype(targetMimetype);
+        transformer.transform(sourceReader.getReader(), targetWriter);
+
+        ContentReader targetReader = new FileContentReader(targetFile);
+        assertTrue(targetReader.getSize() > 0);
     }
 
     /**

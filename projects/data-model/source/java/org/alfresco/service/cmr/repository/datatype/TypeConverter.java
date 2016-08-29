@@ -376,7 +376,6 @@ public class TypeConverter
     /**
      * Get a collection for the passed value converted to the specified type
      * 
-     * @param c Class<T>
      * @param value Object
      * @return Collection
      */
@@ -388,12 +387,6 @@ public class TypeConverter
         
     /**
      * Add a converter to the list of those available
-     * 
-     * @param <F> from
-     * @param <T> to
-     * @param source Class<F>
-     * @param destination Class<T>
-     * @param converter Converter<F, T>
      */
     public final <F, T> void addConverter(Class<F> source, Class<T> destination, Converter<F, T> converter)
     {
@@ -408,12 +401,6 @@ public class TypeConverter
 
     /**
      * Add a dynamic two stage converter
-     * @param <F>  from
-     * @param <I>  intermediate
-     * @param <T>  to
-     * @param source Class<F>
-     * @param intermediate Class<I>
-     * @param destination Class<T>
      */
     public final <F, I, T> Converter<F, T> addDynamicTwoStageConverter(Class<F> source, Class<I> intermediate, Class<T> destination)
     {
@@ -428,10 +415,6 @@ public class TypeConverter
      * Note: Takes into account the class of the object and any interfaces it may
      *       also support.
      * 
-     * @param <T> to
-     * @param value Object
-     * @param dest Class<T>
-     * @return T
      */
     @SuppressWarnings("unchecked")
     public final <T> Converter<Object, T> getConverter(Object value, Class<T> dest)
@@ -477,10 +460,6 @@ public class TypeConverter
     /**
      * Find a conversion for a specific Class 
      * 
-     * @param <F> from
-     * @param <T> to
-     * @param source Class<F>
-     * @param dest Class<T>
      * @return conversion
      */
     @SuppressWarnings("unchecked")
@@ -534,8 +513,8 @@ public class TypeConverter
      * 
      * @author andyh
      *
-     * @param <F> From type
-     * @param <T> To type
+     * @param F From type
+     * @param T To type
      */
     @AlfrescoPublicApi
     public interface Converter<F, T>
@@ -548,9 +527,9 @@ public class TypeConverter
      * 
      * @author andyh
      *
-     * @param <F> From Type
-     * @param <I> Intermediate type
-     * @param <T> To Type
+     * @param F From Type
+     * @param I Intermediate type
+     * @param T To Type
      */
     @AlfrescoPublicApi
     public static class TwoStageConverter<F, I, T> implements Converter<F, T>
@@ -576,9 +555,9 @@ public class TypeConverter
      * 
      * @author David Caruana
      *
-     * @param <F> From Type
-     * @param <I> Intermediate type
-     * @param <T> To Type
+     * @param F From Type
+     * @param I Intermediate type
+     * @param T To Type
      */
     @AlfrescoPublicApi
     protected class DynamicTwoStageConverter<F, I, T> implements Converter<F, T>
