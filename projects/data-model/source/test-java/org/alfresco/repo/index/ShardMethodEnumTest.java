@@ -39,19 +39,24 @@ import org.junit.Test;
 public class ShardMethodEnumTest
 {
     @Test
-    public void testTypeACL()
+    public void testTypeACLLegacy()
     {
         Assert.assertEquals(ShardMethodEnum.MOD_ACL_ID, ShardMethodEnum.getShardMethod("MOD_ACL_ID"));
     }
     @Test
+    public void testTypeACLBasedOnMurmurHash()
+    {
+        Assert.assertEquals(ShardMethodEnum.ACL_ID, ShardMethodEnum.getShardMethod("ACL_ID"));
+    }
+    @Test
     public void testTypeDBID()
     {
-        Assert.assertEquals(ShardMethodEnum.MOD_DBID, ShardMethodEnum.getShardMethod("MOD_DBID"));
+        Assert.assertEquals(ShardMethodEnum.DB_ID, ShardMethodEnum.getShardMethod("DB_ID"));
     }
     @Test
     public void testUnknown()
     {
-        Assert.assertEquals(ShardMethodEnum.UNKOWN, ShardMethodEnum.getShardMethod("MOD_ACL"));
+        Assert.assertEquals(ShardMethodEnum.UNKOWN, ShardMethodEnum.getShardMethod("UNKOWN"));
     }
     @Test
     public void testNull()

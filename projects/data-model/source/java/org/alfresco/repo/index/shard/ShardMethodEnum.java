@@ -32,8 +32,9 @@ package org.alfresco.repo.index.shard;
  */
 public enum ShardMethodEnum
 {
-    MOD_ACL_ID, 
-    MOD_DBID,
+    MOD_ACL_ID,
+    ACL_ID,
+    DB_ID,
     UNKOWN;
     
     public static ShardMethodEnum getShardMethod(String shardMethod)
@@ -45,16 +46,21 @@ public enum ShardMethodEnum
         ShardMethodEnum shardMethodEnum;
         switch (shardMethod)
         {
-        case "MOD_ACL_ID":
-            shardMethodEnum = MOD_ACL_ID;
-            break;
-        case "MOD_DBID":
-            shardMethodEnum = MOD_DBID;
-            break;
-        default:
-            shardMethodEnum = UNKOWN;
-            break;
-            }
+            //MOD_ACL_ID legacy acl used in Alfresco 5.1
+            case "MOD_ACL_ID":
+                shardMethodEnum = MOD_ACL_ID;
+                break;
+            //ACL id based on murmur hash.
+            case "ACL_ID":
+                shardMethodEnum = ACL_ID;
+                break;
+            case "DB_ID":
+                shardMethodEnum = DB_ID;
+                break;
+            default:
+                shardMethodEnum = UNKOWN;
+                break;
+        }
         return shardMethodEnum;
     }
 }
