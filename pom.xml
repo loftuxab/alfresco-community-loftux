@@ -449,7 +449,7 @@
             <artifactId>h2</artifactId>
             <version>1.4.187</version>
         </dependency>
-		<dependency>
+        <dependency>
             <groupId>net.lightbody.bmp</groupId>
             <artifactId>browsermob-core-littleproxy</artifactId>
             <version>2.1.0-beta-1</version>
@@ -517,21 +517,21 @@
         </testResource>
     </testResources>
 
-	<plugins>
-		<plugin>
-			<artifactId>maven-enforcer-plugin</artifactId>
-			<executions>
-				<execution>
-					<id>enforcer</id>
-					<goals>
-						<goal>enforce</goal>
-					</goals>
-					<configuration>
-						<rules>
-							<requireJavaVersion>
-								<version>1.7.0</version>
-							</requireJavaVersion>
-							<bannedDependencies>
+    <plugins>
+        <plugin>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>enforcer</id>
+                    <goals>
+                        <goal>enforce</goal>
+                    </goals>
+                    <configuration>
+                        <rules>
+                            <requireJavaVersion>
+                                <version>1.7.0</version>
+                            </requireJavaVersion>
+                            <bannedDependencies>
                                 <excludes>
                                     <exclude>xerces</exclude>
                                     <exclude>org.apache.xerces</exclude>
@@ -539,12 +539,12 @@
                                 <includes>
                                     <include>xerces:xercesImpl:2.10.0-alfresco-patched</include>
                                 </includes>
-							</bannedDependencies>
-						</rules>
-					</configuration>
-				</execution>
-			</executions>
-		</plugin>
+                            </bannedDependencies>
+                        </rules>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
 
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -646,18 +646,18 @@
             </executions>
         </plugin>
 
-		<!-- Create a jar of test classes, to be reused later in remote-api -->
-		<plugin>
-			<artifactId>maven-jar-plugin</artifactId>
-			<executions>
-				<execution>
-					<id>create-test-jar</id>
-					<goals>
-						<goal>test-jar</goal>
-					</goals>
-				</execution>
-			</executions>
-		</plugin>
+        <!-- Create a jar of test classes, to be reused later in remote-api -->
+        <plugin>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>create-test-jar</id>
+                    <goals>
+                        <goal>test-jar</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
 
         <!--
             Add tomcat's shared/classes as a test source. This is not a nice solution
@@ -941,28 +941,28 @@
             </plugin>
             <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
             <plugin>
-            	<groupId>org.eclipse.m2e</groupId>
-            	<artifactId>lifecycle-mapping</artifactId>
-            	<version>1.0.0</version>
-            	<configuration>
-            		<lifecycleMappingMetadata>
-            			<pluginExecutions>
-            				<pluginExecution>
-            					<pluginExecutionFilter>
-            						<groupId>org.codehaus.mojo</groupId>
-            						<artifactId>license-maven-plugin</artifactId>
-            						<versionRange>[1.9,)</versionRange>
-            						<goals>
-            							<goal>check-file-header</goal>
-            						</goals>
-            					</pluginExecutionFilter>
-            					<action>
-            						<ignore></ignore>
-            					</action>
-            				</pluginExecution>
-            			</pluginExecutions>
-            		</lifecycleMappingMetadata>
-            	</configuration>
+                <groupId>org.eclipse.m2e</groupId>
+                <artifactId>lifecycle-mapping</artifactId>
+                <version>1.0.0</version>
+                <configuration>
+                    <lifecycleMappingMetadata>
+                        <pluginExecutions>
+                            <pluginExecution>
+                                <pluginExecutionFilter>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>license-maven-plugin</artifactId>
+                                    <versionRange>[1.9,)</versionRange>
+                                    <goals>
+                                        <goal>check-file-header</goal>
+                                    </goals>
+                                </pluginExecutionFilter>
+                                <action>
+                                    <ignore></ignore>
+                                </action>
+                            </pluginExecution>
+                        </pluginExecutions>
+                    </lifecycleMappingMetadata>
+                </configuration>
             </plugin>
         </plugins>
     </pluginManagement>
@@ -1543,28 +1543,28 @@
         </build>
     </profile>
 
-	<profile>
-		<id>solr-http</id>
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.tomcat.maven</groupId>
-					<artifactId>tomcat7-maven-plugin</artifactId>
-					<configuration>
-						<systemProperties>
-							<index.subsystem.name>solr</index.subsystem.name>
-							<solr.host>localhost</solr.host>
-							<solr.port>${tomcat.default.solr.port}</solr.port>
-							<solr.secureComms>none</solr.secureComms>
-							<solr.backup.alfresco.numberToKeep>0</solr.backup.alfresco.numberToKeep>
+    <profile>
+        <id>solr-http</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <configuration>
+                        <systemProperties>
+                            <index.subsystem.name>solr</index.subsystem.name>
+                            <solr.host>localhost</solr.host>
+                            <solr.port>${tomcat.default.solr.port}</solr.port>
+                            <solr.secureComms>none</solr.secureComms>
+                            <solr.backup.alfresco.numberToKeep>0</solr.backup.alfresco.numberToKeep>
                             <solr.backup.archive.numberToKeep>0</solr.backup.archive.numberToKeep>
-						</systemProperties>
-					</configuration>
-				</plugin>
-			</plugins>
-		</build>
-	</profile>
-	  <profile>
+                        </systemProperties>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+      <profile>
         <id>solr4-ssl</id>
         <build>
             <plugins>
