@@ -17,8 +17,6 @@
             source/java/org/alfresco/repo/search/impl/parsers/FTSLexer.java
         </sonar.exclusions>
         
-        <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
-        
     </properties>
 
     <build>
@@ -108,7 +106,6 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-core</artifactId>
-            <version>${dependency.alfresco-core.version}</version><!--$NO-MVN-MAN-VER$-->
         </dependency>
         <!--  
             | provided dependencies (are not transitive and not included in webapps)
