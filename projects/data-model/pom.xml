@@ -16,6 +16,9 @@
             source/java/org/alfresco/repo/search/impl/parsers/FTSParser.java,
             source/java/org/alfresco/repo/search/impl/parsers/FTSLexer.java
         </sonar.exclusions>
+        
+        <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
+        
     </properties>
 
     <build>
@@ -105,6 +108,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-core</artifactId>
+            <version>${dependency.alfresco-core.version}</version><!--$NO-MVN-MAN-VER$-->
         </dependency>
         <!--  
             | provided dependencies (are not transitive and not included in webapps)
@@ -136,7 +140,7 @@
         <dependency>
             <groupId>org.apache.chemistry.opencmis</groupId>
             <artifactId>chemistry-opencmis-client-impl</artifactId>
-            <version>${dependency.opencmis.version}</version>
+            <version>${dependency.opencmis.version}</version><!--$NO-MVN-MAN-VER$-->
             <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>
