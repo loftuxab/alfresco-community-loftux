@@ -54,6 +54,21 @@ public class ShardMethodEnumTest
         Assert.assertEquals(ShardMethodEnum.DB_ID, ShardMethodEnum.getShardMethod("DB_ID"));
     }
     @Test
+    public void testTypeDateTimeStamp()
+    {
+        Assert.assertEquals(ShardMethodEnum.DATE, ShardMethodEnum.getShardMethod("DATE"));
+    }
+    @Test
+    public void testTypeDateYear()
+    {
+        Assert.assertEquals(ShardMethodEnum.DATE_YEAR, ShardMethodEnum.getShardMethod("DATE_YEAR"));
+    }
+    @Test
+    public void testTypeDateMonth()
+    {
+        Assert.assertEquals(ShardMethodEnum.DATE_MONTH, ShardMethodEnum.getShardMethod("DATE_MONTH"));
+    }
+    @Test
     public void testUnknown()
     {
         Assert.assertEquals(ShardMethodEnum.UNKOWN, ShardMethodEnum.getShardMethod("UNKOWN"));
