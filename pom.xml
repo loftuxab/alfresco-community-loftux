@@ -1348,7 +1348,7 @@
             <db.master.username>${db.username}</db.master.username>
             <db.master.password>${db.password}</db.master.password>
             <db.drop.command>drop database ${db.name};</db.drop.command>
-            <db.create.command>CREATE DATABASE ${db.name} COLLATE Latin1_General_CS_AS; ALTER DATABASE ${db.name} SET ALLOW_SNAPSHOT_ISOLATION ON;</db.create.command>
+            <db.create.command>CREATE DATABASE ${db.name}; ALTER DATABASE ${db.name} SET ALLOW_SNAPSHOT_ISOLATION ON;</db.create.command>
         </properties>
 
     </profile>
