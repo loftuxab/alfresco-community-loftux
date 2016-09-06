@@ -99,10 +99,12 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.MultiPhraseQuery;
+import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.RegexpQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.spans.SpanMultiTermQueryWrapper;
 import org.apache.lucene.search.spans.SpanNearQuery;
 import org.apache.lucene.search.spans.SpanOrQuery;
@@ -3808,7 +3810,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		}
 		else
 		{
-			return super.newWildcardQuery(t);
+			org.apache.lucene.search.WildcardQuery query = new org.apache.lucene.search.WildcardQuery(t);
+			query.setRewriteMethod(new MultiTermQuery.TopTermsScoringBooleanQueryRewrite(topTermSpanRewriteLimit));
+			return query;
 		}
 	}
 

@@ -63,6 +63,7 @@ public class CoreWatcherJob implements Job
     @Override
     public void execute(JobExecutionContext jec) throws JobExecutionException
     {
+
         AlfrescoCoreAdminHandler adminHandler = (AlfrescoCoreAdminHandler) jec.getJobDetail().getJobDataMap()
                     .get(JOBDATA_ADMIN_HANDLER_KEY);
         CoreContainer coreContainer = adminHandler.getCoreContainer();
@@ -101,6 +102,7 @@ public class CoreWatcherJob implements Job
                 String coreName, TrackerRegistry trackerRegistry) throws JobExecutionException
     {
         Properties props = new CoreDescriptorDecorator(core.getCoreDescriptor()).getCoreProperties();
+        boolean testcase = Boolean.parseBoolean(System.getProperty("alfresco.test", "false"));
         if (Boolean.parseBoolean(props.getProperty("enable.alfresco.tracking", "false")))
         {
             core.addCloseHook(new AlfrescoSolrCloseHook(adminHandler));
@@ -129,7 +131,12 @@ public class CoreWatcherJob implements Job
                     logIfDebugEnabled("Creating ModelTracker when registering trackers for core " + coreName);
                     mTracker = new ModelTracker(coreContainer.getSolrHome(), props, repositoryClient,
                             coreName, srv);
+                    if(testcase) {
+                        // We don't want the trackers scheduled if we are running a test.
+                        return;
+                    }
                     trackerRegistry.setModelTracker(mTracker);
+
                     scheduler.schedule(mTracker, coreName, props);
                 }
             }

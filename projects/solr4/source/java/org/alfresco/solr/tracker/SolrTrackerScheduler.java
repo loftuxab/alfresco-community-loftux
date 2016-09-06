@@ -57,7 +57,7 @@ public class SolrTrackerScheduler
         {
             StdSchedulerFactory factory = new StdSchedulerFactory();
             Properties properties = new Properties();
-            properties.setProperty("org.quartz.scheduler.instanceName", SolrTrackerScheduler.class.getSimpleName());
+            properties.setProperty("org.quartz.scheduler.instanceName", adminHandler.toString());
             properties.setProperty("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
             properties.setProperty("org.quartz.threadPool.threadCount", "40");
             properties.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");

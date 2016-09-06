@@ -311,6 +311,11 @@ public class AlfrescoReRankQParserPlugin extends QParserPlugin {
                     return mainDocs;
                 }
 
+                if(reRankDocs == 0) {
+                    scaleScores(mainDocs, new HashMap());
+                    return mainDocs;
+                }
+
                 if(boostedPriority != null) {
                     SolrRequestInfo info = SolrRequestInfo.getRequestInfo();
                     Map requestContext = null;

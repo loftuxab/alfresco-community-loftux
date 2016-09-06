@@ -24,35 +24,37 @@
  * #L%
  */
 package org.alfresco.repo.index.shard;
-
-
 /**
+ * Enum that details sharding type
  * @author Andy
+ * @author Michael Suzuki
  *
  */
 public enum ShardMethodEnum
 {
-    MOD_ACL_ID, UNKOWN;
+    MOD_ACL_ID, 
+    MOD_DBID,
+    UNKOWN;
     
     public static ShardMethodEnum getShardMethod(String shardMethod)
     {
+        if(shardMethod == null)
+        {
+            return UNKOWN;
+        }
         ShardMethodEnum shardMethodEnum;
-
-        if(null == shardMethod)
+        switch (shardMethod)
         {
-            shardMethodEnum = ShardMethodEnum.UNKOWN;
-        }
-        else
-        {
-            if (shardMethod.equalsIgnoreCase("MOD_ACL_ID"))
-            {
-                shardMethodEnum = ShardMethodEnum.MOD_ACL_ID;
+        case "MOD_ACL_ID":
+            shardMethodEnum = MOD_ACL_ID;
+            break;
+        case "MOD_DBID":
+            shardMethodEnum = MOD_DBID;
+            break;
+        default:
+            shardMethodEnum = UNKOWN;
+            break;
             }
-            else
-            {
-                shardMethodEnum = ShardMethodEnum.UNKOWN;
-            }
-        }
         return shardMethodEnum;
     }
 }

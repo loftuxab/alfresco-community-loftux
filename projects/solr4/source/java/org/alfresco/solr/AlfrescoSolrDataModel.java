@@ -30,18 +30,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.System;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -192,8 +185,13 @@ public class AlfrescoSolrDataModel implements QueryConstants
     private HashSet<QName> crossLocaleSearchProperties = new HashSet<QName>();
     
     private HashSet<QName> identifierProperties = new HashSet<QName>();
+    private ThreadPoolExecutor threadPool;
 
     
+    public void close() {
+        threadPool.shutdown();
+    }
+
     public AlfrescoSolrDataModel()
     {
         tenantService = new SingleTServiceImpl();
@@ -208,7 +206,7 @@ public class AlfrescoSolrDataModel implements QueryConstants
            compiledModelsCache.setTenantService(tenantService);
            compiledModelsCache.setRegistry(new DefaultAsynchronouslyRefreshedCacheRegistry());
            TrackerPoolFactory trackerPoolFactory = new DefaultTrackerPoolFactory(new Properties(), "_dictionary_", "_internal_");
-           ThreadPoolExecutor threadPool = trackerPoolFactory.create();
+            threadPool = trackerPoolFactory.create();
            compiledModelsCache.setThreadPoolExecutor(threadPool);
            
            dictionaryDAO.setDictionaryRegistryCache(compiledModelsCache);

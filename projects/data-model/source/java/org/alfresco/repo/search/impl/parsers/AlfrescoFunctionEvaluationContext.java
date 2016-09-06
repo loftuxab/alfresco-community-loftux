@@ -119,7 +119,7 @@ public class AlfrescoFunctionEvaluationContext implements FunctionEvaluationCont
         EXPOSED_FIELDS.add(QueryConstants.FIELD_DOC_TYPE);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_PROPERTIES);
         EXPOSED_FIELDS.add(QueryConstants.FIELD_NULLPROPERTIES);
-        
+        EXPOSED_FIELDS.add(QueryConstants.FIELD_FINGERPRINT);
     }
 
     /**

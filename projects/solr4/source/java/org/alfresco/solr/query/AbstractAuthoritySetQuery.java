@@ -36,6 +36,8 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
 import org.apache.lucene.util.FixedBitSet;
+import org.apache.solr.handler.component.AlfrescoSearchHandler;
+import org.apache.solr.request.SolrRequestInfo;
 import org.apache.solr.search.DelegatingCollector;
 import org.apache.solr.search.DocIterator;
 import org.apache.solr.search.DocSet;
@@ -182,27 +184,4 @@ public abstract class AbstractAuthoritySetQuery extends Query
         return new BitsFilter(bitSets);
     }
 
-    protected class AllAccessCollector extends DelegatingCollector
-    {
-        public boolean acceptsDocsOutOfOrder()
-        {
-            return false;
         }
-
-        public void setNextReader(AtomicReaderContext context) throws IOException
-        {
-            delegate.setNextReader(context);
-        }
-
-        public void setScorer(Scorer scorer) throws IOException
-        {
-            delegate.setScorer(scorer);
-        }
-
-        public void collect(int doc) throws IOException
-        {
-            delegate.collect(doc);
-        }
-    }
-
-}

@@ -198,4 +198,6 @@ public interface QueryConstants
     public static final String FIELD_VERSION = "_version_";
     
     public static final String FIELD_CASCADETX = "CASCADETX";
+    
+    public static final String FIELD_FINGERPRINT = "FINGERPRINT";
 }

@@ -252,7 +252,7 @@ public class MLTokenDuplicator extends TokenStream
     }
 
     @Override
-    public boolean incrementToken() throws IOException
+    public final boolean incrementToken() throws IOException
     {
         clearAttributes();
         

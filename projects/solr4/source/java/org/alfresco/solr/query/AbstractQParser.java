@@ -95,6 +95,8 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 
     protected final static Logger log = LoggerFactory.getLogger(AbstractQParser.class);
 
+    protected boolean authset;
+
     public static final String ALFRESCO_JSON = "ALFRESCO_JSON";
 
     private static final String AUTHORITY_FILTER_FROM_JSON = "AUTHORITY_FILTER_FROM_JSON";
@@ -266,6 +268,7 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
 
                         StringBuilder authQuery = new StringBuilder();
                         StringBuilder denyQuery = new StringBuilder();
+
                         for (String tenant : tenantList)
                         {
                             for (String authority : authorityList)
@@ -308,9 +311,11 @@ public abstract class AbstractQParser extends QParser implements QueryConstants
                                 {
                                     if(authQuery.length() == 0)
                                     {
+                                        authset = true;
                                         authQuery.append("|AUTHSET:\"");
                                         denyQuery.append("|DENYSET:\"");
                                     }
+
                                     switch (AuthorityType.getAuthorityType(authority))
                                     {
                                     case USER:

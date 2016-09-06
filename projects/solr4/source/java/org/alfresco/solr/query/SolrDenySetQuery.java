@@ -41,33 +41,32 @@ import org.apache.solr.search.SolrIndexSearcher;
 /**
  * Query for a set of denied authorities.
  * 
- * @author Matt Ward
+ * @author Joel Bernstein
  */
 public class SolrDenySetQuery extends AbstractAuthoritySetQuery implements PostFilter
 {
-    private int cost;
-    private boolean cache;
-    private boolean cacheSep;
     public SolrDenySetQuery(String authorities)
     {
         super(authorities);
     }
 
-    public void setCost(int cost) {
-        this.cost = cost;
+    public int getCost()
+    {
+        return 201;
     }
 
-    public int getCost() {
-        return 200;
-    }
+    public void setCost(int cost)
+    {
 
-    public boolean getCache() {
-        return false;
     }
 
     public void setCache(boolean cache)
     {
-        this.cache = cache;
+
+    }
+
+    public boolean getCache() {
+        return true;
     }
 
     public boolean getCacheSep()
@@ -77,7 +76,6 @@ public class SolrDenySetQuery extends AbstractAuthoritySetQuery implements PostF
 
     public void setCacheSep(boolean cacheSep)
     {
-        this.cacheSep = cacheSep;
     }
     
     @Override
@@ -99,7 +97,14 @@ public class SolrDenySetQuery extends AbstractAuthoritySetQuery implements PostF
         try
         {
             HybridBitSet denySet = getACLSet(auths, QueryConstants.FIELD_DENIED, (SolrIndexSearcher) searcher);
+            if(denySet instanceof EmptyHybridBitSet)
+            {
+                return new AllAccessCollector();
+            }
+            else
+            {
             return new AccessControlCollector(denySet);
+        }
         }
         catch(Exception e)
         {
@@ -141,6 +146,7 @@ public class SolrDenySetQuery extends AbstractAuthoritySetQuery implements PostF
 
         public void collect(int doc) throws IOException{
             long aclId = this.fieldValues.get(doc);
+
             if(!aclIds.get(aclId))
             {
                 delegate.collect(doc);

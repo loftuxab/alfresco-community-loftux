@@ -49,6 +49,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.Duration;
 import org.alfresco.solr.adapters.IOpenBitSet;
 import org.alfresco.solr.client.Node;
+import org.alfresco.solr.client.SOLRAPIClientFactory;
 import org.alfresco.solr.tracker.AclTracker;
 import org.alfresco.solr.tracker.ContentTracker;
 import org.alfresco.solr.tracker.IndexHealthReport;
@@ -60,6 +61,7 @@ import org.alfresco.solr.tracker.TrackerRegistry;
 import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.shard.ExplicitShardingPolicy;
 import org.apache.commons.codec.EncoderException;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.SolrParams;
@@ -101,13 +103,28 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     public AlfrescoCoreAdminHandler(CoreContainer coreContainer)
     {
         super(coreContainer);
-
         this.scheduler = new SolrTrackerScheduler(this);
-
         initResourceBasedLogging("log4j.properties");
         initResourceBasedLogging("log4j-solr.properties");
     }
 
+    public void shutdown() {
+        super.shutdown();
+        try {
+            AlfrescoSolrDataModel.getInstance().close();
+            SOLRAPIClientFactory.close();
+            MultiThreadedHttpConnectionManager.shutdownAll();
+            boolean testcase = Boolean.parseBoolean(System.getProperty("alfresco.test", "false"));
+            if(testcase) {
+            if (!scheduler.isShutdown()) {
+                scheduler.pauseAll();
+                scheduler.shutdown();
+            }
+            }
+        } catch(Exception e) {
+            log.info("", e);
+        }
+    }
     private void initResourceBasedLogging(String resource)
     {
         try
