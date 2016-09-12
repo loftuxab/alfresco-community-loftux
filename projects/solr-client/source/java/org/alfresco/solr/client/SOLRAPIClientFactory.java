@@ -1,6 +1,6 @@
 /*
  * #%L
- * Alfresco Solr Client
+ * Alfresco Data model classes
  * %%
  * Copyright (C) 2005 - 2016 Alfresco Software Limited
  * %%
@@ -77,6 +77,13 @@ public class SOLRAPIClientFactory
     private int maxHostConnections = 40;
     private int socketTimeout = 120000;
 
+
+    public static void close() {
+        for(SOLRAPIClient client : clientsPerAlfresco.values()) {
+            client.close();
+        }
+    }
+
     /**
      * Gets the client resource from the pool.
      * 
@@ -130,6 +137,12 @@ public class SOLRAPIClientFactory
     public SOLRAPIClient getSOLRAPIClient(Properties props, KeyResourceLoader keyResourceLoader,
                 DictionaryService dictionaryService, NamespaceDAO namespaceDAO)
     {
+
+        if(Boolean.parseBoolean(System.getProperty("alfresco.test", "false")))
+        {
+            return new SOLRAPIQueueClient(namespaceDAO);
+        }
+
         alfrescoHost = props.getProperty("alfresco.host", "localhost");
         alfrescoPort = Integer.parseInt(props.getProperty("alfresco.port", "8080"));
         alfrescoPortSSL = Integer.parseInt(props.getProperty("alfresco.port.ssl", "8443"));

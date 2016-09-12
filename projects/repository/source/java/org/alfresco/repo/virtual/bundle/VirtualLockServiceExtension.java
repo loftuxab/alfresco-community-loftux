@@ -102,6 +102,17 @@ public class VirtualLockServiceExtension extends SpringBeanExtension<LockService
     }
 
     @Override
+    public void lock(NodeRef nodeRef, LockType lockType, int timeToExpire, Lifetime lifetime, boolean lockChildren) 
+               throws UnableToAquireLockException
+    {
+        getTrait().lock(smartStore.materializeIfPossible(nodeRef),
+                lockType,
+                timeToExpire,
+                lifetime,
+                lockChildren);
+    }
+
+    @Override
     public void lock(Collection<NodeRef> nodeRefs, LockType lockType, int timeToExpire)
                 throws UnableToAquireLockException
     {
@@ -193,4 +204,15 @@ public class VirtualLockServiceExtension extends SpringBeanExtension<LockService
         getTrait().setEphemeralExpiryThreshold(threshSecs);
     }
 
+    @Override
+    public boolean isLocked(NodeRef nodeRef)
+    {
+        return getTrait().isLocked(smartStore.materializeIfPossible(nodeRef));
+    }
+
+    @Override
+    public boolean isLockedAndReadOnly(NodeRef nodeRef)
+    {
+        return getTrait().isLockedAndReadOnly(smartStore.materializeIfPossible(nodeRef));
+    }
 }

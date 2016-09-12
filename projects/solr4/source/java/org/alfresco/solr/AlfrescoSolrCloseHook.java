@@ -28,6 +28,7 @@ package org.alfresco.solr;
 import java.util.Collection;
 import java.util.Set;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.alfresco.solr.tracker.ModelTracker;
 import org.alfresco.solr.tracker.SolrTrackerScheduler;
 import org.alfresco.solr.tracker.Tracker;
@@ -67,6 +68,7 @@ public class AlfrescoSolrCloseHook extends CloseHook
     public void preClose(SolrCore core)
     {
         // Sets the shutdown flag on the trackers to stop them from doing any more work
+
         String coreName = core.getName();
         boolean thisIsTheLastCoreRegistered = thisIsTheLastCoreRegistered(coreName);
         ModelTracker modelTracker = trackerRegistry.getModelTracker();
@@ -74,6 +76,13 @@ public class AlfrescoSolrCloseHook extends CloseHook
         {
             modelTracker.setShutdown(true);
         }
+
+        boolean testcase = Boolean.parseBoolean(System.getProperty("alfresco.test", "false"));
+        if(testcase) {
+            //other trackers not present in test case.
+            return;
+        }
+
         Collection<Tracker> coreTrackers = trackerRegistry.getTrackersForCore(coreName);
         for(Tracker tracker : coreTrackers)
         {

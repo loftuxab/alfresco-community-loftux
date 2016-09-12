@@ -162,6 +162,8 @@ public interface QueryConstants
     public static final String FIELD_PRIMARYASSOCQNAME = "PRIMARYASSOCQNAME";
 
     public static final String FIELD_LID = "LID";
+    
+    public static final String FIELD_CASCADE_FLAG = "int@s_@cascade";
 
     public static final String FIELD_TENANT = "TENANT";
 
@@ -198,4 +200,6 @@ public interface QueryConstants
     public static final String FIELD_VERSION = "_version_";
     
     public static final String FIELD_CASCADETX = "CASCADETX";
+    
+    public static final String FIELD_FINGERPRINT = "FINGERPRINT";
 }

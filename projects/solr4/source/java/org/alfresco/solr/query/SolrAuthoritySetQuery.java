@@ -101,7 +101,8 @@ public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery implements 
         }
     }
 
-    public DelegatingCollector getFilterCollector(IndexSearcher searcher){
+    public DelegatingCollector getFilterCollector(IndexSearcher searcher)
+    {
 
         String[] auths = authorities.substring(1).split(authorities.substring(0, 1));
 
@@ -148,29 +149,32 @@ public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery implements 
         }
     }
 
-    public int getCost() {
-        //Hardcoded for testing PostFilter
-        return 201;
+    public int getCost()
+    {
+        return 202;
     }
 
-    public void setCost(int cost) {
+    public void setCost(int cost)
+    {
 
     }
 
     public boolean getCache() {
-        //Hardcorded for testing PostFilter
+        return true;
+    }
+
+    public void setCache(boolean cache)
+    {
+
+    }
+
+    public boolean getCacheSep()
+    {
         return false;
     }
 
-    public void setCache(boolean cache) {
-
-    }
-
-    public boolean getCacheSep() {
-        return false;
-    }
-
-    public void setCacheSep(boolean sep) {
+    public void setCacheSep(boolean sep)
+    {
 
     }
 
@@ -264,6 +268,7 @@ public class SolrAuthoritySetQuery extends AbstractAuthoritySetQuery implements 
         public void collect(int doc) throws IOException
         {
             long aclId = this.fieldValues.get(doc);
+
             if(aclIds.get(aclId) || ownerDocs.get(doc))
             {
                 delegate.collect(doc);

@@ -45,7 +45,6 @@ import org.alfresco.rest.api.tests.client.PublicApiClient;
 import org.alfresco.rest.api.tests.client.PublicApiHttpClient.BinaryPayload;
 import org.alfresco.rest.api.tests.client.PublicApiHttpClient.RequestBuilder;
 import org.alfresco.rest.api.tests.client.RequestContext;
-import org.alfresco.rest.api.tests.client.data.Company;
 import org.alfresco.rest.api.tests.client.data.ContentInfo;
 import org.alfresco.rest.api.tests.client.data.Document;
 import org.alfresco.rest.api.tests.client.data.Folder;
@@ -765,16 +764,29 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
 
         // create empty file
         HttpResponse response = post(getNodeChildrenUrl(parentFolderId), toJsonAsStringNonNull(d1), params, null, "alfresco", expectedStatus);
+        if (expectedStatus != 201)
+        {
+            return null;
+        }
         return RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
     }
 
-    protected Document updateTextFile(String contentId, String textContent, Map<String, String> params) throws IOException, Exception
+    protected Document updateTextFile(String contentId, String textContent, Map<String, String> params) throws Exception
+    {
+        return updateTextFile(contentId, textContent, params, 200);
+    }
+
+    protected Document updateTextFile(String contentId, String textContent, Map<String, String> params, int expectedStatus) throws Exception
     {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(textContent.getBytes());
         File txtFile = TempFileProvider.createTempFile(inputStream, getClass().getSimpleName(), ".txt");
         BinaryPayload payload = new BinaryPayload(txtFile);
 
-        HttpResponse response = putBinary(getNodeContentUrl(contentId), payload, null, params, 200);
+        HttpResponse response = putBinary(getNodeContentUrl(contentId), payload, null, params, expectedStatus);
+        if (expectedStatus != 200)
+        {
+            return null;
+        }
         return RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
     }
 
@@ -786,6 +798,18 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
             fail("Cannot get the resource: " + fileName);
         }
         return ResourceUtils.getFile(url);
+    }
+
+    protected Document lock(String nodeId, String body) throws Exception
+    {
+        HttpResponse response = post(getNodeOperationUrl(nodeId, "lock"), body, null, 200);
+        return RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+    }
+
+    protected Document unlock(String nodeId) throws Exception
+    {
+        HttpResponse response = post(getNodeOperationUrl(nodeId, "unlock"), null, null, 200);
+        return RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
     }
 
     protected static final long PAUSE_TIME = 5000; //millisecond
@@ -859,6 +883,11 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
     protected String getNodeContentUrl(String nodeId)
     {
         return URL_NODES + "/" + nodeId + "/" + URL_CONTENT;
+    }
+
+    protected String getNodeOperationUrl(String nodeId, String operation)
+    {
+        return URL_NODES + "/" + nodeId + "/" + operation;
     }
 }
 

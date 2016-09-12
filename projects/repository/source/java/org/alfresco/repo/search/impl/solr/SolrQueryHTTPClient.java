@@ -401,7 +401,11 @@ public class SolrQueryHTTPClient implements BeanFactoryAware, InitializingBean
             url.append(httpClientAndBaseUrl.getSecond());
          
             String languageUrlFragment = extractLanguageFragment(language);
-            url.append("/").append(languageUrlFragment);
+            if(!url.toString().endsWith("/"))
+            {
+                url.append("/");
+            }
+            url.append(languageUrlFragment);
 
             // Send the query in JSON only
             // url.append("?q=");
@@ -478,7 +482,7 @@ public class SolrQueryHTTPClient implements BeanFactoryAware, InitializingBean
                 url.append("&fq=").append(encoder.encode("{!afts}TENANT_FILTER_FROM_JSON", "UTF-8"));
             }
 
-            if(searchParameters.getFieldFacets().size() > 0)
+            if(searchParameters.getFieldFacets().size() > 0 || searchParameters.getFacetQueries().size() > 0)
             {
                 url.append("&facet=").append(encoder.encode("true", "UTF-8"));
                 for(FieldFacet facet : searchParameters.getFieldFacets())
@@ -529,14 +533,22 @@ public class SolrQueryHTTPClient implements BeanFactoryAware, InitializingBean
                 }
                 for(String facetQuery : searchParameters.getFacetQueries())
                 {
-                    url.append("&facet.query=").append(encoder.encode("{!afts}"+facetQuery, "UTF-8"));
+                    if (!facetQuery.startsWith("{!afts"))
+                    {
+                        facetQuery = "{!afts}"+facetQuery;
+                    }
+                    url.append("&facet.query=").append(encoder.encode(facetQuery, "UTF-8"));
                 }                
             }
+
             // filter queries
-            
             for(String filterQuery : searchParameters.getFilterQueries())
             {
-                url.append("&fq=").append(encoder.encode("{!afts}"+filterQuery, "UTF-8"));
+                if (!filterQuery.startsWith("{!afts"))
+                {
+                    filterQuery = "{!afts}"+filterQuery;
+                }
+                url.append("&fq=").append(encoder.encode(filterQuery, "UTF-8"));
             }   
             
             // end of field facets

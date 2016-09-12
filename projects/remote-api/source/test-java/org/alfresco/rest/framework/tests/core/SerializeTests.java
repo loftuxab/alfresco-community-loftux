@@ -57,8 +57,8 @@ import org.alfresco.rest.framework.tests.api.mocks.Grass;
 import org.alfresco.rest.framework.tests.api.mocks.Sheep;
 import org.alfresco.rest.framework.tests.api.mocks3.Flock;
 import org.alfresco.rest.framework.tests.api.mocks3.SlimGoat;
+import org.alfresco.rest.framework.tools.RecognizedParamsExtractor;
 import org.alfresco.rest.framework.webscripts.AbstractResourceWebScript;
-import org.alfresco.rest.framework.webscripts.ResourceWebScriptHelper;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
@@ -91,7 +91,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class SerializeTests extends AbstractContextTest
+public class SerializeTests extends AbstractContextTest implements RecognizedParamsExtractor
 {
 
     @Test
@@ -197,7 +197,7 @@ public class SerializeTests extends AbstractContextTest
     public void testExpandRelations() throws IOException
     {
         assertNotNull(helper);
-        Map<String, BeanPropertiesFilter> rFilter = ResourceWebScriptHelper.getRelationFilter("blacksheep,baaahh");
+        Map<String, BeanPropertiesFilter> rFilter = getRelationFilter("blacksheep,baaahh");
         ExecutionResult res = (ExecutionResult) helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), api,"sheep",ParamsExtender.valueOf(rFilter,"1"),new Farmer("180"));
         assertNotNull(res);
         String out = writeResponse(res);
@@ -239,7 +239,7 @@ public class SerializeTests extends AbstractContextTest
     public void testExpandRecursiveRelations() throws IOException
     {
         ExecutionResult exec1 = new ExecutionResult(new Farmer("180"),null);
-        ExecutionResult exec2 = new ExecutionResult(new Farmer("456"),ResourceWebScriptHelper.getFilter("age"));
+        ExecutionResult exec2 = new ExecutionResult(new Farmer("456"),getFilter("age"));
         CollectionWithPagingInfo<ExecutionResult> coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1, exec2));
         ExecutionResult execResult = new ExecutionResult(new Sheep("ssheep"),null);
         Map<String,Object> related = new HashMap<String,Object>();
@@ -436,12 +436,12 @@ public class SerializeTests extends AbstractContextTest
     public void testFilter() throws IOException, JSONException
     {
         assertNotNull(helper);
-        BeanPropertiesFilter theFilter  = ResourceWebScriptHelper.getFilter("age");
+        BeanPropertiesFilter theFilter  = getFilter("age");
         Object res = new ExecutionResult(new Sheep("bob"),theFilter);      
         String out = writeResponse(res);
         assertTrue("Filter must only return the age.",  StringUtils.contains(out, "{\"age\":3}"));
        
-        theFilter = ResourceWebScriptHelper.getFilter("age,name");
+        theFilter = getFilter("age,name");
         res = new ExecutionResult(new Sheep("bob"),theFilter);  
         out = writeResponse(res);
         JSONObject jsonRsp = new JSONObject(new JSONTokener(out));
@@ -452,8 +452,8 @@ public class SerializeTests extends AbstractContextTest
         assertTrue("The age should be 3", entry.getInt("age") == 3);
 
         // unit test filter with "include" taking precendence over "fields" filter
-        List<String> theInclude = ResourceWebScriptHelper.getIncludeClause("name");
-        theFilter  = ResourceWebScriptHelper.getFilter("age", theInclude);
+        List<String> theInclude = getIncludeClause("name");
+        theFilter  = getFilter("age", theInclude);
         res = new ExecutionResult(new Sheep("bob"),theFilter);
         out = writeResponse(res);
         jsonRsp = new JSONObject(new JSONTokener(out));
@@ -464,7 +464,7 @@ public class SerializeTests extends AbstractContextTest
         assertTrue("The age should be 3", entry.getInt("age") == 3);
         
         Api v3 = Api.valueOf(api.getName(), api.getScope().toString(), "3");
-        Map<String, BeanPropertiesFilter> relFiler = ResourceWebScriptHelper.getRelationFilter("herd");
+        Map<String, BeanPropertiesFilter> relFiler = getRelationFilter("herd");
         res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat());
         out = writeResponse(res);
         jsonRsp = new JSONObject(new JSONTokener(out));
@@ -476,7 +476,7 @@ public class SerializeTests extends AbstractContextTest
         assertEquals("The name should be 'bigun'", "bigun", entry.getString("name"));
         assertTrue("The quantity should be 56", entry.getInt("quantity") == 56);
 
-        relFiler = ResourceWebScriptHelper.getRelationFilter("herd(name)");
+        relFiler = getRelationFilter("herd(name)");
         res = helper.processAdditionsToTheResponse(mock(WebScriptResponse.class), v3,"goat",ParamsExtender.valueOf(relFiler, "notUsed"),new SlimGoat());
         out = writeResponse(res);
         assertTrue("Must return only the herd name.", StringUtils.contains(out, "{\"name\":\"bigun\"}"));

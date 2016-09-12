@@ -38,7 +38,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.solr.AlfrescoSolrDataModel;
+import org.alfresco.solr.client.SOLRAPIClientFactory;
 import org.alfresco.solr.query.AbstractQParser;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -224,7 +227,6 @@ public class AlfrescoSearchHandler extends RequestHandlerBase implements SolrCor
         {
             if (streams != null)
             {
-
                 try
                 {
                     Reader reader = null;

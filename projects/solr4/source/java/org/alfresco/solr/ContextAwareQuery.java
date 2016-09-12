@@ -196,6 +196,10 @@ public class ContextAwareQuery extends Query
         return true;
     }
 
+    public Query getLuceneQuery()
+    {
+        return luceneQuery;
+    }
  
 
     

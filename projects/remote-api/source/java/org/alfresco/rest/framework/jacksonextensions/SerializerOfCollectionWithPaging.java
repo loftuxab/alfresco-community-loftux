@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.alfresco.rest.framework.resource.SerializablePagedCollection;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
+import org.alfresco.rest.framework.tools.RecognizedParamsExtractor;
 import org.alfresco.rest.framework.webscripts.ResourceWebScriptHelper;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
@@ -60,7 +61,8 @@ public class SerializerOfCollectionWithPaging extends SerializerBase<Serializabl
             jgen.writeFieldName("list");
                 jgen.writeStartObject();
                 serializePagination(pagedCol, jgen);
-    			jgen.writeObjectField("entries", pagedCol.getCollection());
+                serializeContext(pagedCol, jgen);
+                jgen.writeObjectField("entries", pagedCol.getCollection());
                 serializeIncludedSource(pagedCol, jgen);
                 jgen.writeEndObject(); 
             jgen.writeEndObject();  
@@ -73,6 +75,15 @@ public class SerializerOfCollectionWithPaging extends SerializerBase<Serializabl
         if (pagedCol.getSourceEntity() != null)
         {
             jgen.writeObjectField("source",pagedCol.getSourceEntity());
+        }
+    }
+
+    private void serializeContext(SerializablePagedCollection pagedCol, JsonGenerator jgen) throws IOException,
+                JsonProcessingException
+    {
+        if (pagedCol.getContext() != null)
+        {
+            jgen.writeObjectField("context",pagedCol.getContext());
         }
     }
 
@@ -90,8 +101,8 @@ public class SerializerOfCollectionWithPaging extends SerializerBase<Serializabl
         }
         if (pagedCol.getPaging() != null)
         {
-            jgen.writeNumberField(ResourceWebScriptHelper.PARAM_PAGING_SKIP, pagedCol.getPaging().getSkipCount());
-            jgen.writeNumberField(ResourceWebScriptHelper.PARAM_PAGING_MAX, pagedCol.getPaging().getMaxItems());            
+            jgen.writeNumberField(RecognizedParamsExtractor.PARAM_PAGING_SKIP, pagedCol.getPaging().getSkipCount());
+            jgen.writeNumberField(RecognizedParamsExtractor.PARAM_PAGING_MAX, pagedCol.getPaging().getMaxItems());
         }
         jgen.writeEndObject();
     }

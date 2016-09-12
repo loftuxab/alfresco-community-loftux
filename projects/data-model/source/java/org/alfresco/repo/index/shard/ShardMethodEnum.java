@@ -24,34 +24,54 @@
  * #L%
  */
 package org.alfresco.repo.index.shard;
-
-
 /**
+ * Enum that details sharding type
  * @author Andy
+ * @author Michael Suzuki
  *
  */
 public enum ShardMethodEnum
 {
-    MOD_ACL_ID, UNKOWN;
+    MOD_ACL_ID,
+    ACL_ID,
+    DB_ID,
+    DATE,//Time stamp
+    DATE_YEAR,
+    DATE_MONTH,
+    UNKOWN;
     
     public static ShardMethodEnum getShardMethod(String shardMethod)
     {
-        ShardMethodEnum shardMethodEnum;
-
-        if(null == shardMethod)
+        if(shardMethod == null)
         {
-            shardMethodEnum = ShardMethodEnum.UNKOWN;
+            return UNKOWN;
         }
-        else
+        ShardMethodEnum shardMethodEnum;
+        switch (shardMethod)
         {
-            if (shardMethod.equalsIgnoreCase("MOD_ACL_ID"))
-            {
-                shardMethodEnum = ShardMethodEnum.MOD_ACL_ID;
-            }
-            else
-            {
-                shardMethodEnum = ShardMethodEnum.UNKOWN;
-            }
+            //MOD_ACL_ID legacy acl used in Alfresco 5.1
+            case "MOD_ACL_ID":
+                shardMethodEnum = MOD_ACL_ID;
+                break;
+            //ACL id based on murmur hash.
+            case "ACL_ID":
+                shardMethodEnum = ACL_ID;
+                break;
+            case "DB_ID":
+                shardMethodEnum = DB_ID;
+                break;
+            case "DATE":
+                shardMethodEnum = DATE;
+                break;
+            case "DATE_YEAR":
+                shardMethodEnum = DATE_YEAR;
+                break;
+            case "DATE_MONTH":
+                shardMethodEnum = DATE_MONTH;
+                break;
+            default:
+                shardMethodEnum = UNKOWN;
+                break;
         }
         return shardMethodEnum;
     }

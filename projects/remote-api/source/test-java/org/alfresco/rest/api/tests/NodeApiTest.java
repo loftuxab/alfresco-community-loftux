@@ -35,6 +35,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.UUID;
+
 import org.alfresco.repo.content.ContentLimitProvider.SimpleFixedLimitProvider;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -42,6 +57,7 @@ import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.rest.AbstractSingleNetworkSiteTest;
 import org.alfresco.rest.api.Nodes;
+import org.alfresco.rest.api.model.LockInfo;
 import org.alfresco.rest.api.model.NodeTarget;
 import org.alfresco.rest.api.model.Site;
 import org.alfresco.rest.api.nodes.NodesEntityResource;
@@ -57,38 +73,24 @@ import org.alfresco.rest.api.tests.client.data.Folder;
 import org.alfresco.rest.api.tests.client.data.Node;
 import org.alfresco.rest.api.tests.client.data.PathInfo;
 import org.alfresco.rest.api.tests.client.data.PathInfo.ElementInfo;
-import org.alfresco.rest.api.tests.client.data.SiteMember;
 import org.alfresco.rest.api.tests.client.data.SiteRole;
 import org.alfresco.rest.api.tests.client.data.UserInfo;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder.FileData;
 import org.alfresco.rest.api.tests.util.MultiPartBuilder.MultiPartRequest;
 import org.alfresco.rest.api.tests.util.RestApiUtil;
+import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
+import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * V1 REST API tests for Nodes (files, folders and custom node types)
@@ -111,7 +113,8 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
     private static final String PROP_OWNER = "cm:owner";
 
     private static final String URL_DELETED_NODES = "deleted-nodes";
-    
+    private static final String EMPTY_BODY = "{}";
+
     protected PermissionService permissionService;
 
     
@@ -2122,6 +2125,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
             String c1Id = nodeResp.getId();
             assertEquals(fId, nodeResp.getParentId());
 
+            response = getAll(getNodeChildrenUrl(fId), null, null, 200);
+            nodes = RestApiUtil.parseRestApiEntries(response.getJsonResponse(), Node.class);
+            assertEquals(1, nodes.size());
+
             obj = new Node();
             obj.setName("c2");
             obj.setNodeType(TYPE_CM_CONTENT);
@@ -3574,10 +3581,244 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         deleteNode(folderId, true, 204);
     }
 
-    @Override
-    public String getScope()
+    /**
+     * Tests lock of a node
+     * <p>POST:</p>
+     * {@literal <host>:<port>/alfresco/api/-default-/public/alfresco/versions/1/nodes/<nodeId>/lock}
+     */
+   @Test
+    public void testLock() throws Exception
     {
-        return "public";
+        setRequestContext(user1);
+
+        // create folder
+        Folder folderResp = createFolder(Nodes.PATH_MY, "folder" + RUNID);
+        String folderId = folderResp.getId();
+
+        // create doc d1
+        String d1Name = "content" + RUNID + "_1l";
+        Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
+        String d1Id = d1.getId();
+
+        HttpResponse response = getSingle(URL_NODES, d1Id, null, null, 200);
+        Node node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(node.getProperties().get("cm:lockType"));
+        assertNull(node.getProperties().get("cm:lockOwner"));
+        assertNull(node.getIsLocked());
+
+        Map<String, String> params = Collections.singletonMap("include", "isLocked");
+        response = getSingle(URL_NODES, d1Id, params, null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(node.getProperties().get("cm:lockType"));
+        assertNull(node.getProperties().get("cm:lockOwner"));
+        assertFalse(node.getIsLocked());
+
+        LockInfo lockInfo = new LockInfo();
+        lockInfo.setTimeToExpire(60);
+        lockInfo.setType("FULL");
+        lockInfo.setLifetime("PERSISTENT");
+
+        response = post(getNodeOperationUrl(d1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        assertEquals(d1Name, documentResp.getName());
+        assertEquals(d1Id, documentResp.getId());
+        assertEquals(LockType.READ_ONLY_LOCK.toString(), documentResp.getProperties().get("cm:lockType"));
+        assertNotNull(documentResp.getProperties().get("cm:lockOwner"));
+        assertNull(documentResp.getIsLocked());
+
+        unlock(d1Id);
+        // Empty lock body, the default values are used
+        post(getNodeOperationUrl(d1Id, "lock"), EMPTY_BODY, null, 200);
+
+        // Lock on already locked node
+        post(getNodeOperationUrl(d1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+
+        // Test delete on a folder which contains a locked node - NodeLockedException
+        deleteNode(folderId, true, 409);
+
+        // Content update on a locked node
+        updateTextFile(d1Id, "Updated text", null, 409);
+        unlock(d1Id);
+
+        // Test lock file
+        // create folder
+        String folderAName = "folder" + RUNID + "_A";
+        Folder folderA = createFolder(Nodes.PATH_MY, folderAName);
+        String folderAId = folderA.getId();
+
+        // create a file in the folderA
+        Document dA1 = createTextFile(folderAId, "content" + RUNID + "_A1", "A1 content");
+        String dA1Id = dA1.getId();
+
+        lockInfo = new LockInfo();
+        lockInfo.setTimeToExpire(60);
+        lockInfo.setType("ALLOW_OWNER_CHANGES");
+        lockInfo.setLifetime("EPHEMERAL");
+
+        // lock the file
+        post(getNodeOperationUrl(dA1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+
+        params = Collections.singletonMap("include", "aspectNames,properties,isLocked");
+        response = getSingle(URL_NODES, dA1Id, params, null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertTrue(node.getIsLocked());
+        // note: this can be updated by the owner since the lock type is "ALLOW_OWNER_CHANGES"
+        updateTextFile(node.getId(), "Updated text", null, 200);
+
+        // Lock body properties - boundary values
+        Document dB1 = createTextFile(folderAId, "content" + RUNID + "_dB1", "dB1 content");
+        String dB1Id = dB1.getId();
+
+        lockInfo = new LockInfo();
+        lockInfo.setTimeToExpire(-100); // values lower than 0 are considered as no expiry time
+        post(getNodeOperationUrl(dB1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+
+        // Lock node by a different user than the owner
+        setRequestContext(user1);
+        Folder folder1Resp = createFolder(Nodes.PATH_SHARED, "folder1" + RUNID);
+        String folder1Id = folder1Resp.getId();
+
+        String f1d1Name = "content f1" + RUNID + "_1l";
+        Document f1d1 = createTextFile(folder1Id, f1d1Name, "The quick brown fox jumps over the lazy dog 1.");
+        String f1d1Id = f1d1.getId();
+        // use admin for now (might be better to use a user with given WRITE permission)
+        setRequestContext(networkAdmin);
+        post(getNodeOperationUrl(f1d1Id, "lock"), EMPTY_BODY, null, 200);
+        unlock(f1d1Id);
+        // -ve tests
+
+        // Missing target node
+        lockInfo = new LockInfo();
+        post(getNodeOperationUrl("fakeId", "lock"), toJsonAsStringNonNull(lockInfo), null, 404);
+
+        // Cannot lock Data Dictionary node
+        params = new HashMap<>();
+        params.put(Nodes.PARAM_RELATIVE_PATH, "/Data Dictionary");
+        response = getSingle(NodesEntityResource.class, getRootNodeId(), params, 200);
+        Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        String ddNodeId = nodeResp.getId();
+
+        setRequestContext(networkAdmin);
+        post(getNodeOperationUrl(ddNodeId, "lock"), toJsonAsStringNonNull(lockInfo), null, 403);
+
+        // Lock node already locked by another user - UnableToAquireLockException
+        post(getNodeOperationUrl(dB1Id, "lock"), EMPTY_BODY, null, 422);
+
+        // Lock node without permission (node created by user 1 in the Home folder)
+        setRequestContext(user1);
+        Folder folder2Resp = createFolder(Nodes.PATH_MY, "folder2" + RUNID);
+        String folder2Id = folder2Resp.getId();
+
+        String f2d1Name = "content f2" + RUNID + "_1l";
+        Document f2d1 = createTextFile(folder2Id, f2d1Name, "The quick brown fox jumps over the lazy dog 1.");
+        String f2d1Id = f2d1.getId();
+
+        setRequestContext(user2);
+        post(getNodeOperationUrl(f2d1Id, "lock"), EMPTY_BODY, null, 403);
+
+        // Invalid lock body values
+        setRequestContext(user1);
+
+        Folder folderC = createFolder(Nodes.PATH_MY, "folder" + RUNID + "_C");
+        String folderCId = folderC.getId();
+
+        Document dC1 = createTextFile(folderCId, "content" + RUNID + "_dC1", "dC1 content");
+        String dC1Id = dC1.getId();
+
+        Map<String, String> body = new HashMap<>();
+        body.put("type", "FULL123");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+
+        body = new HashMap<>();
+        body.put("type", "ALLOW_ADD_CHILDREN");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+
+        body = new HashMap<>();
+        body.put("lifetime", "PERSISTENT123");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+
+        body = new HashMap<>();
+        body.put("timeToExpire", "NaN");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+
+        body = new HashMap<>();
+        body.put("invalid_property", "true");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+
+        // Invalid lock of a folder
+        post(getNodeOperationUrl(folderId, "lock"), toJsonAsStringNonNull(lockInfo), null, 400);
+
+        //cleanup
+        setRequestContext(user1); // all locks were made by user1
+        unlock(dB1Id);
+        deleteNode(dB1Id);
+        deleteNode(folderId);
+        deleteNode(folderAId);
+        deleteNode(folderCId);
+        deleteNode(folder1Id);
+        deleteNode(folder2Id);
     }
+
+
+   /**
+    * Tests unlock of a node
+    * <p>POST:</p>
+    * {@literal <host>:<port>/alfresco/api/-default-/public/alfresco/versions/1/nodes/<nodeId>/unlock}
+    */
+   @Test
+   public void testUnlock() throws Exception
+   {
+       setRequestContext(user1);
+
+       // create folder
+       Folder folderResp = createFolder(Nodes.PATH_MY, "folder" + RUNID);
+       String folderId = folderResp.getId();
+
+       // create doc d1
+       String d1Name = "content" + RUNID + "_1l";
+       Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
+       String d1Id = d1.getId();
+
+       lock(d1Id, EMPTY_BODY);
+
+       HttpResponse response = post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
+       Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+       assertEquals(d1Name, documentResp.getName());
+       assertEquals(d1Id, documentResp.getId());
+       assertNull(documentResp.getProperties().get("cm:lockType"));
+       assertNull(documentResp.getProperties().get("cm:lockOwner"));
+
+       lock(d1Id, EMPTY_BODY);
+       // Users with admin rights can unlock nodes locked by other users.
+       setRequestContext(networkAdmin);
+       post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
+
+       // -ve
+       // Missing target node
+       post(getNodeOperationUrl("fakeId", "unlock"), null, null, 404);
+
+       // Unlock by a user without permission
+       lock(d1Id, EMPTY_BODY);
+       setRequestContext(user2);
+       post(getNodeOperationUrl(d1Id, "unlock"), null, null, 403);
+
+       setRequestContext(user1);
+       //Unlock on a not locked node
+       post(getNodeOperationUrl(folderId, "unlock"), null, null, 422);
+
+       // clean up
+       setRequestContext(user1); // all locks were made by user1
+
+       unlock(d1Id);
+       deleteNode(folderId);
+   }
+
+   @Override
+   public String getScope()
+   {
+       return "public";
+   }
 }
 

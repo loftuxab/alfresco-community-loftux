@@ -76,6 +76,7 @@ public class AlfrescoFTSQParserPlugin extends QParserPlugin
     public static class AlfrescoFTSQParser extends AbstractQParser
     {
     	private RerankPhase rerankPhase = RerankPhase.SINGLE_PASS_WITH_AUTO_PHRASE;
+        private boolean postfilter;
 
 		public AlfrescoFTSQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, NamedList args)
         {
@@ -85,6 +86,8 @@ public class AlfrescoFTSQParserPlugin extends QParserPlugin
         	{
                 rerankPhase = RerankPhase.valueOf(arg.toString());
         	}
+
+            postfilter = Boolean.parseBoolean(req.getCore().getCoreDescriptor().getCoreProperty("alfresco.postfilter", System.getProperty("alfresco.postfilter", "true")));
         }
 
         /*
@@ -103,6 +106,12 @@ public class AlfrescoFTSQParserPlugin extends QParserPlugin
                 {
                     log.debug("AFTS QP query as lucene:\t    "+query);
                 }
+
+                if(authset && postfilter)
+                {
+                    return new PostFilterQuery(200, query);
+                }
+
                 return query;
             }
             catch(ParseException e)

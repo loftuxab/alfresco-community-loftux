@@ -33,6 +33,8 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.rest.api.search.model.SearchEntry;
 import org.alfresco.rest.framework.resource.UniqueId;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -73,6 +75,7 @@ public class Node implements Comparable<Node>
     protected Boolean isFolder;
     protected Boolean isFile;
     protected Boolean isLink;
+    protected Boolean isLocked;
 
     protected NodeRef parentNodeRef;
     protected PathInfo pathInfo;
@@ -88,6 +91,9 @@ public class Node implements Comparable<Node>
     protected Map<String, Object> properties;
 
     protected List<String> allowableOperations;
+
+    //optional SearchEntry (only ever returned from a search)
+    protected SearchEntry search = null;
 
     public Node(NodeRef nodeRef, NodeRef parentNodeRef, Map<QName, Serializable> nodeProps, Map<String, UserInfo> mapUserInfo, ServiceRegistry sr)
     {
@@ -159,6 +165,11 @@ public class Node implements Comparable<Node>
                 }
                 catch (NoSuchPersonException nspe)
                 {
+                    // drop-through
+                }
+                catch (AccessDeniedException ade)
+                {
+                    // SFS-610
                     // drop-through
                 }
 
@@ -305,6 +316,16 @@ public class Node implements Comparable<Node>
         this.isLink = isLink;
     }
 
+    public Boolean getIsLocked()
+    {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean isLocked)
+    {
+        this.isLocked = isLocked;
+    }
+
     public List<String> getAllowableOperations()
     {
         return allowableOperations;
@@ -447,6 +468,10 @@ public class Node implements Comparable<Node>
         {
             sb.append(", allowableOperations=").append(getAllowableOperations());
         }
+        if (getSearch() != null)
+        {
+            sb.append(", search=").append(getSearch());
+        }
         sb.append("]");
         return sb.toString();
     }
@@ -481,7 +506,15 @@ public class Node implements Comparable<Node>
         this.association = association;
     }
 
+    public SearchEntry getSearch()
+    {
+        return search;
+    }
 
+    public void setSearch(SearchEntry search)
+    {
+        this.search = search;
+    }
     // TODO for backwards compat' - set explicitly when needed (ie. favourites) (note: we could choose to have separate old Node/NodeImpl etc)
 
     protected String title;

@@ -16,6 +16,7 @@
         <maven.tomcat.uriEncoding>UTF-8</maven.tomcat.uriEncoding>
         <maven.tomcat.port>${tomcat.default.alfresco.port}</maven.tomcat.port>
         <maven.tomcat.httpsPort>${tomcat.default.alfresco.ssl.port}</maven.tomcat.httpsPort>
+        
     </properties>
 
     <dependencies>

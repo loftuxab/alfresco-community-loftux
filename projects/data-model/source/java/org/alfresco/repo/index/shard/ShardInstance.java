@@ -77,7 +77,14 @@ public class ShardInstance implements Serializable
      */
     public void setBaseUrl(String baseUrl)
     {
+    	if((baseUrl != null) && baseUrl.endsWith("/"))
+    	{
+    		this.baseUrl = baseUrl.substring(0, baseUrl.length()-1);
+    	}
+    	else
+    	{
         this.baseUrl = baseUrl;
+    }
     }
 
     /**

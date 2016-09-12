@@ -404,11 +404,7 @@ public class TemplateNode extends BasePermissionsNode implements NamespacePrefix
         
         if (getAspects().contains(ContentModel.ASPECT_LOCKABLE))
         {
-            LockStatus lockStatus = this.services.getLockService().getLockStatus(this.nodeRef);
-            if (lockStatus == LockStatus.LOCKED || lockStatus == LockStatus.LOCK_OWNER)
-            {
-                locked = true;
-            }
+            locked = this.services.getLockService().isLocked(this.nodeRef);
         }
         
         return locked;
@@ -600,17 +596,20 @@ public class TemplateNode extends BasePermissionsNode implements NamespacePrefix
                 AuditQueryParameters pathParams = new AuditQueryParameters();
                 pathParams.setApplicationName(applicationName);
                 pathParams.addSearchKey("/alfresco-access/transaction/path", nodePath);
-                services.getAuditService().auditQuery(callback, pathParams, -1);
-                
+                // unfortunately, the getAuditTrail API forces us to get them all
+                services.getAuditService().auditQuery(callback, pathParams, Integer.MAX_VALUE);
+
                 AuditQueryParameters copyFromPathParams = new AuditQueryParameters();
                 copyFromPathParams.setApplicationName(applicationName);
                 copyFromPathParams.addSearchKey("/alfresco-access/transaction/copy/from/path", nodePath);
-                services.getAuditService().auditQuery(callback, copyFromPathParams, -1);
-                
+                // unfortunately, the getAuditTrail API forces us to get them all
+                services.getAuditService().auditQuery(callback, copyFromPathParams, Integer.MAX_VALUE);
+
                 AuditQueryParameters moveFromPathParams = new AuditQueryParameters();
                 moveFromPathParams.setApplicationName(applicationName);
                 moveFromPathParams.addSearchKey("/alfresco-access/transaction/move/from/path", nodePath);
-                services.getAuditService().auditQuery(callback, moveFromPathParams, -1);
+                // unfortunately, the getAuditTrail API forces us to get them all
+                services.getAuditService().auditQuery(callback, moveFromPathParams, Integer.MAX_VALUE);
                 return null;
             }
         }, AuthenticationUtil.getAdminUserName());

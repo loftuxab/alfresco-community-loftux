@@ -34,6 +34,7 @@ import org.alfresco.rest.api.model.AssocChild;
 import org.alfresco.rest.api.model.AssocTarget;
 import org.alfresco.rest.api.model.Document;
 import org.alfresco.rest.api.model.Folder;
+import org.alfresco.rest.api.model.LockInfo;
 import org.alfresco.rest.api.model.Node;
 import org.alfresco.rest.api.model.UserInfo;
 import org.alfresco.rest.framework.resource.content.BasicContentInfo;
@@ -246,6 +247,23 @@ public interface Nodes
     List<AssocTarget> addTargets(String sourceNodeId, List<AssocTarget> entities);
 
     /**
+     * Lock a node
+     * @param nodeId
+     * @param lockInfo
+     * @param parameters
+     * @return
+     */
+    Node lock(String nodeId, LockInfo lockInfo, Parameters parameters);
+
+    /**
+     * Unlock a node
+     * @param nodeId
+     * @param parameters
+     * @return
+     */
+    Node unlock(String nodeId, Parameters parameters);
+
+    /**
      * API Constants - query parameters, etc
      */
 
@@ -264,6 +282,7 @@ public interface Nodes
     String PARAM_INCLUDE_PATH = "path";
     String PARAM_INCLUDE_ASPECTNAMES = "aspectNames";
     String PARAM_INCLUDE_ISLINK = "isLink";
+    String PARAM_INCLUDE_ISLOCKED = "isLocked";
     String PARAM_INCLUDE_ALLOWABLEOPERATIONS = "allowableOperations";
 
     String PARAM_INCLUDE_ASSOCIATION = "association";

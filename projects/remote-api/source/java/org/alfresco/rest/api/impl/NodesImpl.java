@@ -25,6 +25,28 @@
  */
 package org.alfresco.rest.api.impl;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.alfresco.model.ApplicationModel;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.QuickShareModel;
@@ -34,11 +56,13 @@ import org.alfresco.repo.action.executer.ContentMetadataExtracter;
 import org.alfresco.repo.activities.ActivityType;
 import org.alfresco.repo.content.ContentLimitViolationException;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.lock.mem.Lifetime;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.model.filefolder.FileFolderServiceImpl;
 import org.alfresco.repo.node.getchildren.FilterProp;
 import org.alfresco.repo.node.getchildren.FilterPropBoolean;
 import org.alfresco.repo.node.getchildren.GetChildrenCannedQuery;
+import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.policy.BehaviourFilter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -51,6 +75,7 @@ import org.alfresco.repo.thumbnail.ThumbnailRegistry;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.version.VersionModel;
+import org.alfresco.repo.virtual.store.VirtualStore;
 import org.alfresco.rest.antlr.WhereClauseParser;
 import org.alfresco.rest.api.Activities;
 import org.alfresco.rest.api.Nodes;
@@ -59,6 +84,7 @@ import org.alfresco.rest.api.model.AssocChild;
 import org.alfresco.rest.api.model.AssocTarget;
 import org.alfresco.rest.api.model.Document;
 import org.alfresco.rest.api.model.Folder;
+import org.alfresco.rest.api.model.LockInfo;
 import org.alfresco.rest.api.model.Node;
 import org.alfresco.rest.api.model.PathInfo;
 import org.alfresco.rest.api.model.PathInfo.ElementInfo;
@@ -97,6 +123,8 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.NodeLockedException;
 import org.alfresco.service.cmr.model.FileExistsException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -104,6 +132,7 @@ import org.alfresco.service.cmr.model.FileNotFoundException;
 import org.alfresco.service.cmr.repository.AssociationExistsException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.DuplicateChildNodeNameException;
@@ -136,28 +165,6 @@ import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.extensions.surf.util.Content;
 import org.springframework.extensions.webscripts.servlet.FormData;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Centralises access to file/folder/node services and maps between representations.
  *
@@ -184,8 +191,6 @@ public class NodesImpl implements Nodes
         DOCUMENT, FOLDER
     }
 
-    private static final String DEFAULT_MIMETYPE = MimetypeMap.MIMETYPE_BINARY;
-
     private NodeService nodeService;
     private DictionaryService dictionaryService;
     private FileFolderService fileFolderService;
@@ -203,6 +208,8 @@ public class NodesImpl implements Nodes
     private ActivityPoster poster;
     private RetryingTransactionHelper retryingTransactionHelper;
     private NodeAssocService nodeAssocService;
+    private LockService lockService;
+    private VirtualStore smartStore; // note: remove as part of REPO-1173
 
     private enum Activity_Type
     {
@@ -253,6 +260,7 @@ public class NodesImpl implements Nodes
         this.thumbnailService = sr.getThumbnailService();
         this.siteService =  sr.getSiteService();
         this.retryingTransactionHelper = sr.getRetryingTransactionHelper();
+        this.lockService = sr.getLockService();
 
         if (defaultIgnoreTypesAndAspects != null)
         {
@@ -300,6 +308,11 @@ public class NodesImpl implements Nodes
         this.nodeAssocService = nodeAssocService;
     }
 
+    public void setSmartStore(VirtualStore smartStore)
+    {
+        this.smartStore = smartStore;
+    }
+
 
     // excluded namespaces (aspects, properties, assoc types)
     private static final List<String> EXCLUDED_NS = Arrays.asList(NamespaceService.SYSTEM_MODEL_1_0_URI);
@@ -328,7 +341,7 @@ public class NodesImpl implements Nodes
             ContentModel.PROP_LOCK_OWNER,
             ContentModel.PROP_WORKING_COPY_OWNER);
 
-    private final static Map<String,QName> MAP_PARAM_QNAME;
+    public final static Map<String,QName> PARAM_SYNONYMS_QNAME;
     static
     {
         Map<String,QName> aMap = new HashMap<>(9);
@@ -343,7 +356,7 @@ public class NodesImpl implements Nodes
         aMap.put(PARAM_SIZEINBYTES, GetChildrenCannedQuery.SORT_QNAME_CONTENT_SIZE);
         aMap.put(PARAM_NODETYPE, GetChildrenCannedQuery.SORT_QNAME_NODE_TYPE);
 
-        MAP_PARAM_QNAME = Collections.unmodifiableMap(aMap);
+        PARAM_SYNONYMS_QNAME = Collections.unmodifiableMap(aMap);
     }
 
     // list children filtering (via where clause)
@@ -878,15 +891,23 @@ public class NodesImpl implements Nodes
             node.setProperties(mapFromNodeProperties(properties, includeParam, mapUserInfo));
         }
 
+        Set<QName> aspects = null;
         if (includeParam.contains(PARAM_INCLUDE_ASPECTNAMES))
         {
-            node.setAspectNames(mapFromNodeAspects(nodeService.getAspects(nodeRef)));
+            aspects = nodeService.getAspects(nodeRef);
+            node.setAspectNames(mapFromNodeAspects(aspects));
         }
 
         if (includeParam.contains(PARAM_INCLUDE_ISLINK))
         {
             boolean isLink = isSubClass(nodeTypeQName, ContentModel.TYPE_LINK);
             node.setIsLink(isLink);
+        }
+
+        if (includeParam.contains(PARAM_INCLUDE_ISLOCKED))
+        {
+            boolean isLocked = isLocked(nodeRef, aspects);
+            node.setIsLocked(isLocked);
         }
 
         if (includeParam.contains(PARAM_INCLUDE_ALLOWABLEOPERATIONS))
@@ -908,7 +929,7 @@ public class NodesImpl implements Nodes
                     // special case: do not return "create" (as an allowable op) for file/content types - note: 'type' can be null
                     continue;
                 }
-                else if (perm.equals(PermissionService.DELETE) && (isSpecialNodeDoNotDelete(nodeRef, nodeTypeQName)))
+                else if (perm.equals(PermissionService.DELETE) && (isSpecialNode(nodeRef, nodeTypeQName)))
                 {
                     // special case: do not return "delete" (as an allowable op) for specific system nodes
                     continue;
@@ -1238,7 +1259,7 @@ public class NodesImpl implements Nodes
             sortProps = new ArrayList<>(sortCols.size());
             for (SortColumn sortCol : sortCols)
             {
-                QName propQname = MAP_PARAM_QNAME.get(sortCol.column);
+                QName propQname = PARAM_SYNONYMS_QNAME.get(sortCol.column);
                 if (propQname == null)
                 {
                     propQname = createQName(sortCol.column);
@@ -1313,8 +1334,17 @@ public class NodesImpl implements Nodes
         Set<QName> assocTypeQNames = buildAssocTypes(assocTypeQNameParam);
 
         // call GetChildrenCannedQuery (via FileFolderService)
-        pagingResults = fileFolderService.list(parentNodeRef, assocTypeQNames, searchTypeQNames, ignoreAspectQNames, sortProps, filterProps, pagingRequest);
-
+        if (((filterProps == null) || (filterProps.size() == 0)) &&
+            ((assocTypeQNames == null) || (assocTypeQNames.size() == 0)) &&
+            (smartStore.isVirtual(parentNodeRef)|| (smartStore.canVirtualize(parentNodeRef))))
+        {
+            pagingResults = fileFolderService.list(parentNodeRef, searchTypeQNames, ignoreAspectQNames, sortProps, pagingRequest);
+        }
+        else
+        {
+            // TODO smart folders (see REPO-1173)
+            pagingResults = fileFolderService.list(parentNodeRef, assocTypeQNames, searchTypeQNames, ignoreAspectQNames, sortProps, filterProps, pagingRequest);
+        }
 
         final Map<String, UserInfo> mapUserInfo = new HashMap<>(10);
 
@@ -1503,7 +1533,7 @@ public class NodesImpl implements Nodes
     {
         NodeRef nodeRef = validateOrLookupNode(nodeId, null);
 
-        if (isSpecialNodeDoNotDelete(nodeRef, getNodeType(nodeRef)))
+        if (isSpecialNode(nodeRef, getNodeType(nodeRef)))
         {
             throw new PermissionDeniedException("Cannot delete: " + nodeId);
         }
@@ -1927,9 +1957,9 @@ public class NodesImpl implements Nodes
         }
     }
 
-    // special case: additional delete validation (pending common lower-level service support)
-    // for blacklist of system nodes that should not be deleted, eg. Company Home, Sites, Data Dictionary
-    private boolean isSpecialNodeDoNotDelete(NodeRef nodeRef, QName type)
+    // special case: additional node validation (pending common lower-level service support)
+    // for blacklist of system nodes that should not be deleted or locked, eg. Company Home, Sites, Data Dictionary
+    private boolean isSpecialNode(NodeRef nodeRef, QName type)
     {
         // Check for Company Home, Sites and Data Dictionary (note: must be tenant-aware)
 
@@ -1966,6 +1996,18 @@ public class NodesImpl implements Nodes
         }
 
         return false;
+    }
+
+    private boolean isLocked(NodeRef nodeRef, Set<QName> aspects)
+    {
+        boolean locked = false;
+        if (((aspects != null) && aspects.contains(ContentModel.ASPECT_LOCKABLE))
+           || nodeService.hasAspect(nodeRef, ContentModel.ASPECT_LOCKABLE))
+        {
+            locked = lockService.isLocked(nodeRef);
+        }
+
+        return locked;
     }
 
     @Override
@@ -2180,7 +2222,7 @@ public class NodesImpl implements Nodes
             else
             {
                 // move
-                if ((! nodeRef.equals(parentNodeRef)) && isSpecialNodeDoNotDelete(nodeRef, getNodeType(nodeRef)))
+                if ((! nodeRef.equals(parentNodeRef)) && isSpecialNode(nodeRef, getNodeType(nodeRef)))
                 {
                     throw new PermissionDeniedException("Cannot move: "+nodeRef.getId());
                 }
@@ -2351,45 +2393,61 @@ public class NodesImpl implements Nodes
 
     private void writeContent(NodeRef nodeRef, String fileName, InputStream stream, boolean guessEncoding)
     {
-        ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-
-        String mimeType = mimetypeService.guessMimetype(fileName);
-        if ((mimeType != null) && (! mimeType.equals(MimetypeMap.MIMETYPE_BINARY)))
+        try
         {
-            // quick/weak guess based on file extension
-            writer.setMimetype(mimeType);
-        }
-        else
-        {
-            // stronger guess based on file stream
-            writer.guessMimetype(fileName);
-        }
+            ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
 
-        InputStream is = null;
-
-        if (guessEncoding)
-        {
-            is = new BufferedInputStream(stream);
-            is.mark(1024);
-            writer.setEncoding(guessEncoding(is, mimeType, false));
-            try
+            String mimeType = mimetypeService.guessMimetype(fileName);
+            if ((mimeType != null) && (!mimeType.equals(MimetypeMap.MIMETYPE_BINARY)))
             {
-                is.reset();
+                // quick/weak guess based on file extension
+                writer.setMimetype(mimeType);
+            } else
+            {
+                // stronger guess based on file stream
+                writer.guessMimetype(fileName);
             }
-            catch (IOException ioe)
+
+            InputStream is = null;
+
+            if (guessEncoding)
             {
-                if (logger.isWarnEnabled())
+                is = new BufferedInputStream(stream);
+                is.mark(1024);
+                writer.setEncoding(guessEncoding(is, mimeType, false));
+                try
                 {
-                    logger.warn("Failed to reset stream after trying to guess encoding: " + ioe.getMessage());
+                    is.reset();
+                } catch (IOException ioe)
+                {
+                    if (logger.isWarnEnabled())
+                    {
+                        logger.warn("Failed to reset stream after trying to guess encoding: " + ioe.getMessage());
+                    }
                 }
+            } else
+            {
+                is = stream;
             }
-        }
-        else
-        {
-            is = stream;
-        }
 
-        writer.putContent(is);
+            writer.putContent(is);
+        }
+        catch (ContentQuotaException cqe)
+        {
+            throw new InsufficientStorageException();
+        }
+        catch (ContentLimitViolationException clv)
+        {
+            throw new RequestEntityTooLargeException(clv.getMessage());
+        }
+        catch (ContentIOException cioe)
+        {
+            if (cioe.getCause() instanceof NodeLockedException)
+            {
+                throw (NodeLockedException)cioe.getCause();
+            }
+            throw cioe;
+        }
     }
 
     private String guessEncoding(InputStream in, String mimeType, boolean close)
@@ -2634,14 +2692,6 @@ public class NodesImpl implements Nodes
         catch (AccessDeniedException ade)
         {
             throw new PermissionDeniedException(ade.getMessage());
-        }
-        catch (ContentQuotaException cqe)
-        {
-            throw new InsufficientStorageException();
-        }
-        catch (ContentLimitViolationException clv)
-        {
-            throw new RequestEntityTooLargeException(clv.getMessage());
         }
         catch (Exception ex)
         {
@@ -2902,6 +2952,63 @@ public class NodesImpl implements Nodes
             }
         }
         return result;
+    }
+
+    @Override
+    public Node lock(String nodeId, LockInfo lockInfo, Parameters parameters)
+    {
+        NodeRef nodeRef = validateOrLookupNode(nodeId, null);
+
+        if (isSpecialNode(nodeRef, getNodeType(nodeRef)))
+        {
+            throw new PermissionDeniedException("Current user doesn't have permission to lock node " + nodeId);
+        }
+
+        if (!nodeMatches(nodeRef, Collections.singleton(ContentModel.TYPE_CONTENT), null, false))
+        {
+            throw new InvalidArgumentException("Node of type cm:content  or a subtype is expected: " + nodeId);
+        }
+
+        lockInfo = validateLockInformation(lockInfo);
+        lockService.lock(nodeRef, lockInfo.getMappedType(), lockInfo.getTimeToExpire(), lockInfo.getLifetime());
+
+        return getFolderOrDocument(nodeId, parameters);
+    }
+
+    private LockInfo validateLockInformation(LockInfo lockInfo)
+    {
+        // Set default values for the lock details.
+        if (lockInfo.getType() == null)
+        {
+            lockInfo.setType(LockInfo.LockType2.ALLOW_OWNER_CHANGES.name());
+        }
+        if (lockInfo.getLifetime() == null)
+        {
+            lockInfo.setLifetime(Lifetime.PERSISTENT.name());
+        }
+        if (lockInfo.getTimeToExpire() == null)
+        {
+            lockInfo.setTimeToExpire(0);
+        }
+        return lockInfo;
+    }
+
+    @Override
+    public Node unlock(String nodeId, Parameters parameters)
+    {
+        NodeRef nodeRef = validateOrLookupNode(nodeId, null);
+
+        if (isSpecialNode(nodeRef, getNodeType(nodeRef)))
+        {
+            throw new PermissionDeniedException("Current user doesn't have permission to unlock node " + nodeId);
+        }
+        if (!lockService.isLocked(nodeRef))
+        {
+            throw new IntegrityException("Can't unlock node " + nodeId + " because it isn't locked", null);
+        }
+        
+        lockService.unlock(nodeRef);
+        return getFolderOrDocument(nodeId, parameters);
     }
 
     /**

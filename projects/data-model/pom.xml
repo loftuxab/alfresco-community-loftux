@@ -16,6 +16,7 @@
             source/java/org/alfresco/repo/search/impl/parsers/FTSParser.java,
             source/java/org/alfresco/repo/search/impl/parsers/FTSLexer.java
         </sonar.exclusions>
+        
     </properties>
 
     <build>
@@ -64,40 +65,40 @@
         </plugins>
 
         <pluginManagement>
-        	<plugins>
-        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-        		<plugin>
-        			<groupId>org.eclipse.m2e</groupId>
-        			<artifactId>lifecycle-mapping</artifactId>
-        			<version>1.0.0</version>
-        			<configuration>
-        				<lifecycleMappingMetadata>
-        					<pluginExecutions>
-        						<pluginExecution>
-        							<pluginExecutionFilter>
-        								<groupId>org.jibx</groupId>
-        								<artifactId>
-        									maven-jibx-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.2.5,)
-        								</versionRange>
-        								<goals>
-        									<goal>bind</goal>
-        								</goals>
-        							</pluginExecutionFilter>
-        							<action>
-        								<execute>
-        									<runOnConfiguration>true</runOnConfiguration>
-        									<runOnIncremental>true</runOnIncremental>
-        								</execute>
-        							</action>
-        						</pluginExecution>
-        					</pluginExecutions>
-        				</lifecycleMappingMetadata>
-        			</configuration>
-        		</plugin>
-        	</plugins>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.jibx</groupId>
+                                        <artifactId>
+                                            maven-jibx-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.2.5,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>bind</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute>
+                                            <runOnConfiguration>true</runOnConfiguration>
+                                            <runOnIncremental>true</runOnIncremental>
+                                        </execute>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 
@@ -136,7 +137,7 @@
         <dependency>
             <groupId>org.apache.chemistry.opencmis</groupId>
             <artifactId>chemistry-opencmis-client-impl</artifactId>
-            <version>${dependency.opencmis.version}</version>
+            <version>${dependency.opencmis.version}</version><!--$NO-MVN-MAN-VER$-->
             <exclusions>
                 <exclusion>
                     <groupId>junit</groupId>

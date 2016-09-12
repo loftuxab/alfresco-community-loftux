@@ -64,6 +64,7 @@ public class Node
     protected Boolean isFolder;
     protected Boolean isFile;
     protected Boolean isLink;
+    protected Boolean isLocked;
 
     protected String parentId;
     protected PathInfo path;
@@ -81,6 +82,8 @@ public class Node
     protected String relativePath;
     protected List<AssocChild> secondaryChildren;
     protected List<AssocTarget> targets;
+
+    protected SearchResultEntry search;
 
     public Node()
     {
@@ -194,6 +197,16 @@ public class Node
     public void setIsLink(Boolean link)
     {
         isLink = link;
+    }
+
+    public Boolean getIsLocked()
+    {
+        return isLocked;
+    }
+
+    public void setIsLocked(Boolean locked)
+    {
+        isLocked = locked;
     }
 
     public String getParentId()
@@ -311,6 +324,16 @@ public class Node
         this.association = association;
     }
 
+    public SearchResultEntry getSearch()
+    {
+        return search;
+    }
+
+    public void setSearch(SearchResultEntry search)
+    {
+        this.search = search;
+    }
+
     public void expected(Object o)
     {
         Node other = (Node) o;
@@ -396,6 +419,7 @@ public class Node
         AssertUtil.assertEquals("isFolder", isFolder, other.getIsFolder());
         AssertUtil.assertEquals("isFile", isFile, other.getIsFile());
         AssertUtil.assertEquals("isLink", isLink, other.getIsLink());
+        AssertUtil.assertEquals("isLocked", isLocked, other.getIsLocked());
 
         if (path != null)
         {
@@ -413,6 +437,15 @@ public class Node
         else
         {
             assertNull(other.getContent());
+        }
+
+        if (search != null)
+        {
+            search.expected(other.getSearch());
+        }
+        else
+        {
+            assertNull(other.getSearch());
         }
 
         if (allowableOperations != null)

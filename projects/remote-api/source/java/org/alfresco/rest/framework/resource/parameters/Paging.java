@@ -26,13 +26,15 @@
 package org.alfresco.rest.framework.resource.parameters;
 
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
+import org.codehaus.jackson.annotate.JsonCreator;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * Represents paging of collections of resources. Set by the client request.<br/>
  * skipCount - How many entries exist in the entire collection before those included in the list<br/>
  * maxItems - The maximum number of items the client requires. Defaults to 100.
  * 
- * @author Gethin James
+ * @author Gethin James, Martin Muller (mmuller)
  */
 public class Paging
 {
@@ -49,11 +51,11 @@ public class Paging
         super();
         if(skipCount < 0)
         {
-        	throw new InvalidArgumentException();
+        	throw new InvalidArgumentException("Negative values not supported for skipCount.");
         }
         if(maxItems < 1)
         {
-        	throw new InvalidArgumentException();
+        	throw new InvalidArgumentException("Only positive values supported for maxItems.");
         }
         this.skipCount = skipCount;
         this.maxItems = maxItems;
@@ -77,7 +79,8 @@ public class Paging
         return this.maxItems;
     }
 
-    public static Paging valueOf(int skipCount, int maxItems)
+    @JsonCreator
+    public static Paging valueOf(@JsonProperty("skipCount") int skipCount, @JsonProperty("maxItems") int maxItems)
     {
         return new Paging(skipCount,maxItems);
     }

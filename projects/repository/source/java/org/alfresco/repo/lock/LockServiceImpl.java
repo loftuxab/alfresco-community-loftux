@@ -320,6 +320,25 @@ public class LockServiceImpl implements LockService,
     }
     
     /**
+     * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.lock.LockType, int, Lifetime, boolean)
+     */
+    @Override
+    @Extend(traitAPI=LockServiceTrait.class,extensionAPI=LockServiceExtension.class)
+    public void lock(NodeRef nodeRef, LockType lockType, int timeToExpire, Lifetime lifetime, boolean lockChildren)
+    {
+        lock(nodeRef, lockType, timeToExpire, lifetime);
+
+        if (lockChildren)
+        {
+            Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
+            for (ChildAssociationRef childAssocRef : childAssocRefs)
+            {
+                lock(childAssocRef.getChildRef(), lockType, timeToExpire, lifetime, lockChildren);
+            }
+        }
+    }
+    
+    /**
      * @see org.alfresco.service.cmr.lock.LockService#lock(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.lock.LockType, int, Lifetime, String)
      */
     @Override
@@ -446,16 +465,7 @@ public class LockServiceImpl implements LockService,
     public void lock(NodeRef nodeRef, LockType lockType, int timeToExpire, boolean lockChildren)
             throws UnableToAquireLockException
     {
-        lock(nodeRef, lockType, timeToExpire);
-
-        if (lockChildren == true)
-        {
-            Collection<ChildAssociationRef> childAssocRefs = this.nodeService.getChildAssocs(nodeRef);
-            for (ChildAssociationRef childAssocRef : childAssocRefs)
-            {
-                lock(childAssocRef.getChildRef(), lockType, timeToExpire, lockChildren);
-            }
-        }
+        lock(nodeRef, lockType, timeToExpire, Lifetime.PERSISTENT, lockChildren);
     }
 
     /**
@@ -735,7 +745,10 @@ public class LockServiceImpl implements LockService,
      */
     public void beforeDeleteNode(NodeRef nodeRef)
     {
-        checkForLock(nodeRef);
+        if (! nodeService.hasAspect(nodeRef, ContentModel.ASPECT_CHECKED_OUT))
+        {
+            checkForLock(nodeRef);
+        }
     }
 
     /**
@@ -815,6 +828,42 @@ public class LockServiceImpl implements LockService,
             }
         }
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Extend(traitAPI=LockServiceTrait.class,extensionAPI=LockServiceExtension.class)
+    public boolean isLocked(NodeRef nodeRef)
+    {
+        LockStatus lockStatus = getLockStatus(nodeRef);
+        switch (lockStatus)
+        {
+            case LOCKED:
+            case LOCK_OWNER:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Extend(traitAPI=LockServiceTrait.class,extensionAPI=LockServiceExtension.class)
+    public boolean isLockedAndReadOnly(NodeRef nodeRef)
+    {
+        LockStatus lockStatus = getLockStatus(nodeRef);
+        switch (lockStatus)
+        {
+            case NO_LOCK:
+            case LOCK_EXPIRED:
+                return false;
+            case LOCK_OWNER:
+                return getLockType(nodeRef) != LockType.WRITE_LOCK;
+            default:
+                return true;
+        }
     }
 
     /**
