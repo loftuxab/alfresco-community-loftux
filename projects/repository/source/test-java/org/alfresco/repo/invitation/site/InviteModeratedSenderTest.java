@@ -26,6 +26,7 @@
 
 package org.alfresco.repo.invitation.site;
 
+import static org.alfresco.repo.invitation.activiti.SendModeratedInviteDelegate.ENTERPRISE_EMAIL_TEMPLATE_PATH;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -43,8 +44,6 @@ import junit.framework.TestCase;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.action.executer.MailActionExecuter;
-import org.alfresco.repo.admin.SysAdminParams;
-import org.alfresco.repo.admin.SysAdminParamsImpl;
 import org.alfresco.repo.i18n.MessageService;
 import org.alfresco.repo.invitation.WorkflowModelModeratedInvitation;
 import org.alfresco.repo.invitation.activiti.SendModeratedInviteDelegate;
@@ -52,9 +51,6 @@ import org.alfresco.repo.model.Repository;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.admin.RepoAdminService;
-import org.alfresco.service.cmr.admin.RepoUsage;
-import org.alfresco.service.cmr.admin.RepoUsage.LicenseMode;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -68,6 +64,7 @@ import org.alfresco.service.cmr.security.PersonService.PersonInfo;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
+import org.apache.commons.lang.StringUtils;
 import org.mockito.ArgumentCaptor;
 
 
@@ -94,7 +91,6 @@ public class InviteModeratedSenderTest extends TestCase
     private static final String shortSiteName = "site-name";
 
     private static final String packageId = testStore + "/Package";
-    private static final String pendingInvitesLink = MessageFormat.format("page/site/{0}/pending-invites", shortSiteName);
     
     private final MessageService messageService = mock(MessageService.class);
 
@@ -110,7 +106,7 @@ public class InviteModeratedSenderTest extends TestCase
     public void testSendModeratedEmail() throws Exception
     {                  
         Map<String, String> properties = buildDefaultProperties();
-        inviteModeratedSender.sendMail(SendModeratedInviteDelegate.EMAIL_TEMPLATE_XPATH, SendModeratedInviteDelegate.EMAIL_SUBJECT_KEY, properties);
+        inviteModeratedSender.sendMail(ENTERPRISE_EMAIL_TEMPLATE_PATH, SendModeratedInviteDelegate.EMAIL_SUBJECT_KEY, properties);
 
         verify(mailAction).setParameterValue(eq(MailActionExecuter.PARAM_FROM), eq(requesterMail));
         verify(mailAction).setParameterValue(eq(MailActionExecuter.PARAM_TO_MANY), eq(SiteManagerGroup));
@@ -120,6 +116,8 @@ public class InviteModeratedSenderTest extends TestCase
 
         ArgumentCaptor<Map> modelC = ArgumentCaptor.forClass(Map.class);
         verify(mailAction).setParameterValue(eq(MailActionExecuter.PARAM_TEMPLATE_MODEL), (Serializable)modelC.capture());
+
+        String pendingInvitesLink = StringUtils.stripStart(MessageFormat.format(InviteModeratedSender.SHARE_PENDING_INVITES_LINK, StringUtils.EMPTY, shortSiteName), "/");
         
         // Check the model
         Map model = modelC.getValue();
