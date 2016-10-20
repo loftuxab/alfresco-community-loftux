@@ -279,6 +279,24 @@ public class ThumbnailServiceImpl implements ThumbnailService,
             }
             TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES).add(childAssoc);
             TransactionSupportUtil.bindListener(this.transactionListener, 0);
+
+            // The onCreateNode for new version will return a temporary node that gets removed later.
+            // We need to add the original node to the TransactionalResourceHelper instead.
+            String thumbnailQname = "{http://www.alfresco.org/model/content/1.0}" + thumbnailName;
+            if(!childAssoc.getQName().toString().equals(thumbnailQname)) {
+
+                List<ChildAssociationRef> allAssocRefs = nodeService.getChildAssocs(childAssoc.getParentRef());
+                for(ChildAssociationRef childAssocTemp : allAssocRefs ) {
+                    if(childAssocTemp.getQName().toString().equals(thumbnailQname)) {
+                        TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES).add(childAssocTemp);
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("Caching original thumbnail " + childAssocTemp + " in transaction resources, thumbnail " + thumbnailName);
+                        }
+                    }
+                }
+
+            }
         }
         else
         {
