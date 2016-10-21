@@ -1,3 +1,5 @@
+![](https://loftux.com/files/static/images/lxcommunity_ecm_logo.png)
+
 # Loftux AB - Alfresco Community edition
 This is a Github fork of the official Alfresco Community edition. This fork will not contain any major feature additions, those will be released as separate addons.  
 What you will find here is  
