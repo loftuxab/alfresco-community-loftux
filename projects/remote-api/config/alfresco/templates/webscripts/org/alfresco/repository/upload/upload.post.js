@@ -272,16 +272,60 @@ function main()
 
          if (updateNameAndMimetype)
          {
-             //check to see if name is already used in folder
-             var existingFile = updateNode.getParent().childByNamePath(filename),
-                 newFilename = filename;
-             if (existingFile !== null && existingFile.nodeRef.id  !== updateNodeRef.id)
-             {
-                 //name it's already used for other than node to update; create a new one
-                 newFilename = createUniqueNameInFolder(filename, updateNode.getParent());
-             }
-             //update node name
-             updateNode.setName(newFilename);
+            // Loftux: Only change the file suffix if changed mimetype, keep rest of the name
+            var oldFilename, oldFileNameBase, oldFileNameSuffix, fileNameSuffix;
+
+            oldFilename = updateNode.properties.name;
+
+            // Split the filename and suffix
+            if(oldFilename.lastIndexOf(".")<0)
+            {
+               oldFileNameBase = oldFilename;
+               oldFileNameSuffix = "";
+            }
+            else
+            {
+               oldFileNameBase = oldFilename.substring(0,oldFilename.lastIndexOf("."));
+               oldFileNameSuffix = oldFilename.substr(oldFilename.lastIndexOf("."));
+            }
+            // Split the filename and suffix
+            if(filename.lastIndexOf(".")<0)
+            {
+               fileNameSuffix = "";
+            }
+            else
+            {
+               fileNameSuffix = filename.substr(filename.lastIndexOf("."));
+            }
+
+            if(oldFileNameSuffix !== fileNameSuffix) {
+               if (fileNameSuffix === "") {
+                  // No new mimetype can be detected without file ending, assume the old file name is correct
+                  filename = oldFilename;
+                  updateNameAndMimetype = false;
+               } else {
+                  filename = oldFileNameBase + fileNameSuffix;
+               }
+
+            } else {
+               // No new mimetype, keep the old file name
+               filename = oldFilename;
+               updateNameAndMimetype = false;
+            }
+
+            if(filename !== oldFilename) {
+               //check to see if name is already used in folder
+               var existingFile = updateNode.getParent().childByNamePath(filename),
+                  newFilename = filename;
+               if (existingFile !== null && existingFile.nodeRef.id  !== updateNodeRef.id)
+               {
+
+                  //name it's already used for other than node to update; create a new one
+                  newFilename = createUniqueNameInFolder(filename, updateNode.getParent());
+               }
+               //update node name
+               updateNode.setName(newFilename);
+            }
          }
          
          var workingcopy = updateNode.hasAspect("cm:workingcopy");
