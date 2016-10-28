@@ -41,6 +41,26 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>loftux-releases</id>
+      <url>http://artifacts.loftux.net/nexus/content/repositories/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+     </repository>
+     <repository>
+      <id>loftux-snapshots</id>
+      <url>http://artifacts.loftux.net/nexus/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
   <pluginRepositories>
     <!-- Used to download bcel 6.0-RC3 - see ACE-3667 -->
