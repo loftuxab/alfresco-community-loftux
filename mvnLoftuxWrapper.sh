@@ -2,11 +2,19 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="LX91"
+buildnumber="LX92-SNAPSHOT"
 buildAlfresco="5.2-SNAPSHOT"
+
 # Add url in format id::layout::url, see http://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html
-snapshotRepo=""
-releaseRepo=""
+snapshotID=""
+snapshotURL=""
+
+releaseID=""
+releaseURL=""
+
+layout="default"
+snapshotRepo="$snapshotID::$layout::$snapshotURL"
+releaseRepo="$releaseID::$layout::$releaseRepo"
 
 # SCM Revision number -Fetch automatically
 
@@ -41,7 +49,7 @@ read KEY
 
 install() {
     echo "Starting local install build..."
-    mvn clean source:jar-no-fork install -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
+    mvn clean source:jar install -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
     -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
     -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
 }
@@ -53,21 +61,22 @@ deploy() {
 
     if [[ $buildnumber == *"SNAPSHOT"* ]]
     then
-        if [ -n "$snapshotRepo" ]; then
+        if [ -n "$snapshotURL" ]; then
             echo "Deploy to SNAPSHOT $snapshotRepo"
             echo
-            mvn clean deploy source:jar-no-fork -Penv=production -DaltSnapshotDeploymentRepository="$snapshotRepo" \
+            mvn clean source:jar deploy -Penv=production -DaltSnapshotDeploymentRepository="$snapshotRepo" \
+            -Dmaven.distributionManagement.snapshot.url="$snapshotURL" -Dmaven.distributionManagement.snapshot.id="$snapshotID" \
             -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
             -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
-            -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
+            -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"        
         else
             echo "You must set the snapshotRepo url for a SNAPSHOT deployment"
         fi
     else
-        if [ -n "$releaseRepo" ]; then
+        if [ -n "$releaseURL" ]; then
             echo "Deploy to RELEASE $releaseRepo"
             echo
-            mvn clean deploy source:jar-no-fork -Penv=production -DaltReleaseDeploymentRepository="$releaseRepo" \
+            mvn clean source:jar deploy -Penv=production -DaltReleaseDeploymentRepository="$releaseRepo" \
             -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
             -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
             -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
@@ -102,6 +111,11 @@ cleanup() {
     echo
     echo "Restore orginal Alfresco build number completed"
     echo
+
+    read -e -p "Do you want to run mvn clean [y/n] (default: y)" runclean
+    if [ "$runclean" != "n" ]; then
+        mvn clean
+    fi
 
 }
 
