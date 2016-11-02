@@ -77,7 +77,7 @@ deploy() {
             echo "Deploy to RELEASE $releaseRepo"
             echo
             mvn clean source:jar deploy -Penv=production -DaltReleaseDeploymentRepository="$releaseRepo" \
-            -Dmaven.distributionManagement.snapshot.url="$releaseURL" -Dmaven.distributionManagement.snapshot.id="$releaseID" \
+            -Dmaven.distributionManagement.release.url="$releaseURL" -Dmaven.distributionManagement.release.id="$releaseID" \
             -Dversion-edition="$versionedition" -Dbuild-number="$buildnumber" -Dscm-revision="$scmrevision" -Dscm-path="$scmpath" \
             -Dbamboo_planName="$bamboo_planName" -Dbamboo_fullBuildKey="$bamboo_fullBuildKey" -Dbamboo_buildNumber="$bamboo_buildNumber" -Dbamboo_repository_revision_number="$bamboo_repository_revision_number" \
             -Dbamboo_custom_svn_lastchange_revision_number="$bamboo_custom_svn_lastchange_revision_number" -D=bamboo_planRepository_repositoryUrl="$bamboo_planRepository_repositoryUrl"
