@@ -75,8 +75,8 @@
 
   <distributionManagement>
       <repository>
-          <id>alfresco-internal</id>
-          <url>https://artifacts.alfresco.com/nexus/content/repositories/internal-staging</url>
+          <id>${maven.distributionManagement.release.id}</id>
+          <url>${maven.distributionManagement.release.url}</url>
       </repository>
       <snapshotRepository>
           <id>${maven.distributionManagement.snapshot.id}</id>
@@ -141,6 +141,8 @@
     <maven.repository.url>https://artifacts.alfresco.com/nexus/content/groups/public</maven.repository.url>
     <maven.distributionManagement.snapshot.id>alfresco-internal-snapshots</maven.distributionManagement.snapshot.id>
     <maven.distributionManagement.snapshot.url>https://artifacts.alfresco.com/nexus/content/repositories/snapshots</maven.distributionManagement.snapshot.url>
+    <maven.distributionManagement.release.id>alfresco-internal</maven.distributionManagement.release.id>
+    <maven.distributionManagement.release.url>https://artifacts.alfresco.com/nexus/content/repositories/internal-staging</maven.distributionManagement.release.url>
     <maven.license.name>GNU Lesser General Public License v3.0 or later</maven.license.name>
     <maven.license.url>http://www.gnu.org/licenses/lgpl-3.0-standalone.html</maven.license.url>
     <licenseName>community</licenseName>
@@ -710,6 +712,7 @@
         </plugin>
 
                 <!-- Configure deployment of releases to Staging area of Nexus -->
+                <!-- Loftux removed since this is internal Alfresco only
         <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -726,6 +729,7 @@
                 </tags>
             </configuration>
         </plugin>
+                -->
 
 
 
