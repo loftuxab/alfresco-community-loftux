@@ -754,7 +754,7 @@
         <dependency>
             <groupId>se.loftux.alfresco.i18n</groupId>
             <artifactId>alfresco-sv-se</artifactId>
-            <version>5.2.0.1-SNAPSHOT</version>
+            <version>5.2.0.1</version>
         </dependency>
 
         <!-- Test dependencies -->
