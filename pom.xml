@@ -66,7 +66,6 @@
 
   <modules>
     <module>projects/3rd-party</module>
-    <module>projects/data-model</module>
     <module>projects/dev-tomcat</module>
     <module>projects/legacy-lucene</module>
     <module>projects/mbeans</module>
@@ -145,6 +144,7 @@
     <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.8</dependency.webscripts.version>
     <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
+    <dependency.alfresco-data-model.version>6.0</dependency.alfresco-data-model.version>
     <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
@@ -243,6 +243,17 @@
             <artifactId>alfresco-core</artifactId>
             <classifier>tests</classifier>
             <version>${dependency.alfresco-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <version>${dependency.alfresco-data-model.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <classifier>tests</classifier>
+            <version>${dependency.alfresco-data-model.version}</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
