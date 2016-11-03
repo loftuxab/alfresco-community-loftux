@@ -144,7 +144,7 @@
     <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.12</dependency.webscripts.version>
     <dependency.alfresco-core.version>6.6</dependency.alfresco-core.version>
-    <dependency.alfresco-data-model.version>6.3</dependency.alfresco-data-model.version>
+    <dependency.alfresco-data-model.version>6.4</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.1</dependency.alfresco-xmlfactory.version>
     <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
