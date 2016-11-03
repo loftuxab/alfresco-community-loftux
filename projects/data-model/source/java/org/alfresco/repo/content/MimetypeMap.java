@@ -131,6 +131,8 @@ public class MimetypeMap implements MimetypeService
 
     public static final String MIMETYPE_VIDEO_3GP2 = "video/3gpp2";
 
+    public static final String MIMETYPE_DITA = "application/dita+xml";
+
     // Flash
     public static final String MIMETYPE_FLASH = "application/x-shockwave-flash";
 
