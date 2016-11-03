@@ -1586,8 +1586,27 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 			}
 		}
 
-		// Remove small bits already covered in larger fragments 
-		//list = getNonContained(list);
+        // Fix up position increments for in phrase isolated wildcards
+        
+        boolean lastWasWild = false;
+        for(int i = 0; i < list.size() -1; i++)
+        {
+        	for(int j = list.get(i).endOffset() + 1; j < list.get(i + 1).startOffset() - 1; j++)
+        	{
+        		if(wildcardPoistions.contains(j))
+        		{
+        			if(!lastWasWild)
+        			{
+        			    list.get(i+1).setPositionIncrement(list.get(i+1).getPositionIncrement() + 1);
+        			}
+        			lastWasWild = true;
+        		}
+        		else
+        		{
+        			lastWasWild = false;
+        		}
+        	}
+        }
 
 		Collections.sort(list, new Comparator<org.apache.lucene.analysis.Token>()
 				{
@@ -1895,8 +1914,9 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 				String post = postfix.toString();
 				int oldPositionIncrement = replace.getPositionIncrement();
 				String replaceTermText = replace.toString();
+				String replaceType = replace.type();
 				replace = new org.apache.lucene.analysis.Token(replaceTermText + post, replace.startOffset(), replace.endOffset() + post.length());
-				replace.setType(replace.type());
+				replace.setType(replaceType);
 				replace.setPositionIncrement(oldPositionIncrement);
 				fixedTokenSequence.add(replace);
 			}
