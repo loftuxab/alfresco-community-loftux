@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <dependency.solr.version>4.10.4</dependency.solr.version>
         <maven.tomcat.path>/solr4</maven.tomcat.path>
         <m2eclipse.wtp.contextRoot>${maven.tomcat.path}</m2eclipse.wtp.contextRoot>
         <maven.tomcat.port>${tomcat.default.solr4.port}</maven.tomcat.port>
@@ -31,7 +32,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-test-framework</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -52,13 +53,13 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -78,7 +79,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-analysis-extras</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -91,9 +92,9 @@
             </exclusions>
         </dependency>
         <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-langid</artifactId>
-            <version>4.10.3</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-langid</artifactId>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -118,9 +119,9 @@
             </exclusions>
         </dependency>
         <dependency>
-	    <groupId>org.apache.solr</groupId>
-	    <artifactId>solr-clustering</artifactId>
-	    <version>4.10.3</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-clustering</artifactId>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -170,7 +171,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <type>war</type>
         </dependency>
 
