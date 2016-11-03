@@ -145,6 +145,7 @@
     <dependency.webscripts.version>6.8</dependency.webscripts.version>
     <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
     <dependency.alfresco-data-model.version>6.0</dependency.alfresco-data-model.version>
+    <dependency.alfresco-xmlfactory.version>1.1</dependency.alfresco-xmlfactory.version>
     <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
@@ -204,7 +205,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-xmlfactory</artifactId>
-            <version>1.0.3</version>
+            <version>${dependency.alfresco-xmlfactory.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.chemistry.opencmis</groupId>
