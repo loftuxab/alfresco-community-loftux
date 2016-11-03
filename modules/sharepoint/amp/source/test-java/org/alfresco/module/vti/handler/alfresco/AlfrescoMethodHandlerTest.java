@@ -70,7 +70,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.alfresco.util.TempFileProvider;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.apache.chemistry.opencmis.server.shared.TempStoreOutputStreamFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -130,7 +130,7 @@ public class AlfrescoMethodHandlerTest
     public void setUp() throws Exception
     {
         File tempDirectory = TempFileProvider.getTempDir("Alfresco-Vti");
-        ThresholdOutputStreamFactory streamFactory = ThresholdOutputStreamFactory.newInstance(tempDirectory, 4194304, 4294967296L, false);
+        TempStoreOutputStreamFactory streamFactory = TempStoreOutputStreamFactory.newInstance(tempDirectory, 4194304, 4294967296L, false);
 
         // The class under test
         //handler = (MethodHandler) ctx.getBean("vtiHandler");

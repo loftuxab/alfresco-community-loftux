@@ -55,8 +55,8 @@ import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.repo.webdav.ActivityPostProducer;
-import org.alfresco.repo.webdav.WebDAVActivityPoster;
 import org.alfresco.repo.webdav.WebDAV;
+import org.alfresco.repo.webdav.WebDAVActivityPoster;
 import org.alfresco.repo.webdav.WebDAVHelper;
 import org.alfresco.repo.webdav.WebDAVServerException;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -75,7 +75,7 @@ import org.alfresco.service.cmr.webdav.WebDavService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
 import org.alfresco.util.TempFileProvider;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.apache.chemistry.opencmis.server.shared.TempStoreOutputStreamFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.util.URLDecoder;
@@ -103,15 +103,15 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler impleme
     private String tempDirectoryName = null;
     private int memoryThreshold = 4 * 1024 * 1024; // 4mb
     private long maxContentSize = (long) 4 * 1024 * 1024 * 1024; // 4gb
-    private ThresholdOutputStreamFactory streamFactory = null;
+    private TempStoreOutputStreamFactory streamFactory = null;
     
     public void init()
     {
         File tempDirectory = TempFileProvider.getTempDir(tempDirectoryName);
-        this.streamFactory = ThresholdOutputStreamFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
+        this.streamFactory = TempStoreOutputStreamFactory.newInstance(tempDirectory, memoryThreshold, maxContentSize, encryptTempFiles);
     }
 
-    public void setStreamFactory(ThresholdOutputStreamFactory streamFactory)
+    public void setStreamFactory(TempStoreOutputStreamFactory streamFactory)
     {
         this.streamFactory = streamFactory;
     }
