@@ -107,6 +107,14 @@
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>tika-core</artifactId>
+                    <groupId>org.apache.tika</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>tika-parsers</artifactId>
+                    <groupId>org.apache.tika</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -254,7 +262,8 @@
                         WEB-INF/lib/httpmime-4.3.1.jar,
                         WEB-INF/lib/httpcore-4.3.jar,
                         WEB-INF/lib/httpclient-4.3.1.jar,
-                        WEB-INF/lib/commons-io-2.3.jar
+                        WEB-INF/lib/commons-io-2.3.jar,
+                        WEB-INF/lib/wstx-asl-3.2.7.jar
                     </packagingExcludes>
                 </configuration>
                 <!-- This allows overlays to be prepared on the FS for minification and faster run -->
