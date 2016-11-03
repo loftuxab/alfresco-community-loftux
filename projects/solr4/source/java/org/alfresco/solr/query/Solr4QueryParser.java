@@ -1587,7 +1587,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		}
 
 		// Remove small bits already covered in larger fragments 
-		list = getNonContained(list);
+		//list = getNonContained(list);
 
 		Collections.sort(list, new Comparator<org.apache.lucene.analysis.Token>()
 				{
@@ -2594,7 +2594,7 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 
 	private Set<Integer> getWildcardPositions(String string)
