@@ -161,7 +161,7 @@
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
     <installer.java.version>1.8.0_65</installer.java.version>
     <installer.postgresql.version>9.4.4-20151016</installer.postgresql.version>
-    <installer.libreoffice.version>4.4.5-20151016</installer.libreoffice.version>
+    <installer.libreoffice.version>5.2.1-alfresco</installer.libreoffice.version>
     <installer.ghostscript.version>8.64</installer.ghostscript.version>
     <installer.imagemagick.version>6.9.1</installer.imagemagick.version>
 
