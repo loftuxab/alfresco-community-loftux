@@ -142,7 +142,7 @@
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
-    <dependency.webscripts.version>6.8</dependency.webscripts.version>
+    <dependency.webscripts.version>6.9</dependency.webscripts.version>
     <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
     <dependency.alfresco-data-model.version>6.1-SNAPSHOT</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.1</dependency.alfresco-xmlfactory.version>
@@ -414,8 +414,8 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -1476,7 +1476,7 @@
             </dependency>
         </dependencies>
     </profile>
-    
+
     <profile>
         <id>doclint-java8-max</id>
         <activation>
@@ -1494,7 +1494,7 @@
             </plugins>
         </build>
     </profile>
-    
+
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>
