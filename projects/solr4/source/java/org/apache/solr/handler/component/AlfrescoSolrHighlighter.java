@@ -609,6 +609,10 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
                     doHighlightingByHighlighter(query, req, docSummaries, docId, doc, fieldName);
             }
             String printId = schema.printableUniqueKey(doc);
+            if(doc.get("DBID") != null)
+			{
+            	docSummaries.add("DBID", doc.get("DBID"));
+			}
             fragments.add(printId == null ? null : printId, docSummaries);
         }
         return fragments;
