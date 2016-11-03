@@ -16,7 +16,7 @@
     </parent>
 
     <properties>
-        <dependency.solr.version>4.10.4</dependency.solr.version>
+        <dependency.solr.version>4.10.3</dependency.solr.version>
         <maven.tomcat.path>/solr4</maven.tomcat.path>
         <m2eclipse.wtp.contextRoot>${maven.tomcat.path}</m2eclipse.wtp.contextRoot>
         <maven.tomcat.port>${tomcat.default.solr4.port}</maven.tomcat.port>
