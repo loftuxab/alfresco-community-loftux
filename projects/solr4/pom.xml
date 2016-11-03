@@ -230,6 +230,10 @@
                 <configuration>
                     <attachClasses>true</attachClasses>
                     <archiveClasses>true</archiveClasses>
+                    <packagingExcludes>
+		                WEB-INF/lib/commons-fileupload-1.2.1.jar,
+                        WEB-INF/lib/commons-fileupload-1.3.1.jar
+		        </packagingExcludes>
                 </configuration>
                 <!-- This allows overlays to be prepared on the FS for minification and faster run -->
                 <executions>
