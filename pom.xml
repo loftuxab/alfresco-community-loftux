@@ -108,6 +108,7 @@
 
     <!-- Maven specific build properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.build.sourceVersion>1.8</maven.build.sourceVersion>
 
     <!-- Arguments for test execution in surefire -->
     <!-- (Disable assertions in Chemistry OpenCMIS, until their TCK is fixed) -->
@@ -543,7 +544,7 @@
                     <configuration>
                         <rules>
                             <requireJavaVersion>
-                                <version>1.7.0</version>
+                                <version>1.8.0</version>
                             </requireJavaVersion>
                             <bannedDependencies>
                                 <excludes>
