@@ -27,6 +27,7 @@
 package org.alfresco.rest.api.search.impl;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.search.impl.lucene.LuceneQueryLanguageSPI;
 import org.alfresco.rest.api.search.model.Default;
 import org.alfresco.rest.api.search.model.FacetField;
 import org.alfresco.rest.api.search.model.FacetFields;
@@ -40,25 +41,19 @@ import org.alfresco.rest.api.search.model.SortDef;
 import org.alfresco.rest.api.search.model.Spelling;
 import org.alfresco.rest.api.search.model.Template;
 import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
-import org.alfresco.rest.framework.resource.content.BasicContentInfo;
-import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.framework.resource.parameters.Paging;
 import org.alfresco.rest.framework.resource.parameters.Params;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.GeneralHighlightParameters;
 import org.alfresco.service.cmr.search.LimitBy;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
-import org.alfresco.rest.api.model.Node;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacet;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacetMethod;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacetSort;
 import org.alfresco.service.cmr.search.SearchParameters.Operator;
 import org.alfresco.service.cmr.search.SearchParameters.SortDefinition;
 import org.alfresco.service.cmr.search.SearchParameters.SortDefinition.SortType;
-import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
-import org.apache.commons.lang.NotImplementedException;
 
 import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ALLOWABLEOPERATIONS;
 import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASSOCIATION;
@@ -66,13 +61,12 @@ import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ISLINK;
 import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PATH;
 import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASPECTNAMES;
 import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PROPERTIES;
-import static org.alfresco.rest.api.impl.NodesImpl.PARAM_SYNONYMS_QNAME;
 import static org.alfresco.service.cmr.search.SearchService.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Maps from a json request and a solr SearchParameters object.
@@ -95,7 +89,7 @@ public class SearchMapper
      * @param params
      * @return SearchParameters
      */
-    public SearchParameters toSearchParameters(SearchQuery searchQuery)
+    public SearchParameters toSearchParameters(Params params, SearchQuery searchQuery)
     {
         ParameterCheck.mandatory("query", searchQuery.getQuery());
 
@@ -103,7 +97,7 @@ public class SearchMapper
         setDefaults(sp);
 
         fromQuery(sp,  searchQuery.getQuery());
-        fromPaging(sp, searchQuery.getPaging());
+        fromPaging(sp, params.getPaging());
         fromSort(sp, searchQuery.getSort());
         fromTemplate(sp, searchQuery.getTemplates());
         validateInclude(searchQuery.getInclude());
@@ -112,6 +106,7 @@ public class SearchMapper
         fromFacetQuery(sp, searchQuery.getFacetQueries());
         fromFacetFields(sp, searchQuery.getFacetFields());
         fromSpellCheck(sp, searchQuery.getSpellcheck());
+        fromHighlight(sp, searchQuery.getHighlight());
         fromScope(sp, searchQuery.getScope());
         fromLimits(sp, searchQuery.getLimits());
 
@@ -126,8 +121,6 @@ public class SearchMapper
     {
         //Hardcode workspace store
         sp.addStore(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
-        sp.setLimitBy(LimitBy.FINAL_SIZE);
-        sp.setMaxItems(100);
     }
 
     /**
@@ -138,9 +131,9 @@ public class SearchMapper
     public void fromQuery(SearchParameters sp, Query q)
     {
         ParameterCheck.mandatoryString("query", q.getQuery());
-        ParameterCheck.mandatoryString("language", q.getLanguage());
+        String lang = q.getLanguage()==null?AFTS:q.getLanguage();
 
-        switch (q.getLanguage().toLowerCase())
+        switch (lang.toLowerCase())
         {
             case AFTS:
                 sp.setLanguage(LANGUAGE_FTS_ALFRESCO);
@@ -169,7 +162,7 @@ public class SearchMapper
         if (paging != null)
         {
             sp.setLimitBy(LimitBy.FINAL_SIZE);
-            sp.setMaxItems(paging.getMaxItems());
+            sp.setLimit(paging.getMaxItems());
             sp.setSkipCount(paging.getSkipCount());
         }
     }
@@ -283,10 +276,34 @@ public class SearchMapper
     {
         if (filterQueries != null && !filterQueries.isEmpty())
         {
+            if (LANGUAGE_CMIS_ALFRESCO.equals(sp.getLanguage()))
+            {
+                throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                            new Object[] { ": filterQueries {} not allowed with cmis language" });
+            }
             for (FilterQuery fq:filterQueries)
             {
                 ParameterCheck.mandatoryString("filterQueries query", fq.getQuery());
-                sp.addFilterQuery(fq.getQuery());
+                String query = fq.getQuery().trim();
+                if (fq.getTags() == null || fq.getTags().isEmpty() || query.contains("afts tag"))
+                {
+                    //If its already got tags then just let it through
+                    sp.addFilterQuery(query);
+                }
+                else
+                {
+                    String tags = "tag="+String.join(",", fq.getTags());
+                    Matcher matcher = LuceneQueryLanguageSPI.AFTS_QUERY.matcher(query);
+                    if (matcher.find())
+                    {
+                        query = "{!afts "+tags+" "+matcher.group(1).trim()+"}"+matcher.group(2);
+                    }
+                    else
+                    {
+                        query = "{!afts "+tags+" }"+query;
+                    }
+                    sp.addFilterQuery(query);
+                }
             }
         }
     }
@@ -335,8 +352,11 @@ public class SearchMapper
                 {
                     ParameterCheck.mandatoryString("facetFields facet field", facet.getField());
                     String field = facet.getField();
-                    //String label = facet.getLabel()!=null?facet.getLabel():field;
-                    //field = "{key='"+label+"'}"+field;
+                    if (facet.getExcludeFilters() != null && !facet.getExcludeFilters().isEmpty())
+                    {
+                        int startIndex = field.startsWith("{!afts")?7:0;
+                        field = "{!afts ex="+String.join(",", facet.getExcludeFilters())+"}"+field.substring(startIndex);
+                    }
 
                     FieldFacet ff = new FieldFacet(field);
 
@@ -370,7 +390,6 @@ public class SearchMapper
                     ff.setOffset(facet.getOffset());
                     ff.setMinCount(facet.getMincount());
                     ff.setEnumMethodCacheMinDF(facet.getFacetEnumCacheMinDf());
-
                     sp.addFieldFacet(ff);
                 }
             }
@@ -433,6 +452,16 @@ public class SearchMapper
     }
 
     /**
+     * Sets the hightlight object on search parameters
+     * @param sp SearchParameters
+     * @param highlight GeneralHighlightParameters
+     */
+    public void fromHighlight(SearchParameters sp, GeneralHighlightParameters highlight)
+    {
+        sp.setHighlight(highlight);
+    }
+
+    /**
      * SearchParameters from the Limits object
      * @param sp SearchParameters
      * @param paging Paging
@@ -443,14 +472,14 @@ public class SearchMapper
         {
             if (limits.getPermissionEvaluationCount() != null)
             {
-                sp.setMaxItems(-1);
+                sp.setLimit(-1);
                 sp.setLimitBy(LimitBy.NUMBER_OF_PERMISSION_EVALUATIONS);
                 sp.setMaxPermissionChecks(limits.getPermissionEvaluationCount());
             }
 
             if (limits.getPermissionEvaluationTime() != null)
             {
-                sp.setMaxItems(-1);
+                sp.setLimit(-1);
                 sp.setLimitBy(LimitBy.NUMBER_OF_PERMISSION_EVALUATIONS);
                 sp.setMaxPermissionCheckTimeMillis(limits.getPermissionEvaluationTime());
             }

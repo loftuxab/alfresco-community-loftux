@@ -25,16 +25,20 @@
  */
 package org.alfresco.rest.api.search.model;
 
+import java.util.List;
+
 /**
  * POJO class representing the extra information that comes back from Search.
  **/
 public class SearchEntry
 {
     private final Float score;
+    private final List<HighlightEntry> highlight;
 
-    public SearchEntry(Float score)
+    public SearchEntry(Float score, List<HighlightEntry> highlight)
     {
         this.score = score;
+        this.highlight = highlight;
     }
 
     public Float getScore()
@@ -42,5 +46,8 @@ public class SearchEntry
         return score;
     }
 
-    //In future highlighting.
+    public List<HighlightEntry> getHighlight()
+    {
+        return highlight;
+    }
 }

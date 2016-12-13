@@ -26,6 +26,7 @@
 package org.alfresco.service.cmr.quickshare;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Data transfer object for holding quick share information.
@@ -38,6 +39,7 @@ public class QuickShareDTO implements Serializable
     private static final long serialVersionUID = -2163618127531335360L;
 
     private String sharedId;
+    private Date expiresAt;
 
     /**
      * Default constructor
@@ -46,7 +48,13 @@ public class QuickShareDTO implements Serializable
      */
     public QuickShareDTO(String sharedId)
     {
+        this(sharedId, null);
+    }
+
+    public QuickShareDTO(String sharedId, Date expiresAt)
+    {
         this.sharedId = sharedId;
+        this.expiresAt = expiresAt;
     }
 
     /**
@@ -54,7 +62,7 @@ public class QuickShareDTO implements Serializable
      */
     public QuickShareDTO(QuickShareDTO from) 
     {
-        this(from.getId());
+        this(from.getId(), from.getExpiresAt());
     }
     
     /**
@@ -63,5 +71,10 @@ public class QuickShareDTO implements Serializable
     public String getId()
     {
         return this.sharedId;
+    }
+
+    public Date getExpiresAt()
+    {
+        return expiresAt;
     }
 }

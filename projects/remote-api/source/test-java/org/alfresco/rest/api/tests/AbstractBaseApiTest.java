@@ -199,7 +199,7 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
         }
         
         users.clear();
-
+        AuthenticationUtil.clearCurrentSecurityContext();
         setRequestContext(null);
     }
 
@@ -326,6 +326,14 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
     protected HttpResponse getSingle(String url, String entityId, int expectedStatus) throws Exception
     {
         return getSingle(url, entityId, null, expectedStatus);
+    }
+
+    public HttpResponse get(String url, Map<String, String> params, int expectedStatus) throws IOException
+    {
+        HttpResponse response = publicApiClient.get(url, params);
+        checkStatus(expectedStatus, response.getStatusCode());
+
+        return response;
     }
 
     protected HttpResponse getSingle(String url, String entityId, Map<String, String> params, int expectedStatus) throws Exception
@@ -537,7 +545,7 @@ public abstract class AbstractBaseApiTest extends EnterpriseTestApi
     protected SiteMember addSiteMember(String siteId, String userId, final SiteRole siteRole) throws Exception
     {
         SiteMember siteMember = new SiteMember(userId, siteRole.name());
-        HttpResponse response = publicApiClient.post(getScope(), "sites", siteId, "members", null, siteMember.postJSON().toString());
+        HttpResponse response = publicApiClient.post(getScope(), "sites", siteId, "members", null, siteMember.toJSON().toString());
         checkStatus(201, response.getStatusCode());
         return SiteMember.parseSiteMember(siteMember.getSiteId(), (JSONObject)response.getJsonResponse().get("entry"));
     }

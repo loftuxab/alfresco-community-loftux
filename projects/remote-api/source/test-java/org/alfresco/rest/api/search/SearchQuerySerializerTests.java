@@ -39,6 +39,7 @@ import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.api.search.context.SearchContext;
 import org.alfresco.rest.api.search.context.FacetQueryContext;
 import org.alfresco.rest.framework.tests.api.mocks.Farmer;
+import org.alfresco.service.cmr.search.FieldHighlightParameters;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -109,6 +110,32 @@ public class SearchQuerySerializerTests
         assertEquals(2, searchQuery.getFields().size());
         assertTrue(searchQuery.getFields().contains("id"));
         assertTrue(searchQuery.getFields().contains("name"));
+
+        //Highlight
+        assertEquals("]", searchQuery.getHighlight().getPostfix());
+        assertEquals("[", searchQuery.getHighlight().getPrefix());
+        assertEquals(20, searchQuery.getHighlight().getSnippetCount().intValue());
+        assertEquals(10, searchQuery.getHighlight().getFragmentSize().intValue());
+        assertEquals(true, searchQuery.getHighlight().getMergeContiguous());
+        assertEquals(40, searchQuery.getHighlight().getMaxAnalyzedChars().intValue());
+        assertEquals(true, searchQuery.getHighlight().getUsePhraseHighlighter());
+
+        assertEquals(2, searchQuery.getHighlight().getFields().size());
+        FieldHighlightParameters high1 = searchQuery.getHighlight().getFields().get(0);
+        assertEquals("my", high1.getField());
+        assertEquals("¡", high1.getPostfix());
+        assertEquals("?", high1.getPrefix());
+        assertEquals(23,  high1.getSnippetCount().intValue());
+        assertEquals(5,  high1.getFragmentSize().intValue());
+        assertEquals(true,high1.getMergeContiguous());
+
+        FieldHighlightParameters high2 = searchQuery.getHighlight().getFields().get(1);
+        assertEquals("your", high2.getField());
+        assertEquals(")", high2.getPostfix());
+        assertEquals("(", high2.getPrefix());
+        assertEquals(3,  high2.getSnippetCount().intValue());
+        assertEquals(15,  high2.getFragmentSize().intValue());
+        assertEquals(false,high2.getMergeContiguous());
     }
 
     @Test
@@ -116,9 +143,9 @@ public class SearchQuerySerializerTests
     {
         ExecutionResult exec1 = new ExecutionResult(new Farmer("180"),null);
 
-        FacetFieldContext ffc = new FacetFieldContext("theLabel", Arrays.asList(new Bucket("b1", 23), new Bucket("b2", 34)));
+        FacetFieldContext ffc = new FacetFieldContext("theLabel", Arrays.asList(new Bucket("b1", 23, "displayText1"), new Bucket("b2", 34, "displayText2")));
         SearchContext searchContext = new SearchContext(23l, Arrays.asList(new FacetQueryContext("f1", 15), new FacetQueryContext("f2", 20)),
-                    ffc,
+                    Arrays.asList(ffc),
                     new SpellCheckContext("aFlag", Arrays.asList("bish", "bash")));
         CollectionWithPagingInfo<ExecutionResult> coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1), false, 2, null, searchContext);
         String out = helper.writeResponse(coll);
@@ -127,9 +154,9 @@ public class SearchQuerySerializerTests
         assertTrue("There must 'facetQueries f1' json output", out.contains("{\"label\":\"f1\",\"count\":15}"));
         assertTrue("There must 'facetQueries f2' json output", out.contains("{\"label\":\"f2\",\"count\":20}"));
         assertTrue("There must 'spellCheck' json output", out.contains("\"spellCheck\":{\"type\":\"aFlag\",\"suggestions\":[\"bish\",\"bash\"]}"));
-        assertTrue("There must 'facetsFields' json output", out.contains("\"facetsFields\":{\"label\":\"theLabel\",\"buckets\""));
-        assertTrue("There must 'bucket1' json output", out.contains("{\"label\":\"b1\",\"count\":23}"));
-        assertTrue("There must 'bucket2' json output", out.contains("{\"label\":\"b2\",\"count\":34}"));
+        assertTrue("There must 'facetsFields' json output", out.contains("\"facetsFields\":[{\"label\":\"theLabel\",\"buckets\""));
+        assertTrue("There must 'bucket1' json output", out.contains("{\"label\":\"b1\",\"count\":23,\"display\":\"displayText1\"}"));
+        assertTrue("There must 'bucket2' json output", out.contains("{\"label\":\"b2\",\"count\":34,\"display\":\"displayText2\"}"));
 
         searchContext = new SearchContext(-1, null, null, null);
         coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1), false, 2, null, searchContext);

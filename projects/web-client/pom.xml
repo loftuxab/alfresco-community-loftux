@@ -16,10 +16,16 @@
         <maven.tomcat.uriEncoding>UTF-8</maven.tomcat.uriEncoding>
         <maven.tomcat.port>${tomcat.default.alfresco.port}</maven.tomcat.port>
         <maven.tomcat.httpsPort>${tomcat.default.alfresco.ssl.port}</maven.tomcat.httpsPort>
-        
+        <runner.share.version>5.1.1</runner.share.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>alfresco-trashcan-cleaner</artifactId>
+            <version>${dependency.alfresco-trashcan-cleaner.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>alfresco-remote-api</artifactId>
@@ -88,16 +94,11 @@
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-test-browser</artifactId>
-            <version>${dependency.opencmis.version}</version>
-        </dependency>
 
         <!-- 'provided' dependencies, not packaged in war -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -160,7 +161,7 @@
         <dependency>
             <groupId>org.apache.shale</groupId>
             <artifactId>shale-test</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -352,5 +353,48 @@
                 </dependency>
             </dependencies>
        </profile>
+        <profile>
+            <id>withShare</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.alfresco</groupId>
+                    <artifactId>alfresco-share-services</artifactId>
+                    <version>${runner.share.version}</version>
+                    <type>amp</type>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <configuration>
+                            <overlays>
+                                <overlay>
+                                    <groupId>org.alfresco</groupId>
+                                    <artifactId>alfresco-share-services</artifactId>
+                                    <type>amp</type>
+                                </overlay>
+                            </overlays>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <configuration>
+                            <webapps combine.children="append">
+                                <webapp>
+                                    <groupId>org.alfresco</groupId>
+                                    <artifactId>share</artifactId>
+                                    <contextPath>/share</contextPath>
+                                    <version>${runner.share.version}</version>
+                                    <type>war</type>
+                                    <asWebapp>true</asWebapp>
+                                </webapp>
+                            </webapps>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

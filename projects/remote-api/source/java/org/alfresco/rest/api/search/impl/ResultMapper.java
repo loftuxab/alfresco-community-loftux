@@ -28,20 +28,22 @@ package org.alfresco.rest.api.search.impl;
 
 import org.alfresco.repo.search.impl.lucene.SolrJSONResultSet;
 import org.alfresco.rest.api.Nodes;
+import org.alfresco.rest.api.lookups.PropertyLookupRegistry;
 import org.alfresco.rest.api.model.Node;
 import org.alfresco.rest.api.model.UserInfo;
 import org.alfresco.rest.api.search.context.FacetFieldContext;
 import org.alfresco.rest.api.search.context.FacetFieldContext.Bucket;
-import org.alfresco.rest.api.search.context.SpellCheckContext;
-import org.alfresco.rest.api.search.model.SearchEntry;
-import org.alfresco.rest.api.search.model.SearchQuery;
-import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
-import org.alfresco.rest.api.search.context.SearchContext;
 import org.alfresco.rest.api.search.context.FacetQueryContext;
+import org.alfresco.rest.api.search.context.SearchContext;
+import org.alfresco.rest.api.search.context.SpellCheckContext;
+import org.alfresco.rest.api.search.model.HighlightEntry;
+import org.alfresco.rest.api.search.model.SearchEntry;
+import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
+import org.alfresco.rest.framework.resource.parameters.Params;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SpellCheckResult;
 import org.alfresco.util.Pair;
-import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -60,12 +62,21 @@ public class ResultMapper
 {
 
     private Nodes nodes;
+    private PropertyLookupRegistry propertyLookup;
     private static Log logger = LogFactory.getLog(ResultMapper.class);
 
-    public ResultMapper(Nodes nodes)
+    public ResultMapper()
+    {
+    }
+
+    public void setNodes(Nodes nodes)
     {
         this.nodes = nodes;
-        ParameterCheck.mandatory("nodes", this.nodes);
+    }
+
+    public void setPropertyLookup(PropertyLookupRegistry propertyLookup)
+    {
+        this.propertyLookup = propertyLookup;
     }
 
     /**
@@ -74,20 +85,32 @@ public class ResultMapper
      * @param results
      * @return CollectionWithPagingInfo<Node>
      */
-    public CollectionWithPagingInfo<Node> toCollectionWithPagingInfo(SearchQuery searchQuery, ResultSet results)
+    public CollectionWithPagingInfo<Node> toCollectionWithPagingInfo(Params params, ResultSet results)
     {
         SearchContext context = null;
         Integer total = null;
         List<Node> noderesults = new ArrayList();
         Map<String, UserInfo> mapUserInfo = new HashMap<>(10);
+        Map<NodeRef, List<Pair<String, List<String>>>> hightLighting = results.getHighlighting();
 
         results.forEach(row ->
         {
-            Node aNode = nodes.getFolderOrDocument(row.getNodeRef(), null, null, searchQuery.getInclude(), mapUserInfo);
+            Node aNode = nodes.getFolderOrDocument(row.getNodeRef(), null, null, params.getInclude(), mapUserInfo);
             if (aNode != null)
             {
                 float f = row.getScore();
-                aNode.setSearch(new SearchEntry(f));
+                List<HighlightEntry> highlightEntries = null;
+                List<Pair<String, List<String>>> high = hightLighting.get(row.getNodeRef());
+
+                if (high != null && !high.isEmpty())
+                {
+                    highlightEntries = new ArrayList<HighlightEntry>(high.size());
+                    for (Pair<String, List<String>> highlight:high)
+                    {
+                        highlightEntries.add(new HighlightEntry(highlight.getFirst(), highlight.getSecond()));
+                    }
+                }
+                aNode.setSearch(new SearchEntry(f, highlightEntries));
                 noderesults.add(aNode);
             }
             else
@@ -115,7 +138,7 @@ public class ResultMapper
             }
         }
 
-        return CollectionWithPagingInfo.asPaged(searchQuery.getPaging(), noderesults, results.hasMore(), total, null, context);
+        return CollectionWithPagingInfo.asPaged(params.getPaging(), noderesults, results.hasMore(), total, null, context);
     }
 
     /**
@@ -141,7 +164,7 @@ public class ResultMapper
         Map<String, Integer> facetQueries = solrResultSet.getFacetQueries();
         List<FacetQueryContext> facetResults = null;
         SpellCheckContext spellCheckContext = null;
-        FacetFieldContext ffc = null;
+        List<FacetFieldContext> ffcs = null;
 
         //Facet queries
         if(facetQueries!= null && !facetQueries.isEmpty())
@@ -157,6 +180,7 @@ public class ResultMapper
         Map<String, List<Pair<String, Integer>>> facetFields = solrResultSet.getFieldFacets();
         if (facetFields != null && !facetFields.isEmpty())
         {
+            ffcs = new ArrayList<>(facetFields.size());
             for (Entry<String, List<Pair<String, Integer>>> facet:facetFields.entrySet())
             {
                 if (facet.getValue() != null && !facet.getValue().isEmpty())
@@ -164,9 +188,10 @@ public class ResultMapper
                     List<Bucket> buckets = new ArrayList<>(facet.getValue().size());
                     for (Pair<String, Integer> buck:facet.getValue())
                     {
-                        buckets.add(new Bucket(buck.getFirst(), buck.getSecond()));
+                        Object display = propertyLookup.lookup(facet.getKey(), buck.getFirst());
+                        buckets.add(new Bucket(buck.getFirst(), buck.getSecond(), display));
                     }
-                    ffc = new FacetFieldContext(facet.getKey(), buckets);
+                    ffcs.add(new FacetFieldContext(facet.getKey(), buckets));
                 }
             }
         }
@@ -179,7 +204,7 @@ public class ResultMapper
         }
 
         //Put it all together
-        context = new SearchContext(solrResultSet.getLastIndexedTxId(), facetResults, ffc, spellCheckContext);
+        context = new SearchContext(solrResultSet.getLastIndexedTxId(), facetResults, ffcs, spellCheckContext);
         return isNullContext(context)?null:context;
     }
 

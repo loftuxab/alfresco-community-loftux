@@ -430,6 +430,10 @@
       <constructor-arg value="cache.immutableSingletonSharedCache"/>
    </bean>
 
+   <bean name="openCMISRegistrySharedCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.openCMISRegistrySharedCache"/>
+   </bean>
+
    <!-- Remote Alfresco Ticket Cache, cross-transaction shared cache -->
    <bean name="remoteAlfrescoTicketService.ticketsCache" factory-bean="cacheFactory" factory-method="createCache">
       <constructor-arg value="cache.remoteAlfrescoTicketService.ticketsCache"/>
@@ -485,5 +489,11 @@
    <bean name="shardToGuidSharedCache" factory-bean="cacheFactory" factory-method="createCache">
       <constructor-arg value="cache.shardToGuidSharedCache"/>
    </bean>
-   
+
+   <!-- The cross-transaction shared cache for In-Memory protected users -->
+
+   <bean name="protectedUsersCache" factory-bean="cacheFactory" factory-method="createCache">
+      <constructor-arg value="cache.protectedUsersCache"/>
+   </bean>
+
 </beans>

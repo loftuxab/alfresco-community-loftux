@@ -49,6 +49,8 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.FieldHighlightParameters;
+import org.alfresco.service.cmr.search.GeneralHighlightParameters;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetRow;
@@ -558,7 +560,8 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
         return (Scriptable)queryResultSet(search).get("nodes", getScope());
     }
     
-    public Scriptable queryResultSet(Object search)
+    @SuppressWarnings("unchecked")
+	public Scriptable queryResultSet(Object search)
     {
         Object[] results = null;
         Map<String,Object> meta = null;
@@ -754,7 +757,46 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                         sp.addFilterQuery(filter);
                     }
                 }
-
+                
+                
+                Map<Serializable, Serializable> highlighting = (Map<Serializable, Serializable>)def.get("highlight");
+                if (highlighting != null)
+                {
+                   int snippetCount = this.getIntegerValue("snippetCount", 20, highlighting);
+                   int fragmentSize = this.getIntegerValue("fragmentSize", 50, highlighting);
+                   int maxAnalyzedChars = this.getIntegerValue("maxAnalyzedChars", 500, highlighting);
+                   boolean usePhraseHighlighter = this.getBooleanValue("usePhraseHighlighter", true, highlighting);
+                   boolean mergeContiguous = this.getBooleanValue("mergeContiguous", true, highlighting);
+                   
+                   String prefix = (String) highlighting.get("prefix");
+                   if (prefix == null)
+                   {
+                      prefix = "<mark>";
+                   }
+                   String postfix = (String) highlighting.get("postfix");
+                   if (postfix == null)
+                   {
+                      postfix = "</mark>";
+                   }
+                   
+                   List<FieldHighlightParameters> fieldHighlightParameters = new ArrayList<FieldHighlightParameters>();
+                   List<Map<Serializable, Serializable>> fields = (List<Map<Serializable, Serializable>>)highlighting.get("fields");
+                   if (fields != null)
+                   {
+                      for (Map<Serializable, Serializable> field: fields)
+                      {
+                         String propertyName = (String) field.get("field");
+                         if (propertyName != null)
+                         {
+                       	  fieldHighlightParameters.add(new FieldHighlightParameters(propertyName, snippetCount, fragmentSize, mergeContiguous, prefix, postfix));
+                         }
+                      }
+                   }
+                   
+                   GeneralHighlightParameters ghp = new GeneralHighlightParameters(snippetCount, fragmentSize, mergeContiguous, prefix, postfix, maxAnalyzedChars, usePhraseHighlighter, fieldHighlightParameters);
+                   sp.setHighlight(ghp);
+                }
+                
                 // error handling opions
                 boolean exceptionOnError = true;
                 if (onerror != null)
@@ -776,7 +818,7 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
                 // execute search based on search definition
                 Pair<Object[], Map<String,Object>> r = queryResultMeta(sp, exceptionOnError);
                 results = r.getFirst();
-                meta = r.getSecond();
+                meta = r.getSecond();  
             }
         }
         
@@ -804,6 +846,45 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
         res.put("nodes", res, Context.getCurrentContext().newArray(scope, results));
         res.put("meta", res, meta);
         return res;
+    }
+    
+    /**
+     * Attempts to retrieve and parse an attribute in the supplied object to an integer. If the attribute cannot be
+     * found or cannot be parsed then the supplied default is returned.
+     * 
+     * @param attribute
+     * @param defaultValue
+     * @param sourceObject
+     * @return
+     */
+    public int getIntegerValue(String attribute, int defaultValue, Map<Serializable, Serializable> sourceObject)
+    {
+        int intValue = defaultValue;
+        Number configuredInteger = (Number) sourceObject.get(attribute);
+        if (configuredInteger != null)
+        {
+           intValue = configuredInteger.intValue();
+        }
+        return intValue;
+    }
+    
+    /**
+     * Attempts to retrieve and parse an attribute in the supplied object to an integer. If the attribute cannot be
+     * found or cannot be parsed then the supplied default is returned.
+     * 
+     * @param attribute
+     * @param defaultValue
+     * @param sourceObject
+     * @return
+     */
+    public boolean getBooleanValue(String attribute, boolean defaultValue, Map<Serializable, Serializable> sourceObject)
+    {
+       Boolean bool = (Boolean) sourceObject.get(attribute);
+       if (bool == null)
+       {
+          bool = defaultValue;
+       }
+       return bool;
     }
     
     /**
@@ -951,6 +1032,26 @@ public class Search extends BaseScopableProcessorExtension implements Initializi
             // results metadata
             meta.put("numberFound", results.getNumberFound());
             meta.put("hasMore", results.hasMore());
+            
+            Map<String, Map<String, List<String>>> highlightingMeta = new HashMap<>();
+            Map<NodeRef, List<Pair<String, List<String>>>> highlighting = results.getHighlighting();
+            for (Entry<NodeRef, List<Pair<String, List<String>>>> highlight: highlighting.entrySet())
+            {
+               NodeRef nodeRef = highlight.getKey();
+               
+               Map<String, List<String>> scriptProperties = new HashMap<String, List<String>>();
+               List<Pair<String, List<String>>> highlights = highlight.getValue();
+               for (Pair<String, List<String>> propertyHighlight: highlights)
+               {
+                  String property = propertyHighlight.getFirst();
+                  List<String> value = propertyHighlight.getSecond();
+                  scriptProperties.put(property, value);
+               }
+               
+               highlightingMeta.put(nodeRef.toString(), scriptProperties);
+            }
+            meta.put("highlighting", highlightingMeta);
+            
             // results facets
             FacetLabelDisplayHandlerRegistry facetLabelDisplayHandlerRegistry = services.getFacetLabelDisplayHandlerRegistry();
             Map<String, List<ScriptFacetResult>> facetMeta = new HashMap<>();

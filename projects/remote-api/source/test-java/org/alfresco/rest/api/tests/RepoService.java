@@ -209,7 +209,7 @@ public class RepoService
 	protected Activities activities;
 
 	protected PublicApiTestContext publicApiContext;
-
+	
 	protected Random random = new Random(System.currentTimeMillis());
 	
 	protected static int numNetworks = 0;
@@ -450,7 +450,7 @@ public class RepoService
 						personInfo.getCompany(), network, personInfo.getSkype(), personInfo.getLocation(), personInfo.getTel(),
 						personInfo.getMob(), personInfo.getInstantmsg(), personInfo.getGoogle());
 
-				final Map<QName, Serializable> props = testPerson.getProperties();
+				final Map<QName, Serializable> props = testPerson.toProperties();
 
                 // short-circuit for default/tenant "admin"
                 if (! isDefaultAdmin(username, network))
@@ -511,33 +511,21 @@ public class RepoService
 		});
 	}
 
-	public TestSite createSite(TestNetwork network, final SiteInformation site)
+	/**
+	 * @deprecated
+     */
+	public TestSite createSite(TestNetwork network, final SiteInformation siteInfoIn)
     {
-		SiteInfo siteInfo = null;
-
-		if(siteService.hasSite(site.getShortName()))
-		{
-			AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
-			{
-				@Override
-				public Void doWork() throws Exception
-				{
-					siteService.deleteSite(site.getShortName());
-					return null;
-				}
-			});
-		}
-
-    	siteInfo = siteService.createSite(TEST_SITE_PRESET, site.getShortName(), site.getTitle(), site.getDescription(), site.getSiteVisibility());
-    	siteService.createContainer(site.getShortName(), "documentLibrary", ContentModel.TYPE_FOLDER, null);
-
-    	final TestSite testSite = new TestSite(network, siteInfo);
+		SiteInfo siteInfoOut = siteService.createSite(siteInfoIn.getSitePreset() != null ? siteInfoIn.getSitePreset() : TEST_SITE_PRESET, siteInfoIn.getShortName(), siteInfoIn.getTitle(), siteInfoIn.getDescription(), siteInfoIn.getSiteVisibility());
+    	siteService.createContainer(siteInfoIn.getShortName(), "documentLibrary", ContentModel.TYPE_FOLDER, null);
+		
+    	final TestSite testSite = new TestSite(network, siteInfoOut);
 
 		log("Created site " + testSite + (network != null ? " in network " + network : ""));
 
 		return testSite;
     }
-
+	
 	public Invitation rejectSiteInvitation(String personId, String siteId)
 	{
 		Invitation ret = null;
@@ -1383,13 +1371,28 @@ public class RepoService
 			}
 		}
 
-		public TestSite createSite(SiteVisibility siteVisibility)
+		public TestSite createSite(String siteRootName, SiteVisibility siteVisibility)
 		{
-			String shortName = "TESTSITE" + GUID.generate();
+			String shortName = "TESTSITE" + (siteRootName != null ? siteRootName : "") + GUID.generate();
 			SiteInformation siteInfo = new SiteInformation(shortName, shortName, shortName, siteVisibility);
 			return createSite(siteInfo);
 	    }
 
+        public TestSite createSite(String id, String title, String description, String sitePreset, SiteVisibility visibility)
+        {
+            SiteInformation siteInfo = new SiteInformation(id, title, description, sitePreset, visibility);
+            // Used deprecated createSite method until will be allowed creating a site with sitePreset
+            return createSite(siteInfo);
+        }
+
+        public TestSite createSite(SiteVisibility siteVisibility)
+        {
+            return createSite(null, siteVisibility);
+        }
+
+		/**
+		 * @deprecated replace with AbstractBaseApiTest.createSite (or PublicApiClient.sites.createSite)
+		 */
 		public TestSite createSite(final SiteInformation site)
 	    {
 	    	TestSite testSite = RepoService.this.createSite(this, site);
@@ -1400,8 +1403,11 @@ public class RepoService
 		
 		public TestPerson createUser()
 		{
-			String username = "user" + System.currentTimeMillis();
-			PersonInfo personInfo = new PersonInfo("FirstName", "LastName", username, "password", null, "skype", "location",
+			long timeMillis = System.currentTimeMillis();
+			String firstname = "first" + timeMillis;
+			String lastname = "last" + timeMillis;
+			String username = "user" + timeMillis;
+			PersonInfo personInfo = new PersonInfo(firstname, lastname, username, "password", null, "skype", "location",
 					"telephone", "mob", "instant", "google");
 			TestPerson person = createUser(personInfo);
 			return person;
@@ -1881,7 +1887,7 @@ public class RepoService
 			return defaultAccount == null ? null : defaultAccount.getId();
 		}
 
-		public boolean isEnabled()
+		public Boolean isEnabled()
 		{
 			return enabled;
 		}
@@ -1954,6 +1960,12 @@ public class RepoService
 			this.description = description;
 			this.siteVisibility = siteVisibility;
 		}
+
+        public SiteInformation(String shortName, String title, String description, String sitePreset, SiteVisibility siteVisibility)
+        {
+            this(shortName, title, description, siteVisibility);
+            this.sitePreset = sitePreset;
+        }
 
 		public String getShortName()
 		{

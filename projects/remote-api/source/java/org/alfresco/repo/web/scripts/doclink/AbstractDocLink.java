@@ -25,10 +25,13 @@
  */
 package org.alfresco.repo.web.scripts.doclink;
 
+import java.io.StringWriter;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.activities.ActivityService;
 import org.alfresco.service.cmr.repository.DocumentLinkService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -36,9 +39,12 @@ import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.PropertyCheck;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
 import org.springframework.extensions.webscripts.WebScriptException;
+import org.springframework.extensions.webscripts.json.JSONWriter;
 
 /**
  * This class contains common code for doclink webscripts controllers
@@ -55,9 +61,15 @@ public abstract class AbstractDocLink extends DeclarativeWebScript
     private static String PARAM_CONTAINER = "container";
     private static String PARAM_PATH = "path";
 
+    private static final String ACTIVITY_TOOL = "documentLinkService";
+
     protected NodeService nodeService;
     protected SiteService siteService;
     protected DocumentLinkService documentLinkService;
+    protected ActivityService activityService;
+    protected ServiceRegistry serviceRegistry;
+
+    private static Log logger = LogFactory.getLog(AbstractDocLink.class);
 
     protected NodeRef parseNodeRefFromTemplateArgs(Map<String, String> templateVars)
     {
@@ -120,11 +132,40 @@ public abstract class AbstractDocLink extends DeclarativeWebScript
                         }
                     }
                 }
-                
+
                 return node;
             }
         }
         return null;
+    }
+
+    /**
+     * Generates an activity entry for the link
+     */
+
+    protected void addActivityEntry(String activityType, String title, String nodeRef, String site)
+    {
+       try
+       {
+          StringWriter activityJson = new StringWriter();
+          JSONWriter activity = new JSONWriter(activityJson);
+          activity.startObject();
+          activity.writeValue("title", title);
+          activity.writeValue("nodeRef", nodeRef);
+          activity.writeValue("page", "document-details?nodeRef=" + nodeRef);
+          activity.endObject();
+
+          activityService.postActivity(
+                activityType,
+                site,
+                ACTIVITY_TOOL,
+                activityJson.toString());
+       }
+       catch (Exception e)
+       {
+          // Warn, but carry on
+          logger.warn("Error adding link event to activities feed", e);
+       }
     }
 
     public void setNodeService(NodeService nodeService)
@@ -141,4 +182,15 @@ public abstract class AbstractDocLink extends DeclarativeWebScript
     {
         this.documentLinkService = documentLinkService;
     }
+
+    public void setActivityService(ActivityService activityService)
+    {
+        this.activityService = activityService;
+    }
+
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    {
+        this.serviceRegistry = serviceRegistry;
+    }
+
 }

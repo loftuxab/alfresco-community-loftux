@@ -60,6 +60,9 @@
         </property>
     </bean>
        
+   <bean id="defaultFileContentUrlProvider" class="org.alfresco.repo.content.filestore.TimeBasedFileContentUrlProvider">
+       <property name="bucketsPerMinute" value="${dir.contentstore.bucketsPerMinute}"/>
+   </bean>
    <!-- This content limit provider is used above (and can also be overriden, eg. by modules). -->
    <bean id="defaultContentLimitProvider" class="org.alfresco.repo.content.ContentLimitProvider$SimpleFixedLimitProvider">
        <property name="sizeLimitString" value="${system.content.maximumFileSizeLimit}"/>
@@ -330,6 +333,20 @@
    </bean>
    <bean id="extracter.PDFBox"        class="org.alfresco.repo.content.metadata.PdfBoxMetadataExtracter"        parent="baseMetadataExtracter">
       <property name="documentSelector" ref="pdfBoxEmbededDocumentSelector" />
+      <property name="mimetypeLimits">
+         <map>
+            <entry key="application/pdf">
+               <bean class="org.alfresco.repo.content.metadata.MetadataExtracterLimits">
+                  <property name="timeoutMs" value="${content.metadataExtracter.default.timeoutMs}"/>
+                  <property name="maxDocumentSizeMB" value="${content.metadataExtracter.pdf.maxDocumentSizeMB}"/>
+                  <property name="maxConcurrentExtractionsCount" value="${content.metadataExtracter.pdf.maxConcurrentExtractionsCount}"/>
+               </bean>
+            </entry>
+         </map>
+      </property>
+      <property name="overwritePolicy">
+         <value>${content.metadataExtracter.pdf.overwritePolicy}</value>
+      </property>
    </bean>
    <bean id="extracter.Poi"           class="org.alfresco.repo.content.metadata.PoiMetadataExtracter"           parent="baseMetadataExtracter">
       <property name="poiFootnotesLimit" value="${content.transformer.Poi.poiFootnotesLimit}" />

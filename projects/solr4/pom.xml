@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <dependency.solr.version>4.10.3</dependency.solr.version>
         <maven.tomcat.path>/solr4</maven.tomcat.path>
         <m2eclipse.wtp.contextRoot>${maven.tomcat.path}</m2eclipse.wtp.contextRoot>
         <maven.tomcat.port>${tomcat.default.solr4.port}</maven.tomcat.port>
@@ -31,7 +32,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-test-framework</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -39,26 +40,32 @@
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-solrclient</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>asm</artifactId>
+                    <groupId>asm</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- provided dependencies -->
 
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-core</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -69,23 +76,31 @@
                     <groupId>jdk.tools</groupId>
                     <artifactId>jdk.tools</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-analysis-extras</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
                     <artifactId>javax.servlet</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-	    <groupId>org.apache.solr</groupId>
-	    <artifactId>solr-langid</artifactId>
-	    <version>4.10.3</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-langid</artifactId>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -95,12 +110,24 @@
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>tika-core</artifactId>
+                    <groupId>org.apache.tika</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>tika-parsers</artifactId>
+                    <groupId>org.apache.tika</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-	    <groupId>org.apache.solr</groupId>
-	    <artifactId>solr-clustering</artifactId>
-	    <version>4.10.3</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-clustering</artifactId>
+            <version>${dependency.solr.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -109,6 +136,10 @@
                 <exclusion>
                     <groupId>xerces</groupId>
                     <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -125,9 +156,9 @@
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
         <dependency>
-	    <groupId>com.spatial4j</groupId>
-	    <artifactId>spatial4j</artifactId>
-	    <version>0.4.1</version>
+            <groupId>com.spatial4j</groupId>
+            <artifactId>spatial4j</artifactId>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.vividsolutions</groupId>
@@ -146,7 +177,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr</artifactId>
-            <version>4.10.3</version>
+            <version>${dependency.solr.version}</version>
             <type>war</type>
         </dependency>
 
@@ -230,6 +261,17 @@
                 <configuration>
                     <attachClasses>true</attachClasses>
                     <archiveClasses>true</archiveClasses>
+                    <packagingExcludes>
+                        WEB-INF/lib/commons-fileupload-1.2.1.jar,
+                        WEB-INF/lib/commons-fileupload-1.3.1.jar,
+                        WEB-INF/lib/joda-time-2.2.jar,
+                        WEB-INF/lib/commons-codec-1.9.jar,
+                        WEB-INF/lib/httpmime-4.3.1.jar,
+                        WEB-INF/lib/httpcore-4.3.jar,
+                        WEB-INF/lib/httpclient-4.3.1.jar,
+                        WEB-INF/lib/commons-io-2.3.jar,
+                        WEB-INF/lib/wstx-asl-3.2.7.jar
+                    </packagingExcludes>
                 </configuration>
                 <!-- This allows overlays to be prepared on the FS for minification and faster run -->
                 <executions>

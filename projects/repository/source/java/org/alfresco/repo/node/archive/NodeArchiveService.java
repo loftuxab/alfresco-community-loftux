@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.alfresco.query.PagingResults;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -36,6 +37,17 @@ import org.alfresco.service.namespace.QName;
 /**
  * A service interface providing methods that map onto the low-level
  * node restore functionality.
+ * <p>
+ * Node stores <i>may</i> be mapped to an associated archive node store.  For example, Alfresco ships with the mapping<br>
+ * {@link StoreRef#STORE_REF_WORKSPACE_SPACESSTORE workspace://SpacesStore} .. maps to .. {@link StoreRef#STORE_REF_ARCHIVE_SPACESSTORE archive://SpacesStore}.<br>
+ * When a node is {@link NodeService#deleteNode(NodeRef) deleted} from a regular workspace, it is moved to an archive store if there is a mapping.
+ * <p>
+ * This service operates <b>only on nodes that have been archived</b> by either
+ * <ul>
+ *   <li>{@link #getArchivedNode(NodeRef) retrieving archived nodes},</li>
+ *   <li>{@link #purgeArchivedNode(NodeRef) permanently deleting archived nodes},</li>
+ *   <li>or {@link #restoreArchivedNode(NodeRef) restoring archived nodes back to their original location}.</li>
+ * </ul>
  * 
  * @author Derek Hulley
  */
@@ -130,44 +142,11 @@ public interface NodeArchiveService
             QName assocQName);
     
     /**
-     * Attempt to restore all archived nodes into their original locations.
-     * <p>
-     * <b>TRANSACTIONS:</b> This method will execute in a new transaction.
-     * 
-     * @param originalStoreRef the store that the items originally came from
-     * @return Returns the results of the each attempted restore operation
-     * 
-     * @deprecated              In 3.4: no longer supported as it seldom works due to missing parents
-     */
-    public List<RestoreNodeReport> restoreAllArchivedNodes(StoreRef originalStoreRef);
-    
-    /**
-     * Attempt to restore all archived nodes into a new location.
-     * <p>
-     * <b>TRANSACTIONS:</b> This method will execute in a new transaction.
-     * 
-     * @param originalStoreRef the store that the items originally came from
-     * @param destinationNodeRef the parent of the restored nodes, or
-     *      <tt>null</tt> to use the original parent node references
-     * @param assocTypeQName the type of the primary associations to link the
-     *      restored node to the destination parent, or <tt>null</tt> to use
-     *      the orginal association types
-     * @param assocQName the name of the primary associations to be created,
-     *      or <tt>null</tt> to use the original association names
-     * @return Returns the results of the each attempted restore operation
-     * 
-     * @deprecated              In 3.4: no longer supported as it seldom works due to missing parents
-     */
-    public List<RestoreNodeReport> restoreAllArchivedNodes(
-            StoreRef originalStoreRef,
-            NodeRef destinationNodeRef,
-            QName assocTypeQName,
-            QName assocQName);
-    
-    /**
      * Permanently delete the archived node.
      * 
      * @param archivedNodeRef the archived node to delete.
+     * 
+     * @see NodeService#deleteNode(NodeRef)
      */
     public void purgeArchivedNode(NodeRef archivedNodeRef);
     

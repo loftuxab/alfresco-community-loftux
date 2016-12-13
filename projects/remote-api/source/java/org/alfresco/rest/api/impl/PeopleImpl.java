@@ -26,32 +26,43 @@
 package org.alfresco.rest.api.impl;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.query.PagingRequest;
+import org.alfresco.query.PagingResults;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.People;
 import org.alfresco.rest.api.Sites;
-import org.alfresco.rest.api.model.Company;
 import org.alfresco.rest.api.model.Person;
+import org.alfresco.rest.framework.core.exceptions.ConstraintViolatedException;
 import org.alfresco.rest.framework.core.exceptions.EntityNotFoundException;
+import org.alfresco.rest.framework.core.exceptions.InvalidArgumentException;
+import org.alfresco.rest.framework.core.exceptions.PermissionDeniedException;
+import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
+import org.alfresco.rest.framework.resource.parameters.Paging;
+import org.alfresco.rest.framework.resource.parameters.Parameters;
+import org.alfresco.rest.framework.resource.parameters.SortColumn;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.MutableAuthenticationService;
 import org.alfresco.service.cmr.security.NoSuchPersonException;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.cmr.usage.ContentUsageService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.Pair;
 
 /**
  * Centralises access to people services and maps between representations.
@@ -61,6 +72,32 @@ import org.alfresco.service.namespace.QName;
  */
 public class PeopleImpl implements People
 {
+	private static final List<QName> EXCLUDED_ASPECTS = Arrays.asList();
+	private static final List<QName> EXCLUDED_PROPS = Arrays.asList(
+			ContentModel.PROP_USERNAME,
+			ContentModel.PROP_FIRSTNAME,
+			ContentModel.PROP_LASTNAME,
+			ContentModel.PROP_JOBTITLE,
+			ContentModel.PROP_LOCATION,
+			ContentModel.PROP_TELEPHONE,
+			ContentModel.PROP_MOBILE,
+			ContentModel.PROP_EMAIL,
+			ContentModel.PROP_ORGANIZATION,
+			ContentModel.PROP_COMPANYADDRESS1,
+			ContentModel.PROP_COMPANYADDRESS2,
+			ContentModel.PROP_COMPANYADDRESS3,
+			ContentModel.PROP_COMPANYPOSTCODE,
+			ContentModel.PROP_COMPANYTELEPHONE,
+			ContentModel.PROP_COMPANYFAX,
+			ContentModel.PROP_COMPANYEMAIL,
+			ContentModel.PROP_SKYPE,
+			ContentModel.PROP_INSTANTMSG,
+			ContentModel.PROP_USER_STATUS,
+			ContentModel.PROP_USER_STATUS_TIME,
+			ContentModel.PROP_GOOGLEUSERNAME,
+			ContentModel.PROP_SIZE_QUOTA,
+			ContentModel.PROP_SIZE_CURRENT,
+			ContentModel.PROP_EMAIL_FEED_DISABLED);
 	protected Nodes nodes;
 	protected Sites sites;
 
@@ -68,9 +105,20 @@ public class PeopleImpl implements People
 	protected NodeService nodeService;
     protected PersonService personService;
     protected AuthenticationService authenticationService;
+    protected AuthorityService authorityService;
     protected ContentUsageService contentUsageService;
     protected ContentService contentService;
     protected ThumbnailService thumbnailService;
+
+    private final static Map<String, QName> sort_params_to_qnames;
+    static
+    {
+        Map<String, QName> aMap = new HashMap<>(3);
+        aMap.put(PARAM_FIRST_NAME, ContentModel.PROP_FIRSTNAME);
+        aMap.put(PARAM_LAST_NAME, ContentModel.PROP_LASTNAME);
+        aMap.put(PARAM_ID, ContentModel.PROP_USERNAME);
+        sort_params_to_qnames = Collections.unmodifiableMap(aMap);
+    }
 
 	public void setSites(Sites sites)
 	{
@@ -96,13 +144,18 @@ public class PeopleImpl implements People
     {
 		this.personService = personService;
 	}
-	
-	public void setAuthenticationService(AuthenticationService authenticationService)
+
+    public void setAuthenticationService(AuthenticationService authenticationService)
     {
 		this.authenticationService = authenticationService;
 	}
 
-	public void setContentUsageService(ContentUsageService contentUsageService)
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+
+    public void setContentUsageService(ContentUsageService contentUsageService)
     {
 		this.contentUsageService = contentUsageService;
 	}
@@ -122,8 +175,14 @@ public class PeopleImpl implements People
 		return validatePerson(personId, false);
 	}
 
-	public String validatePerson(String personId, boolean validateIsCurrentUser)
+	public String validatePerson(final String requestedPersonId, boolean validateIsCurrentUser)
 	{
+        String personId = requestedPersonId;
+		if(personId == null)
+		{
+			throw new InvalidArgumentException("personId is null.");
+		}
+        
     	if(personId.equalsIgnoreCase(DEFAULT_USER))
     	{
     		personId = AuthenticationUtil.getFullyAuthenticatedUser();
@@ -132,8 +191,8 @@ public class PeopleImpl implements People
     	personId = personService.getUserIdentifier(personId);
 		if(personId == null)
 		{
-            // "User " + personId + " does not exist"
-            throw new EntityNotFoundException("personId is null.");
+            // Could not find canonical user ID by case-sensitive ID.
+            throw new EntityNotFoundException(requestedPersonId);
 		}
 
 		if(validateIsCurrentUser)
@@ -148,7 +207,7 @@ public class PeopleImpl implements People
     	return personId;
 	}
 
-    protected void processPersonProperties(String userName, final Map<QName, Serializable> nodeProps)
+    protected void processPersonProperties(final Map<QName, Serializable> nodeProps)
     {
 		if(!contentUsageService.getEnabled())
 		{
@@ -157,6 +216,9 @@ public class PeopleImpl implements People
 			nodeProps.remove(ContentModel.PROP_SIZE_CURRENT);
 		}
 
+		// The person description is located in a separate content file located at cm:persondescription
+		// "Inline" this data, by removing the cm:persondescription property and adding a temporary property
+		// (Person.PROP_PERSON_DESCRIPTION) containing the actual content as a string.
 		final ContentData personDescription = (ContentData)nodeProps.get(ContentModel.PROP_PERSONDESC);
 		if(personDescription != null)
 		{
@@ -230,119 +292,320 @@ public class PeopleImpl implements People
 
     /**
      * 
-     * @throws NoSuchPersonException if personId does not exist
+     * @throws NoSuchPersonException
+     *             if personId does not exist
      */
     public Person getPerson(String personId)
     {
-    	Person person = null;
-
-    	personId = validatePerson(personId);
-    	NodeRef personNode = personService.getPerson(personId, false);
-    	if (personNode != null) 
-    	{
-    		Map<QName, Serializable> nodeProps = nodeService.getProperties(personNode);
-    		processPersonProperties(personId, nodeProps);
-    		// TODO this needs to be run as admin but should we do this here?
-    		final String pId = personId;
-    		Boolean enabled = AuthenticationUtil.runAsSystem(new RunAsWork<Boolean>()
-			{
-    			public Boolean doWork() throws Exception
-    			{
-    				return authenticationService.getAuthenticationEnabled(pId);
-    			}
-			});
-    		person = new Person(personNode, nodeProps, enabled);
-
-    		// get avatar information
-    		if(hasAvatar(personNode))
-    		{
-	    		try
-	    		{
-		    		NodeRef avatar = getAvatar(personId);
-		    		person.setAvatarId(avatar);
-	    		}
-	    		catch(EntityNotFoundException e)
-	    		{
-	    			// shouldn't happen, but ok
-	    		}
-    		}
-    	}
-    	else
-    	{
-    		throw new EntityNotFoundException(personId);
-    	}
+        personId = validatePerson(personId);
+        List<String> include = Arrays.asList(
+                PARAM_INCLUDE_ASPECTNAMES,
+                PARAM_INCLUDE_PROPERTIES);
+        Person person = getPersonWithProperties(personId, include);
 
         return person;
     }
-/**
-    private void addToMap(Map<QName, Serializable> properties, QName name, Serializable value)
+
+    public CollectionWithPagingInfo<Person> getPeople(final Parameters parameters)
     {
-//    	if(name != null && value != null)
-//    	{
-    		properties.put(name, value);
-//    	}
+        Paging paging = parameters.getPaging();
+        PagingRequest pagingRequest = Util.getPagingRequest(paging);
+
+        List<Pair<QName, Boolean>> sortProps = getSortProps(parameters);
+
+        // For now the results are not filtered
+        // please see REPO-555
+        final PagingResults<PersonService.PersonInfo> pagingResult = personService.getPeople(null, null, sortProps, pagingRequest);
+
+        final List<PersonService.PersonInfo> page = pagingResult.getPage();
+        int totalItems = pagingResult.getTotalResultCount().getFirst();
+        final String personId = AuthenticationUtil.getFullyAuthenticatedUser();
+        List<Person> people = new AbstractList<Person>()
+        {
+            @Override
+            public Person get(int index)
+            {
+                PersonService.PersonInfo personInfo = page.get(index);
+                Person person = getPersonWithProperties(personInfo.getUserName(), parameters.getInclude());
+                return person;
+            }
+
+            @Override
+            public int size()
+            {
+                return page.size();
+            }
+        };
+
+        return CollectionWithPagingInfo.asPaged(paging, people, pagingResult.hasMoreItems(), totalItems);
     }
 
-    public Person updatePerson(String personId, final Person person)
+    private List<Pair<QName, Boolean>> getSortProps(Parameters parameters)
     {
-    	personId = validatePerson(personId);
-
-    	final Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-//		addToMap(properties, ContentModel.PROP_USERNAME, person.getUserName());
-    	addToMap(properties, ContentModel.PROP_FIRSTNAME, person.getFirstName());
-    	addToMap(properties, ContentModel.PROP_LASTNAME, person.getLastName());
-    	addToMap(properties, ContentModel.PROP_JOBTITLE, person.getJobTitle());
-    	addToMap(properties, ContentModel.PROP_LOCATION, person.getLocation());
-    	addToMap(properties, ContentModel.PROP_TELEPHONE, person.getTelephone());
-    	addToMap(properties, ContentModel.PROP_MOBILE, person.getMobile());
-    	addToMap(properties, ContentModel.PROP_EMAIL, person.getEmail());
-
-		Company company = person.getCompany();
-		if(company != null)
-		{
-			addToMap(properties, ContentModel.PROP_ORGANIZATION, company.getOrganization());
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS1, company.getAddress1());
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS2, company.getAddress2());
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS3, company.getAddress3());
-			addToMap(properties, ContentModel.PROP_COMPANYPOSTCODE, company.getPostcode());
-			addToMap(properties, ContentModel.PROP_COMPANYTELEPHONE, company.getTelephone());
-			addToMap(properties, ContentModel.PROP_COMPANYFAX, company.getFax());
-			addToMap(properties, ContentModel.PROP_COMPANYEMAIL, company.getEmail());
-		}
-		else
-		{
-			addToMap(properties, ContentModel.PROP_ORGANIZATION, null);
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS1, null);
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS2, null);
-			addToMap(properties, ContentModel.PROP_COMPANYADDRESS3, null);
-			addToMap(properties, ContentModel.PROP_COMPANYPOSTCODE, null);
-			addToMap(properties, ContentModel.PROP_COMPANYTELEPHONE, null);
-			addToMap(properties, ContentModel.PROP_COMPANYFAX, null);
-			addToMap(properties, ContentModel.PROP_COMPANYEMAIL, null);
-		}
-
-		addToMap(properties, ContentModel.PROP_SKYPE, person.getSkypeId());
-		addToMap(properties, ContentModel.PROP_INSTANTMSG, person.getInstantMessageId());
-		addToMap(properties, ContentModel.PROP_USER_STATUS, person.getUserStatus());
-		addToMap(properties, ContentModel.PROP_USER_STATUS_TIME, person.getStatusUpdatedAt());
-		addToMap(properties, ContentModel.PROP_GOOGLEUSERNAME, person.getGoogleId());
-		addToMap(properties, ContentModel.PROP_SIZE_QUOTA, person.getQuota());
-		addToMap(properties, ContentModel.PROP_SIZE_CURRENT, person.getQuotaUsed());
-		addToMap(properties, ContentModel.PROP_DESCRIPTION, person.getDescription());
-
-		final String pId = personId;
-		AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
-		{
-			@Override
-			public Void doWork() throws Exception
-			{
-		    	personService.setPersonProperties(pId, properties, false);
-				return null;
-			}
-			
-		});
-
-    	return getPerson(personId);
+        List<Pair<QName, Boolean>> sortProps = new ArrayList<>();
+        List<SortColumn> sortCols = parameters.getSorting();
+        if ((sortCols != null) && (sortCols.size() > 0))
+        {
+            for (SortColumn sortCol : sortCols)
+            {
+                QName sortPropQName = sort_params_to_qnames.get(sortCol.column);
+                if (sortPropQName == null)
+                {
+                    throw new InvalidArgumentException("Invalid sort field: " + sortCol.column);
+                }
+                sortProps.add(new Pair<>(sortPropQName, (sortCol.asc ? Boolean.TRUE : Boolean.FALSE)));
+            }
+        }
+        else
+        {
+            // default sort order
+            sortProps.add(new Pair<>(ContentModel.PROP_USERNAME, Boolean.TRUE));
+        }
+        return sortProps;
     }
- */
+
+    private Person getPersonWithProperties(String personId, List<String> include)
+    {
+        Person person = null;
+        NodeRef personNode = personService.getPerson(personId, false);
+        if (personNode != null)
+        {
+            Map<QName, Serializable> nodeProps = nodeService.getProperties(personNode);
+            processPersonProperties(nodeProps);
+            // TODO this needs to be run as admin but should we do this here?
+            final String pId = personId;
+            Boolean enabled = AuthenticationUtil.runAsSystem(new RunAsWork<Boolean>()
+            {
+                public Boolean doWork() throws Exception
+                {
+                    return authenticationService.getAuthenticationEnabled(pId);
+                }
+            });
+            person = new Person(personNode, nodeProps, enabled);
+
+            // Remove the temporary property used to help inline the person description content property.
+            // It may be accessed from the person object (person.getDescription()).
+            nodeProps.remove(Person.PROP_PERSON_DESCRIPTION);
+
+            // Expose properties
+            if (include.contains(PARAM_INCLUDE_PROPERTIES))
+            {
+                Map<String, Object> custProps = new HashMap<>();
+                custProps.putAll(nodes.mapFromNodeProperties(nodeProps, new ArrayList<>(), new HashMap<>(), EXCLUDED_PROPS));
+                person.setProperties(custProps);
+            }
+            if (include.contains(PARAM_INCLUDE_ASPECTNAMES))
+            {
+                // Expose aspect names
+                Set<QName> aspects = nodeService.getAspects(personNode);
+                person.setAspectNames(nodes.mapFromNodeAspects(aspects, EXCLUDED_ASPECTS));
+            }
+            
+            // get avatar information
+            if (hasAvatar(personNode))
+            {
+                try
+                {
+                    NodeRef avatar = getAvatar(personId);
+                    person.setAvatarId(avatar);
+                }
+                catch (EntityNotFoundException e)
+                {
+                    // shouldn't happen, but ok
+                }
+            }
+        }
+        else
+        {
+            throw new EntityNotFoundException(personId);
+        }
+
+        return person;
+    }
+
+	@Override
+	public Person create(Person person)
+	{
+		validateCreatePersonData(person);
+
+		// TODO: check, is this transaction safe?
+		// Unfortunately PersonService.createPerson(...) only throws an AlfrescoRuntimeException
+		// rather than a more specific exception and does not use a message ID either, so there's
+		// no sensible way to know that it was thrown due to the user already existing - hence this check here.
+		if (personService.personExists(person.getUserName()))
+		{
+			throw new ConstraintViolatedException("Person '"+person.getUserName()+"' already exists.");
+		}
+
+		// set enabled default value true
+        if (person.isEnabled() == null)
+        {
+            person.setEnabled(true);
+        }
+
+        Map<QName, Serializable> props = person.toProperties();
+
+		MutableAuthenticationService mas = (MutableAuthenticationService) authenticationService;
+		mas.createAuthentication(person.getUserName(), person.getPassword().toCharArray());
+		mas.setAuthenticationEnabled(person.getUserName(), person.isEnabled());
+
+		// Add custom properties
+		if (person.getProperties() != null)
+		{
+			Map<String, Object> customProps = person.getProperties();
+			props.putAll(nodes.mapToNodeProperties(customProps));
+		}
+		
+		NodeRef nodeRef = personService.createPerson(props);
+		
+		// Add custom aspects
+		nodes.addCustomAspects(nodeRef, person.getAspectNames(), EXCLUDED_ASPECTS);
+		
+        // Write the contents of PersonUpdate.getDescription() text to a content file
+        // and store the content URL in ContentModel.PROP_PERSONDESC
+        if (person.getDescription() != null)
+        {
+            savePersonDescription(person.getDescription(), nodeRef);
+        }
+
+        // Return a fresh retrieval
+        return getPerson(person.getUserName());
+    }
+	
+    /**
+     * Write the description to a content file and store the content URL in
+     * ContentModel.PROP_PERSONDESC
+     * 
+     * @param description
+     * @param nodeRef
+     */
+    private void savePersonDescription(final String description, final NodeRef nodeRef)
+    {
+        AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+        {
+            @Override
+            public Void doWork() throws Exception
+            {
+                ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_PERSONDESC, true);
+                writer.putContent(description);
+                return null;
+            }
+        });
+    }
+
+	private void validateCreatePersonData(Person person)
+	{
+		checkRequiredField("id", person.getUserName());
+		checkRequiredField("firstName", person.getFirstName());
+		checkRequiredField("email", person.getEmail());
+		checkRequiredField("password", person.getPassword());
+	}
+	
+	private void checkRequiredField(String fieldName, Object fieldValue)
+	{
+		if (fieldValue == null)
+		{
+			throw new InvalidArgumentException("Field '"+fieldName+"' is null, but is required.");
+		}
+	}
+
+    public Person update(String personId, final Person person)
+    {
+        MutableAuthenticationService mutableAuthenticationService = (MutableAuthenticationService) authenticationService;
+
+        String currentUserId = AuthenticationUtil.getFullyAuthenticatedUser();
+        if (!isAdminAuthority() && !currentUserId.equalsIgnoreCase(personId))
+        {
+            // The user is not an admin user and is not attempting to update *their own* details.
+            throw new PermissionDeniedException();
+        }
+        if (!isAdminAuthority() && person.getOldPassword() != null && person.getPassword() == null)
+        {
+            throw new IllegalArgumentException("To change password, both 'oldPassword' and 'password' fields are required.");
+        }
+
+        final String personIdToUpdate = validatePerson(personId);
+        final Map<QName, Serializable> properties = person.toProperties();
+
+        if (person.getPassword() != null && !person.getPassword().isEmpty())
+        {
+            // An admin user can update without knowing the original pass - but must know their own!
+            char[] newPassword = person.getPassword().toCharArray();
+            if (isAdminAuthority())
+            {
+                mutableAuthenticationService.setAuthentication(personIdToUpdate, newPassword);
+            }
+            else
+            {
+                // Non-admin users can update their own password, but must provide their current password.
+                if (person.getOldPassword() == null)
+                {
+                    throw new PermissionDeniedException("Existing password is required, but missing (field 'oldPassword').");
+                }
+                char[] oldPassword = person.getOldPassword().toCharArray();
+                try
+                {
+                    mutableAuthenticationService.updateAuthentication(personIdToUpdate, oldPassword, newPassword);
+                }
+                catch (AuthenticationException e)
+                {
+                    // TODO: add to exception mappings/handler
+                    throw new PermissionDeniedException("Incorrect existing password.");
+                }
+            }
+        }
+
+        if (person.isEnabled() != null)
+        {
+            if (isAdminAuthority(personIdToUpdate))
+            {
+                throw new PermissionDeniedException("Admin authority cannot be disabled.");
+            }
+
+            mutableAuthenticationService.setAuthenticationEnabled(personIdToUpdate, person.isEnabled());
+        }
+
+		NodeRef personNodeRef = personService.getPerson(personIdToUpdate, false);
+		if (person.getDescription() != null)
+        {
+			// Remove person description from saved properties
+			properties.remove(ContentModel.PROP_PERSONDESC);
+
+			// Custom save for person description.
+            savePersonDescription(person.getDescription(), personNodeRef);
+        }
+
+		// Add custom properties
+		if (person.getProperties() != null)
+		{
+			Map<String, Object> customProps = person.getProperties();
+			properties.putAll(nodes.mapToNodeProperties(customProps));
+		}
+
+        // The person service only allows admin users to set the properties by default.
+        AuthenticationUtil.runAsSystem(new RunAsWork<Void>()
+        {
+            @Override
+            public Void doWork() throws Exception
+            {
+                personService.setPersonProperties(personIdToUpdate, properties, false);
+                return null;
+            }
+        });
+
+		// Update custom aspects
+		nodes.updateCustomAspects(personNodeRef, person.getAspectNames(), EXCLUDED_ASPECTS);
+		
+        return getPerson(personId);
+    }
+
+    private boolean isAdminAuthority()
+    {
+        return authorityService.hasAdminAuthority();
+    }
+
+    private boolean isAdminAuthority(String authorityName)
+    {
+        return authorityService.isAdminAuthority(authorityName);
+    }
 }

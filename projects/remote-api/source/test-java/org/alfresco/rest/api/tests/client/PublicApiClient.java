@@ -43,6 +43,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl;
 import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
+import org.alfresco.rest.api.model.SiteUpdate;
+import org.alfresco.rest.api.tests.TestPeople;
+import org.alfresco.rest.api.tests.TestSites;
 import org.alfresco.rest.api.tests.client.PublicApiHttpClient.BinaryPayload;
 import org.alfresco.rest.api.tests.client.PublicApiHttpClient.RequestBuilder;
 import org.alfresco.rest.api.tests.client.data.Activities;
@@ -53,6 +56,7 @@ import org.alfresco.rest.api.tests.client.data.ContentData;
 import org.alfresco.rest.api.tests.client.data.Favourite;
 import org.alfresco.rest.api.tests.client.data.FavouriteSite;
 import org.alfresco.rest.api.tests.client.data.FolderNode;
+import org.alfresco.rest.api.tests.client.data.JSONAble;
 import org.alfresco.rest.api.tests.client.data.MemberOfSite;
 import org.alfresco.rest.api.tests.client.data.NodeRating;
 import org.alfresco.rest.api.tests.client.data.Person;
@@ -654,28 +658,26 @@ public class PublicApiClient
 
 	public class AbstractProxy
 	{
-		public HttpResponse getAll(String entityCollectionName, String entityId, String relationCollectionName, String relationId, Map<String, String> params, String errorMessage) throws PublicApiException
-		{
-	        try
-	        {
-		        HttpResponse response = get("public", entityCollectionName, entityId, relationCollectionName, relationId, params);
+        public HttpResponse getAll(String entityCollectionName, String entityId, String relationCollectionName, String relationId, Map<String, String> params, String errorMessage)
+                throws PublicApiException
+        {
+            return getAll(entityCollectionName, entityId, relationCollectionName, relationId, params, errorMessage, HttpServletResponse.SC_OK);
+        }
 
-		        if (HttpServletResponse.SC_OK != response.getStatusCode())
-		        {
-		            String msg = errorMessage + ": \n" +
-		                    "   Response: " + response;
-		            throw new PublicApiException(msg, response);
-		        }
-		        else
-		        {
-		        	return response;
-		        }
-			}
-			catch(IOException e)
-			{
-		        throw new PublicApiException(e);
-			}
-		}
+        public HttpResponse getAll(String entityCollectionName, String entityId, String relationCollectionName, String relationId, Map<String, String> params, String errorMessage,
+                int expectedStatus) throws PublicApiException
+        {
+            try
+            {
+                HttpResponse response = get("public", entityCollectionName, entityId, relationCollectionName, relationId, params);
+                checkStatus(errorMessage, expectedStatus, response);
+                return response;
+            }
+            catch (IOException e)
+            {
+                throw new PublicApiException(e);
+            }
+        }
 
         public HttpResponse getSingle(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String errorMessage) throws PublicApiException
         {
@@ -698,25 +700,16 @@ public class PublicApiClient
 		
 		public HttpResponse update(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, String errorMessage) throws PublicApiException
 		{
-		    return update(entityCollectionName, entityId, relationCollectionName, relationId, body, errorMessage, null);
+		    return update(entityCollectionName, entityId, relationCollectionName, relationId, body, null, errorMessage, 200);
 	    }
 		
-		public HttpResponse update(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, String errorMessage, Map<String, String> params) throws PublicApiException
+		public HttpResponse update(String entityCollectionName, String entityId, String relationCollectionName, String relationId, String body, Map<String, String> params, String errorMessage, int expectedStatus) throws PublicApiException
 		{
 	        try
 	        {
 		        HttpResponse response = put("public", entityCollectionName, entityId, relationCollectionName, relationId, body, params);
-
-		        if (HttpServletResponse.SC_OK != response.getStatusCode())
-		        {
-		            String msg = errorMessage + ": \n" +
-		                    "   Response: " + response;
-		            throw new PublicApiException(msg, response);
-		        }
-		        else
-		        {
-		        	return response;
-		        }
+				checkStatus(errorMessage, expectedStatus, response);
+		        return response;
 			}
 			catch(IOException e)
 			{
@@ -859,6 +852,18 @@ public class PublicApiClient
             remove("sites", siteId, null, null, params, "Failed to remove site", expectedStatus);
         }
 
+		public Site updateSite(String siteId, SiteUpdate update, int expectedStatus) throws PublicApiException
+		{
+			JSONAble jsonizer = new TestSites.SiteUpdateJSONSerializer(update);
+			HttpResponse response = update("sites", siteId, null, null, jsonizer.toJSON().toString(), null, "Failed to update site " + update.getTitle(), expectedStatus);
+			if (response.getJsonResponse() != null)
+			{
+				return SiteImpl.parseSite((JSONObject) response.getJsonResponse().get("entry"));
+			}
+			// No JSON response to parse.
+			return null;
+		}
+
 		public ListResponse<SiteContainer> getSiteContainers(String siteId, Map<String, String> params) throws PublicApiException
 		{
 			HttpResponse response = getAll("sites", siteId, "containers", null, params, "Failed to get site containers");
@@ -913,7 +918,7 @@ public class PublicApiClient
 
 		public SiteMember createSiteMember(String siteId, SiteMember siteMember) throws PublicApiException
 		{
-			HttpResponse response = create("sites", siteId, "members", null, siteMember.postJSON().toString(), "Failed to create site member");
+			HttpResponse response = create("sites", siteId, "members", null, siteMember.toJSON().toString(), "Failed to create site member");
 			SiteMember retSiteMember = SiteMember.parseSiteMember(siteMember.getSiteId(), (JSONObject)response.getJsonResponse().get("entry"));
 			return retSiteMember;
 		}
@@ -1062,30 +1067,77 @@ public class PublicApiClient
 
 		public Person getPerson(String personId) throws PublicApiException
 		{
-			HttpResponse response = getSingle("people", personId, null, null, "Failed to get person");
+			return getPerson(personId, 200);
+		}
+		
+		public Person getPerson(String personId, int expectedStatus) throws PublicApiException
+		{
+			HttpResponse response = getSingle("people", personId, null, null, "Failed to get person", expectedStatus);
 			
 			if(logger.isDebugEnabled())
 			{
 				logger.debug(response);
 			}
 			System.out.println(response);
-
-			Person site = Person.parsePerson((JSONObject)response.getJsonResponse().get("entry"));
-			return site;
+			
+			if (response != null && response.getJsonResponse() != null)
+			{
+				JSONObject entry = (JSONObject) response.getJsonResponse().get("entry");
+				if (entry != null)
+				{
+					return Person.parsePerson(entry);
+				}
+			}
+			return null;
 		}
 
-		public Person update(String personId, Person person, boolean fullVisibility) throws PublicApiException
+		public Person update(String personId, Person person) throws PublicApiException
 		{
-			HttpResponse response = update("people", person.getId(), null, null, person.toJSON(fullVisibility).toString(), "Failed to update person");
-			Person retSite = Person.parsePerson((JSONObject)response.getJsonResponse().get("entry"));
-			return retSite;
+			return update(personId, person, 200);
+		}
+		
+		public Person update(String personId, Person person, int expectedStatus) throws PublicApiException
+		{
+			return update(personId, person.toJSON(true).toString(), expectedStatus);
 		}
 
-		public Person create(Person person, boolean fullVisibility) throws PublicApiException
+		public Person update(String personId, String json, int expectedStatus) throws PublicApiException
 		{
-			HttpResponse response = create("people", null, null, null, person.toJSON(fullVisibility).toString(), "Failed to create person");
-			Person retSite = Person.parsePerson((JSONObject)response.getJsonResponse().get("entry"));
-			return retSite;
+			return update(personId, json, null, expectedStatus);
+		}
+
+		public Person update(String personId, String json, Map<String,String> params, int expectedStatus) throws PublicApiException
+		{
+			HttpResponse response = update("people", personId, null, null, json, params, "Failed to update person", expectedStatus);
+			if (response != null && response.getJsonResponse() != null)
+			{
+				JSONObject entry = (JSONObject) response.getJsonResponse().get("entry");
+				if (entry != null)
+				{
+					return Person.parsePerson(entry);
+				}
+			}
+			return null;
+		}
+		
+		public Person create(Person person) throws PublicApiException
+		{
+			return create(person, 201);
+		}
+
+		public Person create(Person person, int expectedStatus) throws PublicApiException
+		{
+			TestPeople.PersonJSONSerializer jsonizer = new TestPeople.PersonJSONSerializer(person) ;
+			HttpResponse response = create("people", null, null, null, jsonizer.toJSON().toString(), "Failed to create person", expectedStatus);
+			if ((response != null) && (response.getJsonResponse() != null))
+			{
+				JSONObject entry = (JSONObject) response.getJsonResponse().get("entry");
+				if (entry != null)
+				{
+					return Person.parsePerson(entry);
+				}
+			}
+			return null;
 		}
 
 		public void remove(Person person) throws PublicApiException

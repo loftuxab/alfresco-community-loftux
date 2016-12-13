@@ -31,8 +31,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStream;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.apache.chemistry.opencmis.commons.server.TempStoreOutputStream;
+import org.apache.chemistry.opencmis.server.shared.TempStoreOutputStreamFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
@@ -43,12 +43,12 @@ import org.springframework.util.FileCopyUtils;
  */
 public class BufferedHttpServletRequest extends HttpServletRequestWrapper
 {
-    private ThresholdOutputStreamFactory streamFactory;
+    private TempStoreOutputStreamFactory streamFactory;
     private HttpServletRequest request;
-    private ThresholdOutputStream bufferStream;
+    private TempStoreOutputStream bufferStream;
     private ServletInputStream contentStream;
     
-    public BufferedHttpServletRequest(HttpServletRequest request, ThresholdOutputStreamFactory streamFactory)
+    public BufferedHttpServletRequest(HttpServletRequest request, TempStoreOutputStreamFactory streamFactory)
     {
         super(request);
         this.request = request;
@@ -57,7 +57,7 @@ public class BufferedHttpServletRequest extends HttpServletRequestWrapper
 
     private void bufferInputStream() throws IOException
     {
-        ThresholdOutputStream bufferStream = streamFactory.newOutputStream();
+        TempStoreOutputStream bufferStream = streamFactory.newOutputStream();
 
         try
         {
@@ -65,7 +65,7 @@ public class BufferedHttpServletRequest extends HttpServletRequestWrapper
         }
         catch (IOException e)
         {
-            bufferStream.destroy(); // remove temp file
+            bufferStream.destroy(e); // remove temp file
             throw e;
         }
         this.bufferStream = bufferStream;
@@ -114,7 +114,7 @@ public class BufferedHttpServletRequest extends HttpServletRequestWrapper
             {
 
             }
-            bufferStream.destroy();
+            bufferStream.destroy(null);
             bufferStream = null;
         }
     }

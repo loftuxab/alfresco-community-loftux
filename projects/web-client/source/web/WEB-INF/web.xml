@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
-    version="2.4">
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
    
    <display-name>Alfresco</display-name>
 
@@ -98,7 +98,12 @@
       -->
    </filter>
 
-   <!-- AOSM filter placeholder -->
+   <filter>
+      <description>CSRF Token filter. Checks for a session based CSRF token in request headers (or form parameters) based on config.</description>
+      <filter-name>CSRF Token Filter</filter-name>
+      <filter-class>org.springframework.extensions.webscripts.servlet.CSRFFilter</filter-class>
+   </filter>
+
 
    <!-- CORS Filter Begin -->
    <!--<filter>
@@ -232,7 +237,15 @@
       <url-pattern>/wcs/api/solr/*</url-pattern>
    </filter-mapping>
 
-   <!-- AOSM filter-mapping placeholder -->
+   <filter-mapping>
+      <filter-name>CSRF Token Filter</filter-name>
+      <url-pattern>/service/enterprise/admin/*</url-pattern>
+   </filter-mapping>
+
+   <filter-mapping>
+      <filter-name>CSRF Token Filter</filter-name>
+      <url-pattern>/s/enterprise/admin/*</url-pattern>
+   </filter-mapping>
 
    <!-- Enterprise filter-mapping placeholder -->
 
@@ -254,11 +267,6 @@
    <listener>
       <listener-class>org.alfresco.repo.webdav.WebDAVSessionListener</listener-class>
    </listener>
-
-   <!-- Web Services context listener for OpenCMIS -->
-   <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-   </listener> 
 
    <!-- Enterprise listener placeholder -->
 
@@ -420,8 +428,6 @@
       </init-param>
    </servlet>
 
-   <!-- AOSM servlet placeholder -->
-
    <!-- Enterprise servlet placeholder -->
 
    <servlet-mapping>
@@ -516,8 +522,6 @@
       <url-pattern>/cmistck</url-pattern>
    </servlet-mapping>
    CMISTCK -->
-
-   <!-- AOSM servlet-mapping placeholder -->
 
    <!-- Enterprise servlet-mapping placeholder -->
 

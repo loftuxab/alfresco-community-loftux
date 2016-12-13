@@ -15,3 +15,4 @@ projects/web-client/source/web/META-INF/MANIFEST.MF
 **/.project
 **/.settings
 **/.classpath
+.svn

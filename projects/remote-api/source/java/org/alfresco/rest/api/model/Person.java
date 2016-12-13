@@ -25,14 +25,16 @@
  */
 package org.alfresco.rest.api.model;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Map;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.rest.framework.resource.UniqueId;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a user of the system.
@@ -64,9 +66,57 @@ public class Person
 	protected Boolean emailNotificationsEnabled;
 	protected String description;
 	protected Company company;
+	protected String password;
+	protected String oldPassword;
+	protected Map<String, Object> properties;
+	protected List<String> aspectNames;
 
 	public Person()
     {
+	}
+
+	public Person(
+			String userName,
+			Boolean enabled,
+			NodeRef avatarId,
+			String firstName,
+			String lastName,
+			String jobTitle,
+			String location,
+			String telephone,
+			String mobile,
+			String email,
+			String skypeId,
+			String instantMessageId,
+			String userStatus,
+			Date statusUpdatedAt,
+			String googleId,
+			Long quota,
+			Long quotaUsed,
+			Boolean emailNotificationsEnabled,
+			String description,
+			Company company)
+	{
+		this.userName = userName;
+		this.enabled = enabled;
+		this.avatarId = avatarId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.jobTitle = jobTitle;
+		this.location = location;
+		this.telephone = telephone;
+		this.mobile = mobile;
+		this.email = email;
+		this.skypeId = skypeId;
+		this.instantMessageId = instantMessageId;
+		this.userStatus = userStatus;
+		this.statusUpdatedAt = statusUpdatedAt;
+		this.googleId = googleId;
+		this.quota = quota;
+		this.quotaUsed = quotaUsed;
+		this.emailNotificationsEnabled = emailNotificationsEnabled;
+		this.description = description;
+		this.company = company;
 	}
 
 	public Person(NodeRef nodeRef, Map<QName, Serializable> nodeProps, boolean enabled)
@@ -116,9 +166,19 @@ public class Person
 		return company;
 	}
 
+	public void setCompany(Company company)
+	{
+		this.company = company;
+	}
+
 	public String getInstantMessageId()
 	{
 		return instantMessageId;
+	}
+
+	public void setInstantMessageId(String instantMessageId)
+	{
+		this.instantMessageId = instantMessageId;
 	}
 
 	public String getGoogleId()
@@ -126,6 +186,11 @@ public class Person
 		return googleId;
 	}
 
+	public void setGoogleId(String googleId)
+	{
+		this.googleId = googleId;
+	}
+	
 	public Long getQuota()
 	{
 		return quota;
@@ -141,10 +206,20 @@ public class Person
 		return description;
 	}
 
+	public void setDescription(String description)
+	{
+		this.description = description;
+	}
+	
 	@UniqueId
 	public String getUserName() 
 	{
 		return userName;
+	}
+
+	public void setUserName(String userName)
+	{
+		this.userName = userName;
 	}
 
 	public Boolean isEnabled()
@@ -152,9 +227,24 @@ public class Person
 		return enabled;
 	}
 
+	public void setEnabled(Boolean enabled)
+	{
+		this.enabled = enabled;
+	}
+	
 	public void setAvatarId(NodeRef avatarId)
 	{
 		this.avatarId = avatarId;
+	}
+	
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+
+	public void setOldPassword(String oldPassword)
+	{
+		this.oldPassword = oldPassword;
 	}
 
 	public NodeRef getAvatarId()
@@ -187,9 +277,19 @@ public class Person
 		return jobTitle;
 	}
 
+	public void setJobTitle(String jobTitle)
+	{
+		this.jobTitle = jobTitle;
+	}
+
 	public String getLocation()
 	{
 		return location;
+	}
+
+	public void setLocation(String location)
+	{
+		this.location = location;
 	}
 
 	public String getTelephone()
@@ -197,9 +297,19 @@ public class Person
 		return telephone;
 	}
 
+	public void setTelephone(String telephone)
+	{
+		this.telephone = telephone;
+	}
+
 	public String getMobile()
 	{
 		return mobile;
+	}
+
+	public void setMobile(String mobile)
+	{
+		this.mobile = mobile;
 	}
 
 	public String getEmail()
@@ -207,14 +317,29 @@ public class Person
 		return email;
 	}
 
+	public void setEmail(String email)
+	{
+		this.email = email;
+	}
+
 	public String getSkypeId()
 	{
 		return skypeId;
 	}
 
+	public void setSkypeId(String skypeId)
+	{
+		this.skypeId = skypeId;
+	}
+
 	public String getUserStatus()
 	{
 		return userStatus;
+	}
+
+	public void setUserStatus(String userStatus)
+	{
+		this.userStatus = userStatus;
 	}
 
 	public Date getStatusUpdatedAt()
@@ -225,6 +350,41 @@ public class Person
 	public Boolean isEmailNotificationsEnabled()
 	{
 		return emailNotificationsEnabled;
+	}
+
+	public void setEmailNotificationsEnabled(Boolean emailNotificationsEnabled)
+	{
+		this.emailNotificationsEnabled = emailNotificationsEnabled;
+	}
+
+	public String getPassword()
+	{
+		return this.password;
+	}
+
+	public String getOldPassword()
+	{
+		return oldPassword;
+	}
+
+	public Map<String, Object> getProperties()
+	{
+		return properties;
+	}
+
+	public void setProperties(Map<String, Object> properties)
+	{
+		this.properties = properties;
+	}
+
+	public List<String> getAspectNames()
+	{
+		return aspectNames;
+	}
+
+	public void setAspectNames(List<String> aspectNames)
+	{
+		this.aspectNames = aspectNames;
 	}
 
 	@Override
@@ -243,5 +403,69 @@ public class Person
 				+ emailNotificationsEnabled + ", description=" + description
 				+ ", company=" + company + "]";
 	}
-	
+
+	public Map<QName, Serializable> toProperties()
+	{
+		Map<QName, Serializable> props = new HashMap<>();
+		populateProps(props);
+		return props;
+	}
+
+	private void addToMap(Map<QName, Serializable> properties, QName name, Serializable value)
+	{
+		if(name != null && value != null)
+		{
+			properties.put(name, value);
+		}
+	}
+
+	private void populateProps(Map<QName, Serializable> properties)
+	{
+		addToMap(properties, ContentModel.PROP_USERNAME, getUserName());
+		addToMap(properties, ContentModel.PROP_FIRSTNAME, getFirstName());
+		addToMap(properties, ContentModel.PROP_LASTNAME, getLastName());
+		addToMap(properties, ContentModel.PROP_JOBTITLE, getJobTitle());
+		addToMap(properties, ContentModel.PROP_LOCATION, getLocation());
+		addToMap(properties, ContentModel.PROP_TELEPHONE, getTelephone());
+		addToMap(properties, ContentModel.PROP_MOBILE, getMobile());
+		addToMap(properties, ContentModel.PROP_EMAIL, getEmail());
+
+		Company company = getCompany();
+		if(company != null)
+		{
+			addToMap(properties, ContentModel.PROP_ORGANIZATION, company.getOrganization());
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS1, company.getAddress1());
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS2, company.getAddress2());
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS3, company.getAddress3());
+			addToMap(properties, ContentModel.PROP_COMPANYPOSTCODE, company.getPostcode());
+			addToMap(properties, ContentModel.PROP_COMPANYTELEPHONE, company.getTelephone());
+			addToMap(properties, ContentModel.PROP_COMPANYFAX, company.getFax());
+			addToMap(properties, ContentModel.PROP_COMPANYEMAIL, company.getEmail());
+		}
+		else
+		{
+			addToMap(properties, ContentModel.PROP_ORGANIZATION, null);
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS1, null);
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS2, null);
+			addToMap(properties, ContentModel.PROP_COMPANYADDRESS3, null);
+			addToMap(properties, ContentModel.PROP_COMPANYPOSTCODE, null);
+			addToMap(properties, ContentModel.PROP_COMPANYTELEPHONE, null);
+			addToMap(properties, ContentModel.PROP_COMPANYFAX, null);
+			addToMap(properties, ContentModel.PROP_COMPANYEMAIL, null);
+		}
+
+//		addToMap(properties, ContentModel.ASSOC_AVATAR, getAvatarId());
+		addToMap(properties, ContentModel.PROP_SKYPE, getSkypeId());
+		addToMap(properties, ContentModel.PROP_INSTANTMSG, getInstantMessageId());
+		addToMap(properties, ContentModel.PROP_USER_STATUS, getUserStatus());
+		addToMap(properties, ContentModel.PROP_USER_STATUS_TIME, getStatusUpdatedAt());
+		addToMap(properties, ContentModel.PROP_GOOGLEUSERNAME, getGoogleId());
+		addToMap(properties, ContentModel.PROP_SIZE_QUOTA, getQuota());
+		addToMap(properties, ContentModel.PROP_SIZE_CURRENT, getQuotaUsed());
+		addToMap(properties, ContentModel.PROP_PERSONDESC, getDescription());
+        addToMap(properties, ContentModel.PROP_ENABLED, isEnabled());
+
+        Boolean isEmailNotificationsEnabled = isEmailNotificationsEnabled();
+        addToMap(properties, ContentModel.PROP_EMAIL_FEED_DISABLED, (isEmailNotificationsEnabled == null ? null : !isEmailNotificationsEnabled.booleanValue()));
+	}
 }

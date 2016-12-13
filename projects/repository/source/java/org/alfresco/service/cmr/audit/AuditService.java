@@ -29,8 +29,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.service.PublicService;
-
 /**
  * The public API by which applications can query the audit logs and enable or disable auditing.
  * 
@@ -214,7 +212,9 @@ public interface AuditService
      * 
      * @param callback          the callback that will handle results
      * @param parameters        the parameters for the query (may not be <tt>null</tt>)
-     * @param maxResults        the maximum number of results to retrieve (zero or negative to ignore)
+     * @param maxResults        the maximum number of results to retrieve (must be greater than 0)
+     * 
+     * @throws IllegalArgumentException if maxResults less or equal to zero
      * 
      * @since 3.3
      */

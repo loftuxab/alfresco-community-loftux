@@ -26,11 +26,9 @@
 package org.alfresco.solr.content;
 
 import java.io.File;
-import java.util.Date;
 
 import org.alfresco.repo.content.ContentContext;
 import org.alfresco.repo.content.ContentStore;
-import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.apache.commons.io.FileUtils;
@@ -145,18 +143,6 @@ public class SolrContentStore implements ContentStore
         SolrFileContentWriter writer = new SolrFileContentWriter(file, url);
         // Done
         return writer;
-    }
-
-    @Override
-    public void getUrls(ContentUrlHandler handler) throws ContentIOException
-    {
-        throw new UnsupportedOperationException("Auto-created method not implemented.");
-    }
-
-    @Override
-    public void getUrls(Date createdAfter, Date createdBefore, ContentUrlHandler handler) throws ContentIOException
-    {
-        throw new UnsupportedOperationException("Auto-created method not implemented.");
     }
 
     @Override

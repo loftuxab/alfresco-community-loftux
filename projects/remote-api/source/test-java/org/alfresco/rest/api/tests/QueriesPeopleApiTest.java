@@ -70,7 +70,7 @@ public class QueriesPeopleApiTest extends AbstractSingleNetworkSiteTest
     //      deleting users is hard from from static methods. For the moment do it
     //      in the first and last tests, but we have to get the TEST count right!
     //      If we don't, a test fails or the users get left behind (not too bad).
-    private static int TEST_COUNT = 20;
+    private static int TEST_COUNT = 22;
     private static int testCounter = 0;
 
     // Test usernames
@@ -511,33 +511,28 @@ public class QueriesPeopleApiTest extends AbstractSingleNetworkSiteTest
         checkApiCall(term, orderBy, fields, paging, expectedStatus, expectedPeople);
     }
     
-//    // TODO Rubbish is taken to be "asc" so returns 200 rather than 400 - is this a framework bug?
-//    @Test
-//    public void testBadOrderByDirection() throws Exception
-//    {
-//        orderBy = "firstName rubbish, lastName asc"; 
-//        expectedStatus = 400;
-//        
-//        checkApiCall(term, orderBy, fields, paging, expectedStatus, expectedPeople);
-//    }
-
-//    // TODO Having a space in the list discards everything after the space - found in manual testing - is this a framework bug?
-//    @Test
-//    public void testFieldsWithSpace() throws Exception
-//    {
-//        fields = PARAM_FIRSTNAME+", "+PARAM_LASTNAME;
-//        term = LAST_A;
-//        expectedPeople = new String[]
-//        {
-//            "Person ["+                  "lastName=LastA, ]", // USER5
-//            "Person ["+"firstName=FirstA, lastName=LastA, ]", // USER1
-//            "Person ["+"firstName=FirstB, lastName=LastA, ]", // USER3
-//            // But is the following:
-////          "Person ["+                  "]",
-////          "Person ["+"firstName=FirstA, ]",
-////          "Person ["+"firstName=FirstB, ]",
-//        };
-//        
-//        checkApiCall(term, orderBy, fields, paging, expectedStatus, expectedPeople);
-//    }
+    @Test
+    public void testBadOrderByDirection() throws Exception
+    {
+        // note: also tested generically in RecognizedParamsExtractorTest
+        orderBy = "firstName rubbish, lastName asc"; 
+        expectedStatus = 400;
+        
+        checkApiCall(term, orderBy, fields, paging, expectedStatus, expectedPeople);
+    }
+    
+    @Test
+    public void testFieldsWithSpace() throws Exception
+    {
+        fields = PARAM_FIRSTNAME+", "+PARAM_LASTNAME;
+        term = LAST_A;
+        expectedPeople = new String[]
+        {
+            "Person ["+                  "lastName=LastA, ]", // USER5
+            "Person ["+"firstName=FirstA, lastName=LastA, ]", // USER1
+            "Person ["+"firstName=FirstB, lastName=LastA, ]" // USER3
+        };
+        
+        checkApiCall(term, orderBy, fields, paging, expectedStatus, expectedPeople);
+    }
 }

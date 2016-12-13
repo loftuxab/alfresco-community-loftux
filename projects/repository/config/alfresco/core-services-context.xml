@@ -377,7 +377,6 @@
                 <value>alfresco.messages.webdav-messages</value>
                 <value>alfresco.messages.copy-service</value>
                 <value>alfresco.messages.content-filter-languages</value>
-                <value>alfresco.messages.jbpm-engine-messages</value>
                 <value>alfresco.messages.activiti-engine-messages</value>
                 <value>alfresco.messages.subscription-service</value>
                 <value>alfresco.messages.replication</value>
@@ -385,6 +384,7 @@
                 <value>alfresco.messages.authentication</value>
                 <value>alfresco.messages.file-folder-service</value>
                 <value>alfresco.messages.custommodel-service</value>
+                <value>alfresco.messages.doclink-service</value>
             </list>
         </property>
     </bean>
@@ -1031,7 +1031,36 @@
         <constructor-arg value="false" />
         <constructor-arg value="false" />
     </bean>
-
+    <bean id="solr6" class="org.alfresco.repo.search.impl.solr.SolrChildApplicationContextFactory" parent="abstractPropertyBackedBean">
+        <property name="autoStart">
+            <value>false</value>
+        </property>
+        <property name="compositePropertyTypes">
+            <map>
+                <entry key="solr6.store.mappings">
+                    <value>org.alfresco.repo.search.impl.solr.SolrStoreMapping</value>
+                </entry>
+            </map>
+        </property>
+        <property name="category">
+            <value>Search</value>
+        </property>
+        <property name="typeName">
+            <value>solr6</value>
+        </property>
+        <property name="instancePath">
+            <list>
+                <value>managed</value>
+                <value>solr6</value>
+            </list>
+        </property>
+        <property name="earlyPropertyCheckers">
+            <map>
+                <entry key="solr.port" value-ref="solr4PortEarlyChecker" />
+                <entry key="solr.port.ssl" value-ref="solr4SSLPortEarlyChecker" />
+            </map>
+        </property>
+    </bean>
     <bean id="solr4" class="org.alfresco.repo.search.impl.solr.SolrChildApplicationContextFactory" parent="abstractPropertyBackedBean">
         <property name="autoStart">
             <value>false</value>

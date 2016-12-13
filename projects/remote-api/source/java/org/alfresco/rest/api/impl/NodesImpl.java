@@ -86,6 +86,7 @@ import org.alfresco.rest.api.model.Document;
 import org.alfresco.rest.api.model.Folder;
 import org.alfresco.rest.api.model.LockInfo;
 import org.alfresco.rest.api.model.Node;
+import org.alfresco.rest.api.model.NodePermissions;
 import org.alfresco.rest.api.model.PathInfo;
 import org.alfresco.rest.api.model.PathInfo.ElementInfo;
 import org.alfresco.rest.api.model.QuickShareLink;
@@ -143,6 +144,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Path;
 import org.alfresco.service.cmr.repository.Path.Element;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.OwnableService;
@@ -334,7 +336,7 @@ public class NodesImpl implements Nodes
             ContentModel.PROP_AUTO_VERSION_PROPS,
             ContentModel.PROP_AUTO_VERSION);
 
-    private static final List<QName> PROPS_USERLOOKUP = Arrays.asList(
+    public static final List<QName> PROPS_USERLOOKUP = Arrays.asList(
             ContentModel.PROP_CREATOR,
             ContentModel.PROP_MODIFIER,
             ContentModel.PROP_OWNER,
@@ -888,14 +890,14 @@ public class NodesImpl implements Nodes
 
         if (includeParam.size() > 0)
         {
-            node.setProperties(mapFromNodeProperties(properties, includeParam, mapUserInfo));
+            node.setProperties(mapFromNodeProperties(properties, includeParam, mapUserInfo, EXCLUDED_PROPS));
         }
 
         Set<QName> aspects = null;
         if (includeParam.contains(PARAM_INCLUDE_ASPECTNAMES))
         {
             aspects = nodeService.getAspects(nodeRef);
-            node.setAspectNames(mapFromNodeAspects(aspects));
+            node.setAspectNames(mapFromNodeAspects(aspects, EXCLUDED_ASPECTS));
         }
 
         if (includeParam.contains(PARAM_INCLUDE_ISLINK))
@@ -917,6 +919,8 @@ public class NodesImpl implements Nodes
             mapPermsToOps.put(PermissionService.DELETE, OP_DELETE);
             mapPermsToOps.put(PermissionService.ADD_CHILDREN, OP_CREATE);
             mapPermsToOps.put(PermissionService.WRITE, OP_UPDATE);
+            mapPermsToOps.put(PermissionService.CHANGE_PERMISSIONS, OP_UPDATE_PERMISSIONS);
+            
 
             List<String> allowableOperations = new ArrayList<>(3);
             for (Entry<String, String> kv : mapPermsToOps.entrySet())
@@ -941,6 +945,47 @@ public class NodesImpl implements Nodes
             }
 
             node.setAllowableOperations((allowableOperations.size() > 0 )? allowableOperations : null);
+        }
+
+        if (includeParam.contains(PARAM_INCLUDE_PERMISSIONS))
+        {
+            Boolean inherit = permissionService.getInheritParentPermissions(nodeRef);
+
+            List<NodePermissions.NodePermission> inheritedPerms = new ArrayList<>(5);
+            List<NodePermissions.NodePermission> setDirectlyPerms = new ArrayList<>(5);
+            Set<String> settablePerms = null;
+            boolean allowRetrievePermission = true;
+
+            try
+            {
+                for (AccessPermission accessPerm : permissionService.getAllSetPermissions(nodeRef))
+                {
+                    NodePermissions.NodePermission nodePerm = new NodePermissions.NodePermission(accessPerm.getAuthority(), accessPerm.getPermission(), accessPerm.getAccessStatus().toString());
+                    if (accessPerm.isSetDirectly())
+                    {
+                        setDirectlyPerms.add(nodePerm);
+                    } else
+                    {
+                        inheritedPerms.add(nodePerm);
+                    }
+                }
+
+                settablePerms = permissionService.getSettablePermissions(nodeRef);
+            }
+            catch (AccessDeniedException ade)
+            {
+                // ignore - ie. denied access to retrieve permissions, eg. non-admin on root (Company Home)
+                allowRetrievePermission = false;
+            }
+
+            // If the user does not have read permissions at
+            // least on a special node then do not include permissions and
+            // returned only node info that he's allowed to see
+            if (allowRetrievePermission)
+            {
+                NodePermissions nodePerms = new NodePermissions(inherit, inheritedPerms, setDirectlyPerms, settablePerms);
+                node.setPermissions(nodePerms);
+            }
         }
 
         if (includeParam.contains(PARAM_INCLUDE_ASSOCIATION))
@@ -1076,7 +1121,7 @@ public class NodesImpl implements Nodes
         return nodeAspects;
     }
 
-    protected Map<QName, Serializable> mapToNodeProperties(Map<String, Object> props)
+    public Map<QName, Serializable> mapToNodeProperties(Map<String, Object> props)
     {
         Map<QName, Serializable> nodeProps = new HashMap<>(props.size());
 
@@ -1115,8 +1160,8 @@ public class NodesImpl implements Nodes
 
         return nodeProps;
     }
-
-    protected Map<String, Object> mapFromNodeProperties(Map<QName, Serializable> nodeProps, List<String> selectParam, Map<String,UserInfo> mapUserInfo)
+    
+    public Map<String, Object> mapFromNodeProperties(Map<QName, Serializable> nodeProps, List<String> selectParam, Map<String,UserInfo> mapUserInfo, List<QName> excludedProps)
     {
         List<QName> selectedProperties;
 
@@ -1126,7 +1171,7 @@ public class NodesImpl implements Nodes
             selectedProperties = new ArrayList<>(nodeProps.size());
             for (QName propQName : nodeProps.keySet())
             {
-                if ((! EXCLUDED_NS.contains(propQName.getNamespaceURI())) && (! EXCLUDED_PROPS.contains(propQName)))
+                if ((! EXCLUDED_NS.contains(propQName.getNamespaceURI())) && (! excludedProps.contains(propQName)))
                 {
                     selectedProperties.add(propQName);
                 }
@@ -1135,7 +1180,7 @@ public class NodesImpl implements Nodes
         else
         {
             // return selected properties
-            selectedProperties = createQNames(selectParam);
+            selectedProperties = createQNames(selectParam, excludedProps);
         }
 
         Map<String, Object> props = null;
@@ -1164,13 +1209,13 @@ public class NodesImpl implements Nodes
         return props;
     }
 
-    protected List<String> mapFromNodeAspects(Set<QName> nodeAspects)
+    public List<String> mapFromNodeAspects(Set<QName> nodeAspects, List<QName> excludedAspects)
     {
         List<String> aspectNames = new ArrayList<>(nodeAspects.size());
 
         for (QName aspectQName : nodeAspects)
         {
-            if ((! EXCLUDED_NS.contains(aspectQName.getNamespaceURI())) && (! EXCLUDED_ASPECTS.contains(aspectQName)))
+            if ((! EXCLUDED_NS.contains(aspectQName.getNamespaceURI())) && (! excludedAspects.contains(aspectQName)))
             {
                 aspectNames.add(aspectQName.toPrefixString(namespaceService));
             }
@@ -1193,98 +1238,25 @@ public class NodesImpl implements Nodes
 
         final List<String> includeParam = parameters.getInclude();
 
-        // filters
-        Boolean includeFolders = null;
-        Boolean includeFiles = null;
-        Boolean isPrimary = null;
         QName assocTypeQNameParam = null;
-        QName filterNodeTypeQName = null;
-
-        // note: for files/folders, include subtypes by default (unless filtering by a specific nodeType - see below)
-        boolean filterIncludeSubTypes = true;
 
         Query q = parameters.getQuery();
 
         if (q != null)
         {
             // filtering via "where" clause
-            MapBasedQueryWalker propertyWalker = new MapBasedQueryWalker(LIST_FOLDER_CHILDREN_EQUALS_QUERY_PROPERTIES, null);
+            MapBasedQueryWalker propertyWalker = createListChildrenQueryWalker();
             QueryHelper.walk(q, propertyWalker);
-
-            isPrimary = propertyWalker.getProperty(PARAM_ISPRIMARY, WhereClauseParser.EQUALS, Boolean.class);
 
             String assocTypeQNameStr = propertyWalker.getProperty(PARAM_ASSOC_TYPE, WhereClauseParser.EQUALS, String.class);
             if (assocTypeQNameStr != null)
             {
                 assocTypeQNameParam = getAssocType(assocTypeQNameStr);
             }
-
-            Boolean isFolder = propertyWalker.getProperty(PARAM_ISFOLDER, WhereClauseParser.EQUALS, Boolean.class);
-            Boolean isFile = propertyWalker.getProperty(PARAM_ISFILE, WhereClauseParser.EQUALS, Boolean.class);
-
-            if (isFolder != null)
-            {
-                includeFolders = isFolder;
-            }
-
-            if (isFile != null)
-            {
-                includeFiles = isFile;
-            }
-
-            if (Boolean.TRUE.equals(includeFiles) && Boolean.TRUE.equals(includeFolders))
-            {
-                throw new InvalidArgumentException("Invalid filter (isFile=true and isFolder=true) - a node cannot be both a file and a folder");
-            }
-
-            String nodeTypeStr = propertyWalker.getProperty(PARAM_NODETYPE, WhereClauseParser.EQUALS, String.class);
-            if ((nodeTypeStr != null) && (! nodeTypeStr.isEmpty()))
-            {
-                if ((isFile != null) || (isFolder != null))
-                {
-                    throw new InvalidArgumentException("Invalid filter - nodeType and isFile/isFolder are mutually exclusive");
-                }
-
-                Pair<QName, Boolean> pair = parseNodeTypeFilter(nodeTypeStr);
-                filterNodeTypeQName = pair.getFirst();
-                filterIncludeSubTypes = pair.getSecond();
-            }
         }
 
-        List<SortColumn> sortCols = parameters.getSorting();
-        List<Pair<QName, Boolean>> sortProps = null;
-        if ((sortCols != null) && (sortCols.size() > 0))
-        {
-            // TODO should we allow isFile in sort (and map to reverse of isFolder) ?
-            sortProps = new ArrayList<>(sortCols.size());
-            for (SortColumn sortCol : sortCols)
-            {
-                QName propQname = PARAM_SYNONYMS_QNAME.get(sortCol.column);
-                if (propQname == null)
-                {
-                    propQname = createQName(sortCol.column);
-                }
-
-                if (propQname != null)
-                {
-                    sortProps.add(new Pair<>(propQname, sortCol.asc));
-                }
-            }
-        }
-        else
-        {
-            // default sort order
-            sortProps = new ArrayList<>(Arrays.asList(
-                    new Pair<>(GetChildrenCannedQuery.SORT_QNAME_NODE_IS_FOLDER, Boolean.FALSE),
-                    new Pair<>(ContentModel.PROP_NAME, true)));
-        }
-
-        List<FilterProp> filterProps = null;
-        if (isPrimary != null)
-        {
-            filterProps = new ArrayList<>(1);
-            filterProps.add(new FilterPropBoolean(GetChildrenCannedQuery.FILTER_QNAME_NODE_IS_PRIMARY, isPrimary));
-        }
+        List<Pair<QName, Boolean>> sortProps = getListChildrenSortProps(parameters);
+        List<FilterProp> filterProps = getListChildrenFilterProps(parameters);
 
         Paging paging = parameters.getPaging();
 
@@ -1292,42 +1264,8 @@ public class NodesImpl implements Nodes
 
         final PagingResults<FileInfo> pagingResults;
 
-        // notes (see also earlier validation checks):
-        // - no filtering means any types/sub-types (well, apart from hidden &/or default ignored types - eg. systemfolder, fm types)
-        // - node type filtering is mutually exclusive from isFile/isFolder, can optionally also include sub-types
-        // - isFile & isFolder cannot both be true
-        // - (isFile=false) means any other types/sub-types (other than files)
-        // - (isFolder=false) means any other types/sub-types (other than folders)
-        // - (isFile=false and isFolder=false) means any other types/sub-types (other than files or folders)
+        Pair<Set<QName>, Set<QName>> pair = buildSearchTypesAndIgnoreAspects(parameters);
 
-        if (filterNodeTypeQName == null)
-        {
-            if ((includeFiles == null) && (includeFolders == null))
-            {
-                // no additional filtering
-                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
-            }
-            else if ((includeFiles != null) && (includeFolders != null))
-            {
-                if ((! includeFiles) && (! includeFolders))
-                {
-                    // no files or folders
-                    filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
-                }
-            }
-            else if ((includeFiles != null) && (! includeFiles))
-            {
-                // no files
-                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
-            }
-            else if ((includeFolders != null) && (! includeFolders))
-            {
-                // no folders
-                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
-            }
-        }
-
-        Pair<Set<QName>, Set<QName>> pair = buildSearchTypesAndIgnoreAspects(filterNodeTypeQName, filterIncludeSubTypes, ignoreQNames, includeFiles, includeFolders);
         Set<QName> searchTypeQNames = pair.getFirst();
         Set<QName> ignoreAspectQNames = pair.getSecond();
 
@@ -1374,6 +1312,100 @@ public class NodesImpl implements Nodes
         }
 
         return CollectionWithPagingInfo.asPaged(paging, nodes, pagingResults.hasMoreItems(), pagingResults.getTotalResultCount().getFirst(), sourceEntity);
+    }
+
+    /**
+     * Create query walker for <code>listChildren</code>.
+     *
+     * @return The  created {@link MapBasedQueryWalker}.
+     */
+    private MapBasedQueryWalker createListChildrenQueryWalker()
+    {
+        return new MapBasedQueryWalker(LIST_FOLDER_CHILDREN_EQUALS_QUERY_PROPERTIES, null);
+    }
+
+    /**
+     * <p>Returns a List of filter properties specified by request parameters.</p>
+     *
+     * @param parameters The {@link Parameters} object to get the parameters passed into the request
+     *        including:
+     *        - filter, sort & paging params (where, orderBy, skipCount, maxItems)
+     *        - incFiles, incFolders (both true by default)
+     * @return The list of {@link FilterProp}. Can be null.
+     */
+    protected List<FilterProp> getListChildrenFilterProps(final Parameters parameters)
+    {
+        List<FilterProp> filterProps = null;
+        Query q = parameters.getQuery();
+        if (q != null)
+        {
+            MapBasedQueryWalker propertyWalker = createListChildrenQueryWalker();
+            QueryHelper.walk(q, propertyWalker);
+
+            Boolean isPrimary = propertyWalker.getProperty(PARAM_ISPRIMARY, WhereClauseParser.EQUALS, Boolean.class);
+
+            if (isPrimary != null)
+            {
+                filterProps = new ArrayList<>(1);
+                filterProps.add(new FilterPropBoolean(GetChildrenCannedQuery.FILTER_QNAME_NODE_IS_PRIMARY, isPrimary));
+            }
+        }
+        return filterProps;
+    }
+
+    /**
+     * <p>Returns a List of sort properties specified by the "sorting" request parameter.</p>
+     *
+     * @param parameters The {@link Parameters} object to get the parameters passed into the request
+     *        including:
+     *        - filter, sort & paging params (where, orderBy, skipCount, maxItems)
+     *        - incFiles, incFolders (both true by default)
+     * @return The list of <code>Pair&lt;QName, Boolean&gt;</code> sort properties. If no sort parameters are
+     *        found defaults to {@link #getListChildrenSortPropsDefault() getListChildrenSortPropsDefault}.
+     */
+    protected List<Pair<QName, Boolean>> getListChildrenSortProps(final Parameters parameters)
+    {
+        List<SortColumn> sortCols = parameters.getSorting();
+        List<Pair<QName, Boolean>> sortProps;
+        if ((sortCols != null) && (sortCols.size() > 0))
+        {
+            // TODO should we allow isFile in sort (and map to reverse of isFolder) ?
+            sortProps = new ArrayList<>(sortCols.size());
+            for (SortColumn sortCol : sortCols)
+            {
+                QName propQname = PARAM_SYNONYMS_QNAME.get(sortCol.column);
+                if (propQname == null)
+                {
+                    propQname = createQName(sortCol.column);
+                }
+
+                if (propQname != null)
+                {
+                    sortProps.add(new Pair<>(propQname, sortCol.asc));
+                }
+            }
+        }
+        else
+        {
+            sortProps = getListChildrenSortPropsDefault();
+        }
+
+        return sortProps;
+    }
+
+    /**
+     * <p>
+     * Returns the default sort order.
+     * </p>
+     *
+     * @return The list of <code>Pair&lt;QName, Boolean&gt;</code> sort
+     *         properties.
+     */
+    protected List<Pair<QName, Boolean>> getListChildrenSortPropsDefault()
+    {
+        List<Pair<QName, Boolean>> sortProps = new ArrayList<>(
+                Arrays.asList(new Pair<>(GetChildrenCannedQuery.SORT_QNAME_NODE_IS_FOLDER, Boolean.FALSE), new Pair<>(ContentModel.PROP_NAME, true)));
+        return sortProps;
     }
 
     private Pair<QName,Boolean> parseNodeTypeFilter(String nodeTypeStr)
@@ -1513,6 +1545,94 @@ public class NodesImpl implements Nodes
         }
 
         return new Pair<>(searchTypeQNames, ignoreAspectQNames);
+    }
+
+    protected Pair<Set<QName>, Set<QName>> buildSearchTypesAndIgnoreAspects(final Parameters parameters)
+    {
+        // filters
+        Boolean includeFolders = null;
+        Boolean includeFiles = null;
+        QName filterNodeTypeQName = null;
+
+        // note: for files/folders, include subtypes by default (unless filtering by a specific nodeType - see below)
+        boolean filterIncludeSubTypes = true;
+
+        Query q = parameters.getQuery();
+
+        if (q != null)
+        {
+            // filtering via "where" clause
+            MapBasedQueryWalker propertyWalker = createListChildrenQueryWalker();
+            QueryHelper.walk(q, propertyWalker);
+
+            Boolean isFolder = propertyWalker.getProperty(PARAM_ISFOLDER, WhereClauseParser.EQUALS, Boolean.class);
+            Boolean isFile = propertyWalker.getProperty(PARAM_ISFILE, WhereClauseParser.EQUALS, Boolean.class);
+
+            if (isFolder != null)
+            {
+                includeFolders = isFolder;
+            }
+
+            if (isFile != null)
+            {
+                includeFiles = isFile;
+            }
+
+            if (Boolean.TRUE.equals(includeFiles) && Boolean.TRUE.equals(includeFolders))
+            {
+                throw new InvalidArgumentException("Invalid filter (isFile=true and isFolder=true) - a node cannot be both a file and a folder");
+            }
+
+            String nodeTypeStr = propertyWalker.getProperty(PARAM_NODETYPE, WhereClauseParser.EQUALS, String.class);
+            if ((nodeTypeStr != null) && (! nodeTypeStr.isEmpty()))
+            {
+                if ((isFile != null) || (isFolder != null))
+                {
+                    throw new InvalidArgumentException("Invalid filter - nodeType and isFile/isFolder are mutually exclusive");
+                }
+
+                Pair<QName, Boolean> pair = parseNodeTypeFilter(nodeTypeStr);
+                filterNodeTypeQName = pair.getFirst();
+                filterIncludeSubTypes = pair.getSecond();
+            }
+        }
+
+        // notes (see also earlier validation checks):
+        // - no filtering means any types/sub-types (well, apart from hidden &/or default ignored types - eg. systemfolder, fm types)
+        // - node type filtering is mutually exclusive from isFile/isFolder, can optionally also include sub-types
+        // - isFile & isFolder cannot both be true
+        // - (isFile=false) means any other types/sub-types (other than files)
+        // - (isFolder=false) means any other types/sub-types (other than folders)
+        // - (isFile=false and isFolder=false) means any other types/sub-types (other than files or folders)
+
+        if (filterNodeTypeQName == null)
+        {
+            if ((includeFiles == null) && (includeFolders == null))
+            {
+                // no additional filtering
+                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
+            }
+            else if ((includeFiles != null) && (includeFolders != null))
+            {
+                if ((! includeFiles) && (! includeFolders))
+                {
+                    // no files or folders
+                    filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
+                }
+            }
+            else if ((includeFiles != null) && (! includeFiles))
+            {
+                // no files
+                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
+            }
+            else if ((includeFolders != null) && (! includeFolders))
+            {
+                // no folders
+                filterNodeTypeQName = ContentModel.TYPE_CMOBJECT;
+            }
+        }
+
+        return buildSearchTypesAndIgnoreAspects(filterNodeTypeQName, filterIncludeSubTypes, ignoreQNames, includeFiles, includeFolders);
     }
 
     private Set<QName> getAspectsToIgnore(Set<QName> ignoreQNames)
@@ -1663,22 +1783,8 @@ public class NodesImpl implements Nodes
             nodeRef = createNodeImpl(parentNodeRef, nodeName, nodeTypeQName, props, assocTypeQName);
         }
 
-        List<String> aspectNames = nodeInfo.getAspectNames();
-        if (aspectNames != null)
-        {
-            // node aspects - set any additional aspects
-            Set<QName> aspectQNames = mapToNodeAspects(aspectNames);
-            for (QName aspectQName : aspectQNames)
-            {
-                if (EXCLUDED_ASPECTS.contains(aspectQName) || aspectQName.equals(ContentModel.ASPECT_AUDITABLE))
-                {
-                    continue; // ignore
-                }
+        addCustomAspects(nodeRef, nodeInfo.getAspectNames(), EXCLUDED_ASPECTS);
 
-                nodeService.addAspect(nodeRef, aspectQName, null);
-            }
-        }
-        
         // eg. to create mandatory assoc(s)
 
         if (nodeInfo.getTargets() != null)
@@ -1698,6 +1804,25 @@ public class NodesImpl implements Nodes
         */
 
         return newNode;
+    }
+
+    public void addCustomAspects(NodeRef nodeRef, List<String> aspectNames, List<QName> excludedAspects)
+    {
+        if (aspectNames == null)
+        {
+            return;
+        }
+        // node aspects - set any additional aspects
+        Set<QName> aspectQNames = mapToNodeAspects(aspectNames);
+        for (QName aspectQName : aspectQNames)
+        {
+            if (excludedAspects.contains(aspectQName) || aspectQName.equals(ContentModel.ASPECT_AUDITABLE))
+            {
+                continue; // ignore
+            }
+
+            nodeService.addAspect(nodeRef, aspectQName, null);
+        }
     }
 
     private NodeRef getOrCreatePath(NodeRef parentNodeRef, String relativePath)
@@ -1957,9 +2082,16 @@ public class NodesImpl implements Nodes
         }
     }
 
-    // special case: additional node validation (pending common lower-level service support)
-    // for blacklist of system nodes that should not be deleted or locked, eg. Company Home, Sites, Data Dictionary
-    private boolean isSpecialNode(NodeRef nodeRef, QName type)
+
+    /**
+     * Check for special case: additional node validation (pending common lower-level service support)
+     * for blacklist of system nodes that should not be deleted or locked, eg. Company Home, Sites, Data Dictionary
+     *
+     * @param nodeRef
+     * @param type
+     * @return
+     */
+    protected boolean isSpecialNode(NodeRef nodeRef, QName type)
     {
         // Check for Company Home, Sites and Data Dictionary (note: must be tenant-aware)
 
@@ -2038,7 +2170,7 @@ public class NodesImpl implements Nodes
     
     protected NodeRef updateNodeImpl(String nodeId, Node nodeInfo, Parameters parameters)
     {
-        final NodeRef nodeRef = validateNode(nodeId);
+        final NodeRef nodeRef = validateOrLookupNode(nodeId, null);
 
         QName nodeTypeQName = getNodeType(nodeRef);
 
@@ -2056,6 +2188,113 @@ public class NodesImpl implements Nodes
         {
             // update node name if needed - note: if the name is different than existing then this is equivalent of a rename (within parent folder)
             props.put(ContentModel.PROP_NAME, name);
+        }
+
+        NodePermissions nodePerms = nodeInfo.getPermissions();
+        if (nodePerms != null)
+        {
+            // Cannot set inherited permissions, only direct (locally set) permissions can be set
+            if ((nodePerms.getInherited() != null) && (nodePerms.getInherited().size() > 0))
+            {
+                throw new InvalidArgumentException("Cannot set *inherited* permissions on this node");
+            }
+
+            // Check inherit from parent value and if it's changed set the new value
+            if (nodePerms.getIsInheritanceEnabled() != null)
+            {
+                if (nodePerms.getIsInheritanceEnabled() != permissionService.getInheritParentPermissions(nodeRef))
+                {
+                    permissionService.setInheritParentPermissions(nodeRef, nodePerms.getIsInheritanceEnabled());
+                }
+            }
+
+            // set direct permissions
+            if ((nodePerms.getLocallySet() != null))
+            {
+                // list of all directly set permissions
+                Set<AccessPermission> directPerms = new HashSet<>(5);
+                for (AccessPermission accessPerm : permissionService.getAllSetPermissions(nodeRef))
+                {
+                    if (accessPerm.isSetDirectly()) 
+                    {
+                        directPerms.add(accessPerm);
+                    }
+                }
+
+                //
+                // replace (or clear) set of direct permissions
+                //
+
+                // TODO cleanup the way we replace permissions (ie. add, update and delete)
+
+                // check if same permission is sent more than once
+                if (hasDuplicatePermissions(nodePerms.getLocallySet()))
+                {
+                    throw new InvalidArgumentException("Duplicate node permissions, there is more than one permission with the same authority and name!");
+                }
+                
+                for (NodePermissions.NodePermission nodePerm : nodePerms.getLocallySet())
+                {
+                    String permName = nodePerm.getName();
+                    String authorityId = nodePerm.getAuthorityId();
+
+                    AccessStatus accessStatus = AccessStatus.ALLOWED;
+                    if (nodePerm.getAccessStatus() != null)
+                    {
+                        accessStatus = AccessStatus.valueOf(nodePerm.getAccessStatus());
+                    }
+
+                    if ((authorityId == null) || 
+                         ((! authorityId.equals(PermissionService.ALL_AUTHORITIES) && (! authorityService.authorityExists(authorityId)))))
+                    {
+                        throw new InvalidArgumentException("Cannot set permissions on this node - unknown authority: "+authorityId);
+                    }
+
+                    AccessPermission existing = null;
+                    boolean addPerm = true;
+                    boolean updatePerm = false;
+
+                    // If the permission already exists but with different access status it will be updated
+                    for (AccessPermission accessPerm : directPerms)
+                    {
+                        if (accessPerm.getAuthority().equals(authorityId) && accessPerm.getPermission().equals(permName))
+                        {
+                            existing = accessPerm;
+                            addPerm = false;
+
+                            if (accessPerm.getAccessStatus() != accessStatus)
+                            {
+                                updatePerm = true;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (existing != null)
+                    {
+                        // ignore existing permissions
+                        directPerms.remove(existing);
+                    }
+
+                    if (addPerm || updatePerm)
+                    {
+                        try
+                        {
+                            permissionService.setPermission(nodeRef, authorityId, permName, (accessStatus == AccessStatus.ALLOWED));
+                        }
+                        catch (UnsupportedOperationException e)
+                        {
+                            throw new InvalidArgumentException("Cannot set permissions on this node - unknown access level: " + permName);
+                        }
+                    }
+                }
+
+                // remove any remaining direct perms
+                for (AccessPermission accessPerm : directPerms)
+                {
+                    permissionService.deletePermission(nodeRef, accessPerm.getAuthority(), accessPerm.getPermission());
+                }
+            }
         }
 
         String nodeType = nodeInfo.getNodeType();
@@ -2094,6 +2333,48 @@ public class NodesImpl implements Nodes
         }
 
         List<String> aspectNames = nodeInfo.getAspectNames();
+        updateCustomAspects(nodeRef, aspectNames, EXCLUDED_ASPECTS);
+
+        if (props.size() > 0)
+        {
+            validatePropValues(props);
+
+            try
+            {
+                // update node properties - note: null will unset the specified property
+                nodeService.addProperties(nodeRef, props);
+            }
+            catch (DuplicateChildNodeNameException dcne)
+            {
+                throw new ConstraintViolatedException(dcne.getMessage());
+            }
+        }
+        
+        return nodeRef;
+    }
+
+    @Override
+    public Node moveOrCopyNode(String sourceNodeId, String targetParentId, String name, Parameters parameters, boolean isCopy)
+    {
+        if ((sourceNodeId == null) || (sourceNodeId.isEmpty()))
+        {
+            throw new InvalidArgumentException("Missing sourceNodeId");
+        }
+
+        if ((targetParentId == null) || (targetParentId.isEmpty()))
+        {
+            throw new InvalidArgumentException("Missing targetParentId");
+        }
+
+        final NodeRef parentNodeRef = validateOrLookupNode(targetParentId, null);
+        final NodeRef sourceNodeRef = validateOrLookupNode(sourceNodeId, null);
+
+        FileInfo fi = moveOrCopyImpl(sourceNodeRef, parentNodeRef, name, isCopy);
+        return getFolderOrDocument(fi.getNodeRef().getId(), parameters);
+    }
+    
+    public void updateCustomAspects(NodeRef nodeRef, List<String> aspectNames, List<QName> excludedAspects)
+    {
         if (aspectNames != null)
         {
             // update aspects - note: can be empty (eg. to remove existing aspects+properties) but not cm:auditable, sys:referencable, sys:localized
@@ -2107,7 +2388,7 @@ public class NodesImpl implements Nodes
 
             for (QName aspectQName : aspectQNames)
             {
-                if (EXCLUDED_NS.contains(aspectQName.getNamespaceURI()) || EXCLUDED_ASPECTS.contains(aspectQName) || aspectQName.equals(ContentModel.ASPECT_AUDITABLE))
+                if (EXCLUDED_NS.contains(aspectQName.getNamespaceURI()) || excludedAspects.contains(aspectQName) || aspectQName.equals(ContentModel.ASPECT_AUDITABLE))
                 {
                     continue; // ignore
                 }
@@ -2120,7 +2401,7 @@ public class NodesImpl implements Nodes
 
             for (QName existingAspect : existingAspects)
             {
-                if (EXCLUDED_NS.contains(existingAspect.getNamespaceURI()) || EXCLUDED_ASPECTS.contains(existingAspect) || existingAspect.equals(ContentModel.ASPECT_AUDITABLE))
+                if (EXCLUDED_NS.contains(existingAspect.getNamespaceURI()) || excludedAspects.contains(existingAspect) || existingAspect.equals(ContentModel.ASPECT_AUDITABLE))
                 {
                     continue; // ignore
                 }
@@ -2163,45 +2444,8 @@ public class NodesImpl implements Nodes
                 nodeService.addAspect(nodeRef, aQName, null);
             }
         }
-
-        if (props.size() > 0)
-        {
-            validatePropValues(props);
-
-            try
-            {
-                // update node properties - note: null will unset the specified property
-                nodeService.addProperties(nodeRef, props);
-            }
-            catch (DuplicateChildNodeNameException dcne)
-            {
-                throw new ConstraintViolatedException(dcne.getMessage());
-            }
-        }
-        
-        return nodeRef;
     }
-
-    @Override
-    public Node moveOrCopyNode(String sourceNodeId, String targetParentId, String name, Parameters parameters, boolean isCopy)
-    {
-        if ((sourceNodeId == null) || (sourceNodeId.isEmpty()))
-        {
-            throw new InvalidArgumentException("Missing sourceNodeId");
-        }
-
-        if ((targetParentId == null) || (targetParentId.isEmpty()))
-        {
-            throw new InvalidArgumentException("Missing targetParentId");
-        }
-
-        final NodeRef parentNodeRef = validateOrLookupNode(targetParentId, null);
-        final NodeRef sourceNodeRef = validateOrLookupNode(sourceNodeId, null);
-
-        FileInfo fi = moveOrCopyImpl(sourceNodeRef, parentNodeRef, name, isCopy);
-        return getFolderOrDocument(fi.getNodeRef().getId(), parameters);
-    }
-
+    
     protected FileInfo moveOrCopyImpl(NodeRef nodeRef, NodeRef parentNodeRef, String name, boolean isCopy)
     {
         String targetParentId = parentNodeRef.getId();
@@ -2931,9 +3175,10 @@ public class NodesImpl implements Nodes
      * Helper to create a QName from either a fully qualified or short-name QName string
      *
      * @param qnameStrList list of fully qualified or short-name QName string
+     * @param excludedProps
      * @return a list of {@code QName} objects
      */
-    protected List<QName> createQNames(List<String> qnameStrList)
+    protected List<QName> createQNames(List<String> qnameStrList, List<QName> excludedProps)
     {
         String PREFIX = PARAM_INCLUDE_PROPERTIES +"/";
 
@@ -2946,7 +3191,7 @@ public class NodesImpl implements Nodes
             }
 
             QName name = createQName(str);
-            if (!EXCLUDED_PROPS.contains(name))
+            if (!excludedProps.contains(name))
             {
                 result.add(name);
             }
@@ -2966,7 +3211,7 @@ public class NodesImpl implements Nodes
 
         if (!nodeMatches(nodeRef, Collections.singleton(ContentModel.TYPE_CONTENT), null, false))
         {
-            throw new InvalidArgumentException("Node of type cm:content  or a subtype is expected: " + nodeId);
+            throw new InvalidArgumentException("Node of type cm:content or a subtype is expected: " + nodeId);
         }
 
         lockInfo = validateLockInformation(lockInfo);
@@ -3009,6 +3254,26 @@ public class NodesImpl implements Nodes
         
         lockService.unlock(nodeRef);
         return getFolderOrDocument(nodeId, parameters);
+    }
+
+    /**
+     * Checks if same permission is sent more than once
+     * @param locallySetPermissions
+     * @return
+     */
+    private boolean hasDuplicatePermissions(List<NodePermissions.NodePermission> locallySetPermissions)
+    {
+        boolean duplicate = false;
+        if (locallySetPermissions != null)
+        {
+            HashSet<NodePermissions.NodePermission> temp = new HashSet<>(locallySetPermissions.size());
+            for (NodePermissions.NodePermission permission : locallySetPermissions)
+            {
+                temp.add(permission);
+            }
+            duplicate = (locallySetPermissions.size() != temp.size());
+        }
+        return duplicate;
     }
 
     /**
@@ -3071,5 +3336,110 @@ public class NodesImpl implements Nodes
         }
     }
     */
+
+    protected NodeService getNodeService()
+    {
+        return nodeService;
+    }
+
+    protected DictionaryService getDictionaryService()
+    {
+        return dictionaryService;
+    }
+
+    protected FileFolderService getFileFolderService()
+    {
+        return fileFolderService;
+    }
+
+    protected NamespaceService getNamespaceService()
+    {
+        return namespaceService;
+    }
+
+    protected PermissionService getPermissionService()
+    {
+        return permissionService;
+    }
+
+    protected MimetypeService getMimetypeService()
+    {
+        return mimetypeService;
+    }
+
+    protected ContentService getContentService()
+    {
+        return contentService;
+    }
+
+    protected ActionService getActionService()
+    {
+        return actionService;
+    }
+
+    protected VersionService getVersionService()
+    {
+        return versionService;
+    }
+
+    protected PersonService getPersonService()
+    {
+        return personService;
+    }
+
+    protected OwnableService getOwnableService()
+    {
+        return ownableService;
+    }
+
+    protected AuthorityService getAuthorityService()
+    {
+        return authorityService;
+    }
+
+    protected ThumbnailService getThumbnailService()
+    {
+        return thumbnailService;
+    }
+
+    protected SiteService getSiteService()
+    {
+        return siteService;
+    }
+
+    protected ActivityPoster getPoster()
+    {
+        return poster;
+    }
+
+    protected RetryingTransactionHelper getRetryingTransactionHelper()
+    {
+        return retryingTransactionHelper;
+    }
+
+    protected NodeAssocService getNodeAssocService()
+    {
+        return nodeAssocService;
+    }
+
+    protected LockService getLockService()
+    {
+        return lockService;
+    }
+
+    protected VirtualStore getSmartStore()
+    {
+        return smartStore;
+    }
+
+    protected QuickShareLinks getQuickShareLinks()
+    {
+        return quickShareLinks;
+    }
+
+    protected Repository getRepositoryHelper()
+    {
+        return repositoryHelper;
+    }
 }
 

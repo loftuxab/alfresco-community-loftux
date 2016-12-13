@@ -1,0 +1,6 @@
+The project was moved to git: https://gitlab.alfresco.com/platform/alfresco-data-model
+
+The history can be searched by using commands like:
+
+svn log -l <number of last revisions to show>
+svn diff -c <the revision number to diff>

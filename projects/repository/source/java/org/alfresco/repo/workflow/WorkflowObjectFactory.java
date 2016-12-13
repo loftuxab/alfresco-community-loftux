@@ -209,7 +209,7 @@ public class WorkflowObjectFactory
             boolean isDefault, String... baseLabelKeys)
     {
         String title = getLabel(baseLabelKeys, TITLE_LABEL, defaultTitle);
-        String description = getLabel(baseLabelKeys, TITLE_LABEL, defaultDescription);
+        String description = getLabel(baseLabelKeys, DESC_LABEL, defaultDescription);
         return new WorkflowTransition(id, title, description, isDefault);
     }
     
@@ -469,10 +469,10 @@ public class WorkflowObjectFactory
     }
     
         /**
-     * Map QName to jBPM variable name
+     * Map QName to workflow variable name
      * 
      * @param name  QName
-     * @return  jBPM variable name
+     * @return  workflow variable name
      */
     public String mapQNameToName(QName name)
     {
@@ -480,10 +480,10 @@ public class WorkflowObjectFactory
     }
     
     /**
-     * Map QName to jBPM variable name
+     * Map QName to workflow variable name
      * 
      * @param name  QName
-     * @return  jBPM variable name
+     * @return  workflow variable name
      */
     public QName mapNameToQName(String name)
     {

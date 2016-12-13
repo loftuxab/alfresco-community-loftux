@@ -43,12 +43,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.alfresco.repo.content.ContentLimitProvider.SimpleFixedLimitProvider;
 import org.alfresco.repo.content.MimetypeMap;
@@ -58,6 +60,7 @@ import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.rest.AbstractSingleNetworkSiteTest;
 import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.model.LockInfo;
+import org.alfresco.rest.api.model.NodePermissions;
 import org.alfresco.rest.api.model.NodeTarget;
 import org.alfresco.rest.api.model.Site;
 import org.alfresco.rest.api.nodes.NodesEntityResource;
@@ -82,11 +85,14 @@ import org.alfresco.rest.api.tests.util.RestApiUtil;
 import org.alfresco.service.cmr.lock.LockType;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessPermission;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
-import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -116,14 +122,19 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
     private static final String EMPTY_BODY = "{}";
 
     protected PermissionService permissionService;
+    protected AuthorityService authorityService;
 
-    
+    private String rootGroupName = null;
+    private String groupA = null;
+    private String groupB = null;
+
     @Before
     public void setup() throws Exception
     {
         super.setup();
 
         permissionService = applicationContext.getBean("permissionService", PermissionService.class);
+        authorityService = (AuthorityService) applicationContext.getBean("AuthorityService");
     }
     
     @After
@@ -518,6 +529,12 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         // -ve test - list folder children with relative path to unknown node should return 400
         params = Collections.singletonMap(Nodes.PARAM_RELATIVE_PATH, "/unknown");
         getAll(getNodeChildrenUrl(content1_Id), paging, params, 400);
+        
+        // filtering, via where clause - negated comparison
+        params = new HashMap<>();
+        params.put("where", "(NOT "+Nodes.PARAM_ISFILE+"=true)");
+        getAll(childrenUrl, paging, params, 400);
+        
     }
 
     /**
@@ -2948,6 +2965,49 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
             assertEquals("1.3", nodeResp.getProperties().get("cm:versionLabel"));
         }
 
+        // update folder(s) via well-known aliases rather than node id
+
+        // note: as of now, the platform does allow a user to modify their home folder [this may change in the future, if so adjust the test accordingly]
+        response = getSingle(URL_NODES, Nodes.PATH_MY, 200);
+        Folder user1MyFolder = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Folder.class);
+        String user1MyFolderId = user1MyFolder.getId();
+
+        String description = "my folder description "+RUNID;
+        props = new HashMap<>();
+        props.put("cm:description", description);
+
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+
+        response = put(URL_NODES, Nodes.PATH_MY, toJsonAsStringNonNull(fUpdate), null, 200);
+        folderResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Folder.class);
+        assertEquals(description, folderResp.getProperties().get("cm:description"));
+
+        setRequestContext(networkAdmin);
+
+        props = new HashMap<>();
+        props.put("cm:description", description);
+
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+
+        response = put(URL_NODES, Nodes.PATH_ROOT, toJsonAsStringNonNull(fUpdate), null, 200);
+        folderResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Folder.class);
+        assertEquals(description, folderResp.getProperties().get("cm:description"));
+
+        props = new HashMap<>();
+        props.put("cm:description", description);
+
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+
+        response = put(URL_NODES, Nodes.PATH_SHARED, toJsonAsStringNonNull(fUpdate), null, 200);
+        folderResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Folder.class);
+        assertEquals(description, folderResp.getProperties().get("cm:description"));
+
+
+        setRequestContext(user1);
+
         // -ve test - fail on unknown property
         props = new HashMap<>();
         props.put("cm:xyz","my unknown property");
@@ -2997,6 +3057,46 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         fUpdate = new Folder();
         fUpdate.setProperties(props);
         put(URL_NODES, f2Id, toJsonAsStringNonNull(fUpdate), null, 400);
+
+        // -ve test - minor: error code if trying to update property with invalid format (REPO-1635)
+        props = new HashMap<>();
+        props.put("exif:dateTimeOriginal", "25-11-2016");
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+        put(URL_NODES, f2Id, toJsonAsStringNonNull(fUpdate), null, 400);
+        
+        // +ve test - try again with valid formats (REPO-473, REPO-1635)
+        props = new HashMap<>();
+        props.put("exif:pixelYDimension", "123");
+        props.put("exif:dateTimeOriginal", "2016-11-21T16:26:19.037+0000");
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+        put(URL_NODES, f2Id, toJsonAsStringNonNull(fUpdate), null, 200);
+        
+        
+        // -ve test - non-admin cannot modify root (Company Home) folder
+        props = new HashMap<>();
+        props.put("cm:description", "my folder description");
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+        put(URL_NODES, Nodes.PATH_ROOT, toJsonAsStringNonNull(fUpdate), null, 403);
+
+        // -ve test - non-admin cannot modify "Shared" folder
+        props = new HashMap<>();
+        props.put("cm:description", "my folder description");
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+        put(URL_NODES, Nodes.PATH_SHARED, toJsonAsStringNonNull(fUpdate), null, 403);
+
+        setRequestContext(user2);
+
+        // -ve test - user cannot modify another user's home folder
+        props = new HashMap<>();
+        props.put("cm:description", "my folder description");
+        fUpdate = new Folder();
+        fUpdate.setProperties(props);
+        put(URL_NODES, user1MyFolderId, toJsonAsStringNonNull(fUpdate), null, 403);
+
     }
 
     /**
@@ -3421,10 +3521,11 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = getSingle(NodesEntityResource.class, getMyNodeId(), params, 200);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(3, nodeResp.getAllowableOperations().size());
+        assertEquals(4, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // create folder
         nodeResp = createFolder(sharedNodeId, "folder 1 - "+RUNID);
@@ -3438,10 +3539,11 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = getSingle(NodesEntityResource.class, folderId, params, 200);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(3, nodeResp.getAllowableOperations().size());
+        assertEquals(4, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // create file
         nodeResp = createTextFile(folderId, "my file - "+RUNID+".txt", "The quick brown fox jumps over the lazy dog");
@@ -3456,9 +3558,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = getSingle(NodesEntityResource.class, fileId, params, 200);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
 
         // as user2 ...
@@ -3486,34 +3589,38 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = publicApiClient.get(NodesEntityResource.class, folderId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(3, nodeResp.getAllowableOperations().size());
+        assertEquals(4, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // a file - no create
         response = publicApiClient.get(NodesEntityResource.class, fileId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         response = publicApiClient.get(NodesEntityResource.class, sharedNodeId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(3, nodeResp.getAllowableOperations().size());
+        assertEquals(4, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_DELETE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // Company Home - no delete
         response = publicApiClient.get(NodesEntityResource.class, rootNodeId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // -ve
         deleteNode(rootNodeId, 403);
@@ -3522,9 +3629,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = publicApiClient.get(NodesEntityResource.class, sitesNodeId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // -ve
         deleteNode(sitesNodeId, 403);
@@ -3533,9 +3641,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         response = publicApiClient.get(NodesEntityResource.class, ddNodeId, null, params);
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // -ve
         deleteNode(ddNodeId, 403);
@@ -3554,9 +3663,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
         assertEquals(userId, nodeResp.getCreatedByUser().getId());
         assertNotNull(nodeResp.getAllowableOperations());
-        assertEquals(2, nodeResp.getAllowableOperations().size());
+        assertEquals(3, nodeResp.getAllowableOperations().size());
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_CREATE));
         assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE));
+        assertTrue(nodeResp.getAllowableOperations().contains(Nodes.OP_UPDATE_PERMISSIONS));
 
         // -ve
         deleteNode(siteNodeId, 403);
@@ -3594,30 +3704,24 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         // create folder
         Folder folderResp = createFolder(Nodes.PATH_MY, "folder" + RUNID);
         String folderId = folderResp.getId();
-
-        // create doc d1
-        String d1Name = "content" + RUNID + "_1l";
-        Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
-        String d1Id = d1.getId();
-
-        HttpResponse response = getSingle(URL_NODES, d1Id, null, null, 200);
-        Node node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
-        assertNull(node.getProperties().get("cm:lockType"));
-        assertNull(node.getProperties().get("cm:lockOwner"));
-        assertNull(node.getIsLocked());
-
-        Map<String, String> params = Collections.singletonMap("include", "isLocked");
-        response = getSingle(URL_NODES, d1Id, params, null, 200);
-        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
-        assertNull(node.getProperties().get("cm:lockType"));
-        assertNull(node.getProperties().get("cm:lockOwner"));
-        assertFalse(node.getIsLocked());
-
+        
+        // try to lock the folder and check that is not allowed
         LockInfo lockInfo = new LockInfo();
         lockInfo.setTimeToExpire(60);
         lockInfo.setType("FULL");
         lockInfo.setLifetime("PERSISTENT");
-
+        HttpResponse response = post(getNodeOperationUrl(folderId, "lock"), toJsonAsStringNonNull(lockInfo), null, 400);
+        
+        // create document d1
+        String d1Name = "content" + RUNID + "_1l";
+        Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
+        String d1Id = d1.getId();
+        
+        // lock d1 document
+        lockInfo = new LockInfo();
+        lockInfo.setTimeToExpire(30);
+        lockInfo.setType("FULL");
+        lockInfo.setLifetime("PERSISTENT");
         response = post(getNodeOperationUrl(d1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
         Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
 
@@ -3626,20 +3730,59 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         assertEquals(LockType.READ_ONLY_LOCK.toString(), documentResp.getProperties().get("cm:lockType"));
         assertNotNull(documentResp.getProperties().get("cm:lockOwner"));
         assertNull(documentResp.getIsLocked());
+        
+        // invalid test - delete a locked node
+        deleteNode(d1Id, true, 409);
+        
+        // wait for expiration time set to pass and delete node
+		TimeUnit.SECONDS.sleep(30);
+		deleteNode(d1Id, true, 204);
+       
+        // create doc d2
+        String d2Name = "content" + RUNID + "_2l";
+        Document d2 = createTextFile(folderId, d2Name, "The quick brown fox jumps over the lazy dog 2.");
+        String d2Id = d2.getId();
 
-        unlock(d1Id);
+        response = getSingle(URL_NODES, d2Id, null, null, 200);
+        Node node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(node.getProperties().get("cm:lockType"));
+        assertNull(node.getProperties().get("cm:lockOwner"));
+        assertNull(node.getIsLocked());
+
+        Map<String, String> params = Collections.singletonMap("include", "isLocked");
+        response = getSingle(URL_NODES, d2Id, params, null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(node.getProperties().get("cm:lockType"));
+        assertNull(node.getProperties().get("cm:lockOwner"));
+        assertFalse(node.getIsLocked());
+
+        lockInfo = new LockInfo();
+        lockInfo.setTimeToExpire(60);
+        lockInfo.setType("FULL");
+        lockInfo.setLifetime("PERSISTENT");
+
+        response = post(getNodeOperationUrl(d2Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+        documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        assertEquals(d2Name, documentResp.getName());
+        assertEquals(d2Id, documentResp.getId());
+        assertEquals(LockType.READ_ONLY_LOCK.toString(), documentResp.getProperties().get("cm:lockType"));
+        assertNotNull(documentResp.getProperties().get("cm:lockOwner"));
+        assertNull(documentResp.getIsLocked());
+
+        unlock(d2Id);
         // Empty lock body, the default values are used
-        post(getNodeOperationUrl(d1Id, "lock"), EMPTY_BODY, null, 200);
+        post(getNodeOperationUrl(d2Id, "lock"), EMPTY_BODY, null, 200);
 
         // Lock on already locked node
-        post(getNodeOperationUrl(d1Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
+        post(getNodeOperationUrl(d2Id, "lock"), toJsonAsStringNonNull(lockInfo), null, 200);
 
         // Test delete on a folder which contains a locked node - NodeLockedException
         deleteNode(folderId, true, 409);
 
         // Content update on a locked node
-        updateTextFile(d1Id, "Updated text", null, 409);
-        unlock(d1Id);
+        updateTextFile(d2Id, "Updated text", null, 409);
+        unlock(d2Id);
 
         // Test lock file
         // create folder
@@ -3739,6 +3882,10 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
         post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
 
         body = new HashMap<>();
+        body.put("includeChildren", "true");
+        post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
+        
+        body = new HashMap<>();
         body.put("timeToExpire", "NaN");
         post(getNodeOperationUrl(dC1Id, "lock"), toJsonAsStringNonNull(body), null, 400);
 
@@ -3761,64 +3908,696 @@ public class NodeApiTest extends AbstractSingleNetworkSiteTest
     }
 
 
-   /**
-    * Tests unlock of a node
-    * <p>POST:</p>
-    * {@literal <host>:<port>/alfresco/api/-default-/public/alfresco/versions/1/nodes/<nodeId>/unlock}
-    */
-   @Test
-   public void testUnlock() throws Exception
-   {
-       setRequestContext(user1);
+    /**
+     * Tests unlock of a node
+     * <p>POST:</p>
+     * {@literal <host>:<port>/alfresco/api/-default-/public/alfresco/versions/1/nodes/<nodeId>/unlock}
+     */
+    @Test
+    public void testUnlock() throws Exception
+    {
+        setRequestContext(user1);
 
-       // create folder
-       Folder folderResp = createFolder(Nodes.PATH_MY, "folder" + RUNID);
-       String folderId = folderResp.getId();
+        // create folder
+        Folder folderResp = createFolder(Nodes.PATH_MY, "folder" + RUNID);
+        String folderId = folderResp.getId();
 
-       // create doc d1
-       String d1Name = "content" + RUNID + "_1l";
-       Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
-       String d1Id = d1.getId();
+        // create doc d1
+        String d1Name = "content" + RUNID + "_1l";
+        Document d1 = createTextFile(folderId, d1Name, "The quick brown fox jumps over the lazy dog 1.");
+        String d1Id = d1.getId();
 
-       lock(d1Id, EMPTY_BODY);
+        lock(d1Id, EMPTY_BODY);
 
-       HttpResponse response = post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
-       Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+        HttpResponse response = post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
 
-       assertEquals(d1Name, documentResp.getName());
-       assertEquals(d1Id, documentResp.getId());
-       assertNull(documentResp.getProperties().get("cm:lockType"));
-       assertNull(documentResp.getProperties().get("cm:lockOwner"));
+        assertEquals(d1Name, documentResp.getName());
+        assertEquals(d1Id, documentResp.getId());
+        assertNull(documentResp.getProperties().get("cm:lockType"));
+        assertNull(documentResp.getProperties().get("cm:lockOwner"));
 
-       lock(d1Id, EMPTY_BODY);
-       // Users with admin rights can unlock nodes locked by other users.
-       setRequestContext(networkAdmin);
-       post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
+        lock(d1Id, EMPTY_BODY);
+        // Users with admin rights can unlock nodes locked by other users.
+        setRequestContext(networkAdmin);
+        post(getNodeOperationUrl(d1Id, "unlock"), null, null, 200);
 
-       // -ve
-       // Missing target node
-       post(getNodeOperationUrl("fakeId", "unlock"), null, null, 404);
+        // -ve
+        // Missing target node
+        post(getNodeOperationUrl("fakeId", "unlock"), null, null, 404);
 
-       // Unlock by a user without permission
-       lock(d1Id, EMPTY_BODY);
-       setRequestContext(user2);
-       post(getNodeOperationUrl(d1Id, "unlock"), null, null, 403);
+        // Unlock by a user without permission
+        lock(d1Id, EMPTY_BODY);
+        setRequestContext(user2);
+        post(getNodeOperationUrl(d1Id, "unlock"), null, null, 403);
 
-       setRequestContext(user1);
-       //Unlock on a not locked node
-       post(getNodeOperationUrl(folderId, "unlock"), null, null, 422);
+        setRequestContext(user1);
 
-       // clean up
-       setRequestContext(user1); // all locks were made by user1
+        //Unlock on a not locked node
+        post(getNodeOperationUrl(folderId, "unlock"), null, null, 422);
 
-       unlock(d1Id);
-       deleteNode(folderId);
-   }
+        // clean up
+        setRequestContext(user1); // all locks were made by user1
 
-   @Override
-   public String getScope()
-   {
-       return "public";
-   }
+        unlock(d1Id);
+        deleteNode(folderId);
+    }
+
+    /**
+     * Creates authority context
+     *
+     * @param user
+     * @return
+     */
+    private void createAuthorityContext(String user)
+    {
+        String groupName = "Group_ROOT" + GUID.generate();
+
+        AuthenticationUtil.setRunAsUser(user);
+        if (rootGroupName == null)
+        {
+            rootGroupName = authorityService.getName(AuthorityType.GROUP, groupName);
+        }
+
+        if (!authorityService.authorityExists(rootGroupName))
+        {
+            AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
+            rootGroupName = authorityService.createAuthority(AuthorityType.GROUP, groupName);
+            groupA = authorityService.createAuthority(AuthorityType.GROUP, "Test_GroupA");
+            authorityService.addAuthority(rootGroupName, groupA);
+            groupB = authorityService.createAuthority(AuthorityType.GROUP, "Test_GroupB");
+            authorityService.addAuthority(rootGroupName, groupB);
+            authorityService.addAuthority(groupA, user1);
+            authorityService.addAuthority(groupB, user2);
+        }
+    }
+
+    /**
+     * Clears authority context: removes root group and all child groups
+     */
+    private void clearAuthorityContext()
+    {
+        if (authorityService.authorityExists(rootGroupName))
+        {
+            AuthenticationUtil.setAdminUserAsFullyAuthenticatedUser();
+            authorityService.deleteAuthority(rootGroupName, true);
+        }
+    }
+
+    @Test
+    public void testRetrievePermissions() throws Exception
+    {
+        try
+        {
+            createAuthorityContext(user1);
+            testRetrieveNodePermissionsSpecialNodes();
+            testRetrieveNodePermissions();
+        }
+        finally
+        {
+            clearAuthorityContext();
+        }
+    }
+
+    /**
+     * Test retrieve node permissions for special nodes like:
+     * 'Company Home', 'Data Dictionary', 'Shared', 'Sites', 'User Home'
+     *
+     * @throws Exception
+     */
+    private void testRetrieveNodePermissionsSpecialNodes() throws Exception
+    {
+        setRequestContext(user1);
+        String rootNodeId = getRootNodeId();
+        String userHome = getMyNodeId();
+        String sharedFolder = getSharedNodeId();
+        String sitesNodeId = getSitesNodeId();
+        String ddNodeId = getDataDictionaryNodeId();
+
+        Map params = new HashMap<>();
+        params.put("include", "permissions");
+
+        // Test permissions for node 'Company Home'
+        HttpResponse response = getSingle(NodesEntityResource.class, rootNodeId, params, 200);
+        Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(nodeResp.getPermissions());
+
+        // Test permissions for node 'Sites'
+        response = getSingle(NodesEntityResource.class, sitesNodeId, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(nodeResp.getPermissions());
+
+        // Test permissions for node 'Data Dictionary'
+        response = getSingle(NodesEntityResource.class, ddNodeId, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNull(nodeResp.getPermissions());
+
+        // Test permissions for node 'Shared Folder'
+        response = getSingle(NodesEntityResource.class, sharedFolder, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNotNull(nodeResp.getPermissions());
+
+        Set<String> expectedSettable = new HashSet<>(Arrays.asList("Coordinator", "Collaborator", "Contributor", "Consumer", "Editor"));
+
+        // Test permissions for node 'User Home'
+        response = getSingle(NodesEntityResource.class, userHome, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertNotNull(nodeResp.getPermissions());
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+        assertFalse(nodeResp.getPermissions().getIsInheritanceEnabled());
+
+        // Try as admin
+        setRequestContext(networkAdmin);
+
+        // Test permissions for node 'Company Home'
+        response = getSingle(NodesEntityResource.class, rootNodeId, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertFalse(nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNull(nodeResp.getPermissions().getInherited());
+        assertNotNull(nodeResp.getPermissions().getLocallySet());
+        assertTrue(nodeResp.getPermissions().getLocallySet().contains(new NodePermissions.NodePermission("GROUP_EVERYONE", PermissionService.CONSUMER, AccessStatus.ALLOWED.toString())));
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+
+        // Test permissions for node 'Sites'
+        response = getSingle(NodesEntityResource.class, sitesNodeId, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertTrue(nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNotNull(nodeResp.getPermissions().getInherited());
+        assertTrue(nodeResp.getPermissions().getInherited().contains(new NodePermissions.NodePermission("GROUP_EVERYONE", PermissionService.CONSUMER, AccessStatus.ALLOWED.toString())));
+        assertNull(nodeResp.getPermissions().getLocallySet());
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+
+        // Test permissions for node 'Data Dictionary'
+        response = getSingle(NodesEntityResource.class, ddNodeId, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertFalse(nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNull(nodeResp.getPermissions().getInherited());
+        assertNotNull(nodeResp.getPermissions().getLocallySet());
+        assertTrue(nodeResp.getPermissions().getLocallySet().contains(new NodePermissions.NodePermission("GROUP_EVERYONE", PermissionService.CONSUMER, AccessStatus.ALLOWED.toString())));
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+
+        // Test permissions for node 'Shared Folder'
+        response = getSingle(NodesEntityResource.class, sharedFolder, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertFalse(nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNull(nodeResp.getPermissions().getInherited());
+        assertNotNull(nodeResp.getPermissions().getLocallySet());
+        assertTrue(nodeResp.getPermissions().getLocallySet().contains(new NodePermissions.NodePermission("GROUP_EVERYONE", PermissionService.CONTRIBUTOR, AccessStatus.ALLOWED.toString())));
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+
+        // Test permissions for node 'User Home'
+        response = getSingle(NodesEntityResource.class, userHome, params, 200);
+        nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        assertFalse(nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNull(nodeResp.getPermissions().getInherited());
+        assertNotNull(nodeResp.getPermissions().getLocallySet());
+        assertTrue(nodeResp.getPermissions().getLocallySet().contains(new NodePermissions.NodePermission("ROLE_OWNER", "All", AccessStatus.ALLOWED.toString())));
+        assertTrue(nodeResp.getPermissions().getLocallySet().contains(new NodePermissions.NodePermission(user1, "All", AccessStatus.ALLOWED.toString())));
+        assertNotNull(nodeResp.getPermissions().getSettable());
+        assertTrue("Incorrect list of settable permissions returned!", nodeResp.getPermissions().getSettable().containsAll(expectedSettable));
+
+    }
+
+    private void testRetrieveNodePermissions() throws Exception
+    {
+        setRequestContext(user1);
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String docId = createDocument(postUrl);
+
+        Map params = new HashMap<>();
+        params.put("include", "permissions");
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupB, PermissionService.CONSUMER, AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // update node
+        HttpResponse response = put(URL_NODES, docId, toJsonAsStringNonNull(dUpdate), null, 200);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        // Check if permission are retrieved if 'include=permissions' is not
+        // sent in the request
+        response = getSingle(NodesEntityResource.class, documentResp.getId(), null, 200);
+        documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+        assertNull("Permissions should not be retrieved unless included!", documentResp.getPermissions());
+
+        // Call again with 'include=permissions'
+        response = getSingle(NodesEntityResource.class, documentResp.getId(), params, 200);
+        documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+        // Check that all permissions are retrieved
+        assertNotNull(documentResp.getPermissions());
+        assertTrue("Locally set permissions were not set properly!", documentResp.getPermissions().getLocallySet().size() == 2);
+        // Check inherit default true
+        assertTrue("Inheritance flag was not retrieved!", documentResp.getPermissions().getIsInheritanceEnabled());
+        // Check inherited permissions (for ROLE_OWNER and user1)
+        assertNotNull(documentResp.getPermissions().getInherited());
+        assertTrue(documentResp.getPermissions().getInherited().size() == 2);
+        assertNotNull(documentResp.getPermissions().getSettable());
+        assertTrue(documentResp.getPermissions().getSettable().size() == 5);
+        Set<String> expectedSettable = new HashSet<>(Arrays.asList("Coordinator", "Collaborator", "Contributor", "Consumer", "Editor"));
+        assertTrue("Incorrect list of settable permissions returned!", documentResp.getPermissions().getSettable().containsAll(expectedSettable));
+    }
+
+    /**
+     * Tests set permissions on an existing node
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUpdateNodePermissions() throws Exception
+    {
+        try
+        {
+            createAuthorityContext(networkAdmin);
+
+            setRequestContext(user1);
+            // +ve tests
+            testUpdatePermissionsOnNode();
+
+            // -ve tests
+            // invalid permission tests (authority, name or access level)
+            testUpdatePermissionInvalidAuthority();
+            testUpdatePermissionInvalidName();
+            testUpdatePermissionInvalidAccessStatus();
+            testUpdatePermissionAddDuplicate();
+
+            // 'Permission Denied' tests
+            testUpdatePermissionsPermissionDeniedUser();
+            testUpdatePermissionsOnSpecialNodes();
+
+            // Inherit from parent tests
+            testUpdatePermissionsDefaultInheritFromParent();
+            testUpdatePermissionsSetFalseInheritFromParent();
+        }
+        finally
+        {
+            clearAuthorityContext();
+        }
+    }
+
+    /**
+     * Test update permission on a node
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionsOnNode() throws Exception
+    {
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // update node
+        HttpResponse response = put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 200);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        validatePermissionsAfterUpdate(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), locallySetPermissions);
+
+        // Check permissions on node for user2 (part of groupB)
+        AuthenticationUtil.setRunAsUser(user2);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.CONSUMER) == AccessStatus.DENIED);
+
+        // Check permissions on node for user1 (part of groupA)
+        AuthenticationUtil.setRunAsUser(user1);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.CONSUMER) == AccessStatus.ALLOWED);
+
+        // add two groups with different permissions for each
+        locallySetPermissions.clear();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.EDITOR, AccessStatus.ALLOWED.toString()));
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupB, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // update node
+        response = put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 200);
+        documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        validatePermissionsAfterUpdate(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), locallySetPermissions);
+
+        // Check permissions on node for user2 (part of groupB)
+        AuthenticationUtil.setRunAsUser(user2);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.CONSUMER) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.EDITOR) == AccessStatus.DENIED);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.WRITE) == AccessStatus.DENIED);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.READ) == AccessStatus.ALLOWED);
+
+        // Check permissions on node for user1 (part of groupA)
+        AuthenticationUtil.setRunAsUser(user1);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.EDITOR) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.WRITE) == AccessStatus.ALLOWED);
+        assertTrue(permissionService.hasPermission(new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, documentResp.getId()), PermissionService.READ) == AccessStatus.ALLOWED);
+    }
+
+    /**
+     * Test attempt to set permission with an invalid authority
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionInvalidAuthority() throws Exception
+    {
+        // create folder containing an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission("NonExistingAuthority", PermissionService.CONSUMER, AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // "Cannot set permissions on this node - unknown authority:
+        // NonExistingAuthority"
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 400);
+    }
+
+    /**
+     * Test attempt to set permission with an invalid name
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionInvalidName() throws Exception
+    {
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, "InvalidName", AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // "Cannot set permissions on this node - unknown permission name:
+        // InvalidName"
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 400);
+    }
+
+    /**
+     * Test attempt to set permission with an invalid access status
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionInvalidAccessStatus() throws Exception
+    {
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, "InvalidAccessLevel"));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // "Cannot set permissions on this node - unknown access status:
+        // InvalidName"
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 400);
+    }
+
+    /**
+     * Test add duplicate permissions
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionAddDuplicate() throws Exception
+    {
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        // Add same permission with different access status
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // "Duplicate node permissions, there is more than one permission with
+        // the same authority and name!"
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 400);
+
+        // Add the same permission with same access status
+        locallySetPermissions.clear();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.ALLOWED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        // "Duplicate node permissions, there is more than one permission with
+        // the same authority and name!"
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 400);
+    }
+
+    /**
+     * Tests updating permissions on a node that user doesn't have permission for
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionsPermissionDeniedUser() throws Exception
+    {
+        // create folder with an empty document
+        String postUrl = createFolder();
+        String dId = createDocument(postUrl);
+
+        // update permissions
+        Document dUpdate = new Document();
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.CONSUMER, AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        dUpdate.setPermissions(nodePermissions);
+
+        setRequestContext(user2);
+        // "Permission Denied" expected
+        put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 403);
+    }
+
+    /**
+     * Test update permissions on special nodes like
+     * 'Company Home', 'Sites', 'Shared', 'User Home', 'Data Dictionary'
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionsOnSpecialNodes() throws Exception
+    {
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.EDITOR, AccessStatus.ALLOWED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+
+        // 'Company Home'
+        HttpResponse response = getSingle(NodesEntityResource.class, getRootNodeId(), null, 200);
+        Node node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        node.setPermissions(nodePermissions);
+        put(URL_NODES, node.getId(), toJsonAsStringNonNull(node), null, 403);
+
+        // 'Sites' folder
+        response = getSingle(NodesEntityResource.class, getSharedNodeId(), null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        node.setPermissions(nodePermissions);
+        put(URL_NODES, node.getId(), toJsonAsStringNonNull(node), null, 403);
+
+        // 'Data Dictionary' folder
+        response = getSingle(NodesEntityResource.class, getDataDictionaryNodeId(), null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        node.setPermissions(nodePermissions);
+        put(URL_NODES, node.getId(), toJsonAsStringNonNull(node), null, 403);
+
+        // 'Shared' folder
+        response = getSingle(NodesEntityResource.class, getSharedNodeId(), null, 200);
+        node = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        node.setPermissions(nodePermissions);
+        put(URL_NODES, node.getId(), toJsonAsStringNonNull(node), null, 403);
+
+        // 'User Home' folder
+        HttpResponse responseUserHome = getSingle(NodesEntityResource.class, getMyNodeId(), null, 200);
+        Node nodeUserHome = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        node.setPermissions(nodePermissions);
+        put(URL_NODES, node.getId(), toJsonAsStringNonNull(node), null, 403);
+    }
+
+    /**
+     * Test default inherit from parent
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionsDefaultInheritFromParent() throws Exception
+    {
+        // create folder
+        Folder folder = new Folder();
+        folder.setName("testFolder" + GUID.generate());
+        folder.setNodeType(TYPE_CM_FOLDER);
+
+        // set permissions on previously created folder
+        NodePermissions nodePermissions = new NodePermissions();
+        List<NodePermissions.NodePermission> locallySetPermissions = new ArrayList<>();
+        locallySetPermissions.add(new NodePermissions.NodePermission(groupA, PermissionService.EDITOR, AccessStatus.DENIED.toString()));
+        nodePermissions.setLocallySet(locallySetPermissions);
+        folder.setPermissions(nodePermissions);
+
+        HttpResponse response = post(getNodeChildrenUrl(Nodes.PATH_MY), RestApiUtil.toJsonAsStringNonNull(folder), 201);
+        Folder f = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Folder.class);
+
+        // create a new document in testFolder
+        String docId = createDocument(getNodeChildrenUrl(f.getId()));
+
+        Map params = new HashMap<>();
+        params.put("include", "permissions");
+
+        response = getSingle(NodesEntityResource.class, docId, params, 200);
+        Document docResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        assertTrue("Inheritance hasn't been enabled!", docResp.getPermissions().getIsInheritanceEnabled());
+        assertTrue("Permissions were not inherited from parent!", docResp.getPermissions().getInherited().size() > 0);
+    }
+
+    /**
+     * Test set inherit from parent to false
+     *
+     * @throws Exception
+     */
+    private void testUpdatePermissionsSetFalseInheritFromParent() throws Exception
+    {
+        // create folder
+        String testFolderUrl = createFolder();
+        String dId = createDocument(testFolderUrl);
+
+        // create a new document in testFolder and set inherit to false
+        Document dUpdate = new Document();
+        NodePermissions nodePermissionsUpdate = new NodePermissions();
+        nodePermissionsUpdate.setIsInheritanceEnabled(false);
+        dUpdate.setPermissions(nodePermissionsUpdate);
+
+        HttpResponse response = put(URL_NODES, dId, toJsonAsStringNonNull(dUpdate), null, 200);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+
+        Map params = new HashMap<>();
+        params.put("include", "permissions");
+
+        response = getSingle(NodesEntityResource.class, documentResp.getId(), params, 200);
+        Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+
+        assertFalse("Inheritance hasn't been disabled!", nodeResp.getPermissions().getIsInheritanceEnabled());
+        assertNull("Permissions were inherited from parent!", nodeResp.getPermissions().getInherited());
+
+    }
+
+    private String getDataDictionaryNodeId() throws Exception
+    {
+        Map params = new HashMap<>();
+        params.put(Nodes.PARAM_RELATIVE_PATH, "/Data Dictionary");
+        HttpResponse response = getSingle(NodesEntityResource.class, getRootNodeId(), params, 200);
+        Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        return nodeResp.getId();
+    }
+
+    private String getSitesNodeId() throws Exception
+    {
+        Map params = new HashMap<>();
+        params.put(Nodes.PARAM_RELATIVE_PATH, "/Sites");
+        HttpResponse response = getSingle(NodesEntityResource.class, getRootNodeId(), params, 200);
+        Node nodeResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Node.class);
+        return nodeResp.getId();
+    }
+
+    private String createFolder() throws Exception
+    {
+        String folderName = "testPermissionsFolder-" + GUID.generate();
+        String folderId = createFolder(Nodes.PATH_MY, folderName).getId();
+        return getNodeChildrenUrl(folderId);
+    }
+
+    /**
+     * Created an empty document in the given url path
+     * 
+     * @param url
+     * @return
+     * @throws Exception
+     */
+    private String createDocument(String url) throws Exception
+    {
+        Document d1 = new Document();
+        d1.setName("testDoc" + GUID.generate());
+        d1.setNodeType(TYPE_CM_CONTENT);
+
+        HttpResponse response = post(url, toJsonAsStringNonNull(d1), 201);
+        Document documentResp = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), Document.class);
+        return documentResp.getId();
+    }
+
+    private void validatePermissionsAfterUpdate(NodeRef nodeRef, List<NodePermissions.NodePermission> expectedPermissions)
+    {
+        Set<AccessPermission> permissions = permissionService.getAllSetPermissions(nodeRef);
+
+        for (NodePermissions.NodePermission permission : expectedPermissions)
+        {
+            String authority = permission.getAuthorityId();
+            AccessPermission ap = getPermission(permissions, authority);
+            assertNotNull("Permission " + authority + " missing", ap);
+
+            assertEquals(authority, ap.getAuthority());
+            comparePermissions(authority, permission, ap);
+        }
+    }
+
+    private void comparePermissions(String authority, NodePermissions.NodePermission permission, AccessPermission ap)
+    {
+        assertEquals("Wrong permission for " + authority, permission.getAuthorityId(), ap.getAuthority());
+        assertEquals("Wrong permission for " + authority, permission.getName(), ap.getPermission());
+        assertEquals("Wrong access status for " + authority, permission.getAccessStatus(), ap.getAccessStatus().toString());
+    }
+
+    /**
+     * Searches through actual set of permissions
+     *
+     * @param permissions
+     * @param expectedAuthority
+     * @return
+     */
+    private AccessPermission getPermission(Set<AccessPermission> permissions, String expectedAuthority)
+    {
+        AccessPermission result = null;
+        for (AccessPermission ap : permissions)
+        {
+            if (expectedAuthority.equals(ap.getAuthority()))
+            {
+                result = ap;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public String getScope()
+    {
+        return "public";
+    }
 }
 

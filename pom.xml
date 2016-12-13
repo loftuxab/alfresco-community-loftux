@@ -86,7 +86,6 @@
 
   <modules>
     <module>projects/3rd-party</module>
-    <module>projects/data-model</module>
     <module>projects/dev-tomcat</module>
     <module>projects/legacy-lucene</module>
     <module>projects/mbeans</module>
@@ -156,32 +155,38 @@
     <dependency.jibx.version>1.2.6</dependency.jibx.version>
     <dependency.tika.version>1.6-20160727-alfresco-patched</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
-    <dependency.opencmis.version>0.11.0</dependency.opencmis.version>
+    <dependency.opencmis.version>1.0.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
-    <dependency.spring.version>3.2.14.RELEASE</dependency.spring.version>
+    <dependency.spring.version>3.2.17.RELEASE</dependency.spring.version>
     <dependency.tomcat.version>7.0.59</dependency.tomcat.version>
     <dependency.activiti.version>5.19.0.3</dependency.activiti.version>
     <dependency.activiti-engine.version>5.19.0.3</dependency.activiti-engine.version>
-    <dependency.jackson2.version>2.3.2</dependency.jackson2.version>
+    <dependency.jackson2.version>2.8.3</dependency.jackson2.version>
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
-    <dependency.alfresco-authorised-users.version>5.2.0.2</dependency.alfresco-authorised-users.version>
-    <dependency.webscripts.version>6.8</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.5</dependency.alfresco-core.version>
+    <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
+    <dependency.webscripts.version>6.12</dependency.webscripts.version>
+    <dependency.alfresco-core.version>6.9</dependency.alfresco-core.version>
+    <dependency.alfresco-data-model.version>6.7</dependency.alfresco-data-model.version>
+    <dependency.alfresco-xmlfactory.version>1.2.2</dependency.alfresco-xmlfactory.version>
     <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
-    <dependency.httpcomponents.version>4.5.1</dependency.httpcomponents.version>
-    <dependency.api-explorer.version>1.2</dependency.api-explorer.version>
+    <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
+    <dependency.mysql.version>5.1.39</dependency.mysql.version>
+    <dependency.postgresql.version>9.4.1211.jre7</dependency.postgresql.version>
+    <dependency.api-explorer.version>1.4</dependency.api-explorer.version>
+
+    <dependency.alfresco-trashcan-cleaner.version>2.2</dependency.alfresco-trashcan-cleaner.version>
 
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1.3</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.4</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
     <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
-    <installer.java.version>1.8.0_65</installer.java.version>
+    <installer.java.version>1.8.0_111</installer.java.version>
     <installer.postgresql.version>9.4.4-20151016</installer.postgresql.version>
-    <installer.libreoffice.version>4.4.5-20151016</installer.libreoffice.version>
+    <installer.libreoffice.version>5.2.1-alfresco</installer.libreoffice.version>
     <installer.ghostscript.version>8.64</installer.ghostscript.version>
     <installer.imagemagick.version>6.9.1</installer.imagemagick.version>
 
@@ -204,12 +209,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.12</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.12</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -225,7 +230,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-xmlfactory</artifactId>
-            <version>1.0.3</version>
+            <version>${dependency.alfresco-xmlfactory.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.chemistry.opencmis</groupId>
@@ -267,6 +272,17 @@
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <version>${dependency.alfresco-data-model.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <classifier>tests</classifier>
+            <version>${dependency.alfresco-data-model.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
             <artifactId>alfresco-jlan-embed</artifactId>
             <version>${dependency.alfresco-jlan.version}</version>
         </dependency>
@@ -304,7 +320,7 @@
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.8.1</version>
+            <version>2.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -319,7 +335,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.2</version>
+            <version>1.9.3</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -334,7 +350,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.9</version>
+            <version>1.12</version>
         </dependency>
         <dependency>
             <groupId>commons-digester</groupId>
@@ -394,7 +410,7 @@
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.3</version>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>
@@ -404,17 +420,17 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.4.1</version>
+            <version>1.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-api</artifactId>
-            <version>1.2.15</version>
+            <version>1.2.19</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.axiom</groupId>
             <artifactId>axiom-impl</artifactId>
-            <version>1.2.15</version>
+            <version>1.2.18</version>
         </dependency>
         <dependency>
             <groupId>org.tuckey</groupId>
@@ -423,8 +439,8 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -440,22 +456,22 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
-            <version>2.2.6</version>
+            <version>2.2.11</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.2.6</version>
+            <version>2.2.11</version>
         </dependency>
         <dependency>
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-api</artifactId>
-            <version>1.1.8</version>
+            <version>1.1.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.myfaces.core</groupId>
             <artifactId>myfaces-impl</artifactId>
-            <version>1.1.8</version>
+            <version>1.1.10</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -470,18 +486,18 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.187</version>
+            <version>1.4.192</version>
         </dependency>
         <dependency>
             <groupId>net.lightbody.bmp</groupId>
             <artifactId>browsermob-core-littleproxy</artifactId>
-            <version>2.1.0-beta-1</version>
+            <version>2.1.0-beta-6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.lightbody.bmp</groupId>
             <artifactId>browsermob-proxy</artifactId>
-            <version>2.1.0-beta-1</version>
+            <version>2.1.0-beta-5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.seleniumhq.selenium</groupId>
@@ -515,11 +531,66 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.3</version>
+            <version>4.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${dependency.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${dependency.spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
             <version>${dependency.spring.version}</version>
         </dependency>
     </dependencies>
@@ -552,7 +623,7 @@
                     <configuration>
                         <rules>
                             <requireJavaVersion>
-                                <version>1.7.0</version>
+                                <version>1.8.0</version>
                             </requireJavaVersion>
                             <bannedDependencies>
                                 <excludes>
@@ -604,7 +675,6 @@
             </executions>
         </plugin>
 
-<!--
         <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
@@ -641,7 +711,7 @@
                 </dependency>
             </dependencies>
         </plugin>
--->
+
         <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -1490,7 +1560,7 @@
             </dependency>
         </dependencies>
     </profile>
-    
+
     <profile>
         <id>doclint-java8-max</id>
         <activation>
@@ -1508,7 +1578,7 @@
             </plugins>
         </build>
     </profile>
-    
+
     <!-- Generate the Javadoc for Public API only (filtered on AlfrescoPublicApi annotation) -->
     <profile>
         <id>publicapi</id>

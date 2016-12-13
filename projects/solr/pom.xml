@@ -52,7 +52,7 @@
         <!-- provided dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,12 +90,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.11</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.11</version>
+            <version>1.7.21</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -162,6 +162,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <archiveClasses>true</archiveClasses>
+		            <packagingExcludes>WEB-INF/lib/commons-fileupload-1.3.1.jar</packagingExcludes>
                     <overlays>
                         <overlay>
                             <groupId>org.apache.solr</groupId>

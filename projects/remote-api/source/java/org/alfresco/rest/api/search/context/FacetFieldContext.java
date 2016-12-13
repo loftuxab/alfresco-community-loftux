@@ -55,11 +55,18 @@ public class FacetFieldContext
     {
         private final String label;
         private final int count;
+        private final Object display;
 
-        public Bucket(String label, int count)
+        public Bucket(String label, int count, Object display)
         {
             this.label = label;
             this.count = count;
+            this.display = display;
+        }
+
+        public Object getDisplay()
+        {
+            return display;
         }
 
         public String getLabel()

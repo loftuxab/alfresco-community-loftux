@@ -143,6 +143,7 @@
                 <entry key="org.alfresco.service.cmr.repository.CyclicChildRelationshipException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.InvalidArgumentException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
                 <entry key="org.alfresco.service.cmr.version.VersionServiceException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
+                <entry key="org.alfresco.service.cmr.repository.datatype.TypeConversionException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.NotFoundException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.EntityNotFoundException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.service.cmr.repository.InvalidNodeRefException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
@@ -627,6 +628,7 @@
         <property name="nodeService" ref="NodeService" />
         <property name="personService" ref="PersonService" />
         <property name="authenticationService" ref="AuthenticationService" />
+        <property name="authorityService" ref="AuthorityService" />
         <property name="contentUsageService" ref="contentUsageImpl" />
         <property name="contentService" ref="ContentService" />
         <property name="thumbnailService" ref="ThumbnailService" />
@@ -734,6 +736,39 @@
              <idref bean="legacyExceptionInterceptor" />
           </list>
        </property>
+    </bean>
+
+    <bean id="publicapi.mimeTypePropertyLookup" class="org.alfresco.rest.api.lookups.MimeTypePropertyLookup">
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="supported">
+            <list>
+                <value>cm:content.mimetype</value>
+                <value>content.mimetype</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="publicapi.personPropertyLookup" class="org.alfresco.rest.api.lookups.PersonPropertyLookup">
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="supported">
+            <list>
+                <value>cm:creator</value>
+                <value>cm:modifier</value>
+                <value>cm:owner</value>
+                <value>creator</value>
+                <value>modifier</value>
+                <value>owner</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="publicapi.propertyLookups" class="org.alfresco.rest.api.lookups.PropertyLookupRegistry">
+        <property name="lookups">
+            <list>
+                <ref bean="publicapi.personPropertyLookup" />
+                <ref bean="publicapi.mimeTypePropertyLookup" />
+            </list>
+        </property>
     </bean>
 
     <!-- API webscripts -->
@@ -858,7 +893,26 @@
         <property name="serviceRegistry" ref="ServiceRegistry" />
         <property name="assistant" ref="apiAssistant" />
         <property name="helper" ref="webscriptHelper" />
+        <property name="resultMapper" ref="searchapiResultMapper" />
+    </bean>
+
+    <bean id="searchapiResultMapper" class="org.alfresco.rest.api.search.impl.ResultMapper">
         <property name="nodes" ref="Nodes" />
+        <property name="propertyLookup">
+            <ref bean="publicapi.propertyLookups"/>
+        </property>
+    </bean>
+
+    <bean id="webscript.org.alfresco.api.DiscoveryApiWebscript.get"
+          class="org.alfresco.rest.api.discovery.DiscoveryApiWebscript" parent="webscript">
+        <property name="descriptorService" ref="DescriptorService"  />
+        <property name="repoAdminService" ref="repoAdminService" />
+        <property name="auditService" ref="auditService" />
+        <property name="quickShareService" ref="QuickShareService" />
+        <property name="moduleService" ref="ModuleService" />
+        <property name="assistant" ref="apiAssistant" />
+        <property name="enabled" value="${system.api.discovery.enabled}" />
+        <property name="thumbnailService" ref="ThumbnailService" />
     </bean>
 
     <!-- OpenCMIS -->

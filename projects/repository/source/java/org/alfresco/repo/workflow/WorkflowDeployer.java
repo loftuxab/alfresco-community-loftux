@@ -443,7 +443,7 @@ public class WorkflowDeployer extends AbstractLifecycleBean
             String defName = (String)nodeService.getProperty(nodeRef, WorkflowModel.PROP_WORKFLOW_DEF_NAME);
             if (defName != null)
             {
-                // Undeploy the workflow definition - all versions in JBPM
+                // Undeploy the workflow definition
                 List<WorkflowDefinition> defs = workflowService.getAllDefinitionsByName(defName);
                 for (WorkflowDefinition def: defs)
                 {
@@ -472,7 +472,7 @@ public class WorkflowDeployer extends AbstractLifecycleBean
             String engineId = BPMEngineRegistry.getEngineId(workflowName);
             if (workflowAdminService.isEngineEnabled(engineId))
             {
-                // Undeploy the workflow definition - all versions in JBPM
+                // Undeploy the workflow definition
                 List<WorkflowDefinition> defs = workflowService.getAllDefinitionsByName(workflowName);
                 if(defs.size() > 0)
                 {
@@ -549,9 +549,9 @@ public class WorkflowDeployer extends AbstractLifecycleBean
                             {
                                 public Object doWork()
                                 {
-                                    // invalidate - to force lazy re-init
-                                    dictionaryDAO.destroy();
-                                    
+                                    // force refresh of the dictionary
+                                    dictionaryDAO.init();
+
                                     if (logger.isTraceEnabled())
                                     {
                                         logger.trace("Workflow deployer afterCommit: Dictionary destroyed ["+AlfrescoTransactionSupport.getTransactionId()+"]");

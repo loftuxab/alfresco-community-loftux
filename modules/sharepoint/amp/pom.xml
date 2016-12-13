@@ -12,6 +12,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-remote-api</artifactId>
             <version>${project.version}</version>
@@ -53,7 +58,7 @@
             <version>${dependency.spring.version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>	
+    </dependencies>
 
     <build>
         <resources>

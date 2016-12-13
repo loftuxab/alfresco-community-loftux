@@ -301,7 +301,7 @@
                     <title>Workflow Engine Id</title>
                     <type>d:text</type>
                     <mandatory>true</mandatory>
-                    <default>jbpm</default>
+                    <default>activiti</default>
                     <index enabled="true"/>
                 </property>
                 <property name="bpm:definitionDeployed">

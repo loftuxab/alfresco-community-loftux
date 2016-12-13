@@ -606,9 +606,13 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
                 if (useFastVectorHighlighter(params, schema, fieldName))
                     doHighlightingByFastVectorHighlighter(fvh, fieldQuery, req, docSummaries, docId, doc, fieldName);
                 else
-                    doHighlightingByHighlighter(query, req, docSummaries, docId, doc, fieldName);
+                    doHighlightingByHighlighter(query, req, docSummaries, docId, doc, fieldName, 0);
             }
             String printId = schema.printableUniqueKey(doc);
+            if(doc.get("DBID") != null)
+			{
+            	docSummaries.add("DBID", doc.get("DBID"));
+			}
             fragments.add(printId == null ? null : printId, docSummaries);
         }
         return fragments;
@@ -634,9 +638,9 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
         return termPosOff;
     }
 
-    private void doHighlightingByHighlighter(Query query, SolrQueryRequest req, NamedList docSummaries, int docId, Document doc, String requestFieldname) throws IOException
+    private void doHighlightingByHighlighter(Query query, SolrQueryRequest req, NamedList docSummaries, int docId, Document doc, String requestFieldname, int position) throws IOException
     {
-        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty(requestFieldname, FieldUse.HIGHLIGHT, req);
+        String schemaFieldName = AlfrescoSolrDataModel.getInstance().mapProperty(requestFieldname, FieldUse.HIGHLIGHT, req, position);
         
         final SolrIndexSearcher searcher = req.getSearcher();
         final IndexSchema schema = searcher.getSchema();
@@ -802,6 +806,10 @@ public class AlfrescoSolrHighlighter extends SolrHighlighter implements PluginIn
             summaries = fragTexts.toArray(new String[0]);
             if (summaries.length > 0)
                 docSummaries.add(requestFieldname, summaries);
+        }
+        if ((summaries == null || summaries.length == 0) && position == 0)
+        {
+        	 doHighlightingByHighlighter(query, req, docSummaries, docId, doc, requestFieldname, 1);
         }
         // no summeries made, copy text from alternate field
         if (summaries == null || summaries.length == 0)

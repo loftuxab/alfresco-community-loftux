@@ -82,6 +82,7 @@ import org.alfresco.repo.Client;
 import org.alfresco.repo.Client.ClientType;
 import org.alfresco.repo.action.executer.ContentMetadataExtracter;
 import org.alfresco.repo.cache.SimpleCache;
+import org.alfresco.repo.coci.CheckOutCheckInServiceImpl;
 import org.alfresco.repo.events.EventPreparator;
 import org.alfresco.repo.events.EventPublisher;
 import org.alfresco.repo.model.filefolder.GetChildrenCannedQuery;
@@ -283,6 +284,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     private static final BigInteger TYPES_DEFAULT_DEPTH = BigInteger.valueOf(-1);
     private static final BigInteger OBJECTS_DEFAULT_MAX_ITEMS = BigInteger.valueOf(200);
     private static final BigInteger OBJECTS_DEFAULT_DEPTH = BigInteger.valueOf(10);
+    private static final int CONTENT_CHANGES_DEFAULT_MAX_ITEMS = 10000;
 
     private static final String QUERY_NAME_OBJECT_ID = "cmis:objectId";
     private static final String QUERY_NAME_OBJECT_TYPE_ID = "cmis:objectTypeId";
@@ -351,6 +353,7 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     private BigInteger typesDefaultDepth = TYPES_DEFAULT_DEPTH;
     private BigInteger objectsDefaultMaxItems = OBJECTS_DEFAULT_MAX_ITEMS;
     private BigInteger objectsDefaultDepth = OBJECTS_DEFAULT_DEPTH;
+    private int contentChangesDefaultMaxItems = CONTENT_CHANGES_DEFAULT_MAX_ITEMS;
 
     private List<PermissionDefinition> repositoryPermissions;
     private Map<String, PermissionMapping> permissionMappings;
@@ -457,6 +460,22 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
     public void setObjectsDefaultDepth(BigInteger objectsDefaultDepth)
     {
         this.objectsDefaultDepth = objectsDefaultDepth;
+    }
+
+    /**
+     * Set the default number of content changes to return if nothing is specified
+     */
+    public void setContentChangesDefaultMaxItems(int contentChangesDefaultMaxItems)
+    {
+        if (contentChangesDefaultMaxItems < 1)
+        {
+            throw new IllegalArgumentException("The default maximum number of content changes to retrieve must be greater than zero.");
+        }
+        else if (contentChangesDefaultMaxItems == Integer.MAX_VALUE)
+        {
+            throw new IllegalArgumentException("The server cannot return " + Integer.MAX_VALUE + " content changes in a request!");
+        }
+        this.contentChangesDefaultMaxItems = contentChangesDefaultMaxItems;
     }
 
     /**
@@ -3158,7 +3177,8 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
 
         Set<QName> ignore = new HashSet<QName>();
         ignore.add(ContentModel.ASPECT_REFERENCEABLE);
-        ignore.add(ContentModel.ASPECT_LOCALIZED);
+        ignore.add(ContentModel.ASPECT_LOCALIZED); 
+        ignore.add(ContentModel.ASPECT_WORKING_COPY);
 
         // aspects to add == the list of secondary types - existing aspects - ignored aspects
         Set<QName> toAdd = new HashSet<QName>(secondaryTypeAspects);
@@ -3565,34 +3585,49 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
         }
         else
         {
-        	QName propertyQName = propDef.getPropertyAccessor().getMappedProperty();
-        	if (propertyQName == null)
-        	{
-        		throw new CmisConstraintException("Unable to set property " + propertyId + "!");
-        	}
-        
-        	if (propertyId.equals(PropertyIds.NAME))
-        	{
-        		if (!(value instanceof String))
-        		{
-        			throw new CmisInvalidArgumentException("Object name must be a string!");
-        		}
-
-        		try
-        		{
-        			fileFolderService.rename(nodeRef, value.toString());
-        		}
-        		catch (FileExistsException e)
-        		{
-        			throw new CmisContentAlreadyExistsException("An object with this name already exists!", e);
-        		}
-        		catch (FileNotFoundException e)
-        		{
-        			throw new CmisInvalidArgumentException("Object with id " + nodeRef.getId() + " not found!");
-        		}
-        	}
-        	else
+            QName propertyQName = propDef.getPropertyAccessor().getMappedProperty();
+            if (propertyQName == null)
             {
+                throw new CmisConstraintException("Unable to set property " + propertyId + "!");
+            }
+
+            if (propertyId.equals(PropertyIds.NAME))
+            {
+                if (!(value instanceof String))
+                {
+                    throw new CmisInvalidArgumentException("Object name must be a string!");
+                }
+
+                try
+                {
+                    String newName = value.toString();
+                    // If the node is checked out and the name property is set on the working copy, make sure the new name has the working copy format
+                    if (checkOutCheckInService.isWorkingCopy(nodeRef))
+                    {
+                        String wcLabel = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_WORKING_COPY_LABEL);
+                        if (wcLabel == null)
+                        {
+                            wcLabel = CheckOutCheckInServiceImpl.getWorkingCopyLabel();
+                        }
+                        if (!newName.contains(wcLabel))
+                        {
+                            newName = CheckOutCheckInServiceImpl.createWorkingCopyName(newName, wcLabel);
+                        }
+                    }
+                    
+                    fileFolderService.rename(nodeRef, newName);
+                }
+                catch (FileExistsException e)
+                {
+                    throw new CmisContentAlreadyExistsException("An object with this name already exists!", e);
+                }
+                catch (FileNotFoundException e)
+                {
+                    throw new CmisInvalidArgumentException("Object with id " + nodeRef.getId() + " not found!");
+                }
+            }
+            else
+        	{
                 // overflow check
                 if (propDef.getPropertyDefinition().getPropertyType() == PropertyType.INTEGER && value instanceof BigInteger)
                 {
@@ -3667,25 +3702,31 @@ public class CMISConnector implements ApplicationContextAware, ApplicationListen
         params.setForward(true);
         params.setFromId(from);
 
-        int maxResults = (maxItems == null ? 0 : maxItems.intValue());
-        maxResults = (maxResults < 1 ? 0 : maxResults + 1);
+        // So we have a BigInteger.  We need to ensure that we cut it down to an integer smaller than Integer.MAX_VALUE
+        
+        int maxResults = (maxItems == null ? contentChangesDefaultMaxItems : maxItems.intValue());
+        maxResults = maxResults < 1 ? contentChangesDefaultMaxItems : maxResults;           // Just a double check of the unbundled contents
+        maxResults = maxResults > contentChangesDefaultMaxItems ? contentChangesDefaultMaxItems : maxResults;   // cut it down
+        int queryFor = maxResults + 1;                          // Query for 1 more so that we know if there are more results
 
-        auditService.auditQuery(changeLogCollectingCallback, params, maxResults);
+        auditService.auditQuery(changeLogCollectingCallback, params, queryFor);
 
         String newChangeLogToken = null;
-        if (maxResults > 0)
+        // Check if we got more than the client requested
+        if (result.getObjects().size() >= maxResults)
         {
-            if (result.getObjects().size() >= maxResults)
-            {
-            	StringBuilder clt = new StringBuilder();
-                newChangeLogToken = (from == null ? clt.append(maxItems.intValue() + 1).toString() : clt.append(from.longValue() + maxItems.intValue()).toString());
-                result.getObjects().remove(result.getObjects().size() - 1).getId();
-                result.setHasMoreItems(true);
-            }
-            else
-            {
-                result.setHasMoreItems(false);
-            }
+            // Build the change log token from the last item
+            StringBuilder clt = new StringBuilder();
+            newChangeLogToken = (from == null ? clt.append(maxItems.intValue() + 1).toString() : clt.append(from.longValue() + maxItems.intValue()).toString());    // TODO: Make this readable
+            // Remove extra item that was not actually requested
+            result.getObjects().remove(result.getObjects().size() - 1).getId();
+            // Note to client that there are more items
+            result.setHasMoreItems(true);
+        }
+        else
+        {
+            // We got the same or fewer than the number requested, so there are no more items
+            result.setHasMoreItems(false);
         }
 
         if (changeLogToken != null)

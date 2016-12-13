@@ -26,11 +26,7 @@
 package org.alfresco.rest.api;
 
 import org.alfresco.query.PagingResults;
-import org.alfresco.rest.api.model.FavouriteSite;
-import org.alfresco.rest.api.model.MemberOfSite;
-import org.alfresco.rest.api.model.Site;
-import org.alfresco.rest.api.model.SiteContainer;
-import org.alfresco.rest.api.model.SiteMember;
+import org.alfresco.rest.api.model.*;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
 import org.alfresco.rest.framework.resource.parameters.Paging;
 import org.alfresco.rest.framework.resource.parameters.Parameters;
@@ -45,7 +41,8 @@ public interface Sites
     Site getSite(String siteId);
 	void deleteSite(String siteId, Parameters parameters);
     Site createSite(Site site, Parameters parameters);
-    
+	Site updateSite(String siteId, SiteUpdate site, Parameters parameters);
+
 	/**
 	 * people/<personId>/sites/<siteId>
 	 * 
@@ -66,11 +63,19 @@ public interface Sites
     void addFavouriteSite(String personId, FavouriteSite favouriteSite);
     void removeFavouriteSite(String personId, String siteId);
     CollectionWithPagingInfo<FavouriteSite> getFavouriteSites(String personId, Parameters parameters);
-    
+
     String getSiteRole(String siteId);
     String getSiteRole(String siteId, String personId);
 
     String PARAM_PERMANENT = "permanent";
-	String PARAM_SKIP_ADDTOFAVORITES = "skipAddToFavorites";
-	String PARAM_SKIP_SURF_CONFIGURATION = "skipConfiguration";
+    String PARAM_SKIP_ADDTOFAVORITES = "skipAddToFavorites";
+    String PARAM_SKIP_SURF_CONFIGURATION = "skipConfiguration";
+
+    String PARAM_SITE_ID          = "id";
+    String PARAM_SITE_TITLE       = "title";
+    String PARAM_SITE_DESCRIPTION = "description";
+
+    String PARAM_SITE_ROLE = "role";
+    String PARAM_VISIBILITY = "visibility";
+    String PARAM_PRESET = "preset";
 }

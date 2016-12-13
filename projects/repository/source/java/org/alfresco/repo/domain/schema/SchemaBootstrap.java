@@ -1484,7 +1484,7 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                         
                         if (this.dialect != null && this.dialect instanceof MySQLInnoDBDialect)
                         {
-                            // note: enable bootstrap on MySQL 5.5 (eg. for auto-generated SQL, such as JBPM)
+                            // note: enable bootstrap on MySQL 5.5 (eg. for auto-generated SQL)
                             sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=InnoDB");
                         }
                         
@@ -1492,9 +1492,9 @@ public class SchemaBootstrap extends AbstractLifecycleBean
                         {
                             // note: enable bootstrap on MySQL Cluster NDB
                             /*
-                        	 * WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect !
-                    		 */
-                        	sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=NDB"); // belts-and-braces
+                             * WARNING: Experimental/unsupported - see AlfrescoMySQLClusterNDBDialect !
+                             */
+                            sql = sql.replaceAll("(?i)TYPE=InnoDB", "ENGINE=NDB"); // belts-and-braces
                             sql = sql.replaceAll("(?i)ENGINE=InnoDB", "ENGINE=NDB");
                             
                             sql = sql.replaceAll("(?i) BIT ", " BOOLEAN ");

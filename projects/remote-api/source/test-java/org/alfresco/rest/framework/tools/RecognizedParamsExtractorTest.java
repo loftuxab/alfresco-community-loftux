@@ -54,26 +54,48 @@ import java.util.Map;
  */
 public class RecognizedParamsExtractorTest implements RecognizedParamsExtractor
 {
-
-
     @Test
     public void getFilterTest()
     {
         BeanPropertiesFilter theFilter  = getFilter(null);
         assertNotNull(theFilter);
         assertTrue("Null passed in so must return the default BeanPropertiesFilter.ALLOW_ALL class", BeanPropertiesFilter.AllProperties.class.equals(theFilter.getClass()));
-
+        assertTrue(theFilter.isAllowed("bob"));
+        assertTrue(theFilter.isAllowed("fred"));
+        assertTrue(theFilter.isAllowed("50"));
+        assertTrue(theFilter.isAllowed("b.z"));
+        
         theFilter  = getFilter("bob");
         assertNotNull(theFilter);
         assertTrue("Must return the BeanPropertiesFilter class", theFilter instanceof BeanPropertiesFilter);
+        assertTrue(theFilter.isAllowed("bob"));
+        assertFalse(theFilter.isAllowed("fred"));
+        assertFalse(theFilter.isAllowed("50"));
+        assertFalse(theFilter.isAllowed("b.z"));
 
         theFilter  = getFilter("50,fred,b.z");
         assertNotNull(theFilter);
         assertTrue("Must return the BeanPropertiesFilter class", theFilter instanceof BeanPropertiesFilter);
-
+        assertFalse(theFilter.isAllowed("bob"));
+        assertTrue(theFilter.isAllowed("fred"));
+        assertTrue(theFilter.isAllowed("50"));
+        assertTrue(theFilter.isAllowed("b.z"));
+        
         theFilter  = getFilter("50,fred,");
         assertNotNull(theFilter);
         assertTrue("Must return the BeanPropertiesFilter class", theFilter instanceof BeanPropertiesFilter);
+        assertFalse(theFilter.isAllowed("bob"));
+        assertTrue(theFilter.isAllowed("fred"));
+        assertTrue(theFilter.isAllowed("50"));
+        assertFalse(theFilter.isAllowed("b.z"));
+
+        theFilter  = getFilter("50, bob, fred ,");
+        assertNotNull(theFilter);
+        assertTrue("Must return the BeanPropertiesFilter class", theFilter instanceof BeanPropertiesFilter);
+        assertTrue(theFilter.isAllowed("bob"));
+        assertTrue(theFilter.isAllowed("fred"));
+        assertTrue(theFilter.isAllowed("50"));
+        assertFalse(theFilter.isAllowed("b.z"));
     }
 
 
@@ -139,7 +161,7 @@ public class RecognizedParamsExtractorTest implements RecognizedParamsExtractor
         assertEquals("age", theSort.get(1).column);
         assertTrue(!theSort.get(1).asc);  //desc
 
-        theSort  = getSort("age Desc, name Asc");
+        theSort  = getSort("age DeSc, name AsC");
         assertNotNull(theSort);
         assertTrue("Must have a value for column: NAME", !theSort.isEmpty());
         assertTrue(theSort.size() == 2);
@@ -147,20 +169,33 @@ public class RecognizedParamsExtractorTest implements RecognizedParamsExtractor
         assertTrue(!theSort.get(0).asc);  //desc
         assertEquals("name", theSort.get(1).column);
         assertTrue(theSort.get(1).asc);
-
-        theSort  = getSort("name des");  //invalid, should be desc
-        assertNotNull(theSort);
-        assertTrue("Must have a value for column: NAME", !theSort.isEmpty());
-        assertTrue(theSort.size() == 1);
-        assertEquals("name", theSort.get(0).column);
-        assertTrue(theSort.get(0).asc);  //Defaults to ascending because the sort order was invalid
-
-        theSort  = getSort("name asc,");  //invalid, should be desc
+        
+        theSort  = getSort("name asc,");  // ok for now, trailing comma is ignored
         assertNotNull(theSort);
         assertTrue("Must have a value for column: NAME", !theSort.isEmpty());
         assertTrue(theSort.size() == 1);
         assertEquals("name", theSort.get(0).column);
         assertTrue(theSort.get(0).asc);
+        
+        try
+        {
+            getSort("age asc, name des");  // invalid, should be desc
+            fail("Should throw an InvalidArgumentException");
+        }
+        catch (InvalidArgumentException error)
+        {
+            // this is correct
+        }
+        
+        try
+        {
+            getSort("age asc name");  // invalid, missing comma
+            fail("Should throw an InvalidArgumentException");
+        }
+        catch (InvalidArgumentException error)
+        {
+            // this is correct
+        }
     }
 
     @Test

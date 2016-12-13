@@ -27,13 +27,6 @@
 
 package org.alfresco.opencmis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -62,8 +55,6 @@ import org.alfresco.repo.audit.AuditComponentImpl;
 import org.alfresco.repo.audit.AuditServiceImpl;
 import org.alfresco.repo.audit.UserAuditFilter;
 import org.alfresco.repo.audit.model.AuditModelRegistryImpl;
-import org.alfresco.repo.batch.BatchProcessWorkProvider;
-import org.alfresco.repo.batch.BatchProcessor;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.M2Model;
@@ -139,6 +130,7 @@ import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.UnfileObject;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisUpdateConflictException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlListImpl;
@@ -162,6 +154,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.extensions.webscripts.GUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * OpenCMIS tests.
@@ -611,8 +610,8 @@ public class CMISTest
 
         // populate workflow parameters
         java.util.Properties props = new java.util.Properties();
-        props.setProperty(WorkflowDeployer.ENGINE_ID, "jbpm");
-        props.setProperty(WorkflowDeployer.LOCATION, "jbpmresources/test_taskVarScriptAssign.xml");
+        props.setProperty(WorkflowDeployer.ENGINE_ID, "activiti");
+        props.setProperty(WorkflowDeployer.LOCATION, "activiti/testCustomActiviti.bpmn20.xml");
         props.setProperty(WorkflowDeployer.MIMETYPE, "text/xml");
         props.setProperty(WorkflowDeployer.REDEPLOY, Boolean.FALSE.toString());
 
@@ -622,7 +621,7 @@ public class CMISTest
         testWorkflowDeployer.setWorkflowDefinitions(definitions);
 
         List<String> models = new ArrayList<String>(1);
-        models.add("jbpmresources/testWorkflowModel.xml");
+        models.add("activiti/testWorkflowModel.xml");
 
         testWorkflowDeployer.setModels(models);
 
@@ -652,6 +651,9 @@ public class CMISTest
         // check that workflow types were correctly bootstrapped
         assertNotNull(startTaskTypeDefinition);
         assertNotNull(workflowTaskTypeDefinition);
+
+        // caches are refreshed asynchronously
+        Thread.sleep(5000);
 
         // check that loaded model is available via CMIS API
         CallContext context = new SimpleCallContext("admin", "admin", CmisVersion.CMIS_1_1);
@@ -2433,32 +2435,33 @@ public class CMISTest
 	{
         TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
         {
-			@Override
-			public Void doWork() throws Exception
-			{
-				M2Model customModel = M2Model.createModel(
-						Thread.currentThread().getContextClassLoader().
-						getResourceAsStream("dictionary/dictionarydaotest_model1.xml"));
-				dictionaryDAO.putModel(customModel);
-				assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
-				TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
-				assertNotNull(td);
-				return null;
-			}
-		}, "user1", "tenant1");
+            @Override
+            public Void doWork() throws Exception
+            {
+                M2Model customModel = M2Model.createModel(
+                        Thread.currentThread().getContextClassLoader().
+                        getResourceAsStream("dictionary/dictionarydaotest_model1.xml"));
+                dictionaryDAO.putModel(customModel);
+
+                assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
+                TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
+                assertNotNull(td);
+                return null;
+            }
+        }, "user1", "tenant1");
 
         TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
         {
-			@Override
-			public Void doWork() throws Exception
-			{
-				assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
-				TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
-				assertNull(td);
-				return null;
-			}
-		}, "user2", "tenant2");
-	}
+            @Override
+            public Void doWork() throws Exception
+            {
+                assertNotNull(cmisDictionaryService.findType("P:cm:dublincore"));
+                TypeDefinitionWrapper td = cmisDictionaryService.findType("D:daotest1:type1");
+                assertNull(td);
+                return null;
+            }
+        }, "user2", "tenant2");
+    }
 
     /**
      * MNT-13529: Just-installed Alfresco does not return a CMIS latestChangeLogToken
@@ -2585,6 +2588,31 @@ public class CMISTest
                         
                         assertFalse("CMISChangeEvent " + changeType + " should store short form of objectId " + objectId, 
                                 objectId.toString().contains(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE.toString()));
+                    }
+                    int expectAtLeast = changes.getObjects().size();
+
+                    // We should also be able to query without passing in any limit
+                    changes = cmisService.getContentChanges(repositoryId, new Holder<String>(changeToken), Boolean.TRUE, null, Boolean.FALSE, Boolean.FALSE, null, null);
+                    assertTrue("Expected to still get changes", changes.getObjects().size() >= expectAtLeast);
+                    // and zero
+                    changes = cmisService.getContentChanges(repositoryId, new Holder<String>(changeToken), Boolean.TRUE, null, Boolean.FALSE, Boolean.FALSE, BigInteger.valueOf(0), null);
+                    assertTrue("Expected to still get changes", changes.getObjects().size() >= expectAtLeast);
+                    // and one
+                    changes = cmisService.getContentChanges(repositoryId, new Holder<String>(changeToken), Boolean.TRUE, null, Boolean.FALSE, Boolean.FALSE, BigInteger.valueOf(1), null);
+                    assertEquals("Expected to still get changes", changes.getObjects().size(), 1);
+                    // Integery.MAX_VALUE must be handled
+                    //      This will limit the number to a sane value
+                    changes = cmisService.getContentChanges(repositoryId, new Holder<String>(changeToken), Boolean.TRUE, null, Boolean.FALSE, Boolean.FALSE, BigInteger.valueOf(Integer.MAX_VALUE), null);
+                    assertTrue("Expected to still get changes", changes.getObjects().size() >= expectAtLeast);
+                    // but not negative
+                    try
+                    {
+                        changes = cmisService.getContentChanges(repositoryId, new Holder<String>(changeToken), Boolean.TRUE, null, Boolean.FALSE, Boolean.FALSE, BigInteger.valueOf(-1), null);
+                        fail("Negative maxItems is expected to fail");
+                    }
+                    catch (CmisInvalidArgumentException e)
+                    {
+                        // Expected
                     }
 
                     return null;
