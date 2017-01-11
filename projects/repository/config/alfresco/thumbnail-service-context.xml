@@ -56,6 +56,7 @@
         <property name="behaviourFilter" ref="policyBehaviourFilter" />
         <property name="ruleService" ref="ruleService"/>
         <property name="transactionService" ref="TransactionService" />
+        <property name="lockService" ref="LockService" />
         <!-- Generate thumbnails at all? A false value turns generation off regardless of mimetype -->
         <property name="thumbnailsEnabled">
             <value>${system.thumbnail.generate}</value>
