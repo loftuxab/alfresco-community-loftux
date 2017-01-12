@@ -61,7 +61,7 @@
     </dependencies>
 
     <build>
-        <finalName>alfresco-content-services-community-file-transfer-receiver-${project.version}</finalName>
+        <finalName>alfresco-community-file-transfer-receiver-${project.version}</finalName>
         <plugins>
             <!-- Build Launcher jar -->
             <plugin>
