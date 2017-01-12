@@ -54,6 +54,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.repo.transaction.TransactionalResourceHelper;
 import org.alfresco.service.cmr.lock.LockService;
+import org.alfresco.service.cmr.lock.LockStatus;
 import org.alfresco.service.cmr.rendition.RenditionDefinition;
 import org.alfresco.service.cmr.rendition.RenditionService;
 import org.alfresco.service.cmr.rendition.RenditionServiceException;
@@ -814,7 +815,9 @@ public class ThumbnailServiceImpl implements ThumbnailService,
 
                        NodeRef parentNode = parent.getParentRef();
 
-                       if(!lockService.isLocked(parentNode))
+                       LockStatus lockStatus = lockService.getLockStatus(parentNode, AuthenticationUtil.getFullyAuthenticatedUser());
+
+                       if(lockStatus != LockStatus.LOCKED)
                        {
                            // we don't want to audit any changes to the parent here.
                            behaviourFilter.disableBehaviour(parentNode, ContentModel.ASPECT_AUDITABLE);
