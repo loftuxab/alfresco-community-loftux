@@ -25,9 +25,6 @@
  */
 package org.alfresco.rest.api.impl;
 
-import java.io.Serializable;
-import java.util.*;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
@@ -61,8 +58,19 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.cmr.usage.ContentUsageService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
+
+import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Centralises access to people services and maps between representations.
@@ -72,32 +80,12 @@ import org.alfresco.util.Pair;
  */
 public class PeopleImpl implements People
 {
+    private static final List<String> EXCLUDED_NS = Arrays.asList(
+            NamespaceService.SYSTEM_MODEL_1_0_URI,
+            "http://www.alfresco.org/model/user/1.0",
+            NamespaceService.CONTENT_MODEL_1_0_URI);
 	private static final List<QName> EXCLUDED_ASPECTS = Arrays.asList();
-	private static final List<QName> EXCLUDED_PROPS = Arrays.asList(
-			ContentModel.PROP_USERNAME,
-			ContentModel.PROP_FIRSTNAME,
-			ContentModel.PROP_LASTNAME,
-			ContentModel.PROP_JOBTITLE,
-			ContentModel.PROP_LOCATION,
-			ContentModel.PROP_TELEPHONE,
-			ContentModel.PROP_MOBILE,
-			ContentModel.PROP_EMAIL,
-			ContentModel.PROP_ORGANIZATION,
-			ContentModel.PROP_COMPANYADDRESS1,
-			ContentModel.PROP_COMPANYADDRESS2,
-			ContentModel.PROP_COMPANYADDRESS3,
-			ContentModel.PROP_COMPANYPOSTCODE,
-			ContentModel.PROP_COMPANYTELEPHONE,
-			ContentModel.PROP_COMPANYFAX,
-			ContentModel.PROP_COMPANYEMAIL,
-			ContentModel.PROP_SKYPE,
-			ContentModel.PROP_INSTANTMSG,
-			ContentModel.PROP_USER_STATUS,
-			ContentModel.PROP_USER_STATUS_TIME,
-			ContentModel.PROP_GOOGLEUSERNAME,
-			ContentModel.PROP_SIZE_QUOTA,
-			ContentModel.PROP_SIZE_CURRENT,
-			ContentModel.PROP_EMAIL_FEED_DISABLED);
+	private static final List<QName> EXCLUDED_PROPS = Arrays.asList();
 	protected Nodes nodes;
 	protected Sites sites;
 
@@ -291,6 +279,7 @@ public class PeopleImpl implements People
     }
 
     /**
+     * Get a full representation of a person.
      * 
      * @throws NoSuchPersonException
      *             if personId does not exist
@@ -301,6 +290,14 @@ public class PeopleImpl implements People
         List<String> include = Arrays.asList(
                 PARAM_INCLUDE_ASPECTNAMES,
                 PARAM_INCLUDE_PROPERTIES);
+        Person person = getPersonWithProperties(personId, include);
+
+        return person;
+    }
+    
+    public Person getPerson(String personId, List<String> include)
+    {
+        personId = validatePerson(personId);
         Person person = getPersonWithProperties(personId, include);
 
         return person;
@@ -390,15 +387,15 @@ public class PeopleImpl implements People
             // Expose properties
             if (include.contains(PARAM_INCLUDE_PROPERTIES))
             {
-                Map<String, Object> custProps = new HashMap<>();
-                custProps.putAll(nodes.mapFromNodeProperties(nodeProps, new ArrayList<>(), new HashMap<>(), EXCLUDED_PROPS));
+                // Note that custProps may be null.
+                Map<String, Object> custProps = nodes.mapFromNodeProperties(nodeProps, new ArrayList<>(), new HashMap<>(), EXCLUDED_NS, EXCLUDED_PROPS);
                 person.setProperties(custProps);
             }
             if (include.contains(PARAM_INCLUDE_ASPECTNAMES))
             {
                 // Expose aspect names
                 Set<QName> aspects = nodeService.getAspects(personNode);
-                person.setAspectNames(nodes.mapFromNodeAspects(aspects, EXCLUDED_ASPECTS));
+                person.setAspectNames(nodes.mapFromNodeAspects(aspects, EXCLUDED_NS, EXCLUDED_ASPECTS));
             }
             
             // get avatar information
@@ -428,7 +425,13 @@ public class PeopleImpl implements People
 	{
 		validateCreatePersonData(person);
 
-		// TODO: check, is this transaction safe?
+        if (! isAdminAuthority())
+        {
+            // note: do an explict check for admin here (since personExists does not throw 403 unlike createPerson,
+            // hence next block would cause 409 to be returned)
+            throw new PermissionDeniedException();
+        }
+
 		// Unfortunately PersonService.createPerson(...) only throws an AlfrescoRuntimeException
 		// rather than a more specific exception and does not use a message ID either, so there's
 		// no sensible way to know that it was thrown due to the user already existing - hence this check here.
@@ -486,8 +489,15 @@ public class PeopleImpl implements People
             @Override
             public Void doWork() throws Exception
             {
-                ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_PERSONDESC, true);
-                writer.putContent(description);
+                if (description != null)
+                {
+                    ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_PERSONDESC, true);
+                    writer.putContent(description);
+                }
+                else
+                {
+                    nodeService.setProperty(nodeRef, ContentModel.PROP_PERSONDESC, null);
+                }
                 return null;
             }
         });
@@ -495,78 +505,76 @@ public class PeopleImpl implements People
 
 	private void validateCreatePersonData(Person person)
 	{
+        validateNamespaces(person.getAspectNames(), person.getProperties());
 		checkRequiredField("id", person.getUserName());
 		checkRequiredField("firstName", person.getFirstName());
 		checkRequiredField("email", person.getEmail());
 		checkRequiredField("password", person.getPassword());
 	}
-	
-	private void checkRequiredField(String fieldName, Object fieldValue)
+
+    private void validateNamespaces(List<String> aspectNames, Map<String, Object> properties)
+    {
+        if (aspectNames != null)
+        {
+            Set<QName> aspects = nodes.mapToNodeAspects(aspectNames);
+            aspects.forEach(aspect ->
+            {
+                if (EXCLUDED_NS.contains(aspect.getNamespaceURI()))
+                {
+                    throw new IllegalArgumentException("Namespace cannot be used by People API: "+aspect.toPrefixString());
+                }
+            });
+        }
+        
+        if (properties != null)
+        {
+            Map<QName, Serializable> nodeProps = nodes.mapToNodeProperties(properties);
+            nodeProps.keySet().forEach(qname ->
+            {
+                if (EXCLUDED_NS.contains(qname.getNamespaceURI()))
+                {
+                    throw new IllegalArgumentException("Namespace cannot be used by People API: "+qname.toPrefixString());
+                }
+            });
+        }
+    }
+
+    private void checkRequiredField(String fieldName, Object fieldValue)
 	{
 		if (fieldValue == null)
 		{
 			throw new InvalidArgumentException("Field '"+fieldName+"' is null, but is required.");
 		}
+
+        // belts-and-braces - note: should not see empty string (since converted to null via custom json deserializer)
+        if ((fieldValue instanceof String) && ((String)fieldValue).isEmpty())
+        {
+            throw new InvalidArgumentException("Field '"+fieldName+"' is empty, but is required.");
+        }
 	}
 
     public Person update(String personId, final Person person)
     {
-        MutableAuthenticationService mutableAuthenticationService = (MutableAuthenticationService) authenticationService;
+        boolean isAdmin = isAdminAuthority();
+
+        validateUpdatePersonData(person);
 
         String currentUserId = AuthenticationUtil.getFullyAuthenticatedUser();
-        if (!isAdminAuthority() && !currentUserId.equalsIgnoreCase(personId))
+        if (!isAdmin && !currentUserId.equalsIgnoreCase(personId))
         {
             // The user is not an admin user and is not attempting to update *their own* details.
             throw new PermissionDeniedException();
-        }
-        if (!isAdminAuthority() && person.getOldPassword() != null && person.getPassword() == null)
-        {
-            throw new IllegalArgumentException("To change password, both 'oldPassword' and 'password' fields are required.");
         }
 
         final String personIdToUpdate = validatePerson(personId);
         final Map<QName, Serializable> properties = person.toProperties();
 
-        if (person.getPassword() != null && !person.getPassword().isEmpty())
-        {
-            // An admin user can update without knowing the original pass - but must know their own!
-            char[] newPassword = person.getPassword().toCharArray();
-            if (isAdminAuthority())
-            {
-                mutableAuthenticationService.setAuthentication(personIdToUpdate, newPassword);
-            }
-            else
-            {
-                // Non-admin users can update their own password, but must provide their current password.
-                if (person.getOldPassword() == null)
-                {
-                    throw new PermissionDeniedException("Existing password is required, but missing (field 'oldPassword').");
-                }
-                char[] oldPassword = person.getOldPassword().toCharArray();
-                try
-                {
-                    mutableAuthenticationService.updateAuthentication(personIdToUpdate, oldPassword, newPassword);
-                }
-                catch (AuthenticationException e)
-                {
-                    // TODO: add to exception mappings/handler
-                    throw new PermissionDeniedException("Incorrect existing password.");
-                }
-            }
-        }
+        // if requested, update password
+        updatePassword(isAdmin, personIdToUpdate, person);
 
-        if (person.isEnabled() != null)
-        {
-            if (isAdminAuthority(personIdToUpdate))
-            {
-                throw new PermissionDeniedException("Admin authority cannot be disabled.");
-            }
-
-            mutableAuthenticationService.setAuthenticationEnabled(personIdToUpdate, person.isEnabled());
-        }
 
 		NodeRef personNodeRef = personService.getPerson(personIdToUpdate, false);
-		if (person.getDescription() != null)
+		if (person.wasSet(Person.PROP_PERSON_DESCRIPTION))
         {
 			// Remove person description from saved properties
 			properties.remove(ContentModel.PROP_PERSONDESC);
@@ -575,6 +583,11 @@ public class PeopleImpl implements People
             savePersonDescription(person.getDescription(), personNodeRef);
         }
 
+        // Update custom aspects - do this *before* adding custom properties. The
+        // addition of custom properties may result in the auto-addition of aspects
+        // and we don't want to remove them during the update of explicitly specified aspects.
+        nodes.updateCustomAspects(personNodeRef, person.getAspectNames(), EXCLUDED_ASPECTS);
+        
 		// Add custom properties
 		if (person.getProperties() != null)
 		{
@@ -592,12 +605,95 @@ public class PeopleImpl implements People
                 return null;
             }
         });
-
-		// Update custom aspects
-		nodes.updateCustomAspects(personNodeRef, person.getAspectNames(), EXCLUDED_ASPECTS);
 		
         return getPerson(personId);
     }
+
+    private void validateUpdatePersonData(Person person)
+    {
+        validateNamespaces(person.getAspectNames(), person.getProperties());
+        
+        if (person.wasSet(ContentModel.PROP_FIRSTNAME))
+        {
+            checkRequiredField("firstName", person.getFirstName());
+        }
+
+        if (person.wasSet(ContentModel.PROP_EMAIL))
+        {
+            checkRequiredField("email", person.getEmail());
+        }
+
+        if (person.wasSet(ContentModel.PROP_ENABLED) && (person.isEnabled() == null))
+        {
+            throw new IllegalArgumentException("'enabled' field cannot be empty.");
+        }
+
+        if (person.wasSet(ContentModel.PROP_EMAIL_FEED_DISABLED) && (person.isEmailNotificationsEnabled() == null))
+        {
+            throw new IllegalArgumentException("'emailNotificationsEnabled' field cannot be empty.");
+        }
+    }
+
+    private void updatePassword(boolean isAdmin, String personIdToUpdate, Person person)
+    {
+        MutableAuthenticationService mutableAuthenticationService = (MutableAuthenticationService) authenticationService;
+
+        boolean isOldPassword = person.wasSet(Person.PROP_PERSON_OLDPASSWORD);
+        boolean isPassword = person.wasSet(Person.PROP_PERSON_PASSWORD);
+
+        if (isPassword || isOldPassword)
+        {
+            if (isOldPassword && ((person.getOldPassword() == null) || (person.getOldPassword().isEmpty())))
+            {
+                throw new IllegalArgumentException("'oldPassword' field cannot be empty.");
+            }
+
+            if (!isPassword || (person.getPassword() == null) || (person.getPassword().isEmpty()))
+            {
+                throw new IllegalArgumentException("password' field cannot be empty.");
+            }
+
+            char[] newPassword = person.getPassword().toCharArray();
+
+            if (!isAdmin)
+            {
+                // Non-admin users can update their own password, but must provide their current password.
+                if (!isOldPassword)
+                {
+                    throw new IllegalArgumentException("To change password, both 'oldPassword' and 'password' fields are required.");
+                }
+
+                char[] oldPassword = person.getOldPassword().toCharArray();
+                try
+                {
+                    mutableAuthenticationService.updateAuthentication(personIdToUpdate, oldPassword, newPassword);
+                }
+                catch (AuthenticationException e)
+                {
+                    throw new PermissionDeniedException("Incorrect password.");
+                }
+            }
+            else
+            {
+                // An admin user can update without knowing the original pass - but must know their own!
+                // note: is it reasonable to silently ignore oldPassword if supplied ?
+
+                mutableAuthenticationService.setAuthentication(personIdToUpdate, newPassword);
+            }
+        }
+
+        if (person.isEnabled() != null)
+        {
+            if (isAdminAuthority(personIdToUpdate))
+            {
+                throw new PermissionDeniedException("Admin authority cannot be disabled.");
+            }
+
+            mutableAuthenticationService.setAuthenticationEnabled(personIdToUpdate, person.isEnabled());
+        }
+
+    }
+
 
     private boolean isAdminAuthority()
     {

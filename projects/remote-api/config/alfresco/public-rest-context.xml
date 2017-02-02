@@ -136,9 +136,7 @@
        <property name="exceptionMappings">
             <map>
                 <entry key="org.alfresco.rest.framework.core.exceptions.ApiException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_INTERNAL_SERVER_ERROR}" />
-                <entry key="java.lang.NullPointerException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_INTERNAL_SERVER_ERROR}" />
-                <entry key="java.lang.IndexOutOfBoundsException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_INTERNAL_SERVER_ERROR}" />
-                <entry key="java.lang.OutOfMemoryError" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_INTERNAL_SERVER_ERROR}" />
+                <entry key="java.lang.Throwable" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_INTERNAL_SERVER_ERROR}" />
                 <entry key="java.lang.IllegalArgumentException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
                 <entry key="org.alfresco.service.cmr.repository.CyclicChildRelationshipException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.InvalidArgumentException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_BAD_REQUEST}" />
@@ -423,6 +421,7 @@
         <property name="commentService" ref="CommentService" />
         <property name="contentService" ref="ContentService" />
         <property name="typeConstraint" ref="nodeTypeConstraint" />
+        <property name="people" ref="people"/>
     </bean>
 
     <bean id="Comments" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -839,7 +838,7 @@
         <property name="nodeAssocService" ref="NodeAssocService"/>
     </bean>
 
-    <bean class="org.alfresco.rest.api.nodes.NodeVersionsRelation" parent="baseNodeRelation">
+    <bean id="nodeVersionsRelation" class="org.alfresco.rest.api.nodes.NodeVersionsRelation" parent="baseNodeRelation">
         <property name="behaviourFilter" ref="policyBehaviourFilter"/>
     </bean>
     
@@ -894,13 +893,22 @@
         <property name="assistant" ref="apiAssistant" />
         <property name="helper" ref="webscriptHelper" />
         <property name="resultMapper" ref="searchapiResultMapper" />
+        <property name="searchMapper" ref="searchapiSearchMapper" />
+    </bean>
+
+    <bean id="searchapiStoreMapper" class="org.alfresco.rest.api.search.impl.StoreMapper" />
+
+    <bean id="searchapiSearchMapper" class="org.alfresco.rest.api.search.impl.SearchMapper">
+        <property name="storeMapper" ref="searchapiStoreMapper" />
     </bean>
 
     <bean id="searchapiResultMapper" class="org.alfresco.rest.api.search.impl.ResultMapper">
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+        <property name="storeMapper" ref="searchapiStoreMapper" />
+        <property name="nodeVersions" ref="nodeVersionsRelation" />
         <property name="nodes" ref="Nodes" />
-        <property name="propertyLookup">
-            <ref bean="publicapi.propertyLookups"/>
-        </property>
+        <property name="deletedNodes"  ref="DeletedNodes" />
+        <property name="propertyLookup" ref="publicapi.propertyLookups" />
     </bean>
 
     <bean id="webscript.org.alfresco.api.DiscoveryApiWebscript.get"
