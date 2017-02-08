@@ -890,14 +890,14 @@ public class NodesImpl implements Nodes
 
         if (includeParam.size() > 0)
         {
-            node.setProperties(mapFromNodeProperties(properties, includeParam, mapUserInfo, EXCLUDED_PROPS));
+            node.setProperties(mapFromNodeProperties(properties, includeParam, mapUserInfo, EXCLUDED_NS, EXCLUDED_PROPS));
         }
 
         Set<QName> aspects = null;
         if (includeParam.contains(PARAM_INCLUDE_ASPECTNAMES))
         {
             aspects = nodeService.getAspects(nodeRef);
-            node.setAspectNames(mapFromNodeAspects(aspects, EXCLUDED_ASPECTS));
+            node.setAspectNames(mapFromNodeAspects(aspects, EXCLUDED_NS, EXCLUDED_ASPECTS));
         }
 
         if (includeParam.contains(PARAM_INCLUDE_ISLINK))
@@ -1099,7 +1099,7 @@ public class NodesImpl implements Nodes
         return new PathInfo(pathStr, isComplete, pathElements);
     }
 
-    protected Set<QName> mapToNodeAspects(List<String> aspectNames)
+    public Set<QName> mapToNodeAspects(List<String> aspectNames)
     {
         Set<QName> nodeAspects = new HashSet<>(aspectNames.size());
 
@@ -1161,7 +1161,7 @@ public class NodesImpl implements Nodes
         return nodeProps;
     }
     
-    public Map<String, Object> mapFromNodeProperties(Map<QName, Serializable> nodeProps, List<String> selectParam, Map<String,UserInfo> mapUserInfo, List<QName> excludedProps)
+    public Map<String, Object> mapFromNodeProperties(Map<QName, Serializable> nodeProps, List<String> selectParam, Map<String,UserInfo> mapUserInfo, List<String> excludedNS, List<QName> excludedProps)
     {
         List<QName> selectedProperties;
 
@@ -1171,7 +1171,7 @@ public class NodesImpl implements Nodes
             selectedProperties = new ArrayList<>(nodeProps.size());
             for (QName propQName : nodeProps.keySet())
             {
-                if ((! EXCLUDED_NS.contains(propQName.getNamespaceURI())) && (! excludedProps.contains(propQName)))
+                if ((! excludedNS.contains(propQName.getNamespaceURI())) && (! excludedProps.contains(propQName)))
                 {
                     selectedProperties.add(propQName);
                 }
@@ -1209,13 +1209,13 @@ public class NodesImpl implements Nodes
         return props;
     }
 
-    public List<String> mapFromNodeAspects(Set<QName> nodeAspects, List<QName> excludedAspects)
+    public List<String> mapFromNodeAspects(Set<QName> nodeAspects, List<String> excludedNS, List<QName> excludedAspects)
     {
         List<String> aspectNames = new ArrayList<>(nodeAspects.size());
 
         for (QName aspectQName : nodeAspects)
         {
-            if ((! EXCLUDED_NS.contains(aspectQName.getNamespaceURI())) && (! excludedAspects.contains(aspectQName)))
+            if ((! excludedNS.contains(aspectQName.getNamespaceURI())) && (! excludedAspects.contains(aspectQName)))
             {
                 aspectNames.add(aspectQName.toPrefixString(namespaceService));
             }
@@ -1295,7 +1295,8 @@ public class NodesImpl implements Nodes
                 FileInfo fInfo = page.get(index);
 
                 // minimal info by default (unless "include"d otherwise)
-                return getFolderOrDocument(fInfo.getNodeRef(), parentNodeRef, fInfo.getType(), includeParam, mapUserInfo);
+                // (pass in null as parentNodeRef to force loading of primary parent node as parentId)
+                return getFolderOrDocument(fInfo.getNodeRef(), null, fInfo.getType(), includeParam, mapUserInfo);
             }
 
             @Override
@@ -1978,7 +1979,7 @@ public class NodesImpl implements Nodes
     }
 
     /**
-     * Posts activites based on the activity_type.
+     * Posts activities based on the activity_type.
      * If the method is called with aSync=true then a TransactionListener is used post the activity
      * afterCommit.  Otherwise the activity posting is done synchronously.
      * @param activity_type
@@ -2009,9 +2010,19 @@ public class NodesImpl implements Nodes
         }
     }
 
+    // note: see also org.alfresco.opencmis.ActivityPosterImpl
     protected ActivityInfo getActivityInfo(NodeRef parentNodeRef, NodeRef nodeRef)
     {
-        SiteInfo siteInfo = siteService.getSite(nodeRef);
+        // runAs system, eg. user may not have permission see one or more parents (irrespective of whether in a site context of not)
+        SiteInfo siteInfo = AuthenticationUtil.runAs(new RunAsWork<SiteInfo>()
+        {
+            @Override
+            public SiteInfo doWork() throws Exception
+            {
+                return siteService.getSite(nodeRef);
+            }
+        }, AuthenticationUtil.getSystemUserName());
+
         String siteId = (siteInfo != null ? siteInfo.getShortName() : null);
         if(siteId != null && !siteId.equals(""))
         {
@@ -2244,10 +2255,19 @@ public class NodesImpl implements Nodes
                         accessStatus = AccessStatus.valueOf(nodePerm.getAccessStatus());
                     }
 
-                    if ((authorityId == null) || 
-                         ((! authorityId.equals(PermissionService.ALL_AUTHORITIES) && (! authorityService.authorityExists(authorityId)))))
+                    if (authorityId == null || authorityId.isEmpty())
                     {
-                        throw new InvalidArgumentException("Cannot set permissions on this node - unknown authority: "+authorityId);
+                        throw new InvalidArgumentException("Authority Id is expected.");
+                    }
+
+                    if (permName == null || permName.isEmpty())
+                    {
+                        throw new InvalidArgumentException("Permission name is expected.");
+                    }
+
+                    if (((!authorityId.equals(PermissionService.ALL_AUTHORITIES) && (!authorityService.authorityExists(authorityId)))))
+                    {
+                        throw new InvalidArgumentException("Cannot set permissions on this node - unknown authority: " + authorityId);
                     }
 
                     AccessPermission existing = null;
@@ -2928,25 +2948,16 @@ public class NodesImpl implements Nodes
             // Do not clean formData temp files to allow for retries.
             // Temp files will be deleted later when GC call DiskFileItem#finalize() method or by temp file cleaner.
         }
-        catch (ApiException apiEx)
-        {
-            // As this is an public API fwk exception, there is no need to convert it, so just throw it.
-            throw apiEx;
-        }
         catch (AccessDeniedException ade)
         {
             throw new PermissionDeniedException(ade.getMessage());
         }
-        catch (Exception ex)
-        {
-            /*
-             * NOTE: Do not clean formData temp files to allow for retries. It's
-             * possible for a temp file to remain if max retry attempts are
-             * made, but this is rare, so leave to usual temp file cleanup.
-             */
 
-            throw new ApiException("Unexpected error occurred during upload of new content.", ex);
-        }
+        /*
+         * NOTE: Do not clean formData temp files to allow for retries. It's
+         * possible for a temp file to remain if max retry attempts are
+         * made, but this is rare, so leave to usual temp file cleanup.
+         */
     }
 
     private NodeRef createNewFile(NodeRef parentNodeRef, String fileName, QName nodeType, Content content, Map<QName, Serializable> props, QName assocTypeQName, Parameters params,

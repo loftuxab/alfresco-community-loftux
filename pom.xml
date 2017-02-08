@@ -174,12 +174,12 @@
     <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
     <dependency.mysql.version>5.1.39</dependency.mysql.version>
     <dependency.postgresql.version>9.4.1211.jre7</dependency.postgresql.version>
-    <dependency.api-explorer.version>1.4</dependency.api-explorer.version>
+    <dependency.api-explorer.version>5.2.e</dependency.api-explorer.version>
 
     <dependency.alfresco-trashcan-cleaner.version>2.2</dependency.alfresco-trashcan-cleaner.version>
 
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1.4</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.5</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
