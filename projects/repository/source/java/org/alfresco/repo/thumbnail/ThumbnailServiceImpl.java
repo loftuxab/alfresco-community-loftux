@@ -164,7 +164,7 @@ public class ThumbnailServiceImpl implements ThumbnailService,
     }
 
     /**
-     * Set the node service
+     * Set the lockService service
      *
      * @param lockService   LockService
      */
@@ -821,6 +821,7 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                        {
                            // we don't want to audit any changes to the parent here.
                            behaviourFilter.disableBehaviour(parentNode, ContentModel.ASPECT_AUDITABLE);
+                           behaviourFilter.disableBehaviour(parentNode, ContentModel.ASPECT_VERSIONABLE);
                            try
                            {
                                if (nodeService.hasAspect(parentNode, ContentModel.ASPECT_THUMBNAIL_MODIFICATION))
@@ -894,6 +895,7 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                            finally
                            {
                                behaviourFilter.enableBehaviour(parentNode, ContentModel.ASPECT_AUDITABLE);
+                               behaviourFilter.enableBehaviour(parentNode, ContentModel.ASPECT_VERSIONABLE);
                            }
                        }
                        else
@@ -923,10 +925,13 @@ public class ThumbnailServiceImpl implements ThumbnailService,
 
             Set<ChildAssociationRef> childAssocs =  TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES);
 
-            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>() {
-                @Override
-                public Object doWork() throws Exception {
+            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
 
+                @Override
+                public Void doWork() throws Exception {
+
+                    // MNT-15135: Do the property update in a new transaction, in case the parent node was already changed (has a different version) in another transaction.
+                    // This way the failures will not propagate up the retry stack.
                     RetryingTransactionHelper txnHelper = transactionService.getRetryingTransactionHelper();
                     txnHelper.setForceWritable(true);
                     txnHelper.doInTransaction(new RetryingTransactionCallback<Void>()
@@ -958,7 +963,6 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                                 String thumbnailName = (String) nodeService.getProperty(thumbnailNodeRef, ContentModel.PROP_NAME);
                                 try
                                 {
-                                    behaviourFilter.disableBehaviour(sourceNodeRef, ContentModel.ASPECT_VERSIONABLE);
                                     // Update the parent node with the thumbnail update...
                                     if (logger.isDebugEnabled())
                                     {
@@ -967,9 +971,13 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                                     }
                                     addThumbnailModificationData(thumbnailNodeRef, thumbnailName);
                                 }
-                                finally
+                                catch (Error e)
                                 {
-                                    behaviourFilter.enableBehaviour(sourceNodeRef, ContentModel.ASPECT_VERSIONABLE);
+                                    if (logger.isDebugEnabled())
+                                    {
+                                        logger.debug("Error: " + e.getMessage());
+                                        logger.debug(e.getStackTrace());
+                                    }
                                 }
                             }
 
@@ -978,7 +986,7 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                     }, false, true);
                     return null;
                 }
-            }, AuthenticationUtil.SYSTEM_USER_NAME);
+            }, AuthenticationUtil.getSystemUserName());
 
         }
     }
