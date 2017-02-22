@@ -117,6 +117,11 @@ public class OpenOfficeVariant
 
     public boolean isLibreOffice3Dot5(File officeHome)
     {
+        return (new File(officeHome, "ure-link").isFile() || new File(officeHome, "ure-link").isDirectory());
+    }
+
+    public boolean useNewLibreOfficeConfig(File officeHome)
+    {
         if (logger.isDebugEnabled())
         {
             logger.debug("System.getProperty(\"os.name\")="+System.getProperty("os.name"));
@@ -127,19 +132,24 @@ public class OpenOfficeVariant
             logger.debug("  ure-link:"+new File(officeHome, "ure-link").isDirectory());
             logger.debug("    NOTICE:"+new File(officeHome, "NOTICE").isFile());
         }
-        return
-            officeHome != null &&
-            !new File(officeHome, "basis-link").isFile() &&
-            (new File(officeHome, "ure-link").isFile() || new File(officeHome, "ure-link").isDirectory());
-    }
-
-    public boolean isLibreOffice3Dot6(File officeHome)
-    {
+        if(new File(officeHome, "NOTICE").isFile()) {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Using New config");
+            }
+            return true;
+        } else if (isLibreOffice3Dot5(officeHome)) {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Using Old config");
+            }
+            return false;
+        }
         if (logger.isDebugEnabled())
         {
-            logger.debug("    NOTICE:"+new File(officeHome, "NOTICE").isFile());
+            logger.debug("Using New config - default");
         }
-        return isLibreOffice3Dot5(officeHome) && new File(officeHome, "NOTICE").isFile();
+        return true;
     }
 
     public boolean isLinux()
