@@ -60,17 +60,11 @@ public class OpenOfficeCommandLine extends AbstractMap<String, List<String>>
         String acceptValue = "socket,host=127.0.0.1,port="+port+";urp;StarOffice.ServiceManager";
         String userInstallation = new OpenOfficeURI(user).toString();
         command.add(executable == null ? exe : executable.getAbsolutePath());
-        if (variant.isLibreOffice3Dot5(officeHome))
+        if (variant.useNewLibreOfficeConfig(officeHome))
         {
             command.add("--accept=" + acceptValue);
-            if (variant.isMac() && !variant.isLibreOffice3Dot6(officeHome))
-            {
-                command.add("--env:UserInstallation=" + userInstallation);
-            }
-            else
-            {
-                command.add("-env:UserInstallation=" + userInstallation);
-            }
+
+            command.add("-env:UserInstallation=" + userInstallation);
             command.add("--headless");
             command.add("--nocrashreport");
             //command.add("--nodefault"); included by JOD
@@ -78,9 +72,8 @@ public class OpenOfficeCommandLine extends AbstractMap<String, List<String>>
             //command.add("--nolockcheck"); included by JOD
             command.add("--nologo");
             command.add("--norestore");
-            logger.info("Using GNU based LibreOffice "+
-                    (variant.isLibreOffice3Dot6(officeHome) ? "3.6" : "3.5")+" command"+
-                    (variant.isMac() ? " on Mac" : "")+": "+command);
+            logger.info("Using GNU based LibreOffice command"+
+                    (variant.isMac() ? " on Mac" : "") + ": "+command);
         }
         else
         {
