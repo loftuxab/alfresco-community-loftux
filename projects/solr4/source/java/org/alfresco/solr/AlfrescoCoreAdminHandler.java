@@ -62,15 +62,21 @@ import org.alfresco.util.CachingDateFormat;
 import org.alfresco.util.shard.ExplicitShardingPolicy;
 import org.apache.commons.codec.EncoderException;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.log4j.Level;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.params.CoreAdminParams;
 import org.apache.solr.common.params.SolrParams;
 import org.apache.solr.common.util.NamedList;
 import org.apache.solr.common.util.SimpleOrderedMap;
+import org.apache.solr.core.ConfigSolr;
 import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.CoreDescriptor;
 import org.apache.solr.core.SolrCore;
+import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.handler.admin.CoreAdminHandler;
+import org.apache.solr.logging.ListenerConfig;
+import org.apache.solr.logging.LogWatcher;
+import org.apache.solr.logging.log4j.EventAppender;
 import org.apache.solr.request.SolrQueryRequest;
 import org.apache.solr.response.SolrQueryResponse;
 import org.json.JSONException;
@@ -104,8 +110,8 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
     {
         super(coreContainer);
         this.scheduler = new SolrTrackerScheduler(this);
-        initResourceBasedLogging("log4j.properties");
-        initResourceBasedLogging("log4j-solr.properties");
+
+        initResourceBasedLogging(coreContainer, "log4j-solr.properties");
     }
 
     public void shutdown() {
@@ -125,7 +131,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
             log.info("", e);
         }
     }
-    private void initResourceBasedLogging(String resource)
+    private void initResourceBasedLogging(CoreContainer coreContainer, String resource)
     {
         try
         {
@@ -138,12 +144,23 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
         }
         catch (ClassNotFoundException e)
         {
-            return;
+            log.info("ClassNotFoundException  ", e);
         }
         catch (Exception e)
         {
-            log.info("Failed to load " + resource, e);
+            log.info("Failed to load logging resource " + resource, e);
         }
+
+        ListenerConfig cfg = coreContainer.getConfig().getLogWatcherConfig().asListenerConfig();
+        EventAppender appender = new EventAppender(coreContainer.getLogging());
+        if(cfg.threshold != null) {
+            appender.setThreshold(Level.toLevel(cfg.threshold));
+        }
+        else {
+            appender.setThreshold(Level.WARN);
+        }
+        org.apache.log4j.Logger rootLogger = org.apache.log4j.LogManager.getRootLogger();
+        rootLogger.addAppender(appender);
     }
 
     private InputStream openResource(CoreContainer coreContainer, String resource)
@@ -329,7 +346,7 @@ public class AlfrescoCoreAdminHandler extends CoreAdminHandler
                 {
                     resource = params.get("resource");
                 }
-                initResourceBasedLogging(resource);
+                initResourceBasedLogging(coreContainer, resource);
             }
             else
             {
