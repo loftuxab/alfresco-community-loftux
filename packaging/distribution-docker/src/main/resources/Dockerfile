@@ -5,7 +5,7 @@ ENV LANG C.UTF-8
 ARG alfUrl
 ARG alfInstallerVer
 ARG alfVer
-ENV ALF_URL ${alfUrl:-nightlybuilds.alfresco.com/Enterprise-${alfVer}/${alfVer}.N/LATEST/ALL/alfresco-content-services-installer-${alfInstallerVer}-linux-x64.bin
+ENV ALF_URL ${alfUrl:-https://nightlybuilds.alfresco.com/Enterprise-${alfVer}/${alfVer}.N/LATEST/ALL/alfresco-content-services-installer-${alfInstallerVer}-linux-x64.bin
 ENV ALF_INSTALLER_DIR /alfresco/installer
 ENV ALF_INSTALLER_BIN $ALF_INSTALLER_DIR/installer.bin
 ENV ALFRESCO_HOME /opt/alfresco
