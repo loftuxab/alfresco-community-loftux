@@ -141,10 +141,10 @@
     <dependency.jackson2.version>2.8.3</dependency.jackson2.version>
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
-    <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
+    <dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.13</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.9</dependency.alfresco-core.version>
-    <dependency.alfresco-data-model.version>6.7</dependency.alfresco-data-model.version>
+    <dependency.alfresco-core.version>6.10</dependency.alfresco-core.version>
+    <dependency.alfresco-data-model.version>6.9</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.2</dependency.alfresco-xmlfactory.version>
     <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
@@ -156,7 +156,7 @@
     <dependency.alfresco-trashcan-cleaner.version>2.2</dependency.alfresco-trashcan-cleaner.version>
 
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1.4</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.5</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
     <installer.common.version>5.1-20151118</installer.common.version>
