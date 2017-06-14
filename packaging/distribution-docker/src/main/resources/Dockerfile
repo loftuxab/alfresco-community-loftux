@@ -24,7 +24,7 @@ RUN touch $ALFRESCO_HOME/alfresco.log
 COPY enablecors*.jar $ALFRESCO_HOME/modules/platform/
 COPY api-explorer*.war $ALFRESCO_HOME/tomcat/webapps/api-explorer.war
 
-RUN wget -O "$ALF_INSTALLER_BIN" "$ALF_URL" \
+RUN wget --no-check-certificate -O "$ALF_INSTALLER_BIN" "$ALF_URL" \
    && chmod +x $ALF_INSTALLER_BIN; sync \
    && .$ALF_INSTALLER_BIN --optionfile $ALF_INSTALLER_DIR/install_options.txt \
    && mkdir -p $ALFRESCO_HOME/alf_data \
