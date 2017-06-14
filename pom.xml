@@ -142,7 +142,7 @@
     <dependency.poi.version>3.10.1-20151016-alfresco-patched</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.3</dependency.alfresco-authorised-users.version>
-    <dependency.webscripts.version>6.12</dependency.webscripts.version>
+    <dependency.webscripts.version>6.13</dependency.webscripts.version>
     <dependency.alfresco-core.version>6.9</dependency.alfresco-core.version>
     <dependency.alfresco-data-model.version>6.7</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.2</dependency.alfresco-xmlfactory.version>
