@@ -24,7 +24,7 @@
  * #L%
  */
 
-package org.alfresco.rest.api.search.impl;
+package org.alfresco.repo.search.impl.solr.facet.facetsresponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,6 @@ import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetRespo
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric.METRIC_TYPE;
 import org.alfresco.repo.search.impl.solr.facet.facetsresponse.SimpleMetric;
-import org.alfresco.rest.api.search.model.SearchQuery;
 import org.alfresco.service.cmr.search.RangeParameters;
 
 /**Helper to map range results.
@@ -55,17 +54,16 @@ public class RangeResultMapper
      * @param searchQuery
      * @return GenericFacetResponse
      */
-    public static List<GenericFacetResponse> getGenericFacetsForRanges( Map<String,List<Map<String,String>>> facetFields, SearchQuery searchQuery)
+    public static List<GenericFacetResponse> getGenericFacetsForRanges(Map<String,List<Map<String,String>>> facetFields, List<RangeParameters> ranges)
     {
         List<GenericFacetResponse> ffcs = new ArrayList<>(facetFields.size());
-        if (facetFields != null && !facetFields.isEmpty() && searchQuery.getQuery() != null)
+        if (facetFields != null && !facetFields.isEmpty())
         {
             for (Entry<String, List<Map<String, String>>> facet : facetFields.entrySet())
             {
                 List<GenericBucket> buckets = new ArrayList<>();
                 facet.getValue().forEach(action -> buckets.add(buildGenericBucketFromRange(facet.getKey(),
-                        (Map<String, String>) action,
-                        searchQuery.getFacetRanges())));
+                        (Map<String, String>) action, ranges)));
                 ffcs.add(new GenericFacetResponse(FACET_TYPE.range, facet.getKey(), buckets));
             }
         }
@@ -84,20 +82,22 @@ public class RangeResultMapper
         String end = facet.get(GenericFacetResponse.END);
         boolean startInclusive = true;
         boolean endInclusive = false;
-        
-        for(RangeParameters range : ranges)
-        {
-            if(range.getField().equalsIgnoreCase(facetField))
+
+        if (ranges!= null) {
+            for(RangeParameters range : ranges)
             {
-                List<String> includes = range.getInclude();
-                if(includes != null && !includes.isEmpty())
+                if(range.getField().equalsIgnoreCase(facetField))
                 {
-                    startInclusive = range.isRangeStartInclusive(); 
-                    endInclusive = range.isRangeEndInclusive();
+                    List<String> includes = range.getInclude();
+                    if(includes != null && !includes.isEmpty())
+                    {
+                        startInclusive = range.isRangeStartInclusive();
+                        endInclusive = range.isRangeEndInclusive();
+                    }
                 }
             }
         }
-        
+
         facet.put(GenericFacetResponse.START_INC.toString(), Boolean.toString(startInclusive));
         facet.put(GenericFacetResponse.END_INC.toString(), Boolean.toString(endInclusive));
   
