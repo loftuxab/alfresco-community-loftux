@@ -1745,10 +1745,7 @@
                   <target>
                     <echo message="Extracting alfresco-pdf-renderer (windows) for testing..."/>
                     <mkdir dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer" />
-                    <exec failonerror="true" executable="tar" dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer">
-                      <arg value="xf" />
-                      <arg value="${settings.localRepository}/org/alfresco/alfresco-pdf-renderer/${installer.alfresco-pdf-renderer.version}/alfresco-pdf-renderer-${installer.alfresco-pdf-renderer.version}-win64.tgz" />
-                    </exec>
+                    <untar compression="gzip" src="${settings.localRepository}/org/alfresco/alfresco-pdf-renderer/${installer.alfresco-pdf-renderer.version}/alfresco-pdf-renderer-${installer.alfresco-pdf-renderer.version}-win64.tgz" dest="${project.build.directory}/test-binaries/alfresco-pdf-renderer" />
                   </target>
                 </configuration>
               </execution>
