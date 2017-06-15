@@ -1453,7 +1453,21 @@ public class SolrInformationServer implements InformationServer
                     {
                         if (node.getStatus() == SolrApiNodeStatus.DELETED)
                         {
-                            this.removeDocFromContentStore(nodeMetaData);
+                            try
+                            {
+                                //Lock the node to ensure that no other trackers work with this node until this code completes.
+                                if(!spinLock(nodeMetaData.getId(), 120000))
+                                {
+                                    //We haven't acquired the lock in over 2 minutes. This really shouldn't happen unless something has gone wrong.
+                                    throw new Exception("Unable to acquire lock on nodeId:"+nodeMetaData.getId());
+                                }
+
+                                this.removeDocFromContentStore(nodeMetaData);
+                            }
+                            finally
+                            {
+                               unlock(nodeMetaData.getId());
+                            }
                         }
                     }
                     // else, the node has moved on to a later transaction, and it will be indexed later
@@ -1981,7 +1995,21 @@ public class SolrInformationServer implements InformationServer
                     }
                     if (nodeMetaData != null)
                     {
-                        this.removeDocFromContentStore(nodeMetaData);
+                        try
+                        {
+                            //Lock the node to ensure that no other trackers work with this node until this code completes.
+                            if(!spinLock(nodeMetaData.getId(), 120000))
+                            {
+                                //We haven't acquired the lock in over 2 minutes. This really shouldn't happen unless something has gone wrong.
+                                throw new Exception("Unable to acquire lock on nodeId:"+nodeMetaData.getId());
+                            }
+
+                            this.removeDocFromContentStore(nodeMetaData);
+                        }
+                        finally
+                        {
+                            unlock(nodeMetaData.getId());
+                        }
                     }
                 }
 
