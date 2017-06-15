@@ -151,8 +151,8 @@
     <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
     <dependency.mysql.version>5.1.39</dependency.mysql.version>
     <dependency.postgresql.version>9.4.1211.jre7</dependency.postgresql.version>
+      <dependency.mariadb.version>2.0.1</dependency.mariadb.version>
     <dependency.api-explorer.version>5.2.1-SNAPSHOT</dependency.api-explorer.version>
-
     <dependency.alfresco-trashcan-cleaner.version>2.2</dependency.alfresco-trashcan-cleaner.version>
 
     <!-- Alfresco Office Services Module -->
@@ -177,6 +177,7 @@
   <!-- Define versions of very common components -->
   <dependencyManagement>
     <dependencies>
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -458,6 +459,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${dependency.mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${dependency.mariadb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -1238,6 +1244,8 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>sql-maven-plugin</artifactId>
+
+
                     <executions>
                         <execution>
                             <id>drop-db</id>
@@ -1250,6 +1258,7 @@
                                 <sqlCommand>${db.drop.command}</sqlCommand>
                             </configuration>
                         </execution>
+
                         <execution>
                             <id>create-db</id>
                             <phase>initialize</phase>
@@ -1347,12 +1356,63 @@
 
     <profile>
         <id>mariadb-props</id>
+
         <properties>
-            <db.master.url>jdbc:mysql://localhost/</db.master.url>
-            <db.driver>com.mysql.jdbc.Driver</db.driver>
-            <db.url>jdbc:mysql://localhost/${db.name}</db.url>
+            <db.master.url>jdbc:mariadb://localhost/</db.master.url>
+            <db.driver>org.mariadb.jdbc.Driver</db.driver>
+            <db.url>jdbc:mariadb://localhost/${db.name}</db.url>
+            <db.create.command>create database ${db.name} CHARACTER SET utf8 COLLATE utf8_bin;</db.create.command>
+
         </properties>
+
     </profile>
+
+      <profile>
+          <id>mariadb</id>
+          <build>
+              <plugins>
+                  <plugin>
+                      <groupId>org.apache.tomcat.maven</groupId>
+                      <artifactId>tomcat7-maven-plugin</artifactId>
+                      <configuration>
+                          <systemProperties>
+                              <db.driver>${db.driver}</db.driver>
+                              <db.url>${db.url}</db.url>
+                          </systemProperties>
+                      </configuration>
+                      <dependencies>
+                          <dependency>
+                              <groupId>org.mariadb.jdbc</groupId>
+                              <artifactId>mariadb-java-client</artifactId>
+                              <version>${dependency.mariadb.version}</version>
+                          </dependency>
+                      </dependencies>
+                  </plugin>
+                  <plugin>
+                      <groupId>org.codehaus.mojo</groupId>
+                      <artifactId>sql-maven-plugin</artifactId>
+                      <dependencies>
+                          <dependency>
+                              <groupId>org.mariadb.jdbc</groupId>
+                              <artifactId>mariadb-java-client</artifactId>
+                              <version>${dependency.mariadb.version}</version>
+                          </dependency>
+                      </dependencies>
+                  </plugin>
+              </plugins>
+          </build>
+          <dependencies>
+              <dependency>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                  <version>${dependency.mariadb.version}</version>
+                  <scope>test</scope>
+              </dependency>
+          </dependencies>
+      </profile>
+
+
+
 
     <profile>
         <id>oracle-props</id>
