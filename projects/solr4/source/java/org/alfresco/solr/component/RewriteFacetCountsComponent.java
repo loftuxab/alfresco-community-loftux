@@ -77,10 +77,10 @@ public class RewriteFacetCountsComponent extends SearchComponent
         rewrite(rb, "_field_mappings_", "facet_counts", "facet_fields");
         rewrite(rb, "_date_mappings_", "facet_counts", "facet_dates");
         rewrite(rb, "_range_mappings_", "facet_counts", "facet_ranges");
+        rewrite(rb, "_interval_mappings_", "facet_counts", "facet_intervals");
         
         rewrite(rb, "_pivot_mappings_", "facet_counts", "facet_pivot");
         rewritePivotFields(rb, "facet_counts", "facet_pivot");
-        // TODO: rewrite(rb, "_interval_mappings_", "facet_counts", "facet_fields");
         
         rewrite(rb, "_stats_field_mappings_", "stats", "stats_fields");
         
