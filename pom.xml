@@ -143,8 +143,8 @@
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.13</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.11</dependency.alfresco-core.version>
-    <dependency.alfresco-data-model.version>6.14</dependency.alfresco-data-model.version>
+    <dependency.alfresco-core.version>6.12</dependency.alfresco-core.version>
+    <dependency.alfresco-data-model.version>6.15</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.2</dependency.alfresco-xmlfactory.version>
     <dependency.alfresco-jlan.version>6.3</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
@@ -1360,7 +1360,6 @@
             <db.driver>org.mariadb.jdbc.Driver</db.driver>
             <db.url>jdbc:mariadb://localhost/${db.name}</db.url>
             <db.create.command>create database ${db.name} CHARACTER SET utf8 COLLATE utf8_bin;</db.create.command>
-
         </properties>
 
     </profile>
