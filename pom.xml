@@ -1728,7 +1728,36 @@
 			<type>tgz</type>
 		</dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <inherited>false</inherited>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>extract-alfresco-pdf-renderer-test</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <target>
+                    <echo message="Extracting alfresco-pdf-renderer (windows) for testing..."/>
+                    <mkdir dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer" />
+                    <exec failonerror="true" executable="tar" dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer">
+                      <arg value="xf" />
+                      <arg value="${settings.localRepository}/org/alfresco/alfresco-pdf-renderer/${installer.alfresco-pdf-renderer.version}/alfresco-pdf-renderer-${installer.alfresco-pdf-renderer.version}-win64.tgz" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
       <properties>
+        <alfresco-pdf-renderer.exe>${project.build.directory}/test-binaries/alfresco-pdf-renderer/alfresco-pdf-renderer</alfresco-pdf-renderer.exe>
       </properties>
     </profile>
     <profile>
@@ -1747,7 +1776,36 @@
 			<type>tgz</type>
 		</dependency>
       </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <inherited>false</inherited>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>extract-alfresco-pdf-renderer-test</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <target>
+                    <echo message="Extracting alfresco-pdf-renderer (linux) for testing..."/>
+                    <mkdir dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer" />
+                    <exec failonerror="true" executable="tar" dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer">
+                      <arg value="xf" />
+                      <arg value="${settings.localRepository}/org/alfresco/alfresco-pdf-renderer/${installer.alfresco-pdf-renderer.version}/alfresco-pdf-renderer-${installer.alfresco-pdf-renderer.version}-linux.tgz" />
+                    </exec>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
       <properties>
+        <alfresco-pdf-renderer.exe>${project.build.directory}/test-binaries/alfresco-pdf-renderer/alfresco-pdf-renderer</alfresco-pdf-renderer.exe>
       </properties>
     </profile>
     <profile>
