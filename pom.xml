@@ -165,6 +165,8 @@
     <installer.postgresql.version>9.4.4-20151016</installer.postgresql.version>
     <installer.libreoffice.version>5.2.1-alfresco</installer.libreoffice.version>
     <installer.imagemagick.version>7.0.5</installer.imagemagick.version>
+    <installer.pdfium.version>0.4</installer.pdfium.version>
+
 
     <!-- Install builder version -->
     <installer.installbuilder.version>15.10.1</installer.installbuilder.version>
