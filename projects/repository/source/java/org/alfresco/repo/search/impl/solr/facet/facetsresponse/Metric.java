@@ -1,6 +1,6 @@
 /*-
  * #%L
- * Alfresco Remote API
+ * Alfresco Repository
  * %%
  * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
@@ -23,47 +23,17 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.alfresco.rest.api.search.context.facetsresponse;
+package org.alfresco.repo.search.impl.solr.facet.facetsresponse;
 
-import java.util.List;
+import java.util.Map;
 
 /**
- * A Generic Bucket response covering range, interval, pivot etc.
+ * Metrics returned from Solr
  */
-public class GenericBucket
+public interface Metric
 {
-    private final String label;
-    private final String filterQuery;
-    private final Object display;
-    private final List<Metric> metrics;
+    public static enum METRIC_TYPE {count};
 
-    public GenericBucket(String label, String filterQuery, Object display, List<Metric> metrics)
-    {
-        this.label = label;
-        this.filterQuery = filterQuery;
-        this.display = display;
-        this.metrics = metrics;
-    }
-
-    public String getFilterQuery()
-    {
-        return filterQuery;
-    }
-
-    public Object getDisplay()
-    {
-        return display;
-    }
-
-    public String getLabel()
-    {
-        return label;
-    }
-
-    public List<Metric> getMetrics()
-    {
-        return metrics;
-    }
-
-
+    METRIC_TYPE getType();
+    Map<String, Object> getValue();
 }

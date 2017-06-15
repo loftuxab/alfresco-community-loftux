@@ -1,6 +1,6 @@
 /*-
  * #%L
- * Alfresco Remote API
+ * Alfresco Repository
  * %%
  * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
@@ -23,32 +23,40 @@
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-package org.alfresco.rest.api.search.context.facetsresponse;
+package org.alfresco.repo.search.impl.solr.facet.facetsresponse;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
- * A count metric
+ * A Generic facet response covering range, interval, pivot etc.
  */
-public class MetricCount implements Metric
+public class GenericFacetResponse
 {
-    private final Map<String, Object> value = new HashMap<>(1);
+    public static enum FACET_TYPE {range, interval, pivot};
+    private final FACET_TYPE type;
+    private final String label;
+    private final List<GenericBucket> buckets;
 
-    public MetricCount(Integer count)
+    public GenericFacetResponse(FACET_TYPE type, String label, List<GenericBucket> buckets)
     {
-        value.put("count", count);
+        this.type = type;
+        this.label = label;
+        this.buckets = buckets;
     }
 
-    @Override
-    public METRIC_TYPE getType()
+    public String getLabel()
     {
-        return METRIC_TYPE.count;
+        return label;
     }
 
-    @Override
-    public Map<String, Object> getValue()
+    public List<GenericBucket> getBuckets()
     {
-        return value;
+        return buckets;
     }
+
+    public FACET_TYPE getType()
+    {
+        return type;
+    }
+
 }
