@@ -1779,6 +1779,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skip>${skipTests}</skip>
                   <target>
                     <echo message="Extracting alfresco-pdf-renderer (OS-X) for testing..."/>
                     <mkdir dir="${project.build.directory}/test-binaries/alfresco-pdf-renderer" />
