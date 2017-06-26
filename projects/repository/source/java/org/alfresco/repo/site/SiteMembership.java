@@ -51,19 +51,19 @@ public class SiteMembership
 		}
 		if(personId == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("Person required building site membership of " + siteInfo.getShortName());
 		}
 		if(firstName == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("FirstName required building site membership of " + siteInfo.getShortName());
 		}
 		if(lastName == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("LastName required building site membership of " + siteInfo.getShortName());
 		}
 		if(role == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("Role required building site membership of " + siteInfo.getShortName());
 		}
 		this.siteInfo = siteInfo;
 		this.personId = personId;
@@ -81,11 +81,11 @@ public class SiteMembership
 		}
 		if(personId == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("Person required building site membership of " + siteInfo.getShortName());
 		}
 		if(role == null)
 		{
-			throw new java.lang.IllegalArgumentException();
+			throw new java.lang.IllegalArgumentException("Role required building site membership of " + siteInfo.getShortName());
 		}
 
 		this.siteInfo = siteInfo;
