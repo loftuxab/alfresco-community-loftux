@@ -2100,7 +2100,7 @@ public class SolrInformationServer implements InformationServer
                             log.debug(".. deleting node " + node.getId());
                         }
 
-                        deleteErrorNode(processor, request, node);
+                        deleteNode(processor, request, node);
 
                         SolrInputDocument doc = createNewDoc(nodeMetaData, DOC_TYPE_NODE);
                         addToNewDocAndCache(nodeMetaData, doc);
