@@ -73,7 +73,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), personErrorMessage + siteInfo.getShortName());
+            assertEquals(personErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
 
         try
@@ -82,7 +82,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), personErrorMessage + siteInfo.getShortName());
+            assertEquals(personErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), roleErrorMessage + siteInfo.getShortName());
+            assertEquals(roleErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
 
         try
@@ -104,7 +104,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), roleErrorMessage + siteInfo.getShortName());
+            assertEquals(roleErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
     }
 
@@ -117,7 +117,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), firstNameErrorMessage + siteInfo.getShortName());
+            assertEquals(firstNameErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
     }
 
@@ -130,7 +130,7 @@ public class SiteMembershipTest
         }
         catch (IllegalArgumentException e)
         {
-            assertEquals(e.getMessage(), lastNameErrorMessage + siteInfo.getShortName());
+            assertEquals(lastNameErrorMessage + siteInfo.getShortName(), e.getMessage());
         }
     }
 }
