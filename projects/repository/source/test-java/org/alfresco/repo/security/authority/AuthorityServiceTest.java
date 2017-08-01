@@ -25,7 +25,11 @@
  */
 package org.alfresco.repo.security.authority;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +42,6 @@ import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import junit.framework.TestCase;
-
 import net.sf.acegisecurity.AuthenticationCredentialsNotFoundException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -49,10 +52,14 @@ import org.alfresco.repo.domain.permissions.AclDAO;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.node.archive.NodeArchiveService;
 import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.Policy;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
+import org.alfresco.repo.security.authority.AuthorityServicePolicies.OnAuthorityAddedToGroup;
+import org.alfresco.repo.security.authority.AuthorityServicePolicies.OnAuthorityRemovedFromGroup;
+import org.alfresco.repo.security.authority.AuthorityServicePolicies.OnGroupDeleted;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport.TxnReadState;
 import org.alfresco.service.ServiceRegistry;
@@ -74,10 +81,13 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.test_category.OwnJVMTestsCategory;
 import org.alfresco.util.ApplicationContextHelper;
+import org.junit.FixMethodOrder;
 import org.junit.experimental.categories.Category;
+import org.junit.runners.MethodSorters;
 import org.springframework.context.ApplicationContext;
 
 @Category(OwnJVMTestsCategory.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AuthorityServiceTest extends TestCase
 {
     private static ApplicationContext ctx = ApplicationContextHelper.getApplicationContext();
@@ -95,6 +105,7 @@ public class AuthorityServiceTest extends TestCase
     private NodeArchiveService nodeArchiveService;
     private PolicyComponent policyComponent;
     private TransactionService transactionService;
+    private AuthorityDAO authorityDAO;
     
     public AuthorityServiceTest()
     {
@@ -132,6 +143,7 @@ public class AuthorityServiceTest extends TestCase
         nodeArchiveService = (NodeArchiveService) ctx.getBean("nodeArchiveService");
         policyComponent = (PolicyComponent) ctx.getBean("policyComponent");
         transactionService = (TransactionService) ctx.getBean(ServiceRegistry.TRANSACTION_SERVICE.getLocalName());
+        authorityDAO = ctx.getBean("authorityDAO", AuthorityDAO.class);
         
         String defaultAdminUser = AuthenticationUtil.getAdminUserName();
         AuthenticationUtil.setFullyAuthenticatedUser(defaultAdminUser);
@@ -1577,6 +1589,115 @@ public class AuthorityServiceTest extends TestCase
         assertFalse(groups.getPage().contains(user));
         assertFalse(groups.getPage().contains(role));
     }
+    
+    /**
+     * Test that the AuthorityServicePolicies are invoked whenever an authority is added/removed from a group, or a group is being deleted
+     */
+    public void testAuthorityPolicies()
+    {
+        String testGroup = authorityService.createAuthority(AuthorityType.GROUP, "testGroup");
+        String testSubGroup = authorityService.createAuthority(AuthorityType.GROUP, "testSubGroup");
+        
+        String anotherTestGroup = authorityService.createAuthority(AuthorityType.GROUP, "testGroup2");
+        
+        String testUser = "testUser";
+        HashMap<QName, Serializable> properties = new HashMap<>();
+        properties.put(ContentModel.PROP_USERNAME, testUser);
+        personService.createPerson(properties);
+        
+        //test that OnAuthorityAddedToGroup is invoked when an user is added to a group
+        OnAuthorityAddedToGroup onAuthorityAddedToGroup = createClassPolicy(OnAuthorityAddedToGroup.class, OnAuthorityAddedToGroup.QNAME, ContentModel.TYPE_AUTHORITY);
+        
+        authorityService.addAuthority(testGroup, testUser);
+        
+        verify(onAuthorityAddedToGroup).onAuthorityAddedToGroup(testGroup, testUser);
+        
+        //test that OnAuthorityAddedToGroup is invoked when an user is removed from a group
+        OnAuthorityRemovedFromGroup onAuthorityRemovedFromGroup = createClassPolicy(OnAuthorityRemovedFromGroup.class, OnAuthorityRemovedFromGroup.QNAME, ContentModel.TYPE_AUTHORITY);
+        
+        authorityService.removeAuthority(testGroup, testUser);
+        
+        verify(onAuthorityRemovedFromGroup).onAuthorityRemovedFromGroup(testGroup, testUser);
+        
+        //test that OnAuthorityAddedToGroup is invoked when a group is added to another group
+        onAuthorityAddedToGroup = createClassPolicy(OnAuthorityAddedToGroup.class, OnAuthorityAddedToGroup.QNAME, ContentModel.TYPE_AUTHORITY);
+        
+        authorityService.addAuthority(testGroup, testSubGroup);
+        
+        verify(onAuthorityAddedToGroup).onAuthorityAddedToGroup(testGroup, testSubGroup);
+        
+        //test that OnGroupDeleted is invoked when a group is deleted without the cascade flag
+        OnGroupDeleted onGroupDeleted = createClassPolicy(OnGroupDeleted.class, OnGroupDeleted.QNAME, ContentModel.TYPE_AUTHORITY);
+        
+        authorityService.deleteAuthority(anotherTestGroup);
+        
+        verify(onGroupDeleted).onGroupDeleted(anotherTestGroup, false);
+        
+        //test that OnGroupDeleted is invoked when a group is deleted with cascade=true
+        onGroupDeleted = createClassPolicy(OnGroupDeleted.class, OnGroupDeleted.QNAME, ContentModel.TYPE_AUTHORITY);
+        
+        authorityService.deleteAuthority(testGroup, true);
+        
+        verify(onGroupDeleted).onGroupDeleted(testSubGroup, true);
+        
+        verify(onGroupDeleted).onGroupDeleted(testGroup, true);
+    }
+
+    /**
+     * Test for MNT-17824
+     */
+    public void testGetDoublePrefixedGroupAuth()
+    {
+        List<String> createdAuthNames = new ArrayList<>(3);
+
+        // Simulate creating authority before upgrade to 5.0.4 or 5.1.1
+        final String oldPrefixedGroupName = "GROUP_MNT_17824";
+        Set<String> defaultZones = new HashSet<>();
+        defaultZones.add(AuthorityService.ZONE_APP_DEFAULT);
+        defaultZones.add(AuthorityService.ZONE_AUTH_ALFRESCO);
+        // Use authorityDAO to force create a double prefixed group name to simulate a scenario
+        // where a group is created with a double prefix, before MNT-14958 fix.
+        // This could happened if the admin created a group with a name 'GROUP_MNT_17824' before MNT-14958.
+        authorityDAO.createAuthority("GROUP_" + oldPrefixedGroupName, "GROUP_MNT_17824_DISPLAY_NAME", defaultZones);
+
+        // Now check that this group can be retrieved
+        String auth = pubAuthorityService.getName(AuthorityType.GROUP, oldPrefixedGroupName);
+        createdAuthNames.add(auth);
+        assertTrue("The group authority exists.", pubAuthorityService.authorityExists(auth));
+
+        // Create authority using the authority service after the fix (for sanity check sake!)
+        final String noPrefixGroupName = "NO_PREFIX_MNT_17824";
+        final String prefixedGroupName = "GROUP_PREFIXED_MNT_17824";
+        pubAuthorityService.createAuthority(AuthorityType.GROUP, noPrefixGroupName);
+        pubAuthorityService.createAuthority(AuthorityType.GROUP, prefixedGroupName);
+
+        // Get 'noPrefixGroupName' authority
+        auth = pubAuthorityService.getName(AuthorityType.GROUP, noPrefixGroupName);
+        createdAuthNames.add(auth);
+        assertTrue("The group authority exists.", pubAuthorityService.authorityExists(auth));
+
+        // Get 'prefixedGroupName' authority
+        auth = pubAuthorityService.getName(AuthorityType.GROUP, prefixedGroupName);
+        createdAuthNames.add(auth);
+        assertTrue("The group authority exists.", pubAuthorityService.authorityExists(auth));
+
+        // Cleanup
+        for (String name : createdAuthNames)
+        {
+            pubAuthorityService.deleteAuthority(name);
+        }
+    }
+
+    private <T extends Policy> T createClassPolicy(Class<T> policyInterface, QName policyQName, QName triggerOnClass)
+    {
+        T policy = mock(policyInterface);
+        policyComponent.bindClassBehaviour(
+                    policyQName, 
+                    triggerOnClass, 
+                    new JavaBehaviour(policy, policyQName.getLocalName()));
+        return policy;
+    }  
+      
 
     private void createUserAuthority(String user)
     {

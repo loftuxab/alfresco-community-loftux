@@ -82,7 +82,7 @@ public class CloudTest extends SolrCoreTestBase
         Object value = "value";
         valueLists[0].add(value);
         String query = cloud.getQuery(fieldName, operator, valueLists);
-        assertEquals(FIELD_DBID + ":" + value, query);
+        assertEquals(FIELD_DBID + ":\"" + value+"\"", query);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -103,8 +103,8 @@ public class CloudTest extends SolrCoreTestBase
         Object value4 = "value4";
         valueLists[1].add(value4);
         String query = cloud.getQuery(fieldName, operator, valueLists);
-        assertEquals(FIELD_DBID + ":" + value1 + operator + FIELD_DBID + ":" + value2 + operator
-                    + FIELD_DBID + ":" + value3 + operator + FIELD_DBID + ":" + value4, query);
+        assertEquals(FIELD_DBID + ":\"" + value1 + "\"" + operator + FIELD_DBID + ":\"" + value2 + "\"" + operator
+                    + FIELD_DBID + ":\"" + value3 + "\"" + operator + FIELD_DBID + ":\"" + value4 + "\"", query);
     }
     
     @Test

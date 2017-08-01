@@ -39,6 +39,10 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.transform.RuntimeExecutableContentTransformerOptions;
 import org.alfresco.repo.content.transform.magick.ImageTransformationOptions;
 import org.alfresco.repo.content.transform.swf.SWFTransformationOptions;
+import org.alfresco.repo.copy.CopyBehaviourCallback;
+import org.alfresco.repo.copy.CopyDetails;
+import org.alfresco.repo.copy.CopyServicePolicies;
+import org.alfresco.repo.copy.DoNothingCopyBehaviourCallback;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.Behaviour;
 import org.alfresco.repo.policy.BehaviourFilter;
@@ -228,6 +232,12 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                 ContentModel.TYPE_THUMBNAIL,
                 new JavaBehaviour(this, "onDeleteNode", Behaviour.NotificationFrequency.EVERY_EVENT));
 
+        // Register copy class behaviour
+        this.policyComponent.bindClassBehaviour(
+                CopyServicePolicies.OnCopyNodePolicy.QNAME,
+                ContentModel.ASPECT_THUMBNAIL_MODIFICATION,
+                new JavaBehaviour(this, "getCopyCallback"));
+
         transactionListener = new ThumbnailTransactionListenerAdapter();
     }
     
@@ -280,8 +290,8 @@ public class ThumbnailServiceImpl implements ThumbnailService,
 
         if (logger.isDebugEnabled())
         {
-        	logger.debug("Thumbnail created " + childAssoc + " for sourceNodeRef " + sourceNodeRef + ", thumbnail " + thumbnailName
-        			+ ", thumbnailNodeRef " + thumbnailNodeRef);
+            logger.debug("Thumbnail created " + childAssoc + " for sourceNodeRef " + sourceNodeRef + ", thumbnail " + thumbnailName
+                          + ", thumbnailNodeRef " + thumbnailNodeRef);
         }
 
         // MNT-15135: Cache the associations between parent nodes and updated thumbnails,
@@ -294,21 +304,20 @@ public class ThumbnailServiceImpl implements ThumbnailService,
             }
             TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES).add(childAssoc);
             TransactionSupportUtil.bindListener(this.transactionListener, 0);
-
-            // The onCreateNode for new version will return a temporary node that gets removed later.
-            // We need to add the original node to the TransactionalResourceHelper instead.
-            String thumbnailQname = "{http://www.alfresco.org/model/content/1.0}" + thumbnailName;
-            if(!childAssoc.getQName().toString().equals(thumbnailQname)) {
-
-                List<ChildAssociationRef> allAssocRefs = nodeService.getChildAssocs(childAssoc.getParentRef());
-                for(ChildAssociationRef childAssocTemp : allAssocRefs ) {
-                    if(childAssocTemp.getQName().toString().equals(thumbnailQname)) {
-                        TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES).add(childAssocTemp);
-                        if (logger.isDebugEnabled())
-                        {
-                            logger.debug("Caching original thumbnail " + childAssocTemp + " in transaction resources, thumbnail " + thumbnailName);
-                        }
+            
+            // For new version/content the child association contains a temporary thumbnail node, that gets removed later.
+            // We need to add the original thumbnail node to the TransactionalResourceHelper instead.
+            QName thumbnailQname = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, thumbnailName);
+            if (!childAssoc.getQName().equals(thumbnailQname)) 
+            {
+                List<ChildAssociationRef> allAssocList = nodeService.getChildAssocs(childAssoc.getParentRef(), RegexQNamePattern.MATCH_ALL, thumbnailQname);
+                for (ChildAssociationRef aChildAssoc : allAssocList)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Caching original thumbnail " + aChildAssoc + " in transaction resources, thumbnail " + thumbnailName);
                     }
+                    TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES).add(aChildAssoc);
                 }
 
             }
@@ -792,20 +801,20 @@ public class ThumbnailServiceImpl implements ThumbnailService,
      * @param nodeRef A {@link NodeRef} representing a thumbnail to provide last modification data for.
      */
     @SuppressWarnings("unchecked")
-    public void addThumbnailModificationData(final NodeRef nodeRef, final String thumbnailName)
+    private void addThumbnailModificationData(final NodeRef nodeRef, final String thumbnailName)
     {
         if (nodeService.exists(nodeRef))
         {
-           if (thumbnailName != null && !nodeRef.toString().endsWith(thumbnailName))
-           {
-               Date modified = (Date)nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED);
-               if (modified != null)
-               {
-                   // Get the last modified value as a timestamp...
-                   Long timestamp = modified.getTime();
-                   
-                   // Create the value we want to set...
-                   final String lastModifiedValue = thumbnailName + ":" + timestamp;
+            if (thumbnailName != null && !nodeRef.toString().endsWith(thumbnailName))
+            {
+                Date modified = (Date)nodeService.getProperty(nodeRef, ContentModel.PROP_MODIFIED);
+                if (modified != null)
+                {
+                    // Get the last modified value as a timestamp...
+                    Long timestamp = modified.getTime();
+
+                    // Create the value we want to set...
+                    final String lastModifiedValue = thumbnailName + ":" + timestamp;
 
                    // Get the parent node (there should be only one) and apply the aspect and
                    // set the property to indicate which thumbnail the checksum refers to...
@@ -850,31 +859,30 @@ public class ThumbnailServiceImpl implements ThumbnailService,
                                    // Add the timestamp...
                                    thumbnailMods.add(lastModifiedValue);
 
-                                   // Set the property...
-                                   if (logger.isDebugEnabled())
-                                   {
-                                       logger.debug("Setting thumbnail last modified date to " + lastModifiedValue +
-                                               " on parent node: " + parentNode);
-                                   }
-                                   ruleService.disableRuleType(RuleType.UPDATE);
-                                   try
-                                   {
-                                       nodeService.setProperty(parentNode, ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA, (Serializable) thumbnailMods);
-                                   }
-                                   finally
-                                   {
-                                       ruleService.enableRuleType(RuleType.UPDATE);
-                                   }
-                               }
-                               else
-                               {
-                                   // If the aspect has not previously been added then we'll need to set it now...
-                                   thumbnailMods = new ArrayList<String>();
-                                   thumbnailMods.add(lastModifiedValue);
+                                // Set the property...
+                                if (logger.isDebugEnabled())
+                                {
+                                    logger.debug("Setting thumbnail last modified date to " + lastModifiedValue +" on parent node: " + parentNode);
+                                }
+                                ruleService.disableRuleType(RuleType.UPDATE);
+                                try
+                                {
+                                    nodeService.setProperty(parentNode, ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA, (Serializable) thumbnailMods);
+                                }
+                                finally
+                                {
+                                    ruleService.enableRuleType(RuleType.UPDATE);
+                                }
+                            }
+                            else
+                            {
+                                // If the aspect has not previously been added then we'll need to set it now...
+                                thumbnailMods = new ArrayList<String>();
+                                thumbnailMods.add(lastModifiedValue);
 
-                                   // Add the aspect with the new property...
-                                   Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
-                                   properties.put(ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA, (Serializable) thumbnailMods);
+                                // Add the aspect with the new property...
+                                Map<QName, Serializable> properties = new HashMap<QName, Serializable>();
+                                properties.put(ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA, (Serializable) thumbnailMods);
 
                                    if (logger.isDebugEnabled())
                                    {
@@ -922,11 +930,10 @@ public class ThumbnailServiceImpl implements ThumbnailService,
             {
                 logger.debug("Starting afterCommit listener execution.");
             }
+            final Set<ChildAssociationRef> childAssocs =  TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES);
 
-            Set<ChildAssociationRef> childAssocs =  TransactionalResourceHelper.getSet(THUMBNAIL_PARENT_NODES);
-
-            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>() {
-
+            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>()
+            {
                 @Override
                 public Void doWork() throws Exception {
 
@@ -989,5 +996,15 @@ public class ThumbnailServiceImpl implements ThumbnailService,
             }, AuthenticationUtil.getSystemUserName());
 
         }
+    }
+
+    /**
+     * See init - eg. registers "do nothing" copy behaviour for "cm:thumbnailModification" aspect
+     * 
+     * @return          Returns {@link DoNothingCopyBehaviourCallback}
+     */
+    public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails)
+    {
+        return DoNothingCopyBehaviourCallback.getInstance();
     }
 }

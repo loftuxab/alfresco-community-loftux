@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -28,7 +28,6 @@ package org.alfresco.rest.api.impl;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.QuickShareModel;
 import org.alfresco.query.PagingRequest;
-import org.alfresco.repo.quickshare.QuickShareClientNotFoundException;
 import org.alfresco.repo.quickshare.QuickShareLinkExpiryActionException;
 import org.alfresco.repo.quickshare.QuickShareServiceImpl.QuickShareEmailRequest;
 import org.alfresco.repo.search.QueryParameterDefImpl;
@@ -385,10 +384,6 @@ public class QuickShareLinksImpl implements QuickShareLinks, RecognizedParamsExt
             logger.warn("Unable to find: " + sharedId + " [" + inre.getNodeRef() + "]");
             throw new EntityNotFoundException(sharedId);
         }
-        catch (QuickShareClientNotFoundException ex)
-        {
-            throw new InvalidArgumentException("Client is not registered [" + emailRequest.getClient() + "]");
-        }
     }
 
     private Parameters getParamsWithCreatedStatus()
@@ -584,13 +579,20 @@ public class QuickShareLinksImpl implements QuickShareLinks, RecognizedParamsExt
             qs.setExpiresAt((Date) map.get("expiryDate"));
 
             // note: if noAuth mode then do not return allowable operations (eg. but can be optionally returned when finding shared links)
-            if ((! noAuth) && includeParam.contains(PARAM_INCLUDE_ALLOWABLEOPERATIONS))
+            if (!noAuth)
             {
-                if (quickShareService.canDeleteSharedLink(nodeRef, sharedByUserId))
+                if (includeParam.contains(PARAM_INCLUDE_ALLOWABLEOPERATIONS) && quickShareService.canDeleteSharedLink(nodeRef, sharedByUserId))
                 {
                     qs.setAllowableOperations(Collections.singletonList(Nodes.OP_DELETE));
                 }
+
+                // in noAuth mode we don't return the path info
+                if (includeParam.contains(PARAM_INCLUDE_PATH))
+                {
+                    qs.setPath(nodes.lookupPathInfo(nodeRef, null));
+                }
             }
+
 
             return qs;
         }

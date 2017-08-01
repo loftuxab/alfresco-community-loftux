@@ -13,14 +13,12 @@
     <target name="extract-base">
         <extract-base-for targetPlatform="linux" unless:set="skipLinInstaller" />
         <extract-base-for targetPlatform="osx" unless:set="skipOSXInstaller" />
-        <extract-base-for targetPlatform="win32" unless:set="skipWinInstaller" />
         <extract-base-for targetPlatform="win64" unless:set="skipWinInstaller" />
     </target>
 
     <target name="extract-platform">
         <extract-platform-for targetPlatform="linux" unless:set="skipLinInstaller" />
         <extract-platform-for targetPlatform="osx" unless:set="skipOSXInstaller" />
-        <extract-platform-for targetPlatform="win32" unless:set="skipWinInstaller" />
         <extract-platform-for targetPlatform="win64" unless:set="skipWinInstaller" />
     </target>
 
@@ -36,9 +34,6 @@
             </condition>
             <condition property="bin.folder" value="${project.build.directory}/binaries-osx-x64">
                 <equals arg1="@{targetPlatform}" arg2="osx" />
-            </condition>
-            <condition property="bin.folder" value="${project.build.directory}/binaries-windows">
-                <equals arg1="@{targetPlatform}" arg2="win32" />
             </condition>
             <condition property="bin.folder" value="${project.build.directory}/binaries-windows-x64">
                 <equals arg1="@{targetPlatform}" arg2="win64" />
@@ -59,10 +54,7 @@
             <!-- Check if platform is windows -->
             <local name="isPlatformWindows"/>
             <condition property="isPlatformWindows">
-                <or>
-                    <equals arg1="@{targetPlatform}" arg2="win32" />
-                    <equals arg1="@{targetPlatform}" arg2="win64" />
-                </or>
+                <equals arg1="@{targetPlatform}" arg2="win64" />
             </condition>
 
             <echo>  Extracting Common...</echo>
@@ -106,9 +98,6 @@
             <condition property="bin.folder" value="${project.build.directory}/binaries-osx-x64">
                 <equals arg1="@{targetPlatform}" arg2="osx" />
             </condition>
-            <condition property="bin.folder" value="${project.build.directory}/binaries-windows">
-                <equals arg1="@{targetPlatform}" arg2="win32" />
-            </condition>
             <condition property="bin.folder" value="${project.build.directory}/binaries-windows-x64">
                 <equals arg1="@{targetPlatform}" arg2="win64" />
             </condition>
@@ -116,15 +105,17 @@
             <!-- LibreOffice is the same for win32 and win64 -->
             <local name="isPlatformWindows"/>
             <condition property="isPlatformWindows">
-                <or>
-                    <equals arg1="@{targetPlatform}" arg2="win32" />
-                    <equals arg1="@{targetPlatform}" arg2="win64" />
-                </or>
+                <equals arg1="@{targetPlatform}" arg2="win64" />
             </condition>
             <local name="libreoffice.platform"/>
             <condition property="libreoffice.platform" value="windows" else="@{targetPlatform}">
                 <isset property="isPlatformWindows"/>
             </condition>
+        	
+        	 <local name="alfrescoPdfRenderer.platform"/>
+        	 <condition property="alfrescoPdfRenderer.platform" value="win64" else="@{targetPlatform}">
+        	                <isset property="isPlatformWindows"/>
+        	  </condition>
 
             <!-- Accommodate poor Cygwin users -->
             <pathconvert property="maven.localrepo" targetos="unix">
@@ -148,17 +139,19 @@
                 <arg value="${maven.localrepo}/org/libreoffice/libreoffice-dist/${installer.libreoffice.version}/libreoffice-dist-${installer.libreoffice.version}-${libreoffice.platform}.tgz" />
             </exec>
             
-            <echo>  Extracting GhostScript...</echo>
-            <exec failonerror="true" executable="tar" dir="${bin.folder}">
-                <arg value="xf" />
-                <arg value="${maven.localrepo}/com/ghostscript/ghostscript-distribution/${installer.ghostscript.version}/ghostscript-distribution-${installer.ghostscript.version}-@{targetPlatform}.tgz" />
-            </exec>
-            
             <echo>  Extracting ImageMagick...</echo>
             <exec failonerror="true" executable="tar" dir="${bin.folder}">
                 <arg value="xf" />
                 <arg value="${maven.localrepo}/org/imagemagick/imagemagick-distribution/${installer.imagemagick.version}/imagemagick-distribution-${installer.imagemagick.version}-@{targetPlatform}.tgz" />
             </exec>
+
+        	<mkdir dir="${bin.folder}/alfresco-pdf-renderer"/>
+        	<echo> Extracting Alfresco Pdf Renderer...</echo>
+        	<exec failonerror="true" executable="tar" dir="${bin.folder}/alfresco-pdf-renderer">
+        	    <arg value="xf" />
+        	    <arg value="${maven.localrepo}/org/alfresco/alfresco-pdf-renderer/${installer.alfresco-pdf-renderer.version}/alfresco-pdf-renderer-${installer.alfresco-pdf-renderer.version}-${alfrescoPdfRenderer.platform}.tgz" />
+        	</exec>
+
         </sequential>
     </macrodef>
 

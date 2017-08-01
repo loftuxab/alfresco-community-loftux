@@ -26,14 +26,28 @@
 
 package org.alfresco.rest.api.search.impl;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ALLOWABLEOPERATIONS;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASPECTNAMES;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASSOCIATION;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ISLINK;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PATH;
+import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PROPERTIES;
+import static org.alfresco.service.cmr.search.SearchService.LANGUAGE_CMIS_ALFRESCO;
+import static org.alfresco.service.cmr.search.SearchService.LANGUAGE_FTS_ALFRESCO;
+import static org.alfresco.service.cmr.search.SearchService.LANGUAGE_LUCENE;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryLanguageSPI;
+import org.alfresco.rest.api.search.context.SearchRequestContext;
 import org.alfresco.rest.api.search.model.Default;
 import org.alfresco.rest.api.search.model.FacetField;
 import org.alfresco.rest.api.search.model.FacetFields;
 import org.alfresco.rest.api.search.model.FacetQuery;
 import org.alfresco.rest.api.search.model.FilterQuery;
 import org.alfresco.rest.api.search.model.Limits;
+import org.alfresco.rest.api.search.model.Localization;
+import org.alfresco.rest.api.search.model.Pivot;
 import org.alfresco.rest.api.search.model.Query;
 import org.alfresco.rest.api.search.model.Scope;
 import org.alfresco.rest.api.search.model.SearchQuery;
@@ -45,7 +59,11 @@ import org.alfresco.rest.framework.resource.parameters.Paging;
 import org.alfresco.rest.framework.resource.parameters.Params;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.GeneralHighlightParameters;
+import org.alfresco.service.cmr.search.Interval;
+import org.alfresco.service.cmr.search.IntervalParameters;
+import org.alfresco.service.cmr.search.IntervalSet;
 import org.alfresco.service.cmr.search.LimitBy;
+import org.alfresco.service.cmr.search.RangeParameters;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacet;
 import org.alfresco.service.cmr.search.SearchParameters.FieldFacetMethod;
@@ -53,20 +71,21 @@ import org.alfresco.service.cmr.search.SearchParameters.FieldFacetSort;
 import org.alfresco.service.cmr.search.SearchParameters.Operator;
 import org.alfresco.service.cmr.search.SearchParameters.SortDefinition;
 import org.alfresco.service.cmr.search.SearchParameters.SortDefinition.SortType;
+import org.alfresco.service.cmr.search.StatsRequestParameters;
 import org.alfresco.util.ParameterCheck;
 
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ALLOWABLEOPERATIONS;
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASSOCIATION;
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ISLINK;
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PATH;
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_ASPECTNAMES;
-import static org.alfresco.rest.api.Nodes.PARAM_INCLUDE_PROPERTIES;
-import static org.alfresco.service.cmr.search.SearchService.*;
-
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Maps from a json request and a solr SearchParameters object.
@@ -90,13 +109,13 @@ public class SearchMapper
      * @param params
      * @return SearchParameters
      */
-    public SearchParameters toSearchParameters(Params params, SearchQuery searchQuery)
+    public SearchParameters toSearchParameters(Params params, SearchQuery searchQuery, SearchRequestContext searchRequestContext)
     {
         ParameterCheck.mandatory("query", searchQuery.getQuery());
 
         SearchParameters sp = new SearchParameters();
         setDefaults(sp);
-
+        fromLocalization(sp, searchQuery.getLocalization());
         fromQuery(sp,  searchQuery.getQuery());
         fromPaging(sp, params.getPaging());
         fromSort(sp, searchQuery.getSort());
@@ -105,12 +124,15 @@ public class SearchMapper
         fromDefault(sp, searchQuery.getDefaults());
         fromFilterQuery(sp, searchQuery.getFilterQueries());
         fromFacetQuery(sp, searchQuery.getFacetQueries());
+        fromPivot(sp, searchQuery.getStats(), searchQuery.getFacetFields(), searchQuery.getFacetRanges(), searchQuery.getPivots(), searchRequestContext);
+        fromStats(sp, searchQuery.getStats());
         fromFacetFields(sp, searchQuery.getFacetFields());
         fromSpellCheck(sp, searchQuery.getSpellcheck());
         fromHighlight(sp, searchQuery.getHighlight());
-        fromScope(sp, searchQuery.getScope());
+        fromFacetIntervals(sp, searchQuery.getFacetIntervals());
+        fromRange(sp, searchQuery.getFacetRanges());
+        fromScope(sp, searchQuery.getScope(), searchRequestContext);
         fromLimits(sp, searchQuery.getLimits());
-
         return sp;
     }
 
@@ -284,8 +306,20 @@ public class SearchMapper
             }
             for (FilterQuery fq:filterQueries)
             {
-                ParameterCheck.mandatoryString("filterQueries query", fq.getQuery());
-                String query = fq.getQuery().trim();
+                String query = null;
+
+                if (fq.getQuery() != null && !fq.getQuery().isEmpty())
+                {
+                    query = fq.getQuery().trim();
+                }
+
+                if (fq.getQueries() != null && !fq.getQueries().isEmpty() && query == null)
+                {
+                    query = String.join(" OR ", fq.getQueries());
+                }
+
+                ParameterCheck.mandatoryString("filterQueries query", query);
+
                 if (fq.getTags() == null || fq.getTags().isEmpty() || query.contains("afts tag"))
                 {
                     //If its already got tags then just let it through
@@ -353,11 +387,6 @@ public class SearchMapper
                 {
                     ParameterCheck.mandatoryString("facetFields facet field", facet.getField());
                     String field = facet.getField();
-                    if (facet.getExcludeFilters() != null && !facet.getExcludeFilters().isEmpty())
-                    {
-                        int startIndex = field.startsWith("{!afts")?7:0;
-                        field = "{!afts ex="+String.join(",", facet.getExcludeFilters())+"}"+field.substring(startIndex);
-                    }
 
                     FieldFacet ff = new FieldFacet(field);
 
@@ -386,6 +415,8 @@ public class SearchMapper
                     }
 
                     ff.setPrefix(facet.getPrefix());
+                    ff.setLabel(facet.getLabel());
+                    ff.setExcludeFilters(facet.getExcludeFilters());
                     ff.setCountDocsMissingFacetField(facet.getMissing());
                     ff.setLimitOrNull(facet.getLimit());
                     ff.setOffset(facet.getOffset());
@@ -396,6 +427,7 @@ public class SearchMapper
             }
         }
     }
+
     /**
      * SearchParameters from SpellCheck object
      * @param sp SearchParameters
@@ -424,10 +456,11 @@ public class SearchMapper
 
     /**
      * SearchParameters from Scope object
-     * @param sp SearchParameters
      * @param Scope scope
+     * @param sp SearchParameters
+     * @param searchRequestContext
      */
-    public void fromScope(SearchParameters sp, Scope scope)
+    public void fromScope(SearchParameters sp, Scope scope, SearchRequestContext searchRequestContext)
     {
         if (scope != null)
         {
@@ -436,6 +469,8 @@ public class SearchMapper
             {
                 //First reset the stores then add them.
                 sp.getStores().clear();
+
+                searchRequestContext.getStores().addAll(stores);
                 for (String aStore:stores)
                 {
                     try
@@ -447,6 +482,241 @@ public class SearchMapper
                         throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
                                     new Object[] { aStore });
                     }
+                }
+
+                if (stores.contains(StoreMapper.HISTORY) && (stores.size() > 1))
+                {
+                    throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                new Object[] { ": scope 'history' can only be used on its own" });
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets the Interval Parameters object on search parameters
+     *
+     * It does some valiation then takes any "SETS" at the top level and sets them at every field level.
+     *
+     * @param sp SearchParameters
+     * @param facetIntervals IntervalParameters
+     */
+    public void fromFacetIntervals(SearchParameters sp, IntervalParameters facetIntervals)
+    {
+        if (facetIntervals != null)
+        {
+            ParameterCheck.mandatory("facetIntervals intervals", facetIntervals.getIntervals());
+
+            Set<IntervalSet> globalSets = facetIntervals.getSets();
+            validateSets(globalSets, "facetIntervals");
+
+            if (facetIntervals.getIntervals() != null && !facetIntervals.getIntervals().isEmpty())
+            {
+                List<String> intervalLabels = new ArrayList<>(facetIntervals.getIntervals().size());
+                for (Interval interval:facetIntervals.getIntervals())
+                {
+                    ParameterCheck.mandatory("facetIntervals intervals field", interval.getField());
+                    validateSets(interval.getSets(), "facetIntervals intervals "+interval.getField());
+                    if (interval.getSets() != null && globalSets != null)
+                    {
+                        interval.getSets().addAll(globalSets);
+                    }
+                    ParameterCheck.mandatoryCollection("facetIntervals intervals sets", interval.getSets());
+
+                    List<Map.Entry<String, Long>> duplicateSetLabels =
+                                interval.getSets().stream().collect(groupingBy(IntervalSet::getLabel, Collectors.counting()))
+                                .entrySet().stream().filter(e -> e.getValue().intValue() > 1).collect(toList());
+                    if (!duplicateSetLabels.isEmpty())
+                    {
+                        throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                    new Object[] { ": duplicate set interval label "+duplicateSetLabels.toString() });
+
+                    }
+                    if (interval.getLabel() != null) intervalLabels.add(interval.getLabel());
+                }
+
+                List<Map.Entry<String, Long>> duplicateIntervalLabels =
+                            intervalLabels.stream().collect(groupingBy(Function.identity(), Collectors.counting()))
+                            .entrySet().stream().filter(e -> e.getValue().intValue() > 1).collect(toList());
+                if (!duplicateIntervalLabels.isEmpty())
+                {
+                    throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                new Object[] { ": duplicate interval label "+duplicateIntervalLabels.toString() });
+                }
+            }
+
+            if (facetIntervals.getSets() != null)
+            {
+                facetIntervals.getSets().clear();
+            }
+        }
+        sp.setInterval(facetIntervals);
+    }
+    /**
+     * Sets the Range Parameters object on search parameters
+     * @param sp SearchParameters
+     * @param rangeParams RangeParameters
+     */
+    public void fromRange(SearchParameters sp, List<RangeParameters> ranges)
+    {
+        if(ranges != null && !ranges.isEmpty())
+        {
+            for(RangeParameters rangeParams : ranges)
+            {
+                ParameterCheck.mandatory("ranges", rangeParams);
+                ParameterCheck.mandatory("field", rangeParams.getField());
+                ParameterCheck.mandatory("start", rangeParams.getStart());
+                ParameterCheck.mandatory("end", rangeParams.getEnd());
+                ParameterCheck.mandatory("gap", rangeParams.getGap());
+            }
+            sp.setRanges(ranges);
+        }
+        
+    }
+
+    public void fromPivot(SearchParameters sp, List<StatsRequestParameters> stats, FacetFields facetFields, List<RangeParameters> ranges, List<Pivot> multiplePivots,
+                SearchRequestContext searchRequestContext)
+    {
+        if (multiplePivots != null && !multiplePivots.isEmpty())
+        {
+            multiplePivots.forEach(aPivot -> {
+                List<String> pivotKeys = new ArrayList<>();
+                buildPivotKeys(pivotKeys, aPivot, stats, facetFields, ranges, searchRequestContext);
+                sp.addPivots(pivotKeys);
+            });
+
+        }
+    }
+
+    protected void buildPivotKeys(List<String> pivotKeys, Pivot aPivot, List<StatsRequestParameters> stats, FacetFields facetFields,
+                List<RangeParameters> ranges, SearchRequestContext searchRequestContext)
+    {
+        if (aPivot == null) return;
+        String pivotKey = null;
+        ParameterCheck.mandatoryString("pivot key", aPivot.getKey());
+
+        if (facetFields.getFacets() != null && !facetFields.getFacets().isEmpty())
+        {
+            Optional<FacetField> found = facetFields.getFacets().stream()
+                        .filter(queryable -> aPivot.getKey().equals(queryable.getLabel() != null ? queryable.getLabel() : queryable.getField())).findFirst();
+
+            if (found.isPresent())
+            {
+                pivotKey = aPivot.getKey();
+                if (searchRequestContext.getPivotKeys().containsValue(pivotKey))
+                {
+                    throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                new Object[] { ": Duplicate pivot parameter " + aPivot.getKey() + "" });
+                }
+
+                pivotKeys.add(found.get().getField());
+                facetFields.getFacets().remove(found.get());
+                searchRequestContext.getPivotKeys().put(found.get().getField(), pivotKey);
+            }
+        }
+
+        if (pivotKey == null && ((aPivot.getPivots() == null) || aPivot.getPivots().isEmpty()))
+        {
+            //It is the last one so it can reference stats or range
+            if (stats != null && !stats.isEmpty())
+            {
+                Optional<StatsRequestParameters> foundStat =  stats.stream().filter(stas -> aPivot.getKey().equals(stas.getLabel()!=null?stas.getLabel():stas.getField())).findFirst();
+                if (foundStat.isPresent())
+                {
+                    pivotKey = aPivot.getKey();
+                    if (pivotKeys.isEmpty())
+                    {
+                        throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                    new Object[] { ": Stats key " + pivotKey + " cannot be used here" });
+                    }
+                    pivotKeys.add(pivotKey);
+                    searchRequestContext.getPivotKeys().put(pivotKey, pivotKey);
+                }
+            }
+
+            if (ranges != null && !ranges.isEmpty())
+            {
+                for (RangeParameters aRange:ranges)
+                {
+                    if (aPivot.getKey().equals(aRange.getLabel()))
+                    {
+                        pivotKey = aPivot.getKey();
+                        if (pivotKeys.isEmpty())
+                        {
+                            throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                                        new Object[] { ": Range key " + pivotKey + " cannot be used here" });
+                        }
+                        pivotKeys.add(pivotKey);
+                        searchRequestContext.getPivotKeys().put(pivotKey, pivotKey);
+                    }
+                }
+            }
+        }
+
+        if (pivotKey == null)
+        {
+            String invalidMessage = searchRequestContext.getPivotKeys().values().contains(aPivot.getKey())
+                        ? " cannot be used more than once.":" does not reference a facet Field, range or stats.";
+            throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                        new Object[] { ": Pivot parameter " + aPivot.getKey() + invalidMessage });
+        }
+
+        if (aPivot.getPivots() != null && !aPivot.getPivots().isEmpty() && aPivot.getPivots().size()>1)
+        {
+            throw new InvalidArgumentException(InvalidArgumentException.DEFAULT_MESSAGE_ID,
+                        new Object[] { ": Currently only 1 nested pivot is supported, you have "+aPivot.getPivots().size()});
+        }
+
+        aPivot.getPivots().forEach(subPivot ->
+        {
+            buildPivotKeys(pivotKeys, subPivot, stats, facetFields, ranges, searchRequestContext);
+        });
+
+    }
+
+    public void fromStats(SearchParameters sp, List<StatsRequestParameters> stats)
+    {
+        if (stats != null && !stats.isEmpty())
+        {
+            for (StatsRequestParameters aStat:stats)
+            {
+                ParameterCheck.mandatory("stats field", aStat.getField());
+
+                List<Float> perc = aStat.getPercentiles();
+                if (perc != null && !perc.isEmpty())
+                {
+                    for (Float percentile:perc)
+                    {
+                        if (percentile == null || percentile < 0 || percentile > 100)
+                        {
+                            throw new IllegalArgumentException("Invalid percentile "+percentile);
+                        }
+                    }
+                }
+
+                if (aStat.getCardinality() && (aStat.getCardinalityAccuracy() < 0 || aStat.getCardinalityAccuracy() > 1))
+                {
+                    throw new IllegalArgumentException("Invalid cardinality accuracy "+aStat.getCardinalityAccuracy() + " It must be between 0 and 1.");
+                }
+            }
+
+            sp.setStats(stats);
+        }
+
+    }
+
+    protected void validateSets(Set<IntervalSet> intervalSets, String prefix)
+    {
+        if (intervalSets != null && !intervalSets.isEmpty())
+        {
+            for (IntervalSet aSet:intervalSets)
+            {
+                ParameterCheck.mandatory(prefix+" sets start", aSet.getStart());
+                ParameterCheck.mandatory(prefix+" sets end", aSet.getEnd());
+
+                if (aSet.getLabel() == null)
+                {
+                    aSet.setLabel(aSet.toRange());
                 }
             }
         }
@@ -460,6 +730,73 @@ public class SearchMapper
     public void fromHighlight(SearchParameters sp, GeneralHighlightParameters highlight)
     {
         sp.setHighlight(highlight);
+    }
+
+    /**
+     * Validates and sets the timezone
+     * @param sp SearchParameters
+     * @param timezoneId a valid java.time.ZoneId
+     */
+    public void fromLocalization(SearchParameters sp, Localization localization)
+    {
+        if (localization != null)
+        {
+
+            if (!localization.getLocales().isEmpty())
+            {
+                try
+                {
+                    localization.getLocales().forEach(localeStr -> {
+                        if (localeStr != null) localeStr = localeStr.replace('_','-');
+                        sp.addLocale(Locale.forLanguageTag(localeStr));
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw new IllegalArgumentException("Invalid locale " + localization.getLocales());
+                }
+
+            }
+
+            /*
+             * java.util.TimeZone will not error if you set an invalid timezone
+             * it just falls back to GMT without telling you.
+             *
+             * So I am using java.time.ZoneId because that throws an error,
+             * if I then convert a ZoneId to Timezone I have the same problem (silently uses GMT)
+             * so
+             * I am converting using both methods:
+             * If a timezoneId is invalid then an Invalid error is thrown
+             * If its not possible to take a java.time.ZoneId and convert it to a java.util.TimeZone then an Incompatible error is thrown
+             *
+             */
+            String timezoneId = localization.getTimezone();
+            if (timezoneId != null && !timezoneId.isEmpty())
+            {
+                ZoneId validZoneId = null;
+                TimeZone timeZone = null;
+
+                try
+                {
+                    validZoneId = ZoneId.of(timezoneId);
+                    timeZone = TimeZone.getTimeZone(timezoneId);
+                }
+                catch (Exception e)
+                {
+                    throw new IllegalArgumentException("Invalid timezoneId " + timezoneId);
+                }
+
+                if (validZoneId.getId().equals(timeZone.getID()))
+                {
+                    sp.setTimezone(validZoneId.getId());
+                }
+                else
+                {
+                    throw new IllegalArgumentException("Incompatible timezoneId " + timezoneId);
+                }
+
+            }
+        }
     }
 
     /**

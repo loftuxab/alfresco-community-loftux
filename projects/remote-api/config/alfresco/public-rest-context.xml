@@ -147,7 +147,9 @@
                 <entry key="org.alfresco.service.cmr.repository.InvalidNodeRefException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.RelationshipResourceNotFoundException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.service.cmr.version.VersionDoesNotExistException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
+                <entry key="org.alfresco.repo.client.config.ClientAppNotFoundException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.PermissionDeniedException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_FORBIDDEN}" />
+                <entry key="org.alfresco.repo.security.authority.UnknownAuthorityException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_NOT_FOUND}" />
                 <entry key="org.alfresco.repo.security.permissions.AccessDeniedException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_FORBIDDEN}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.UnsupportedResourceOperationException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_METHOD_NOT_ALLOWED}" />
                 <entry key="org.alfresco.rest.framework.core.exceptions.ConstraintViolatedException" value="#{T(org.springframework.extensions.webscripts.Status).STATUS_CONFLICT}" />
@@ -509,7 +511,26 @@
           </list>
        </property>
     </bean>
+    <bean id="downloads" class="org.alfresco.rest.api.impl.DownloadsImpl">
+        <property name="downloadService" ref="DownloadService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="nodes" ref="Nodes" />
+        <property name="permissionService" ref="permissionService"/>
+    </bean>
 
+    <bean id="Downloads" class="org.springframework.aop.framework.ProxyFactoryBean">
+            <property name="proxyInterfaces">
+            <value>org.alfresco.rest.api.Downloads</value>
+        </property>
+        <property name="target">
+            <ref bean="downloads" />
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="legacyExceptionInterceptor" />
+            </list>
+        </property>
+    </bean>
     <bean id="deletedNodes" class="org.alfresco.rest.api.impl.DeletedNodesImpl">
         <property name="nodes" ref="Nodes" />
         <property name="nodeService" ref="NodeService" />
@@ -631,6 +652,7 @@
         <property name="contentUsageService" ref="contentUsageImpl" />
         <property name="contentService" ref="ContentService" />
         <property name="thumbnailService" ref="ThumbnailService" />
+        <property name="resetPasswordService" ref="resetPasswordService" />
     </bean>
 
     <bean id="People" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -771,6 +793,10 @@
     </bean>
 
     <!-- API webscripts -->
+    
+     <bean class="org.alfresco.rest.api.downloads.DownloadsEntityResource">
+        <property name="downloads" ref="Downloads" />
+     </bean>
 
 	 <bean class="org.alfresco.rest.api.sites.SiteEntityResource">
 		<property name="sites" ref="Sites" />
@@ -791,6 +817,10 @@
 	 <bean class="org.alfresco.rest.api.people.PeopleEntityResource">
 		<property name="people" ref="People" />
 	 </bean>
+
+    <bean class="org.alfresco.rest.api.people.PersonGroupsRelation">
+        <property name="groups" ref="Groups" />
+    </bean>
 	
 	 <bean class="org.alfresco.rest.api.tags.TagsEntityResource">
         <property name="tags" ref="Tags" />
@@ -926,6 +956,8 @@
     <!-- OpenCMIS -->
 
     <bean id="publicApiCMISServiceFactory" class="org.alfresco.opencmis.PublicApiAlfrescoCmisServiceFactory" init-method="init">
+        <property name="memoryThreshold"        value="${opencmis.memoryThresholdKB}" />
+        <property name="maxContentSize"         value="${opencmis.maxContentSizeMB}" />
         <property name="cmisConnector"          ref="CMISConnector" />
         <property name="cmisTransactions"       ref="CMISService_Transactions" />
         <property name="cmisExceptions"         ref="CMISService_Exceptions" />
@@ -948,6 +980,7 @@
         <property name="version"            value="1.0"/>
         <property name="cmisVersion"        value="1.0"/>
         <property name="tenantAdminService" ref="tenantAdminService"/>
+        <property name="nonAttachContentTypes" ref="nodes.nonAttachContentTypes"/>
     </bean>
 
     <bean   id="cmisAtomPubDispatcher1.1" class="org.alfresco.opencmis.PublicApiAtomPubCMISDispatcher" init-method="init">
@@ -959,6 +992,7 @@
         <property name="version"            value="1.1"/>
         <property name="cmisVersion"        value="1.1"/>
         <property name="tenantAdminService" ref="tenantAdminService"/>
+        <property name="nonAttachContentTypes" ref="nodes.nonAttachContentTypes"/>
     </bean>
 
     <bean   id="cmisBrowserDispatcher1.1" class="org.alfresco.opencmis.PublicApiBrowserCMISDispatcher" init-method="init">
@@ -970,6 +1004,7 @@
         <property name="version"            value="1.1"/>
         <property name="cmisVersion"        value="1.1"/>
         <property name="tenantAdminService" ref="tenantAdminService"/>
+        <property name="nonAttachContentTypes" ref="nodes.nonAttachContentTypes"/>
     </bean>
 
     <bean   id="webscript.org.alfresco.api.opencmis.OpenCMIS.get" 
@@ -1332,4 +1367,34 @@
         <property name="nodeService" ref="NodeService"/>
     </bean>
 
+    <!--                               -->
+    <!--    Groups REST API   -->
+    <!--                               -->
+    <bean id="groups" class="org.alfresco.rest.api.impl.GroupsImpl">
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="authorityDAO" ref="authorityDAO" />
+        <property name="people" ref="people"/>
+    </bean>
+
+    <bean id="Groups" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.rest.api.Groups</value>
+        </property>
+        <property name="target">
+            <ref bean="groups" />
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="legacyExceptionInterceptor" />
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.alfresco.rest.api.groups.GroupsEntityResource">
+        <property name="groups" ref="Groups" />
+    </bean>
+
+    <bean class="org.alfresco.rest.api.groups.GroupMembersRelation">
+        <property name="groups" ref="Groups" />
+    </bean>
 </beans>

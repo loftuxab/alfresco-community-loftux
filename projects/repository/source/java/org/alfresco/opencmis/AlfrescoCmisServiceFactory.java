@@ -47,13 +47,43 @@ import org.springframework.aop.framework.ProxyFactory;
 public class AlfrescoCmisServiceFactory extends AbstractServiceFactory
 {
     private static final Log logger = LogFactory.getLog(AlfrescoCmisServiceFactory.class);
-    
+
+    private int memoryThreshold = super.getMemoryThreshold();
+    private long maxContentSize = super.getMaxContentSize();
     private CMISConnector connector;
     private RetryingTransactionInterceptor cmisTransactions;
     private AlfrescoCmisExceptionInterceptor cmisExceptions;
     private AlfrescoCmisServiceInterceptor cmisControl;
     private AlfrescoCmisStreamInterceptor cmisStreams;
     private AuthorityService authorityService;
+
+    /**
+     *
+     * @param memoryThreshold in KB
+     */
+    public void setMemoryThreshold(double memoryThreshold)
+    {
+        this.memoryThreshold = ((int) memoryThreshold) * 1024;
+    }
+
+    /**
+     *
+     * @param maxContentSize in MB
+     */
+    public void setMaxContentSize(double maxContentSize)
+    {
+        this.maxContentSize = ((long) maxContentSize) * 1024 * 1024;
+    }
+
+    @Override
+    public int getMemoryThreshold() {
+        return memoryThreshold;
+    }
+
+    @Override
+    public long getMaxContentSize() {
+        return maxContentSize;
+    }
 
     /**
      * Sets the Authority Service.

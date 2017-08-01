@@ -182,7 +182,8 @@ public class DbOrIndexSwitchingQueryLanguage extends AbstractLuceneQueryLanguage
         case TRANSACTIONAL_IF_POSSIBLE:
         default:
             StopWatch stopWatch = new StopWatch("DB if possible");
-            if(dbQueryLanguage != null)
+            //SEARCH-347, exclude TMDQ calls if faceting present.
+            if(dbQueryLanguage != null && !searchParameters.hasFaceting())
             {
                 try
                 {
@@ -251,8 +252,6 @@ public class DbOrIndexSwitchingQueryLanguage extends AbstractLuceneQueryLanguage
             }
             throw new QueryModelException("No query language available");
         }
-        
-        
     }
 
     private SearchParameters flattenDBQuery(SearchParameters sp)

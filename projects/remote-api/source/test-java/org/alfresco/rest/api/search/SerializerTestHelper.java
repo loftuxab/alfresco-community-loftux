@@ -56,12 +56,22 @@ public class SerializerTestHelper implements RequestReader
 
     public static final String JSON = "{ \"query\": {\"query\": \"g*\",\"userQuery\": \"great\",\"language\": \"afts\"}, "
                 + "\"paging\": {\"maxItems\": \"99\",\"skipCount\": \"4\"},"
+                + "\"includeRequest\": true,"
                 + "\"sort\": {\"type\": \"FIELD\",\"field\": \"cm:title\",\"ascending\": \"true\"},"
                 + "\"templates\": [{\"name\": \"mytemp\",\"template\": \"ATEMP\"}, {\"name\": \"yourtemp\",\"template\": \"%cm:content\"}],"
                 + "\"defaults\": {\"namespace\": \"namesp\",\"defaultFieldName\": \"myfield\",\"defaultFTSOperator\": \"AND\", \"textAttributes\": [\"roy\", \"king\"]},"
                 + "\"filterQueries\": [{\"query\": \"myquery\",\"tags\": [\"tag1\", \"tag2\"]},{\"query\": \"myquery2\"}],"
-                + "\"facetFields\": {\"facets\": [{\"field\": \"cm:creator\",\"prefix\": \"myquery2\",\"sort\": \"COUNT\",\"missing\": \"false\"}, {\"field\": \"modifier\",\"label\": \"mylabel\",\"method\": \"FC\",\"mincount\": \"5\"}]},"
-                + "\"facetQueries\": [{\"query\": \"facquery\",\"label\": \"facnoused\"}],"
+                + "\"facetFields\": {\"facets\": [{\"field\": \"cm:creator\",\"prefix\": \"myquery2\",\"sort\": \"COUNT\",\"missing\": \"false\"}, {\"field\": \"modifier\",\"label\": \"mylabel\",\"method\": \"FC\",\"mincount\": \"5\"}, {\"field\": \"owner\",\"label\": \"ownerLabel\"}]},"
+                + "\"facetQueries\": [{\"query\": \"cm:created:bob\",\"label\": \"small\"}],"
+                + "\"pivots\": [{\"key\": \"mylabel\"}],"
+                + "\"ranges\": [{\"field\": \"content.size\",\"start\": \"0\",\"end\": \"300\",\"gap\": \"100\",\"include\":[\"lower\"]}],"
+                + "\"facetIntervals\": {\"sets\": [{ \"label\": \"king\", \"start\": \"1\", \"end\": \"2\",\"startInclusive\": true,\"endInclusive\": false}]"
+                + ",\"intervals\": [{\"field\": \"cm:creator\",\"label\": \"creator\","
+                + "\"sets\": [{\"label\": \"last\",\"start\": \"a\",\"end\": \"b\",\"startInclusive\": false}]"
+                + "},"
+                + "{\"label\":\"TheCreated\",\"field\":\"cm:created\",\"sets\":[{\"label\":\"lastYear\",\"start\":\"2016\",\"end\":\"2017\",\"endInclusive\":false},{\"label\":\"currentYear\",\"start\":\"NOW/YEAR\",\"end\":\"NOW/YEAR+1YEAR\"},{\"label\":\"earlier\",\"start\":\"*\",\"end\":\"2016\",\"endInclusive\":false}]}"
+                + "]},"
+                + "\"stats\": [{\"field\": \"cm:creator\", \"label\": \"mylabel\"}],"
                 + "\"spellcheck\": {\"query\": \"alfrezco\"},"
                 + "\"limits\": {\"permissionEvaluationCount\": \"2000\",\"permissionEvaluationTime\": \"5000\"},"
                 + "\"scope\": { \"locations\": [\"nodes\"]},"
@@ -89,7 +99,7 @@ public class SerializerTestHelper implements RequestReader
         }
     }
 
-    private SearchQuery extractFromJson(String json) throws IOException
+    public SearchQuery extractFromJson(String json) throws IOException
     {
         Content content = mock(Content.class);
         when(content.getReader()).thenReturn(new StringReader(json));
@@ -115,7 +125,6 @@ public class SerializerTestHelper implements RequestReader
                 objectMapper.writeValue(generator, respons);
             }
         });
-        System.out.println(out.toString());
         return out.toString();
     }
 }

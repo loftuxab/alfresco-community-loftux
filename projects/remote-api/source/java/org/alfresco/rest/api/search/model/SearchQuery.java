@@ -27,7 +27,11 @@
 package org.alfresco.rest.api.search.model;
 
 import org.alfresco.rest.framework.resource.parameters.Paging;
+import org.alfresco.service.cmr.search.FacetFormat;
 import org.alfresco.service.cmr.search.GeneralHighlightParameters;
+import org.alfresco.service.cmr.search.IntervalParameters;
+import org.alfresco.service.cmr.search.RangeParameters;
+import org.alfresco.service.cmr.search.StatsRequestParameters;
 import org.codehaus.jackson.annotate.JsonCreator;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -54,12 +58,22 @@ public class SearchQuery
     private final Scope scope;
     private final Limits limits;
     private final GeneralHighlightParameters highlight;
+    private final IntervalParameters facetIntervals;
+    private final boolean includeRequest;
+    private final List<Pivot> pivots;
+    private final List<StatsRequestParameters> stats;
+    private final List<RangeParameters> ranges;
+    private final Localization localization;
+    private final FacetFormat facetFormat;
 
-    public static final SearchQuery EMPTY = new SearchQuery(null, null, null, null, null,null, null, null,null, null, null, null, null, null);
+    public static final SearchQuery EMPTY = new SearchQuery(null, null, null, null, null, null,
+                null,null, null, null, null,null, null, null, null,
+                null, null, null,null, null,null);
 
     @JsonCreator
     public SearchQuery(@JsonProperty("query") Query query,
                 @JsonProperty("paging") Paging paging,
+                @JsonProperty("includeRequest") Boolean includeRequest,
                 @JsonProperty("include") List<String> include,
                 @JsonProperty("fields") List<String> fields,
                 @JsonProperty("sort") List<SortDef> sort,
@@ -71,9 +85,16 @@ public class SearchQuery
                 @JsonProperty("spellcheck") Spelling spellcheck,
                 @JsonProperty("scope") Scope scope,
                 @JsonProperty("limits")Limits limits,
-                @JsonProperty("highlight")GeneralHighlightParameters highlight)
+                @JsonProperty("highlight")GeneralHighlightParameters highlight,
+                @JsonProperty("facetIntervals")IntervalParameters facetIntervals,
+                @JsonProperty("pivots") List<Pivot> pivots,
+                @JsonProperty("stats") List<StatsRequestParameters> stats,
+                @JsonProperty("ranges") List<RangeParameters> ranges,
+                @JsonProperty("localization") Localization localization,
+                @JsonProperty("facetFormat") FacetFormat facetFormat)
     {
         this.query = query;
+        this.includeRequest = includeRequest==null?false:includeRequest;
         this.paging = paging;
         this.include = include;
         this.fields = fields;
@@ -87,6 +108,12 @@ public class SearchQuery
         this.facetFields = facetFields;
         this.limits = limits;
         this.highlight = highlight;
+        this.facetIntervals = facetIntervals;
+        this.pivots = pivots;
+        this.stats = stats;
+        this.ranges = ranges;
+        this.localization = localization;
+        this.facetFormat = facetFormat;
     }
 
     public Query getQuery()
@@ -152,8 +179,45 @@ public class SearchQuery
     {
         return highlight;
     }
+
+    public IntervalParameters getFacetIntervals()
+    {
+        return facetIntervals;
+    }
+
     public Limits getLimits()
     {
         return limits;
     }
+
+    public boolean includeRequest()
+    {
+        return includeRequest;
+    }
+
+    public List<Pivot> getPivots()
+    {
+        return pivots;
+    }
+
+    public List<StatsRequestParameters> getStats()
+    {
+        return stats;
+    }
+
+    public List<RangeParameters> getFacetRanges()
+    {
+        return ranges;
+    }
+
+    public Localization getLocalization()
+    {
+        return localization;
+    }
+
+    public FacetFormat getFacetFormat()
+    {
+        return facetFormat;
+    }
+
 }

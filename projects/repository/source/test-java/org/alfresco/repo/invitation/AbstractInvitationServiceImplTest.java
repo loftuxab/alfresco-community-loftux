@@ -47,10 +47,12 @@ import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.workflow.WorkflowAdminServiceImpl;
 import org.alfresco.service.cmr.invitation.Invitation;
 import org.alfresco.service.cmr.invitation.Invitation.ResourceType;
+import org.alfresco.service.cmr.invitation.InvitationExceptionUserError;
 import org.alfresco.service.cmr.invitation.InvitationSearchCriteria;
 import org.alfresco.service.cmr.invitation.InvitationService;
 import org.alfresco.service.cmr.invitation.ModeratedInvitation;
 import org.alfresco.service.cmr.invitation.NominatedInvitation;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.site.SiteInfo;
@@ -58,15 +60,23 @@ import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.util.BaseAlfrescoSpringTest;
 import org.alfresco.util.PropertyMap;
+import org.alfresco.util.email.ExtendedMailActionExecutor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.ReflectionUtils;
+
 
 /**
  * Unit tests of Invitation Service
  */
 public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpringTest
 {
+    private static final String TEST_REJECT_URL = "testRejectUrl";
+
+    private static final String TEST_ACCEPT_URL = "testAcceptUrl";
+
+    private static final String TEST_SERVER_PATH = "testServerPath";
+
     private static final Log logger = LogFactory.getLog(AbstractInvitationServiceImplTest.class);
     
     private SiteService siteService;
@@ -114,8 +124,8 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         this.authenticationComponent = (AuthenticationComponent) this.applicationContext
                     .getBean("authenticationComponent");
         this.invitationServiceImpl = (InvitationServiceImpl) applicationContext.getBean("invitationService");
-        this.workflowAdminService = (WorkflowAdminServiceImpl)applicationContext.getBean(WorkflowAdminServiceImpl.NAME); 
-        
+        this.workflowAdminService = (WorkflowAdminServiceImpl)applicationContext.getBean(WorkflowAdminServiceImpl.NAME);
+
         this.templateService = (TemplateServiceImpl)applicationContext.getBean("templateService");
         
         this.startSendEmails = invitationServiceImpl.isSendEmails();
@@ -223,11 +233,16 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         this.authenticationComponent.setCurrentUser(USER_MANAGER);
 
         // Invite our existing user
-        NominatedInvitation nominatedInvitation = invitationService.inviteNominated(
-                inviteeUserName, resourceType, resourceName, inviteeRole, acceptUrl, rejectUrl);
-
-        // Cancel the invite
-        invitationService.cancel(nominatedInvitation.getInviteId());
+        try
+        {
+            invitationService.inviteNominated(inviteeUserName, resourceType, resourceName, inviteeRole, acceptUrl, rejectUrl);
+            fail("An exception of type " + InvitationExceptionUserError.class.getName() + " should be thrown");
+        }
+        catch (Exception ex)
+        {
+            assertTrue("Incorrect exception was thrown", ex instanceof InvitationExceptionUserError);
+        }
+       
 
         // Our User and associated Authentication still exists
         assertNotNull("User Exists", personService.getPersonOrNull(USER_ONE));
@@ -379,6 +394,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         /**
          * Now accept the invitation
          */
+        AuthenticationUtil.setFullyAuthenticatedUser(inviteeUserName);
         NominatedInvitation acceptedInvitation = (NominatedInvitation) invitationService.accept(firstInvite
                     .getInviteId(), firstInvite.getTicket());
         assertEquals("invite id wrong", firstInvite.getInviteId(), acceptedInvitation.getInviteId());
@@ -408,9 +424,17 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
          * Check that system generated invitations can work as well
          */
         {
-           Field faf = mailService.getClass().getDeclaredField("fromAddress");
-           faf.setAccessible(true);
-           String defaultFromAddress = (String)ReflectionUtils.getField(faf, mailService);
+            Field faf;
+            if (mailService instanceof ExtendedMailActionExecutor)
+            {
+                faf = mailService.getClass().getSuperclass().getDeclaredField("fromDefaultAddress");
+            }
+            else
+            {
+                faf = mailService.getClass().getDeclaredField("fromDefaultAddress");
+            }
+            faf.setAccessible(true);
+            String defaultFromAddress = (String) ReflectionUtils.getField(faf, mailService);
            
            AuthenticationUtil.setFullyAuthenticatedUser(USER_NOEMAIL);
 
@@ -431,7 +455,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
            assertEquals(USER_TWO_EMAIL, msg.getAllRecipients()[0].toString());
            
            assertEquals(1, msg.getFrom().length);
-           assertEquals(defaultFromAddress, msg.getFrom()[0].toString());           
+           assertEquals(defaultFromAddress, msg.getFrom()[0].toString());
         }
     }
 
@@ -570,6 +594,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         /**
          * Now accept the invitation
          */
+        AuthenticationUtil.setFullyAuthenticatedUser(nominatedInvitationA.getInviteeUserName());
         NominatedInvitation acceptedInvitationA = (NominatedInvitation) invitationService.accept(inviteAId,
                     nominatedInvitationA.getTicket());
         assertEquals("invite id wrong", inviteAId, acceptedInvitationA.getInviteId());
@@ -577,6 +602,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         assertEquals("last name wrong", inviteeALastName, acceptedInvitationA.getInviteeLastName());
         assertEquals("user name wrong", inviteeAUserName, acceptedInvitationA.getInviteeUserName());
 
+        AuthenticationUtil.setFullyAuthenticatedUser(nominatedInvitationB.getInviteeUserName());
         NominatedInvitation acceptedInvitationB = (NominatedInvitation) invitationService.accept(inviteBId,
                     nominatedInvitationB.getTicket());
         assertEquals("invite id wrong", inviteBId, acceptedInvitationB.getInviteId());
@@ -587,6 +613,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         /**
          * Now verify access control list
          */
+        AuthenticationUtil.setFullyAuthenticatedUser(USER_MANAGER);
         String roleNameA = siteService.getMembersRole(resourceName, inviteeAUserName);
         assertEquals("role name wrong", roleNameA, inviteeRole);
         String roleNameB = siteService.getMembersRole(resourceName, inviteeBUserName);
@@ -684,6 +711,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
                 siteService.createSite("InviteSitePreset", siteName, "InviteSiteTitle",
                         "InviteSiteDescription", SiteVisibility.MODERATED);
             }
+            assertEquals( SiteModel.SITE_MANAGER, siteService.getMembersRole(siteName, AuthenticationUtil.getAdminUserName()));
 
             // Invite user
             NominatedInvitation nominatedInvitation = invitationService.inviteNominated(
@@ -728,6 +756,7 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         assertEquals("user name wrong", expectedUserName, invitation.getInviteeUserName());
 
         // Now accept the invitation
+        AuthenticationUtil.setFullyAuthenticatedUser(invitation.getInviteeUserName());
         NominatedInvitation acceptedInvitation = (NominatedInvitation) invitationService.accept(invitation
                     .getInviteId(), invitation.getTicket());
 
@@ -1144,25 +1173,24 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         invitationService.inviteModerated(comments, USER_TWO, resourceType, SITE_SHORT_NAME_RED, inviteeRole);
 
         /**
-         * Search for invitations for BLUE
+         * Search for invitations for BLUE - no pending invite since the user is added directly without waiting for the user to accept it
          */
         List<Invitation> resOne = invitationService.listPendingInvitationsForResource(ResourceType.WEB_SITE,
                     SITE_SHORT_NAME_BLUE);
-        assertEquals("blue invites not 1", 1, resOne.size());
-        assertEquals("blue id wrong", threeId, resOne.get(0).getInviteId());
+        assertEquals("blue invites not 0", 0, resOne.size());
 
         /**
-         * Search for invitations for RED
+         * Search for invitations for RED - no pending nominated invites since the user is added directly without waiting for the user to accept it
          */
         List<Invitation> resTwo = invitationService.listPendingInvitationsForResource(ResourceType.WEB_SITE,
                     SITE_SHORT_NAME_RED);
-        assertEquals("red invites not 3", 3, resTwo.size());
+        assertEquals("red invites not 2", 2, resTwo.size());
 
         /**
          * Search for invitations for USER_ONE
          */
         List<Invitation> resThree = invitationService.listPendingInvitationsForInvitee(USER_ONE);
-        assertEquals("user one does not have 3 invitations", 3, resThree.size());
+        assertEquals("user one does not have 1 invitations", 1, resThree.size());
 
         /**
          * Search for invitations for USER_TWO
@@ -1178,33 +1206,33 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         crit1.setInvitationType(InvitationSearchCriteria.InvitationType.NOMINATED);
 
         List<Invitation> resFive = invitationService.searchInvitation(crit1);
-        assertEquals("user one does not have 2 nominated", 2, resFive.size());
+        assertEquals("user one should not have any nominated invites", 0, resFive.size());
 
         // now limit the search to 1 returned value
         List<Invitation> limitRes = invitationService.searchInvitation(crit1, 1);
-        assertEquals("user one does not have 1 nominated", 1, limitRes.size());
+        assertEquals("user one should not have any nominated invites", 0, limitRes.size());
 
         /**
          * Search with an empty criteria - should find all open invitations
          */
         InvitationSearchCriteria crit2 = new InvitationSearchCriteriaImpl();
-        invitationService.searchInvitation(crit2);
-        assertTrue("search everything returned 0 elements", resFive.size() > 0);
+        List<Invitation> searchInvitation = invitationService.searchInvitation(crit2);
+        assertTrue("2 moderated invitations should be found", searchInvitation.size() == 2);
 
         // now search everything but limit the results to 3
-        invitationService.searchInvitation(crit2, 3);
-        assertTrue("search everything returned 0 or more than 3 elements", resFive.size() > 0 && resFive.size() <=3);
+        searchInvitation = invitationService.searchInvitation(crit2, 2);
+        assertTrue("search everything returned 0 or more than 2 elements", searchInvitation.size() > 0 && searchInvitation.size() <=2);
 
         InvitationSearchCriteriaImpl crit3 = new InvitationSearchCriteriaImpl();
         crit3.setInviter(USER_MANAGER);
         crit3.setInvitationType(InvitationSearchCriteria.InvitationType.NOMINATED);
 
         List<Invitation> res3 = invitationService.searchInvitation(crit3);
-        assertEquals("user one does not have 2 nominated", 2, res3.size());
+        assertEquals("user one should not have any nominated invites", 0, res3.size());
 
         //now limit the search to 1 result
         res3 = invitationService.searchInvitation(crit3, 1);
-        assertEquals("user one does not have 1 nominated", 1, res3.size());
+        assertEquals("user one should not have any nominated invites", 0, res3.size());
     }
 
     /**
@@ -1247,6 +1275,61 @@ public abstract class AbstractInvitationServiceImplTest extends BaseAlfrescoSpri
         // only search for the first MAX_SEARCH
         results = invitationService.searchInvitation(query, MAX_SEARCH);
         assertEquals(MAX_SEARCH, results.size());
+    }
+    
+    /**
+     * MNT-17341 : External users with Manager role cannot invite other external users to the site because site invitation accept fails
+     */
+    public void testExternalUserManagerInvitingAnotherExternalUser() throws Exception{
+        String inviteeFirstName = PERSON_FIRSTNAME;
+        String inviteeLastName = PERSON_LASTNAME;
+        String inviteeEmail = "123@alfrescotesting.com";
+        
+        String inviteeFirstName2 = "user2name";
+        String inviteeLastName2 = "user2lastname";
+        String inviteeEmail2 = "1234@alfrescotesting.com";
+
+        this.authenticationComponent.setCurrentUser(USER_MANAGER);
+
+        // internal user invites an external user as a site manager
+        NominatedInvitation nominatedInvitation = invitationService.inviteNominated(inviteeFirstName, inviteeLastName, inviteeEmail,
+                Invitation.ResourceType.WEB_SITE, SITE_SHORT_NAME_INVITE, SiteModel.SITE_MANAGER, TEST_SERVER_PATH, TEST_ACCEPT_URL, TEST_REJECT_URL);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(nominatedInvitation.getInviteeUserName());
+
+        invitationService.accept(nominatedInvitation.getInviteId(), nominatedInvitation.getTicket());
+
+        // external user1 now a site manager, invites another external user as a site collaborator
+        NominatedInvitation nominatedInvitation2 = invitationService.inviteNominated(inviteeFirstName2, inviteeLastName2, inviteeEmail2,
+                Invitation.ResourceType.WEB_SITE, SITE_SHORT_NAME_INVITE, SiteModel.SITE_COLLABORATOR, TEST_SERVER_PATH, TEST_ACCEPT_URL, TEST_REJECT_URL);
+
+        assertNotNull("nominated invitation is null", nominatedInvitation2);
+        assertEquals("first name wrong", inviteeFirstName2, nominatedInvitation2.getInviteeFirstName());
+        assertEquals("last name wrong", inviteeLastName2, nominatedInvitation2.getInviteeLastName());
+        assertEquals("email name wrong", inviteeEmail2, nominatedInvitation2.getInviteeEmail());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(nominatedInvitation2.getInviteeUserName());
+        
+        NodeRef person = personService.getPersonOrNull(nominatedInvitation2.getInviteeUserName());
+        assertTrue("user has not been created", person != null);
+        assertTrue("user should have the ASPECT_ANULLABLE aspect since the invitation hasn't been accepted yet", nodeService.hasAspect(person, ContentModel.ASPECT_ANULLABLE));      
+        
+        // authenticated as external user 2 accept the invitation
+        Invitation acceptedNominatedInvitation2 = invitationService.accept(nominatedInvitation2.getInviteId(), nominatedInvitation2.getTicket());
+        
+        assertNotNull("accepted nominated invitation is null", acceptedNominatedInvitation2);
+        assertEquals("role is wrong", SiteModel.SITE_COLLABORATOR, acceptedNominatedInvitation2.getRoleName());
+        assertEquals("user name wrong", inviteeFirstName2 + "_" + inviteeLastName2, acceptedNominatedInvitation2.getInviteeUserName());
+        
+        person = personService.getPersonOrNull(acceptedNominatedInvitation2.getInviteeUserName());
+        assertTrue("user has not been created", person != null);
+        assertTrue("user should not have the ASPECT_ANULLABLE aspect anymore", !nodeService.hasAspect(person, ContentModel.ASPECT_ANULLABLE));
+        
+        Invitation invitation = invitationService.getInvitation(acceptedNominatedInvitation2.getInviteId());
+        assertEquals("invited user name is wrong", invitation.getInviteeUserName(), acceptedNominatedInvitation2.getInviteeUserName());
+        assertEquals("invite id is wrong", invitation.getInviteId(), acceptedNominatedInvitation2.getInviteId());
+        assertEquals("invite resource name is wrong", invitation.getResourceName(), acceptedNominatedInvitation2.getResourceName());
+        
     }
 
     public void disabled_test100Invites() throws Exception

@@ -28,17 +28,31 @@ package org.alfresco.repo.search.impl.lucene;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.alfresco.repo.domain.node.NodeDAO;
 import org.alfresco.repo.search.SimpleResultSetMetaData;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericBucket;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetResponse;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.GenericFacetResponse.FACET_TYPE;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.ListMetric;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.Metric.METRIC_TYPE;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.PercentileMetric;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.RangeResultMapper;
+import org.alfresco.repo.search.impl.solr.facet.facetsresponse.SimpleMetric;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.PermissionEvaluationMode;
+import org.alfresco.service.cmr.search.RangeParameters;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.ResultSetMetaData;
 import org.alfresco.service.cmr.search.ResultSetRow;
@@ -83,7 +97,15 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
     private Map<String, Integer> facetQueries = new HashMap<String, Integer>();
 
     private Map<NodeRef, List<Pair<String, List<String>>>> highlighting = new HashMap<>();
+
+    private Map<String, List<Pair<String, Integer>>> facetIntervals = new HashMap<String, List<Pair<String, Integer>>>(1);
     
+    private Map<String,List<Map<String,String>>> facetRanges = new HashMap<String,List<Map<String,String>>>();
+
+    private List<GenericFacetResponse> pivotFacets = new ArrayList<>();
+
+    private Map<String, Set<Metric>> stats = new HashMap<>();
+
     private NodeDAO nodeDao;
     
     private long lastIndexedTxId;
@@ -115,7 +137,8 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
             JSONObject response = json.getJSONObject("response");
             numberFound = response.getLong("numFound");
             start = response.getLong("start");
-            maxScore = Float.valueOf(response.getString("maxScore"));
+            Double d = response.getDouble("maxScore");
+            maxScore = d.floatValue();
             if (json.has("lastIndexedTx"))
             {
                 lastIndexedTxId = json.getLong("lastIndexedTx");
@@ -137,7 +160,7 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
                 if(dbids != null)
                 {
                     Long dbid = dbids.getLong(0);
-                    Float score = Float.valueOf(doc.getString("score"));
+                    Float score = Float.valueOf((float)doc.getDouble("score"));
                     rawDbids.add(dbid);
                     rawScores.add(score);
                 }
@@ -146,7 +169,7 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
                     Long dbid = doc.optLong("DBID");
                     if(dbid != null)
                     {
-                        Float score = Float.valueOf(doc.getString("score"));
+                        Float score = Float.valueOf((float)doc.getDouble("score"));
                         rawDbids.add(dbid);
                         rawScores.add(score);
                     }
@@ -229,7 +252,7 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
                     for(Iterator it = facet_queries.keys(); it.hasNext(); /**/)
                     {
                         String fq = (String) it.next();
-                        Integer count =Integer.parseInt(facet_queries.getString(fq));
+                        Integer count =Integer.valueOf(facet_queries.getInt(fq));
                         facetQueries.put(fq, count);
                     }
                 }
@@ -245,14 +268,96 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
                         for(int i = 0; i < facetArraySize; i+=2)
                         {
                             String facetEntryName = facets.getString(i);
-                            Integer facetEntryCount = Integer.parseInt(facets.getString(i+1));
+                            Integer facetEntryCount = Integer.valueOf(facets.getInt(i+1));
                             Pair<String, Integer> pair = new Pair<String, Integer>(facetEntryName, facetEntryCount);
                             facetValues.add(pair);
                         }
                         fieldFacets.put(fieldName, facetValues);
                     }
                 }
+                if(facet_counts.has("facet_intervals"))
+                {
+                    JSONObject facet_intervals = facet_counts.getJSONObject("facet_intervals");
+                    for(Iterator it = facet_intervals.keys(); it.hasNext(); /**/)
+                    {
+                        String fieldName = (String)it.next();
+                        JSONObject intervals = facet_intervals.getJSONObject(fieldName);
+
+                        ArrayList<Pair<String, Integer>> intervalValues = new ArrayList<Pair<String, Integer>>(intervals.length());
+                        for(Iterator itk = intervals.keys(); itk.hasNext(); /**/)
+                        {
+                            String key = (String) itk.next();
+                            Integer count = Integer.valueOf(intervals.getInt(key));
+                            intervalValues.add(new Pair<String, Integer>(key, count));
+                        }
+                        facetIntervals.put(fieldName,intervalValues);
+                    }
+                }
+                if(facet_counts.has("facet_pivot"))
+                {
+                    JSONObject facet_pivot = facet_counts.getJSONObject("facet_pivot");
+                    for(Iterator it = facet_pivot.keys(); it.hasNext(); /**/)
+                    {
+                        String pivotName = (String)it.next();
+                        pivotFacets.addAll(buildPivot(facet_pivot, pivotName, searchParameters.getRanges()));
+                    }
+                }
+
+                if(facet_counts.has("facet_ranges"))
+                {
+                    JSONObject facet_ranges = facet_counts.getJSONObject("facet_ranges");
+                    for(Iterator it = facet_ranges.keys(); it.hasNext();)
+                    {
+                        String fieldName = (String) it.next();
+                        String end = "";
+                        try
+                        {
+                            end = facet_ranges.getJSONObject(fieldName).getString("end");
+                        }
+                        catch(JSONException e)
+                        {
+                            end = String.valueOf(facet_ranges.getJSONObject(fieldName).getInt("end"));
+                            
+                        }
+                        JSONArray rangeCollection = facet_ranges.getJSONObject(fieldName).getJSONArray("counts");
+                        List<Map<String, String>> buckets = new ArrayList<Map<String, String>>();
+                        for(int i = 0; i < rangeCollection.length(); i += 2)
+                        {
+                            String position = i == 0 ? "head":"body";
+                            if( i+2 == rangeCollection.length())
+                            {
+                                position = "tail";
+                            }
+                            Map<String,String> rangeMap = new HashMap<String,String>(3);
+                            String rangeFrom = rangeCollection.getString(i);
+                            String facetRangeCount = String.valueOf(rangeCollection.getInt(i+1));
+                            String rangeTo = (i+2 < rangeCollection.length() ? rangeCollection.getString(i+2):end);
+                            String label = rangeFrom + " - " + rangeTo;
+                            rangeMap.put(GenericFacetResponse.LABEL, label);
+                            rangeMap.put(GenericFacetResponse.COUNT, facetRangeCount);
+                            rangeMap.put(GenericFacetResponse.START, rangeFrom);
+                            rangeMap.put(GenericFacetResponse.END, rangeTo);
+                            rangeMap.put("bucketPosition", position);
+                            buckets.add(rangeMap);
+                        }
+                        facetRanges.put(fieldName, buckets);
+                    }
+                    Map<String, List<Map<String, String>>> builtRanges = buildRanges(facet_ranges);
+                    builtRanges.forEach((pKey, buckets) -> {
+                        facetRanges.put(pKey, buckets);
+                    });
+                }
             }
+
+            if(json.has("stats"))
+            {
+                JSONObject statsObj = json.getJSONObject("stats");
+                Map<String, Map<String, Object>> builtStats = buildStats(statsObj);
+                builtStats.forEach((pKey, pVal) -> {
+                    stats.put(pKey, getMetrics(pVal));
+                });
+            }
+
             // process Spell check 
             JSONObject spellCheckJson = (JSONObject) json.opt("spellcheck");
             if (spellCheckJson != null)
@@ -294,7 +399,151 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
                 maxResults > 0 && numberFound < maxResults ? LimitBy.UNLIMITED : limitBy,
                 PermissionEvaluationMode.EAGER, searchParameters);
     }
-    
+
+    protected Map<String,List<Map<String,String>>> buildRanges(JSONObject facet_ranges) throws JSONException
+    {
+        Map<String,List<Map<String,String>>> ranges = new HashMap<>();
+
+        for(Iterator it = facet_ranges.keys(); it.hasNext();)
+        {
+            String fieldName = (String) it.next();
+            String end = "";
+            try
+            {
+                end = facet_ranges.getJSONObject(fieldName).getString("end");
+            }
+            catch(JSONException e)
+            {
+                end = String.valueOf(facet_ranges.getJSONObject(fieldName).getInt("end"));
+            }
+            JSONArray rangeCollection = facet_ranges.getJSONObject(fieldName).getJSONArray("counts");
+            List<Map<String, String>> buckets = new ArrayList<Map<String, String>>();
+            for(int i = 0; i < rangeCollection.length(); i+=2)
+            {
+                String position = i == 0 ? "head":"body";
+                if( i+2 == rangeCollection.length())
+                {
+                    position = "tail";
+                }
+                Map<String,String> rangeMap = new HashMap<String,String>(3);
+                String rangeFrom = rangeCollection.getString(i);
+                int facetRangeCount = rangeCollection.getInt(i+1);
+                String rangeTo = (i+2 < rangeCollection.length() ? rangeCollection.getString(i+2):end);
+                String label = rangeFrom + " - " + rangeTo;
+                rangeMap.put(GenericFacetResponse.LABEL, label);
+                rangeMap.put(GenericFacetResponse.COUNT, String.valueOf(facetRangeCount));
+                rangeMap.put(GenericFacetResponse.START, rangeFrom);
+                rangeMap.put(GenericFacetResponse.END, rangeTo);
+                rangeMap.put("bucketPosition", position);
+                buckets.add(rangeMap);
+            }
+            ranges.put(fieldName, buckets);
+        }
+
+        return ranges;
+    }
+
+    protected Map<String, Map<String, Object>> buildStats(JSONObject statsObj) throws JSONException
+    {
+        if(statsObj.has("stats_fields"))
+        {
+            Map<String, Map<String, Object>> statsMap = new HashMap<>();
+            JSONObject statsFields = statsObj.getJSONObject("stats_fields");
+            for(Iterator itk = statsFields.keys(); itk.hasNext(); /**/)
+            {
+                String fieldName = (String) itk.next();
+                JSONObject theStats = statsFields.getJSONObject(fieldName);
+                Map<String, Object> fieldStats = new HashMap<>(statsFields.length());
+                for(Iterator it = theStats.keys(); it.hasNext(); /**/)
+                {
+                    String key = (String) it.next();
+                    Object val = theStats.get(key);
+                    if ("count".equals(key)) key = METRIC_TYPE.countValues.toString();
+                    fieldStats.put(key, val);
+                }
+                statsMap.put(fieldName, fieldStats);
+            }
+            return statsMap;
+        }
+        return Collections.emptyMap();
+    }
+
+    protected List<GenericFacetResponse> buildPivot(JSONObject facet_pivot, String pivotName, List<RangeParameters> rangeParameters) throws JSONException
+    {
+        if (!facet_pivot.has(pivotName)) return Collections.emptyList();
+
+        JSONArray pivots = facet_pivot.getJSONArray(pivotName);
+        Map<String,List<GenericBucket>> pivotBuckets = new HashMap<>(pivots.length());
+        List<GenericFacetResponse> facetResponses = new ArrayList<>();
+        for(int i = 0; i < pivots.length(); i++)
+        {
+            JSONObject piv = pivots.getJSONObject(i);
+            Set<Metric> metrics = new HashSet<>(1);
+            List<GenericFacetResponse> nested = new ArrayList<>();
+            String field = piv.getString("field");
+            String value = piv.getString("value");
+            if (piv.has("stats"))
+            {
+                JSONObject stats = piv.getJSONObject("stats");
+                Map<String, Map<String, Object>> pivotStats = buildStats(stats);
+                pivotStats.forEach((pKey, pVal) -> {
+                   metrics.addAll(getMetrics(pVal));
+                });
+            }
+
+            Integer count = Integer.valueOf(piv.getInt("count"));
+            metrics.add(new SimpleMetric(METRIC_TYPE.count,count));
+            nested.addAll(buildPivot(piv, "pivot", rangeParameters));
+
+            if (piv.has("ranges"))
+            {
+                JSONObject ranges = piv.getJSONObject("ranges");
+                Map<String, List<Map<String, String>>> builtRanges = buildRanges(ranges);
+                List<GenericFacetResponse> rangefacets = RangeResultMapper.getGenericFacetsForRanges(builtRanges,rangeParameters);
+                nested.addAll(rangefacets);
+            }
+
+            GenericBucket buck = new GenericBucket(value, field+":\""+value+"\"", null, metrics, nested);
+            List<GenericBucket> listBucks = pivotBuckets.containsKey(field)?pivotBuckets.get(field):new ArrayList<>();
+            listBucks.add(buck);
+            pivotBuckets.put(field, listBucks);
+        }
+
+        for (Map.Entry<String, List<GenericBucket>> entry : pivotBuckets.entrySet()) {
+            facetResponses.add(new GenericFacetResponse(FACET_TYPE.pivot,entry.getKey(),entry.getValue()));
+        }
+
+        if (!facetResponses.isEmpty()) return facetResponses;
+
+        return Collections.emptyList();
+    }
+
+    protected Set<Metric> getMetrics(Map<String, Object> metrics)
+    {
+        if(metrics != null && !metrics.isEmpty())
+        {
+            return metrics.entrySet().stream().map(aStat -> {
+                METRIC_TYPE metricType = METRIC_TYPE.valueOf(aStat.getKey());
+                Object val = aStat.getValue();
+                if (JSONObject.NULL.equals(val)) return null;
+
+                switch (metricType)
+                {
+                    case distinctValues:
+                        return new ListMetric(metricType, val);
+                    case percentiles:
+                        return new PercentileMetric(metricType, val);
+                    case facets:
+                    	return null;
+                    case mean:
+                        if ("NaN".equals(String.valueOf(val))) return null; //else fall through
+                    default:
+                        return new SimpleMetric(metricType, val);
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toSet());
+        }
+        return Collections.emptySet();
+    }
 
     public NodeService getNodeService()
     {
@@ -512,6 +761,21 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
         return Collections.unmodifiableMap(fieldFacets);
     }
 
+    public Map<String, List<Pair<String, Integer>>> getFacetIntervals()
+    {
+        return Collections.unmodifiableMap(facetIntervals);
+    }
+
+    public List<GenericFacetResponse> getPivotFacets()
+    {
+        return pivotFacets;
+    }
+
+    public Map<String, Set<Metric>> getStats()
+    {
+        return Collections.unmodifiableMap(stats);
+    }
+
     public long getLastIndexedTxId()
     {
         return lastIndexedTxId;
@@ -539,4 +803,10 @@ public class SolrJSONResultSet implements ResultSet, JSONResult
     {
         return processedDenies;
     }
+
+    public Map<String,List<Map<String,String>>> getFacetRanges()
+    {
+        return facetRanges;
+    }
+    
 }

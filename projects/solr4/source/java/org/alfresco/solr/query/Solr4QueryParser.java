@@ -25,6 +25,10 @@
  */
 package org.alfresco.solr.query;
 
+import static org.alfresco.util.SearchDateConversion.getDateEnd;
+import static org.alfresco.util.SearchDateConversion.getDateStart;
+import static org.alfresco.util.SearchDateConversion.parseDateString;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
@@ -4339,128 +4343,6 @@ public class Solr4QueryParser extends QueryParser implements QueryConstants
 		return true;
 
 	}
-
-	/**
-     * @param dateAndResolution
-     * @return
-	 */
-	private String getDateEnd(Pair<Date, Integer> dateAndResolution)
-	{
-		Calendar cal= Calendar.getInstance(I18NUtil.getLocale());
-		cal.setTime(dateAndResolution.getFirst());
-		switch(dateAndResolution.getSecond())
-		{
-		case Calendar.YEAR:
-			cal.set(Calendar.MONTH, cal.getActualMaximum(Calendar.MONTH));
-		case Calendar.MONTH:
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-		case Calendar.DAY_OF_MONTH:
-			cal.set(Calendar.HOUR_OF_DAY, cal.getActualMaximum(Calendar.HOUR_OF_DAY));
-		case Calendar.HOUR_OF_DAY:
-			cal.set(Calendar.MINUTE, cal.getActualMaximum(Calendar.MINUTE));
-		case Calendar.MINUTE:
-			cal.set(Calendar.SECOND, cal.getActualMaximum(Calendar.SECOND));
-		case Calendar.SECOND:
-			cal.set(Calendar.MILLISECOND, cal.getActualMaximum(Calendar.MILLISECOND));
-		case Calendar.MILLISECOND:
-		default:
-		}
-		SimpleDateFormat formatter = CachingDateFormat.getSolrDatetimeFormat();
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-		return formatter.format(cal.getTime());
-	}
-
-	/**
-     * @param dateAndResolution
-     * @return
-	 */
-	private String getDateStart(Pair<Date, Integer> dateAndResolution)
-	{
-		Calendar cal= Calendar.getInstance(I18NUtil.getLocale());
-		cal.setTime(dateAndResolution.getFirst());
-		switch(dateAndResolution.getSecond())
-		{
-		case Calendar.YEAR:
-			cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
-		case Calendar.MONTH:
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
-		case Calendar.DAY_OF_MONTH:
-			cal.set(Calendar.HOUR_OF_DAY, cal.getActualMinimum(Calendar.HOUR_OF_DAY));
-		case Calendar.HOUR_OF_DAY:
-			cal.set(Calendar.MINUTE, cal.getActualMinimum(Calendar.MINUTE));
-		case Calendar.MINUTE:
-			cal.set(Calendar.SECOND, cal.getActualMinimum(Calendar.SECOND));
-		case Calendar.SECOND:
-			cal.set(Calendar.MILLISECOND, cal.getActualMinimum(Calendar.MILLISECOND));
-		case Calendar.MILLISECOND:
-		default:
-		}
-		SimpleDateFormat formatter = CachingDateFormat.getSolrDatetimeFormat();
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-		return formatter.format(cal.getTime());
-	}
-
-	private Pair<Date, Integer> parseDateString(String dateString)
-	{
-		try
-		{
-			Pair<Date, Integer> result = CachingDateFormat.lenientParse(dateString, Calendar.YEAR);
-			return result;
-		}
-		catch (java.text.ParseException e)
-		{
-			SimpleDateFormat oldDf = CachingDateFormat.getDateFormat();
-			try
-			{
-				Date date = oldDf.parse(dateString);
-				return new Pair<Date, Integer>(date, Calendar.SECOND);
-			}
-			catch (java.text.ParseException ee)
-			{
-				if (dateString.equalsIgnoreCase("min"))
-				{
-					Calendar cal = Calendar.getInstance(I18NUtil.getLocale());
-					cal.set(Calendar.YEAR, cal.getMinimum(Calendar.YEAR));
-					cal.set(Calendar.DAY_OF_YEAR, cal.getMinimum(Calendar.DAY_OF_YEAR));
-					cal.set(Calendar.HOUR_OF_DAY, cal.getMinimum(Calendar.HOUR_OF_DAY));
-					cal.set(Calendar.MINUTE, cal.getMinimum(Calendar.MINUTE));
-					cal.set(Calendar.SECOND, cal.getMinimum(Calendar.SECOND));
-					cal.set(Calendar.MILLISECOND, cal.getMinimum(Calendar.MILLISECOND));
-					return new Pair<Date, Integer>(cal.getTime(), Calendar.MILLISECOND);
-				}
-				else if (dateString.equalsIgnoreCase("now"))
-				{
-					return new Pair<Date, Integer>(new Date(), Calendar.MILLISECOND);
-				}
-				else if (dateString.equalsIgnoreCase("today"))
-				{
-					Calendar cal = Calendar.getInstance(I18NUtil.getLocale());
-					cal.setTime(new Date());
-					cal.set(Calendar.HOUR_OF_DAY, cal.getMinimum(Calendar.HOUR_OF_DAY));
-					cal.set(Calendar.MINUTE, cal.getMinimum(Calendar.MINUTE));
-					cal.set(Calendar.SECOND, cal.getMinimum(Calendar.SECOND));
-					cal.set(Calendar.MILLISECOND, cal.getMinimum(Calendar.MILLISECOND));
-					return new Pair<Date, Integer>(cal.getTime(), Calendar.DAY_OF_MONTH);
-				}
-				else if (dateString.equalsIgnoreCase("max"))
-				{
-					Calendar cal = Calendar.getInstance(I18NUtil.getLocale());
-					cal.set(Calendar.YEAR, cal.getMaximum(Calendar.YEAR));
-					cal.set(Calendar.DAY_OF_YEAR, cal.getMaximum(Calendar.DAY_OF_YEAR));
-					cal.set(Calendar.HOUR_OF_DAY, cal.getMaximum(Calendar.HOUR_OF_DAY));
-					cal.set(Calendar.MINUTE, cal.getMaximum(Calendar.MINUTE));
-					cal.set(Calendar.SECOND, cal.getMaximum(Calendar.SECOND));
-					cal.set(Calendar.MILLISECOND, cal.getMaximum(Calendar.MILLISECOND));
-					return new Pair<Date, Integer>(cal.getTime(), Calendar.MILLISECOND);
-				}
-				else
-				{
-					return null; // delegate to SOLR date parsing
-				}
-			}
-		}
-	}
-
 
 	protected Query functionQueryBuilder(String expandedFieldName, String ending, QName propertyQName, PropertyDefinition propertyDef, IndexTokenisationMode tokenisationMode, String queryText,
 			LuceneFunction luceneFunction) throws ParseException

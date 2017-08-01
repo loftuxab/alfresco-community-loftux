@@ -23,11 +23,6 @@ System variables provided by this component:
         <isTrue value="${imagemagick_component_enabled}"/>
     </shouldPackRuleList>
     <preBuildActionList>
-        <setInstallerVariable name="component(imagemagick).parameter(imagemagick_ghostscriptwin_included).value" value="1">
-            <ruleList>
-                <fileTest path="${imagemagick_distribution_folder_windows}/lib/gs_init.ps" condition="exists" />
-            </ruleList>
-        </setInstallerVariable>
         <actionGroup>
             <actionList>
                 <setInstallerVariable name="imagemagick_build_path" value=""/>
@@ -90,10 +85,9 @@ System variables provided by this component:
             <ask>0</ask>
             <!--description>ImageMagick version</description-->
             <name>imagemagick_version</name>
-            <value>6.9.1</value>
-            <default>6.9.1</default>
+            <value>7.0.5</value>
+            <default>7.0.5</default>
         </stringParameter>
-        <booleanParameter name="imagemagick_ghostscriptwin_included" value="0" ask="0" />
     </parameterList>
     <readyToInstallActionList>
         <setInstallerVariable name="imagemagick_root_directory" value="${installdir}/common">
@@ -134,9 +128,9 @@ System variables provided by this component:
             <value>##### IMAGEMAGICK ENV #####
 MAGICK_HOME="${imagemagick_root_directory}"
 export MAGICK_HOME
-MAGICK_CONFIGURE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16"
+MAGICK_CONFIGURE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16HDRI"
 export MAGICK_CONFIGURE_PATH
-MAGICK_CODER_MODULE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/modules-Q16/coders"
+MAGICK_CODER_MODULE_PATH="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/modules-Q16HDRI/coders"
 export MAGICK_CODER_MODULE_PATH
 
 </value>
@@ -152,24 +146,6 @@ set MAGICK_CONFIGURE_PATH=${imagemagick_root_directory.dos}
 </value>
             <ruleList>
                 <platformTest type="windows"/>
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="IMAGEMAGICK_ENV_VAR">
-            <value>${IMAGEMAGICK_ENV_VAR}
-set GS_LIB=${imagemagick_root_directory.dos}\lib
-</value>
-            <ruleList>
-                <platformTest type="windows"/>
-                <isTrue value="${imagemagick_ghostscriptwin_included}" />
-            </ruleList>
-        </setInstallerVariable>
-        <setInstallerVariable name="IMAGEMAGICK_ENV_VAR">
-            <value>${IMAGEMAGICK_ENV_VAR}
-GS_LIB="${imagemagick_root_directory}/share/ghostscript/fonts"
-export GS_LIB
-</value>
-            <ruleList>
-                <platformTest type="unix"/>
             </ruleList>
         </setInstallerVariable>
         <setInstallerVariable name="ENV_VAR">
@@ -227,34 +203,22 @@ export GS_LIB
             <actionList>
                 <actionGroup>
                     <actionList>
-                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16/" >
+                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16HDRI/" >
                 <ruleList>
                 <fileExists path="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type.xml" />
                 </ruleList>
             </copyFile>
-                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type-ghostscript.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16/" >
+                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type-ghostscript.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16HDRI/" >
                 <ruleList>
                 <fileExists path="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/type-ghostscript.xml" />
                 </ruleList>
             </copyFile>
-                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/delegates.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16/" >
+                        <copyFile origin="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/delegates.xml" destination="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16HDRI/" >
                 <ruleList>
                 <fileExists path="${imagemagick_root_directory}/share/doc/ImageMagick/www/source/delegates.xml" />
                 </ruleList>
             </copyFile>
-                        <substitute>
-                            <files>${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16/type-ghostscript.xml</files>
-                             <substitutionList>
-                                 <substitution>
-                                     <pattern>/usr/share/fonts/default/Type1</pattern>
-                                     <value>${common_root_directory}/share/ghostscript/fonts</value>
-                                 </substitution>
-                             </substitutionList>
-                        </substitute>
                     </actionList>
-                    <ruleList>
-                        <fileTest path="${common_root_directory}/share/ghostscript/fonts" condition="exists" />
-                    </ruleList>
                 </actionGroup>
                 <substitute>
                     <type>exact</type>          
@@ -290,7 +254,7 @@ export GS_LIB
                 <platformTest type="unix"/>
             </conditionRuleList>
             <actionList>
-                <setInstallerVariable name="imagemagick_policy_path" value="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16/policy.xml"/>
+                <setInstallerVariable name="imagemagick_policy_path" value="${imagemagick_root_directory}/lib/ImageMagick-${imagemagick_version}/config-Q16HDRI/policy.xml"/>
             </actionList>
             <elseActionList>
                 <setInstallerVariable name="imagemagick_policy_path" value="${imagemagick_root_directory}/policy.xml"/>

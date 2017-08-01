@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -27,6 +27,11 @@ package org.alfresco.rest.api.tests;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.ResetPasswordServiceImpl;
+import org.alfresco.rest.api.model.Client;
+import org.alfresco.rest.api.model.LoginTicket;
+import org.alfresco.rest.api.model.LoginTicketResponse;
+import org.alfresco.rest.api.model.PasswordReset;
 import org.alfresco.rest.api.tests.RepoService.TestNetwork;
 import org.alfresco.rest.api.tests.client.HttpResponse;
 import org.alfresco.rest.api.tests.client.Pair;
@@ -37,6 +42,8 @@ import org.alfresco.rest.api.tests.client.RequestContext;
 import org.alfresco.rest.api.tests.client.data.Company;
 import org.alfresco.rest.api.tests.client.data.JSONAble;
 import org.alfresco.rest.api.tests.client.data.Person;
+import org.alfresco.util.email.EmailUtil;
+import org.alfresco.rest.api.tests.util.RestApiUtil;
 import org.alfresco.service.cmr.preference.PreferenceService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -63,6 +70,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.mail.internet.MimeMessage;
+
+import static org.alfresco.repo.security.authentication.ResetPasswordServiceImplTest.getWorkflowIdAndKeyFromUrl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -71,29 +81,30 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class TestPeople extends EnterpriseTestApi
+public class TestPeople extends AbstractBaseApiTest
 {
+    private static final String URL_PEOPLE = "people";
     private static final QName ASPECT_COMMS = QName.createQName("test.people.api", "comms");
     private static final QName PROP_TELEHASH = QName.createQName("test.people.api", "telehash");
     private static final QName ASPECT_LUNCHABLE = QName.createQName("test.people.api", "lunchable");
     private static final QName PROP_LUNCH = QName.createQName("test.people.api", "lunch");
+    private static final QName PROP_LUNCH_COMMENTS = QName.createQName("test.people.api", "lunchcomments");
     private People people;
     private Iterator<TestNetwork> accountsIt;
     private TestNetwork account1;
     private TestNetwork account2;
-    private TestNetwork account3;
-    private TestNetwork account4;
+    private static TestNetwork account3;
+    private static TestNetwork account4;
     private Iterator<String> account1PersonIt;
     private Iterator<String> account2PersonIt;
-    private Iterator<String> account3PersonIt;
-    private Iterator<String> account4PersonIt;
     private String account1Admin;
     private String account2Admin;
     private String account3Admin;
-    private String account4Admin;
-    private Person personAlice;
-    private Person personAliceD;
-    private Person personBen;
+    private static String account4Admin;
+    private static Person personAlice;
+    private static Person personAliceD;
+    private static Person personBen;
+    private Person personBob;
     private NodeService nodeService;
     private PersonService personService;
 
@@ -104,21 +115,59 @@ public class TestPeople extends EnterpriseTestApi
         accountsIt = getTestFixture().getNetworksIt();
         account1 = accountsIt.next();
         account2 = accountsIt.next();
-        account3 = createNetwork("account3");
-        account4 = createNetwork("account4");
+        // Networks are very expensive to create, so do this once only and store statically.
+        if (account3 == null)
+        {
+            account3 = createNetwork("account3");
+        }
+        if (account4 == null)
+        {
+            // Use account 4 only for the sorting and paging tests, so that the data doesn't change between tests.
+            account4 = createNetwork("account4");
+
+            account4Admin = "admin@" + account4.getId();
+            
+            publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
+            personAlice = new Person();
+            personAlice.setUserName("alice@" + account4.getId());
+            personAlice.setId("alice@" + account4.getId());
+            personAlice.setFirstName("Alice");
+            personAlice.setLastName("Smith");
+            personAlice.setEmail("alison.smith@example.com");
+            personAlice.setPassword("password");
+            personAlice.setEnabled(true);
+            personAlice.setProperties(Collections.singletonMap("papi:lunch", "Magical sandwich"));
+            people.create(personAlice);
+            
+            personAliceD = new Person();
+            personAliceD.setUserName("aliced@" + account4.getId());
+            personAliceD.setId("aliced@" + account4.getId());
+            personAliceD.setFirstName("Alice");
+            personAliceD.setLastName("Davis");
+            personAliceD.setEmail("alison.davis@example.com");
+            personAliceD.setPassword("password");
+            personAliceD.setEnabled(true);
+            people.create(personAliceD);
+
+            personBen = new Person();
+            personBen.setUserName("ben@" + account4.getId());
+            personBen.setId("ben@" + account4.getId());
+            personBen.setFirstName("Ben");
+            personBen.setLastName("Carson");
+            personBen.setEmail("ben.smythe@example.com");
+            personBen.setPassword("password");
+            personBen.setEnabled(true);
+            people.create(personBen);
+        }
         account1Admin = "admin@" + account1.getId();
         account2Admin = "admin@" + account2.getId();
         account3Admin = "admin@" + account3.getId();
-        account4Admin = "admin@" + account4.getId();
         account1PersonIt = account1.getPersonIds().iterator();
         account2PersonIt = account2.getPersonIds().iterator();
-
-        account3.createUser();
-        account3PersonIt = account3.getPersonIds().iterator();
         
         nodeService = applicationContext.getBean("NodeService", NodeService.class);
         personService = applicationContext.getBean("PersonService", PersonService.class);
-        
+
         // Capture authentication pre-test, so we can restore it again afterwards.
         AuthenticationUtil.pushAuthentication();
     }
@@ -252,8 +301,31 @@ public class TestPeople extends EnterpriseTestApi
         assertEquals("userStatus", p.getUserStatus());
         assertEquals(true, p.isEnabled());
         assertEquals(true, p.isEmailNotificationsEnabled());
+
+        // -ve tests
+        // create person with username too long
+        person.setUserName("myUserName11111111111111111111111111111111111111111111111111111111111111111111111111111111@" + account1.getId());
+        people.create(person, 400);
+
+        // create person with special character '/'
+        person.setUserName("myUser/Name@" + account1.getId());
+        people.create(person, 400);
+
+        // check for reserved authority prefixes
+        person.setUserName("GROUP_EVERYONE");
+        people.create(person, 400);
+
+        person.setUserName("GROUP_mygroup");
+        people.create(person, 400);
+
+        person.setUserName("ROLE_ANYTHING");
+        people.create(person, 400);
+
+        // lower case
+        person.setUserName("role_whatever");
+        people.create(person, 400);
     }
-    
+
     @Test
     public void testCreatePerson_canCreateDisabledPerson() throws PublicApiException
     {
@@ -408,9 +480,13 @@ public class TestPeople extends EnterpriseTestApi
 
         // -ve: not enough fields!
         {
-            // Create a person with no fields set.
+            // Create a person with no fields other than user ID set.
             Person person = new Person();
             person.setUserName("joe.bloggs.2@"+account1.getId());
+            people.create(person, 400);
+
+            // Missing ID
+            person.setUserName(null);
             people.create(person, 400);
         }
     }
@@ -530,6 +606,7 @@ public class TestPeople extends EnterpriseTestApi
         Map<QName, Serializable> nodeProps = new HashMap<>();
         // The papi:lunchable aspect should be auto-added for the papi:lunch property
         nodeProps.put(PROP_LUNCH, "Falafel wrap");
+        nodeProps.put(PROP_LUNCH_COMMENTS, "");
         
         // These properties should not be present when a person is retrieved
         // since they are present as top-level fields.
@@ -582,6 +659,11 @@ public class TestPeople extends EnterpriseTestApi
         assertEquals("Doc", person.getFirstName());
         assertEquals("Falafel wrap", person.getProperties().get("papi:lunch"));
         assertTrue(person.getAspectNames().contains("papi:lunchable"));
+
+        // Empty (zero length) string values are considered to be
+        // null values, and will be represented the same as null
+        // values (i.e. by non-existence of the property).
+        assertNull(person.getProperties().get("papi:lunchcomments"));
         
         // Check that no properties are present that should have been filtered by namespace.
         for (String key : person.getProperties().keySet())
@@ -666,7 +748,7 @@ public class TestPeople extends EnterpriseTestApi
         assertTrue(person.getAspectNames().contains("papi:dessertable"));
         return person;
     }
-    
+
     @Test
     public void testUpdatePerson_withCustomProps() throws Exception
     {
@@ -942,17 +1024,28 @@ public class TestPeople extends EnterpriseTestApi
         final String personId = account1PersonIt.next();
         publicApiClient.setRequestContext(new RequestContext(account1.getId(), personId));
 
-        Person updatedPerson = people.update(personId, qjson("{ `firstName`: `Updated firstName` }"), 200);
-        assertEquals("Updated firstName", updatedPerson.getFirstName());
+        // Explicitly using the person's ID
+        {
+            Person updatedPerson = people.update(personId, qjson("{ `firstName`: `Matt` }"), 200);
+            assertEquals("Matt", updatedPerson.getFirstName());
+        }
+        
+        // "-me-" user
+        {
+            Person updatedPerson = people.update("-me-", qjson("{ `firstName`: `John` }"), 200);
+            assertEquals("John", updatedPerson.getFirstName());
+        }
 
         // TODO: temp fix, set back to orig firstName
         publicApiClient.setRequestContext(new RequestContext(account1.getId(), account1Admin, "admin"));
         people.update(personId, qjson("{ `firstName`:`Bill` }"), 200);
-
+        
         // -ve test: check that required/mandatory/non-null fields cannot be unset (or empty string)
-        people.update("people", personId, null, null, qjson("{ `firstName`:`` }"), null, "Expected 400 response when updating " + personId, 400);
-        people.update("people", personId, null, null, qjson("{ `email`:`` }"), null, "Expected 400 response when updating " + personId, 400);
-        people.update("people", personId, null, null, qjson("{ `emailNotificationsEnabled`:`` }"), null, "Expected 400 response when updating " + personId, 400);
+        {
+            people.update("people", personId, null, null, qjson("{ `firstName`:`` }"), null, "Expected 400 response when updating " + personId, 400);
+            people.update("people", personId, null, null, qjson("{ `email`:`` }"), null, "Expected 400 response when updating " + personId, 400);
+            people.update("people", personId, null, null, qjson("{ `emailNotificationsEnabled`:`` }"), null, "Expected 400 response when updating " + personId, 400);
+        }
     }
 
     @Test
@@ -967,7 +1060,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testUpdatePersonUsingPartialUpdate() throws PublicApiException
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
 
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
 
@@ -984,7 +1077,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public  void testUpdatePersonWithRestrictedResponseFields() throws PublicApiException
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
 
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
 
@@ -1006,7 +1099,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testUpdatePersonUpdateAsAdmin() throws Exception
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
 
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
 
@@ -1184,7 +1277,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public  void testUpdatePersonEnabledNonAdminNotAllowed() throws PublicApiException
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), personId));
 
         people.update("people", personId, null, null, "{\n" + "  \"enabled\": \"false\"\n" + "}", null, "Expected 403 response when updating " + personId, 403);
@@ -1194,7 +1287,7 @@ public class TestPeople extends EnterpriseTestApi
     public  void testUpdatePersonEnabled() throws PublicApiException
     {
         // Non-admin user ID
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
 
         // Use admin user credentials
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
@@ -1291,7 +1384,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public  void testUpdatePersonPasswordByAdmin() throws PublicApiException
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
         final String networkId = account3.getId();
 
         publicApiClient.setRequestContext(new RequestContext(networkId, account3Admin, "admin"));
@@ -1344,7 +1437,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testUpdatePersonWithNotUpdatableFields() throws PublicApiException
     {
-        final String personId = account3PersonIt.next();
+        final String personId = account3.createUser().getId();
 
         publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
 
@@ -1389,8 +1482,18 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testListPeopleWithAspectNamesAndProperties() throws PublicApiException
     {
-        initializeContextForGetPeople();
-        
+        publicApiClient.setRequestContext(new RequestContext(account3.getId(), account3Admin, "admin"));
+        personBob = new Person();
+        personBob.setId("bob@" + account3.getId());
+        personBob.setUserName(personBob.getId());
+        personBob.setFirstName("Bob");
+        personBob.setLastName("Cratchit");
+        personBob.setEmail("bob.cratchit@example.com");
+        personBob.setPassword("password");
+        personBob.setEnabled(true);
+        personBob.setProperties(Collections.singletonMap("papi:lunch", "Magical sandwich"));
+        people.create(personBob);
+
         // Are aspectNames and properties left absent when not required?
         {
             PublicApiClient.ListResponse<Person> resp = listPeople(Collections.emptyMap(), 200);
@@ -1402,13 +1505,13 @@ public class TestPeople extends EnterpriseTestApi
         {
             Map<String, String> parameters = Collections.singletonMap("include", "aspectNames,properties");
             PublicApiClient.ListResponse<Person> resp = listPeople(parameters, 200);
-            Person alice = resp.getList().stream().
-                    filter(p -> p.getUserName().equals("alice@"+account4.getId()))
+            Person bob = resp.getList().stream().
+                    filter(p -> p.getUserName().equals(personBob.getId()))
                     .findFirst().get();
-            assertNotNull(alice.getAspectNames());
-            assertTrue(alice.getAspectNames().contains("papi:lunchable"));
-            assertNotNull(alice.getProperties());
-            assertEquals("Magical sandwich", alice.getProperties().get("papi:lunch"));
+            assertNotNull(bob.getAspectNames());
+            assertTrue(bob.getAspectNames().contains("papi:lunchable"));
+            assertNotNull(bob.getProperties());
+            assertEquals("Magical sandwich", bob.getProperties().get("papi:lunch"));
         }
     }
     
@@ -1421,7 +1524,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByFirstNameAsc() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1449,7 +1552,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByFirstNameDesc() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1477,7 +1580,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndDefaultSorting() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1504,7 +1607,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByIdDesc() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1532,7 +1635,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByInvalidSortKey() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1553,7 +1656,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByLastName() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 2;
@@ -1581,7 +1684,7 @@ public class TestPeople extends EnterpriseTestApi
     @Test
     public void testPagingAndSortingByFirstNameAndLastName() throws Exception
     {
-        initializeContextForGetPeople();
+        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
 
         // paging
         int skipCount = 1;
@@ -1600,39 +1703,226 @@ public class TestPeople extends EnterpriseTestApi
         checkList(expectedList, paging.getExpectedPaging(), resp);
     }
 
-    private void initializeContextForGetPeople() throws PublicApiException
+    /**
+     * Tests reset password.
+     * <p>POST:</p>
+     * <ul>
+     * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/people/<userId>/request-password-reset} </li>
+     * <li> {@literal <host>:<port>/alfresco/api/<networkId>/public/alfresco/versions/1/people/<userId>/reset-password} </li>
+     * </ul>
+     */
+    @Test
+    public void testResetPassword() throws Exception
     {
-        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
-        personAlice = new Person();
-        personAlice.setUserName("alice@" + account4.getId());
-        personAlice.setId("alice@" + account4.getId());
-        personAlice.setFirstName("Alice");
-        personAlice.setLastName("Smith");
-        personAlice.setEmail("alison.smith@example.com");
-        personAlice.setPassword("password");
-        personAlice.setEnabled(true);
-        personAlice.setProperties(Collections.singletonMap("papi:lunch", "Magical sandwich"));
-        people.create(personAlice);
+        // As Admin, create a user
+        setRequestContext(account1.getId(), account1Admin, "admin");
 
-        publicApiClient.setRequestContext(new RequestContext(account4.getId(), account4Admin, "admin"));
-        personAliceD = new Person();
-        personAliceD.setUserName("aliced@" + account4.getId());
-        personAliceD.setId("aliced@" + account4.getId());
-        personAliceD.setFirstName("Alice");
-        personAliceD.setLastName("Davis");
-        personAliceD.setEmail("alison.davis@example.com");
-        personAliceD.setPassword("password");
-        personAliceD.setEnabled(true);
-        people.create(personAliceD);
+        Person person = new Person();
+        person.setUserName("john.doe@" + account1.getId());
+        person.setFirstName("John");
+        person.setLastName("Doe");
+        person.setEmail("john.doe@alfresco.com");
+        person.setEnabled(true);
+        person.setEmailNotificationsEnabled(true);
+        person.setPassword("password");
+        people.create(person);
 
-        personBen = new Person();
-        personBen.setUserName("ben@" + account4.getId());
-        personBen.setId("ben@" + account4.getId());
-        personBen.setFirstName("Ben");
-        personBen.setLastName("Carson");
-        personBen.setEmail("ben.smythe@example.com");
-        personBen.setPassword("password");
-        personBen.setEnabled(true);
-        people.create(personBen);
+        // un-authenticated API
+        setRequestContext(account1.getId(), null, null);
+        // Just try to login, to test the new created user credential
+        LoginTicket loginRequest = new LoginTicket();
+        loginRequest.setUserId(person.getUserName());
+        loginRequest.setPassword(person.getPassword());
+        // Authenticate and create a ticket
+        HttpResponse response = post("tickets", RestApiUtil.toJsonAsString(loginRequest), null, null, "authentication", 201);
+        LoginTicketResponse loginResponse = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), LoginTicketResponse.class);
+        assertNotNull(loginResponse.getId());
+        assertNotNull(loginResponse.getUserId());
+
+        /**
+         * Reset Password
+         */
+        // First make the service to send a synchronous email
+        ResetPasswordServiceImpl passwordService = applicationContext.getBean("resetPasswordService", ResetPasswordServiceImpl.class);
+        passwordService.setSendEmailAsynchronously(false);
+        // Get the 'mail' bean in a test mode.
+        EmailUtil emailUtil = new EmailUtil(applicationContext);
+        try
+        {
+            // Un-authenticated API
+            setRequestContext(account1.getId(), null, null);
+            // Reset email (just in case other tests didn't clean up...)
+            emailUtil.reset();
+
+            // Request reset password
+            Client client = new Client().setClient("share");
+            post(getRequestResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(client), 202);
+            assertEquals("A reset password email should have been sent.", 1, emailUtil.getSentCount());
+
+            MimeMessage msg = emailUtil.getLastEmail();
+            assertNotNull("There should be an email.", msg);
+            assertEquals("Should've been only one email recipient.", 1, msg.getAllRecipients().length);
+            // Check the recipient is the person who requested the reset password
+            assertEquals(person.getEmail(), msg.getAllRecipients()[0].toString());
+            // There should be a subject
+            assertNotNull("There should be a subject.", msg.getSubject());
+
+            // Check the reset password url.
+            String resetPasswordUrl = (String) emailUtil.getLastEmailTemplateModelValue("reset_password_url");
+            assertNotNull("Wrong email is sent.", resetPasswordUrl);
+            // Get the workflow id and key
+            org.alfresco.util.Pair<String, String> pair = getWorkflowIdAndKeyFromUrl(resetPasswordUrl);
+            assertNotNull("Workflow Id can't be null.", pair.getFirst());
+            assertNotNull("Workflow Key can't be null.", pair.getSecond());
+
+            // Reset the email helper, to get rid of the request reset password email
+            emailUtil.reset();
+            // Un-authenticated APIs as we are still using the 'setRequestContext(account1.getId(), null, null)' set above.
+            // Reset the password
+            PasswordReset passwordReset = new PasswordReset()
+                        .setPassword("changed")
+                        .setId(pair.getFirst())
+                        .setKey(pair.getSecond());
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordReset), 202);
+            assertEquals("A reset password confirmation email should have been sent.", 1, emailUtil.getSentCount());
+            msg = emailUtil.getLastEmail();
+            assertNotNull("There should be an email.", msg);
+            assertEquals("Should've been only one email recipient.", 1, msg.getAllRecipients().length);
+            assertEquals(person.getEmail(), msg.getAllRecipients()[0].toString());
+            // There should be a subject
+            assertNotNull("There should be a subject.", msg.getSubject());
+
+            // Try to login with old credential
+            post("tickets", RestApiUtil.toJsonAsString(loginRequest), null, null, "authentication", 403);
+
+            // Set the new password
+            loginRequest.setPassword(passwordReset.getPassword());
+            response = post("tickets", RestApiUtil.toJsonAsString(loginRequest), null, null, "authentication", 201);
+            loginResponse = RestApiUtil.parseRestApiEntry(response.getJsonResponse(), LoginTicketResponse.class);
+            assertNotNull(loginResponse.getId());
+            assertNotNull(loginResponse.getUserId());
+
+
+            /*
+             * Negative tests
+             */
+            // First, reset the email helper
+            emailUtil.reset();
+
+            // Try reset with the used workflow
+            // Note: we still return 202 response for security reasons
+            passwordReset.setPassword("changedAgain");
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordReset), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+
+            // Request reset password - Invalid user (user does not exist)
+            post(getRequestResetPasswordUrl(System.currentTimeMillis() + "noUser"), RestApiUtil.toJsonAsString(client), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+
+            // As Admin disable the user
+            setRequestContext(account1.getId(), account1Admin, "admin");
+            Map<String, String> params = Collections.singletonMap("fields", "enabled");
+            Person updatedPerson = people.update(person.getUserName(), qjson("{`enabled`:" + false + "}"), params, 200);
+            assertFalse(updatedPerson.isEnabled());
+
+            // Un-authenticated API
+            setRequestContext(account1.getId(), null, null);
+            // Request reset password - Invalid user (user is disabled)
+            post(getRequestResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(client), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+
+            // Client is not specified
+            client = new Client();
+            post(getRequestResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(client), 400);
+
+            // Reset password
+            // First, reset the email helper and enable the user
+            emailUtil.reset();
+            // As Admin enable the user
+            setRequestContext(account1.getId(), account1Admin, "admin");
+            params = Collections.singletonMap("fields", "enabled");
+            updatedPerson = people.update(person.getUserName(), qjson("{`enabled`:" + true + "}"), params, 200);
+            assertTrue(updatedPerson.isEnabled());
+
+            // Un-authenticated API
+            setRequestContext(account1.getId(), null, null);
+            client = new Client().setClient("share");
+            post(getRequestResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(client), 202);
+            assertEquals("A reset password email should have been sent.", 1, emailUtil.getSentCount());
+
+            resetPasswordUrl = (String) emailUtil.getLastEmailTemplateModelValue("reset_password_url");
+            // Check the reset password url.
+            assertNotNull("Wrong email is sent.", resetPasswordUrl);
+            // Get the workflow id and key
+            pair = getWorkflowIdAndKeyFromUrl(resetPasswordUrl);
+            assertNotNull("Workflow Id can't be null.", pair.getFirst());
+            assertNotNull("Workflow Key can't be null.", pair.getSecond());
+
+            // Reset the email helper, to get rid of the request reset password email
+            emailUtil.reset();
+            // Invalid request - password is not provided
+            PasswordReset passwordResetInvalid = new PasswordReset()
+                        .setId(pair.getFirst())
+                        .setKey(pair.getSecond());
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordResetInvalid), 400);
+
+            // Invalid request - workflow id is not provided
+            passwordResetInvalid.setPassword("changedAgain")
+                        .setId(null);
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordResetInvalid), 400);
+
+            // Invalid request - workflow key is not provided
+            passwordResetInvalid.setId(pair.getFirst())
+                        .setKey(null);
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordResetInvalid), 400);
+
+            // Invalid request - Invalid workflow id
+            // Note: we still return 202 response for security reasons
+            passwordResetInvalid = new PasswordReset()
+                        .setPassword("changedAgain")
+                        .setId("activiti$" + System.currentTimeMillis()) // Invalid Id
+                        .setKey(pair.getSecond());
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordResetInvalid), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+
+            // Invalid request - Invalid workflow key
+            // Note: we still return 202 response for security reasons
+            passwordResetInvalid = new PasswordReset()
+                        .setPassword("changedAgain")
+                        .setId(pair.getFirst())
+                        .setKey(GUID.generate()); // Invalid Key
+            post(getResetPasswordUrl(person.getUserName()), RestApiUtil.toJsonAsString(passwordResetInvalid), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+
+            // Invalid request (not the same user) - The given user id 'user1' does not match the person's user id who requested the password reset.
+            // Note: we still return 202 response for security reasons
+            passwordResetInvalid = new PasswordReset()
+                        .setPassword("changedAgain")
+                        .setId(pair.getFirst())
+                        .setKey(pair.getSecond());
+            post(getResetPasswordUrl(user1), RestApiUtil.toJsonAsString(passwordResetInvalid), 202);
+            assertEquals("No email should have been sent.", 0, emailUtil.getSentCount());
+        }
+        finally
+        {
+            passwordService.setSendEmailAsynchronously(true);
+            emailUtil.reset();
+        }
+    }
+
+    private String getRequestResetPasswordUrl(String userId)
+    {
+        return URL_PEOPLE + '/' + userId + "/request-password-reset";
+    }
+
+    private String getResetPasswordUrl(String userId)
+    {
+        return URL_PEOPLE + '/' + userId + "/reset-password";
+    }
+
+    @Override
+    public String getScope()
+    {
+        return "public";
     }
 }

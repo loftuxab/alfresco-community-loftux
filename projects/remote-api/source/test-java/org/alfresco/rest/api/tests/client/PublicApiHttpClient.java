@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -43,6 +43,7 @@ import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.tenant.TenantUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest.PatchMethod;
+import org.alfresco.rest.api.tests.TestFixture;
 import org.alfresco.rest.api.tests.client.AuthenticatedHttp.HttpRequestCallback;
 import org.alfresco.rest.framework.Api;
 import org.alfresco.rest.framework.Api.SCOPE;
@@ -93,10 +94,10 @@ public class PublicApiHttpClient
     private static final String PUBLICAPI_CMIS_URL = "{0}://{1}:{2}{3}{4}{5}/{6}/cmis/versions/{7}/{8}";
     private static final String PUBLICAPI_CMIS_URL_SUFFIX = "{0}/{1}/cmis/versions/{2}/{3}";
     private static final String ATOM_PUB_URL = "{0}://{1}:{2}{3}cmisatom";
-
+    
     private String scheme = "http";
-    private String host = "localhost";
-    private int port = 8081;
+    private String host = TestFixture.HOST;
+    private int port = TestFixture.PORT;
 
     private String contextPath;
     private String servletName;
@@ -270,9 +271,13 @@ public class PublicApiHttpClient
             {
                 response = authenticatedHttp.executeHttpMethodAuthenticated(req, rq.getRunAsUser(), rq.getPassword(), callback);
             }
-            else
+            else if (rq.getRunAsUser() != null)
             {
                 response = authenticatedHttp.executeHttpMethodAuthenticated(req, rq.getRunAsUser(), callback);
+            }
+            else
+            {
+                response = authenticatedHttp.executeHttpMethodUnauthenticated(req, callback);
             }
             return response;
         }
@@ -491,16 +496,28 @@ public class PublicApiHttpClient
     }
 
     public HttpResponse post(final RequestContext rq, final String scope, final String entityCollectionName, final Object entityId,
+            final String relationCollectionName, final Object relationshipEntityId, final String body, final Map<String, String> params) throws IOException
+    {
+        return post(rq, scope, 1, entityCollectionName, entityId, relationCollectionName, relationshipEntityId, body, "application/json", params);
+    }
+
+    public HttpResponse post(final RequestContext rq, final String scope, final String entityCollectionName, final Object entityId,
                 final String relationCollectionName, final Object relationshipEntityId, final String body, String contentType) throws IOException
     {
         return post(rq, scope, 1, entityCollectionName, entityId, relationCollectionName, relationshipEntityId, body, contentType);
     }
 
     public HttpResponse post(final RequestContext rq, final String scope, final int version, final String entityCollectionName, final Object entityId,
-                final String relationCollectionName, final Object relationshipEntityId, final String body, String contentType) throws IOException
+            final String relationCollectionName, final Object relationshipEntityId, final String body, String contentType) throws IOException
+    {
+        return post(rq, scope, version, entityCollectionName, entityId, relationCollectionName, relationshipEntityId, body, contentType, null);
+    }
+
+    public HttpResponse post(final RequestContext rq, final String scope, final int version, final String entityCollectionName, final Object entityId,
+                final String relationCollectionName, final Object relationshipEntityId, final String body, String contentType, final Map<String, String> params) throws IOException
     {
         RestApiEndpoint endpoint = new RestApiEndpoint(rq.getNetworkId(), scope, version, entityCollectionName, entityId, relationCollectionName,
-                    relationshipEntityId, null);
+                    relationshipEntityId, params);
         String url = endpoint.getUrl();
 
         PostMethod req = new PostMethod(url.toString());

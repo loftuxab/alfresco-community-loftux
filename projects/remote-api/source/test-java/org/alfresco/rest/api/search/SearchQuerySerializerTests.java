@@ -27,9 +27,17 @@ package org.alfresco.rest.api.search;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import org.alfresco.rest.api.search.context.FacetFieldContext;
 import org.alfresco.rest.api.search.context.FacetFieldContext.Bucket;
+import org.alfresco.rest.api.search.context.FacetQueryContext;
+import org.alfresco.rest.api.search.context.SearchContext;
 import org.alfresco.rest.api.search.context.SpellCheckContext;
 import org.alfresco.rest.api.search.impl.StoreMapper;
 import org.alfresco.rest.api.search.model.Default;
@@ -37,15 +45,14 @@ import org.alfresco.rest.api.search.model.FacetField;
 import org.alfresco.rest.api.search.model.SearchQuery;
 import org.alfresco.rest.framework.jacksonextensions.ExecutionResult;
 import org.alfresco.rest.framework.resource.parameters.CollectionWithPagingInfo;
-import org.alfresco.rest.api.search.context.SearchContext;
-import org.alfresco.rest.api.search.context.FacetQueryContext;
 import org.alfresco.rest.framework.tests.api.mocks.Farmer;
 import org.alfresco.service.cmr.search.FieldHighlightParameters;
+import org.alfresco.service.cmr.search.Interval;
+import org.alfresco.service.cmr.search.IntervalParameters;
+import org.alfresco.service.cmr.search.IntervalSet;
+import org.alfresco.service.cmr.search.RangeParameters;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Tests json -> SearchQuery deserialization
@@ -90,12 +97,12 @@ public class SearchQuerySerializerTests
         assertEquals(2, searchQuery.getFilterQueries().get(0).getTags().size());
         assertEquals("myquery2",searchQuery.getFilterQueries().get(1).getQuery());
         assertEquals(1, searchQuery.getFacetQueries().size());
-        assertEquals("facquery",searchQuery.getFacetQueries().get(0).getQuery());
-        assertEquals("facnoused",searchQuery.getFacetQueries().get(0).getLabel());
+        assertEquals("cm:created:bob",searchQuery.getFacetQueries().get(0).getQuery());
+        assertEquals("small",searchQuery.getFacetQueries().get(0).getLabel());
         assertEquals("alfrezco", searchQuery.getSpellcheck().getQuery());
         assertEquals(1, searchQuery.getScope().getLocations().size());
         assertEquals(StoreMapper.LIVE_NODES, searchQuery.getScope().getLocations().get(0));
-        assertEquals(2, searchQuery.getFacetFields().getFacets().size());
+        assertEquals(3, searchQuery.getFacetFields().getFacets().size());
         FacetField ff = searchQuery.getFacetFields().getFacets().get(0);
         assertEquals("cm:creator", ff.getField());
         assertEquals("myquery2", ff.getPrefix());
@@ -137,6 +144,31 @@ public class SearchQuerySerializerTests
         assertEquals(3,  high2.getSnippetCount().intValue());
         assertEquals(15,  high2.getFragmentSize().intValue());
         assertEquals(false,high2.getMergeContiguous());
+
+        //Facet intervals
+        IntervalParameters ip = searchQuery.getFacetIntervals();
+        assertNotNull(ip);
+        assertEquals(1,ip.getSets().size());
+        IntervalSet expected = new IntervalSet("1","2","king",true, false );
+        assertTrue(ip.getSets().contains(expected));
+
+        assertEquals(2,ip.getIntervals().size());
+        Interval interval = ip.getIntervals().get(0);
+        assertEquals("creator", interval.getLabel());
+        assertEquals("cm:creator", interval.getField());
+        expected = new IntervalSet("a","b","last",false, true );
+        assertTrue(interval.getSets().contains(expected));
+
+        assertEquals(1,searchQuery.getPivots().size());
+        assertEquals("mylabel",searchQuery.getPivots().get(0).getKey());
+
+        assertEquals(1,searchQuery.getStats().size());
+        assertEquals("cm:creator",searchQuery.getStats().get(0).getField());
+        assertEquals("mylabel",searchQuery.getStats().get(0).getLabel());
+        //Range Facet
+        List<RangeParameters> ranges = searchQuery.getFacetRanges();
+        assertNotNull(ranges);
+        
     }
 
     @Test
@@ -144,22 +176,22 @@ public class SearchQuerySerializerTests
     {
         ExecutionResult exec1 = new ExecutionResult(new Farmer("180"),null);
 
-        FacetFieldContext ffc = new FacetFieldContext("theLabel", Arrays.asList(new Bucket("b1", 23, "displayText1"), new Bucket("b2", 34, "displayText2")));
-        SearchContext searchContext = new SearchContext(23l, Arrays.asList(new FacetQueryContext("f1", 15), new FacetQueryContext("f2", 20)),
+        FacetFieldContext ffc = new FacetFieldContext("theLabel", Arrays.asList(new Bucket("b1", "name:b1", 23, "displayText1"), new Bucket("b2", null, 34, "displayText2")));
+        SearchContext searchContext = new SearchContext(23l,null, Arrays.asList(new FacetQueryContext("f1", "creator:bob", 15), new FacetQueryContext("f2", null, 20)),
                     Arrays.asList(ffc),
-                    new SpellCheckContext("aFlag", Arrays.asList("bish", "bash")));
+                    new SpellCheckContext("aFlag", Arrays.asList("bish", "bash")), null);
         CollectionWithPagingInfo<ExecutionResult> coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1), false, 2, null, searchContext);
         String out = helper.writeResponse(coll);
         assertTrue("There must 'context' json output", out.contains("\"context\":{\"consistency\":{\"lastTxId\":23}"));
         assertTrue("There must 'facetQueries' json output", out.contains("\"facetQueries\":"));
-        assertTrue("There must 'facetQueries f1' json output", out.contains("{\"label\":\"f1\",\"count\":15}"));
+        assertTrue("There must 'facetQueries f1' json output", out.contains("{\"label\":\"f1\",\"filterQuery\":\"creator:bob\",\"count\":15}"));
         assertTrue("There must 'facetQueries f2' json output", out.contains("{\"label\":\"f2\",\"count\":20}"));
         assertTrue("There must 'spellCheck' json output", out.contains("\"spellCheck\":{\"type\":\"aFlag\",\"suggestions\":[\"bish\",\"bash\"]}"));
         assertTrue("There must 'facetsFields' json output", out.contains("\"facetsFields\":[{\"label\":\"theLabel\",\"buckets\""));
-        assertTrue("There must 'bucket1' json output", out.contains("{\"label\":\"b1\",\"count\":23,\"display\":\"displayText1\"}"));
+        assertTrue("There must 'bucket1' json output", out.contains("{\"label\":\"b1\",\"filterQuery\":\"name:b1\",\"count\":23,\"display\":\"displayText1\"}"));
         assertTrue("There must 'bucket2' json output", out.contains("{\"label\":\"b2\",\"count\":34,\"display\":\"displayText2\"}"));
 
-        searchContext = new SearchContext(-1, null, null, null);
+        searchContext = new SearchContext(-1, null, null,null, null, null);
         coll = CollectionWithPagingInfo.asPaged(null, Arrays.asList(exec1), false, 2, null, searchContext);
         out = helper.writeResponse(coll);
         assertTrue("There must NOT BE a 'context' json output", out.contains("\"context\":{}"));
