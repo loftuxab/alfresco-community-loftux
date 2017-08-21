@@ -144,6 +144,36 @@ public class ActionServiceImpl2Test
         });
     }
 
+    // MNT-15365
+    @Test
+    public void testIncrementCounterOnDeletedNode() throws Exception
+    {
+        final NodeRef deletedNode = transactionHelper.doInTransaction(new RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // get the Document Library NodeRef
+                final NodeRef docLibNodeRef = testSiteAndMemberInfo.doclib;
+
+                NodeRef result = nodeService.createNode(docLibNodeRef, ContentModel.ASSOC_CONTAINS, ContentModel.ASSOC_CONTAINS,
+                        ContentModel.TYPE_CONTENT).getChildRef();
+                nodeService.deleteNode(result);
+                return result;
+            }
+        });
+
+        // before the fix that would thrown an error
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                Action incrementAction = actionService.createAction(CounterIncrementActionExecuter.NAME);
+
+                actionService.executeAction(incrementAction, deletedNode);
+                return null;
+            }
+        });
+    }
 
     @Test
     public void testIncrementCounter() throws Exception
@@ -164,7 +194,7 @@ public class ActionServiceImpl2Test
         });
         // check that the default counter value is set to 1
         int beforeIncrement = (Integer) nodeService.getProperty(testNode, ContentModel.PROP_COUNTER);
-        assertEquals(1, beforeIncrement);
+        assertEquals("Counter value incorrect", 1, beforeIncrement);
 
         // Set authentication to SiteConsumer.
         AuthenticationUtil.setFullyAuthenticatedUser(testSiteAndMemberInfo.siteConsumer);

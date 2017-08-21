@@ -27,14 +27,19 @@ package org.alfresco.solr;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.System;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -63,7 +68,6 @@ import org.alfresco.repo.search.impl.QueryParserUtils;
 import org.alfresco.repo.search.impl.parsers.AlfrescoFunctionEvaluationContext;
 import org.alfresco.repo.search.impl.parsers.FTSParser;
 import org.alfresco.repo.search.impl.parsers.FTSQueryParser;
-import org.alfresco.repo.search.impl.parsers.FTSQueryParser.RerankPhase;
 import org.alfresco.repo.search.impl.querymodel.Constraint;
 import org.alfresco.repo.search.impl.querymodel.Ordering;
 import org.alfresco.repo.search.impl.querymodel.QueryModelFactory;
@@ -111,7 +115,6 @@ import org.apache.lucene.util.Version;
 import org.apache.solr.core.CoreDescriptorDecorator;
 import org.apache.solr.core.SolrResourceLoader;
 import org.apache.solr.request.SolrQueryRequest;
-import org.apache.solr.schema.IndexSchema;
 import org.apache.solr.search.SyntaxError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1471,6 +1474,11 @@ public class AlfrescoSolrDataModel implements QueryConstants
         options.setLocales(searchParameters.getLocales());
         options.setMlAnalaysisMode(searchParameters.getMlAnalaysisMode());
         options.setQueryParameterDefinitions(searchParameters.getQueryParameterDefinitions());
+        for(String name : searchParameters.getQueryTemplates().keySet())
+        {
+        	String template = searchParameters.getQueryTemplates().get(name);
+        	options.addQueryTemplate(name, template);
+        }
 
         // parse cmis syntax
         CapabilityJoin joinSupport = (mode == CMISQueryMode.CMS_STRICT) ? CapabilityJoin.NONE : CapabilityJoin.INNERONLY;

@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Repository
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -269,7 +269,7 @@ public class Repository01TestSuite extends TestSuite
     
     static void tests40(TestSuite suite)
     {
-        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.quickshare.ClientAppConfigTest.class));
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.client.config.ClientAppConfigTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.quickshare.QuickShareServiceIntegrationTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.rating.RatingServiceIntegrationTest.class));
         suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.remotecredentials.RemoteCredentialsServicesTest.class));
@@ -453,5 +453,10 @@ public class Repository01TestSuite extends TestSuite
     static void tests70(TestSuite suite)
     {
         suite.addTest(org.alfresco.repo.virtual.VirtualizationIntegrationTestSuite.suite());
+    }
+    
+    static void tests71(TestSuite suite)
+    {
+        suite.addTest(new JUnit4TestAdapter(org.alfresco.repo.invitation.ActivitiInvitationServiceImplTests.class));
     }
 }

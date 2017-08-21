@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -31,9 +31,14 @@ import org.alfresco.query.PagingResults;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.authentication.ResetPasswordService;
+import org.alfresco.repo.security.authentication.ResetPasswordServiceImpl.ResetPasswordDetails;
+import org.alfresco.repo.security.authentication.ResetPasswordServiceImpl.ResetPasswordWorkflowException;
+import org.alfresco.repo.security.authentication.ResetPasswordServiceImpl.ResetPasswordWorkflowInvalidUserException;
 import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.People;
 import org.alfresco.rest.api.Sites;
+import org.alfresco.rest.api.model.PasswordReset;
 import org.alfresco.rest.api.model.Person;
 import org.alfresco.rest.framework.core.exceptions.ConstraintViolatedException;
 import org.alfresco.rest.framework.core.exceptions.EntityNotFoundException;
@@ -50,17 +55,15 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityService;
-import org.alfresco.service.cmr.security.MutableAuthenticationService;
-import org.alfresco.service.cmr.security.NoSuchPersonException;
-import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.security.*;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.thumbnail.ThumbnailService;
 import org.alfresco.service.cmr.usage.ContentUsageService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.Pair;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -80,13 +83,21 @@ import java.util.Set;
  */
 public class PeopleImpl implements People
 {
+    private static final Log LOGGER = LogFactory.getLog(PeopleImpl.class);
+
     private static final List<String> EXCLUDED_NS = Arrays.asList(
             NamespaceService.SYSTEM_MODEL_1_0_URI,
             "http://www.alfresco.org/model/user/1.0",
             NamespaceService.CONTENT_MODEL_1_0_URI);
 	private static final List<QName> EXCLUDED_ASPECTS = Arrays.asList();
 	private static final List<QName> EXCLUDED_PROPS = Arrays.asList();
-	protected Nodes nodes;
+    private static final int USERNAME_MAXLENGTH = 100;
+    private static final String[] RESERVED_AUTHORITY_PREFIXES =
+    {
+            PermissionService.GROUP_PREFIX,
+            PermissionService.ROLE_PREFIX
+    };
+    protected Nodes nodes;
 	protected Sites sites;
 
 	protected SiteService siteService;
@@ -97,6 +108,7 @@ public class PeopleImpl implements People
     protected ContentUsageService contentUsageService;
     protected ContentService contentService;
     protected ThumbnailService thumbnailService;
+    protected ResetPasswordService resetPasswordService;
 
     private final static Map<String, QName> sort_params_to_qnames;
     static
@@ -157,12 +169,25 @@ public class PeopleImpl implements People
     {
 		this.thumbnailService = thumbnailService;
 	}
-	
+
+    public void setResetPasswordService(ResetPasswordService resetPasswordService)
+    {
+        this.resetPasswordService = resetPasswordService;
+    }
+
+    /**
+     * Validate, perform -me- substitution and canonicalize the person ID.
+     * 
+     * @param personId
+     * @return The validated and processed ID.
+     */
+    @Override
 	public String validatePerson(String personId)
 	{
 		return validatePerson(personId, false);
 	}
 
+    @Override
 	public String validatePerson(final String requestedPersonId, boolean validateIsCurrentUser)
 	{
         String personId = requestedPersonId;
@@ -195,7 +220,7 @@ public class PeopleImpl implements People
     	return personId;
 	}
 
-    protected void processPersonProperties(final Map<QName, Serializable> nodeProps)
+    protected void processPersonProperties(String userName, final Map<QName, Serializable> nodeProps)
     {
 		if(!contentUsageService.getEnabled())
 		{
@@ -229,7 +254,7 @@ public class PeopleImpl implements People
 			});
 		}
     }
-    
+
     public boolean hasAvatar(NodeRef personNodeRef)
     {
     	if(personNodeRef != null)
@@ -243,6 +268,7 @@ public class PeopleImpl implements People
     	}
     }
 
+    @Override
     public NodeRef getAvatar(String personId)
     {
     	NodeRef avatar = null;
@@ -284,6 +310,7 @@ public class PeopleImpl implements People
      * @throws NoSuchPersonException
      *             if personId does not exist
      */
+    @Override
     public Person getPerson(String personId)
     {
         personId = validatePerson(personId);
@@ -303,6 +330,7 @@ public class PeopleImpl implements People
         return person;
     }
 
+    @Override
     public CollectionWithPagingInfo<Person> getPeople(final Parameters parameters)
     {
         Paging paging = parameters.getPaging();
@@ -368,7 +396,7 @@ public class PeopleImpl implements People
         if (personNode != null)
         {
             Map<QName, Serializable> nodeProps = nodeService.getProperties(personNode);
-            processPersonProperties(nodeProps);
+            processPersonProperties(personId, nodeProps);
             // TODO this needs to be run as admin but should we do this here?
             final String pId = personId;
             Boolean enabled = AuthenticationUtil.runAsSystem(new RunAsWork<Boolean>()
@@ -505,12 +533,36 @@ public class PeopleImpl implements People
 
 	private void validateCreatePersonData(Person person)
 	{
-        validateNamespaces(person.getAspectNames(), person.getProperties());
+	    // Mandatory field checks first
 		checkRequiredField("id", person.getUserName());
 		checkRequiredField("firstName", person.getFirstName());
 		checkRequiredField("email", person.getEmail());
 		checkRequiredField("password", person.getPassword());
+
+        validateUsername(person.getUserName());
+        validateNamespaces(person.getAspectNames(), person.getProperties());
 	}
+
+    private void validateUsername(String username)
+    {
+        if (username.length() > 100)
+        {
+            throw new InvalidArgumentException("Username exceeds max length of " + USERNAME_MAXLENGTH + " characters.");
+        }
+
+        if (username.indexOf('/') != -1)
+        {
+            throw new IllegalArgumentException("Username contains characters that are not permitted.");
+        }
+
+        for (String prefix : RESERVED_AUTHORITY_PREFIXES)
+        {
+            if (username.toUpperCase().startsWith(prefix))
+            {
+                throw new IllegalArgumentException("Username cannot start with the reserved prefix '"+prefix+"'.");
+            }
+        }
+    }
 
     private void validateNamespaces(List<String> aspectNames, Map<String, Object> properties)
     {
@@ -553,11 +605,14 @@ public class PeopleImpl implements People
         }
 	}
 
+    @Override
     public Person update(String personId, final Person person)
     {
-        boolean isAdmin = isAdminAuthority();
-
+        // Validate, perform -me- substitution and canonicalize the person ID.
+        personId = validatePerson(personId);
         validateUpdatePersonData(person);
+
+        boolean isAdmin = isAdminAuthority();
 
         String currentUserId = AuthenticationUtil.getFullyAuthenticatedUser();
         if (!isAdmin && !currentUserId.equalsIgnoreCase(personId))
@@ -572,6 +627,17 @@ public class PeopleImpl implements People
         // if requested, update password
         updatePassword(isAdmin, personIdToUpdate, person);
 
+        if (person.isEnabled() != null)
+        {
+            if (isAdminAuthority(personIdToUpdate))
+            {
+                throw new PermissionDeniedException("Admin authority cannot be disabled.");
+            }
+
+            // note: if current user is not an admin then permission denied exception is thrown
+            MutableAuthenticationService mutableAuthenticationService = (MutableAuthenticationService) authenticationService;
+            mutableAuthenticationService.setAuthenticationEnabled(personIdToUpdate, person.isEnabled());
+        }
 
 		NodeRef personNodeRef = personService.getPerson(personIdToUpdate, false);
 		if (person.wasSet(Person.PROP_PERSON_DESCRIPTION))
@@ -681,19 +747,7 @@ public class PeopleImpl implements People
                 mutableAuthenticationService.setAuthentication(personIdToUpdate, newPassword);
             }
         }
-
-        if (person.isEnabled() != null)
-        {
-            if (isAdminAuthority(personIdToUpdate))
-            {
-                throw new PermissionDeniedException("Admin authority cannot be disabled.");
-            }
-
-            mutableAuthenticationService.setAuthenticationEnabled(personIdToUpdate, person.isEnabled());
-        }
-
     }
-
 
     private boolean isAdminAuthority()
     {
@@ -703,5 +757,74 @@ public class PeopleImpl implements People
     private boolean isAdminAuthority(String authorityName)
     {
         return authorityService.isAdminAuthority(authorityName);
+    }
+
+    @Override
+    public void requestPasswordReset(String userId, String client)
+    {
+        // Validate the userId and the client
+        checkRequiredField("userId", userId);
+        checkRequiredField("client", client);
+
+        // This is an un-authenticated API call so we wrap it to run as System
+        AuthenticationUtil.runAsSystem(() -> {
+            try
+            {
+                resetPasswordService.requestReset(userId, client);
+            }
+            catch (ResetPasswordWorkflowInvalidUserException ex)
+            {
+                // we don't throw an exception.
+                // For security reason (prevent the attackers to determine that userId exists in the system or not),
+                // the endpoint returns a 202 response if the userId does not exist or
+                // if the user is disabled by an Administrator.
+                if (LOGGER.isDebugEnabled())
+                {
+                    LOGGER.debug("Invalid user. " + ex.getMessage());
+                }
+            }
+
+            return null;
+        });
+    }
+
+    @Override
+    public void resetPassword(String personId, final PasswordReset passwordReset)
+    {
+        checkResetPasswordData(passwordReset);
+        checkRequiredField("personId", personId);
+
+        ResetPasswordDetails resetDetails = new ResetPasswordDetails()
+                    .setUserId(personId)
+                    .setPassword(passwordReset.getPassword())
+                    .setWorkflowId(passwordReset.getId())
+                    .setWorkflowKey(passwordReset.getKey());
+        try
+        {
+            // This is an un-authenticated API call so we wrap it to run as System
+            AuthenticationUtil.runAsSystem(() -> {
+                resetPasswordService.initiateResetPassword(resetDetails);
+
+                return null;
+            });
+
+        }
+        catch (ResetPasswordWorkflowException ex)
+        {
+            // we don't throw an exception.
+            // For security reason, the endpoint returns a 202 response
+            // See APPSREPO-35 acceptance criteria
+            if (LOGGER.isWarnEnabled())
+            {
+                LOGGER.warn(ex.getMessage());
+            }
+        }
+    }
+
+    private void checkResetPasswordData(PasswordReset data)
+    {
+        checkRequiredField("password", data.getPassword());
+        checkRequiredField("id", data.getId());
+        checkRequiredField("key", data.getKey());
     }
 }

@@ -8,7 +8,7 @@
     <description>Downloads bits and pieces</description>
     <properties>
       <alfresco.version>${project.version}</alfresco.version>
-      <explorer.version>2.0-SNAPSHOT</explorer.version>
+      <explorer.version>5.2.1-SNAPSHOT</explorer.version>
     </properties>
     <licenses>
       <license>
@@ -17,26 +17,18 @@
       </license>
    </licenses>
     <dependencies>
-      <dependency>
-        <groupId>org.alfresco</groupId>
-        <artifactId>alfresco-content-services-platform-distributionzip</artifactId>
-        <version>${alfresco.version}</version>
-        <type>zip</type>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.alfresco</groupId>
-        <artifactId>alfresco-solr4-distribution</artifactId>
-        <version>${alfresco.version}</version>
-        <type>zip</type>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.alfresco</groupId>
-        <artifactId>api-explorer</artifactId>
-        <version>${explorer.version}</version>
-        <type>war</type>
-      </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>enablecors</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>api-explorer</artifactId>
+            <version>${explorer.version}</version>
+            <type>war</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

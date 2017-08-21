@@ -107,6 +107,7 @@ public class AdminNodeBrowseBean implements Serializable
     transient private DataModel properties = null;
     transient private DataModel children = null;
     transient private DataModel assocs = null;
+    transient private DataModel sourceAssocs = null;
     transient private DataModel permissions = null;
     transient private DataModel permissionMasks = null;
 
@@ -266,6 +267,7 @@ public class AdminNodeBrowseBean implements Serializable
         properties = null;
         children = null;
         assocs = null;
+        sourceAssocs = null;
         inheritPermissions = null;
         permissions = null;
         permissionMasks = null;
@@ -455,6 +457,28 @@ public class AdminNodeBrowseBean implements Serializable
     }
 
     /**
+     * Gets the current source associations
+     *
+     * @return associations
+     */
+    public DataModel getSourceAssocs()
+    {
+        if (sourceAssocs == null)
+        {
+            try
+            {
+                List<AssociationRef> assocRefs = getNodeService().getSourceAssocs(getNodeRef(), RegexQNamePattern.MATCH_ALL);
+                sourceAssocs = new ListDataModel(assocRefs);
+            }
+            catch (UnsupportedOperationException err)
+            {
+                // some stores do not support associations
+            }
+        }
+        return sourceAssocs;
+    }
+
+    /**
      * Gets the current query language
      * 
      * @return query language
@@ -585,6 +609,19 @@ public class AdminNodeBrowseBean implements Serializable
         AssociationRef assocRef = (AssociationRef) getAssocs().getRowData();
         NodeRef targetRef = assocRef.getTargetRef();
         setNodeRef(targetRef);
+        return "success";
+    }
+
+    /**
+     * Action to select association From node
+     *
+     * @return next action
+     */
+    public String selectFromNode()
+    {
+        AssociationRef assocRef = (AssociationRef) getSourceAssocs().getRowData();
+        NodeRef sourceRef = assocRef.getSourceRef();
+        setNodeRef(sourceRef);
         return "success";
     }
 

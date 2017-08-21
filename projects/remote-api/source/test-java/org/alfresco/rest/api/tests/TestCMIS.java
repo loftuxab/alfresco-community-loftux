@@ -33,8 +33,12 @@ import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.math.BigInteger;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +58,7 @@ import org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl;
 import org.alfresco.cmis.client.type.AlfrescoType;
 import org.alfresco.model.ContentModel;
 import org.alfresco.opencmis.CMISDispatcherRegistry.Binding;
+import org.alfresco.opencmis.PublicApiAlfrescoCmisServiceFactory;
 import org.alfresco.opencmis.dictionary.CMISStrictDictionaryService;
 import org.alfresco.opencmis.dictionary.QNameFilter;
 import org.alfresco.opencmis.dictionary.QNameFilterImpl;
@@ -126,11 +131,11 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.IncludeRelationships;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisUpdateConflictException;
-import org.apache.chemistry.opencmis.commons.impl.Constants;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
@@ -161,6 +166,7 @@ public class TestCMIS extends EnterpriseTestApi
 
     private static final String TEST_PASSWORD = "password";
 
+    private ApplicationContext ctx;
 
     private DictionaryDAO dictionaryDAO;
     private LockService lockService;
@@ -174,7 +180,7 @@ public class TestCMIS extends EnterpriseTestApi
     @Before
     public void before() throws Exception
     {
-        ApplicationContext ctx = getTestFixture().getApplicationContext();
+        ctx = getTestFixture().getApplicationContext();
         this.dictionaryDAO = (DictionaryDAO)ctx.getBean("dictionaryDAO");
         this.lockService = (LockService) ctx.getBean("lockService");
         this.tenantService = (TenantService)ctx.getBean("tenantService");
@@ -240,6 +246,106 @@ public class TestCMIS extends EnterpriseTestApi
 
         HttpResponse response = publicApiClient.get(network1.getId() + "/public/cmis/versions/1.1/browser/root", null);
         assertEquals(200, response.getStatusCode());
+    }
+
+    /**
+     * REPO-2041 / MNT-16236 Upload via cmis binding atom and browser files with different maxContentSize
+     */
+    @Test
+    public void testSetMaxContentSize() throws Exception
+    {
+        final TestNetwork network1 = getTestFixture().getRandomNetwork();
+        Iterator<String> personIt = network1.getPersonIds().iterator();
+        final String personId = personIt.next();
+        assertNotNull(personId);
+
+        // Create a site
+        final TestSite site = TenantUtil.runAsUserTenant(new TenantRunAsWork<TestSite>()
+        {
+            @Override
+            public TestSite doWork() throws Exception
+            {
+                String siteName = "site" + System.currentTimeMillis();
+                SiteInformation siteInfo = new SiteInformation(siteName, siteName, siteName, SiteVisibility.PRIVATE);
+                TestSite site = network1.createSite(siteInfo);
+                return site;
+            }
+        }, personId, network1.getId());
+
+        publicApiClient.setRequestContext(new RequestContext(network1.getId(), personId));
+        CmisSession cmisSessionAtom = publicApiClient.createPublicApiCMISSession(Binding.atom, CMIS_VERSION_11, AlfrescoObjectFactoryImpl.class.getName());
+        CmisSession cmisSessionBrowser = publicApiClient.createPublicApiCMISSession(Binding.browser, CMIS_VERSION_11, AlfrescoObjectFactoryImpl.class.getName());
+        Folder documentLibrary = (Folder)cmisSessionAtom.getObjectByPath("/Sites/" + site.getSiteId() + "/documentLibrary");
+
+        // create file for upload
+        String fileName = "test+" + GUID.generate();
+        long fileLength = 6291456L; // 6MB
+        RandomAccessFile f = new RandomAccessFile(fileName, "rw");
+        f.setLength(fileLength);
+
+        Map<String, Serializable> properties = new HashMap<String, Serializable>();
+        properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+        properties.put(PropertyIds.NAME, fileName);
+
+        // change maxContentSize so that the file will be to big
+        double maxContentSize = 5.8;  // 5MB
+        PublicApiAlfrescoCmisServiceFactory publicApiAlfrescoCmisServiceFactory = (PublicApiAlfrescoCmisServiceFactory) ctx.getBean("publicApiCMISServiceFactory");
+        publicApiAlfrescoCmisServiceFactory.setMaxContentSize(maxContentSize);
+
+        // for atom
+        FileChannel fc = f.getChannel();
+        InputStream is = Channels.newInputStream(fc);
+        ContentStreamImpl contentStream = new ContentStreamImpl(fileName, BigInteger.valueOf(fileLength), MimetypeMap.MIMETYPE_TEXT_PLAIN,
+                is);
+        try
+        {
+            cmisSessionAtom.createDocument(documentLibrary.getId(), fileName, properties, contentStream, VersioningState.MAJOR);
+            fail("The file should be to big to upload via atom binding");
+        }
+        catch(CmisConstraintException e)
+        {
+
+        }
+
+        // for browser
+        fc.position(0);
+        try
+        {
+            cmisSessionBrowser.createDocument(documentLibrary.getId(), fileName, properties, contentStream, VersioningState.MAJOR);
+            fail("The file should be to big to upload via browser binding");
+        }
+        catch(CmisConstraintException e)
+        {
+
+        }
+
+        // increase maxContensize so that the file is not to big
+        maxContentSize = 10.6; // 10MB
+        publicApiAlfrescoCmisServiceFactory.setMaxContentSize(maxContentSize);
+
+        // for atom
+        fc.position(0);
+        Document result = cmisSessionAtom.createDocument(documentLibrary.getId(), fileName, properties, contentStream, VersioningState.MAJOR);
+        assertNotNull(result);
+
+        // for browser
+        fc.position(0);
+        result = cmisSessionBrowser.createDocument(documentLibrary.getId(), fileName + "2", properties, contentStream, VersioningState.MAJOR);
+        assertNotNull(result);
+
+        // ignore the size check
+        maxContentSize = -1;
+        publicApiAlfrescoCmisServiceFactory.setMaxContentSize(maxContentSize);
+
+        // for atom
+        fc.position(0);
+        result = cmisSessionAtom.createDocument(documentLibrary.getId(), fileName + "3", properties, contentStream, VersioningState.MAJOR);
+        assertNotNull(result);
+
+        // for browser
+        fc.position(0);
+        result = cmisSessionBrowser.createDocument(documentLibrary.getId(), fileName + "4", properties, contentStream, VersioningState.MAJOR);
+        assertNotNull(result);
     }
 
     /**
@@ -2237,7 +2343,100 @@ public class TestCMIS extends EnterpriseTestApi
 		}
 		assertTrue("The aspects should have P:cm:generalclassifiable", mandatoryAspects.contains("P:cm:generalclassifiable"));
     }
-    
+
+    @Test
+    public void testContentDisposition_MNT_17477() throws Exception
+    {
+        final TestNetwork network1 = getTestFixture().getRandomNetwork();
+
+        String username = "user" + System.currentTimeMillis();
+        PersonInfo personInfo = new PersonInfo(username, username, username, TEST_PASSWORD, null, null, null, null, null, null, null);
+        TestPerson person1 = network1.createUser(personInfo);
+        String person1Id = person1.getId();
+
+        publicApiClient.setRequestContext(new RequestContext(network1.getId(), person1Id));
+        CmisSession cmisSession = publicApiClient.createPublicApiCMISSession(Binding.browser, CMIS_VERSION_11, AlfrescoObjectFactoryImpl.class.getName());
+
+        Folder folder = (Folder)cmisSession.getObjectByPath("/Shared");
+
+        //
+        // Upload test JPG document
+        //
+        String name = GUID.generate() + ".jpg";
+
+        Map<String, Object> properties = new HashMap<>();
+        {
+            properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+            properties.put(PropertyIds.NAME, name);
+        }
+
+        ContentStreamImpl fileContent = new ContentStreamImpl();
+        {
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_IMAGE_JPEG);
+            fileContent.setStream(this.getClass().getResourceAsStream("/test.jpg"));
+        }
+
+        Document doc = folder.createDocument(properties, fileContent, VersioningState.MAJOR);
+        String docId = doc.getId();
+
+        // note: Content-Disposition can be "inline or "attachment" for content types that are white-listed (eg. specific image types & pdf)
+
+        HttpResponse response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/browser/root/Shared/"+name, null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("inline"));
+
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/browser/root/Shared/"+name+"?download=inline", null);
+		assertEquals(200, response.getStatusCode());
+		assertTrue(response.getHeaders().get("Content-Disposition").startsWith("inline"));
+
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/browser/root/Shared/"+name+"?download=attachment", null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("attachment"));
+
+        // note: AtomPub binding (via OpenCMIS) does not support "download" query parameter
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/atom/content?id="+docId, null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("attachment"));
+
+        //
+        // Create test HTML document
+        //
+        name = GUID.generate() + ".html";
+
+        properties = new HashMap<>();
+        {
+            properties.put(PropertyIds.OBJECT_TYPE_ID, TYPE_CMIS_DOCUMENT);
+            properties.put(PropertyIds.NAME, name);
+        }
+
+        fileContent = new ContentStreamImpl();
+        {
+            ContentWriter writer = new FileContentWriter(TempFileProvider.createTempFile(GUID.generate(), ".html"));
+            writer.putContent("<html><script>alert(123);</script><body>Hello <b>world</b></body</html>");
+            ContentReader reader = writer.getReader();
+            fileContent.setMimeType(MimetypeMap.MIMETYPE_HTML);
+            fileContent.setStream(reader.getContentInputStream());
+        }
+
+        doc = folder.createDocument(properties, fileContent, VersioningState.MAJOR);
+        docId = doc.getId();
+
+        // note: Content-Disposition will always be "attachment" for content types that are not white-listed
+
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/browser/root/Shared/"+name, null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("attachment;"));
+
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/browser/root/Shared/"+name+"?download=inline", null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("attachment;"));
+
+        // note: AtomPub binding (via OpenCMIS) does not support "download" query parameter
+        response = publicApiClient.get(network1.getId()+"/public/cmis/versions/1.1/atom/content?id="+docId, null);
+		assertEquals(200, response.getStatusCode());
+        assertTrue(response.getHeaders().get("Content-Disposition").startsWith("attachment;"));
+    }
+
     /**
      * Test delete version on versions other than latest (most recent) version (MNT-17228)
      */

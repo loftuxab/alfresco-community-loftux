@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.alfresco</groupId>
     <artifactId>alfresco-super-pom</artifactId>
-    <version>7</version>
+    <version>8</version>
   </parent>
   <artifactId>alfresco-parent</artifactId>
   <packaging>pom</packaging>
@@ -104,6 +104,12 @@
   </modules>
 
   <properties>
+    <build-number>0</build-number>
+    <build-key>BUILD-KEY</build-key>
+    <build-name>Build-Name</build-name>
+    <scm-path>local/development/workspace</scm-path>
+    <scm-revision>100000</scm-revision>
+
     <!-- Developer's runtime environment configuration -->
     <runtime.parent.folder>${basedir}/../..</runtime.parent.folder>
     <runtime.data.folder>${runtime.parent.folder}/runtime</runtime.data.folder>
@@ -158,7 +164,7 @@
     <dependency.opencmis.version>1.0.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
     <dependency.spring.version>3.2.17.RELEASE</dependency.spring.version>
-    <dependency.tomcat.version>7.0.59</dependency.tomcat.version>
+    <dependency.tomcat.version>7.0.78</dependency.tomcat.version>
     <dependency.activiti.version>5.19.0.3</dependency.activiti.version>
     <dependency.activiti-engine.version>5.19.0.3</dependency.activiti-engine.version>
     <dependency.jackson2.version>2.8.3</dependency.jackson2.version>
@@ -166,29 +172,30 @@
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.13</dependency.webscripts.version>
-    <dependency.alfresco-core.version>6.10</dependency.alfresco-core.version>
-    <dependency.alfresco-data-model.version>6.8</dependency.alfresco-data-model.version>
+    <dependency.alfresco-core.version>6.13</dependency.alfresco-core.version>
+    <dependency.alfresco-data-model.version>6.16</dependency.alfresco-data-model.version>
     <dependency.alfresco-xmlfactory.version>1.2.2</dependency.alfresco-xmlfactory.version>
-    <dependency.alfresco-jlan.version>6.2</dependency.alfresco-jlan.version>
+    <dependency.alfresco-jlan.version>6.3</dependency.alfresco-jlan.version>
     <dependency.alfresco-sdk.version>2.0.0</dependency.alfresco-sdk.version>
     <dependency.httpcomponents.version>4.5.2</dependency.httpcomponents.version>
     <dependency.mysql.version>5.1.39</dependency.mysql.version>
-    <dependency.postgresql.version>9.4.1211.jre7</dependency.postgresql.version>
-    <dependency.api-explorer.version>5.2.e</dependency.api-explorer.version>
-
+    <dependency.postgresql.version>9.4.1212</dependency.postgresql.version>
+    <dependency.mariadb.version>2.0.1</dependency.mariadb.version>
+    <dependency.api-explorer.version>5.2.1-SNAPSHOT</dependency.api-explorer.version>
     <dependency.alfresco-trashcan-cleaner.version>2.2</dependency.alfresco-trashcan-cleaner.version>
 
     <!-- Alfresco Office Services Module -->
-    <alfresco.aos-module.version>1.1.5</alfresco.aos-module.version>
+    <alfresco.aos-module.version>1.1.6</alfresco.aos-module.version>
 
     <!-- Versions of binaries packaged in the installer -->
-    <installer.common.version>5.1-20151118</installer.common.version>
-    <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution</installer.tomcat.version>
-    <installer.java.version>1.8.0_111</installer.java.version>
-    <installer.postgresql.version>9.4.4-20151016</installer.postgresql.version>
+    <installer.common.version>5.2-20170616</installer.common.version>
+    <installer.tomcat.version>${dependency.tomcat.version}-alfresco-distribution-20170616</installer.tomcat.version>
+    <installer.java.version>1.8.0_131</installer.java.version>
+    <installer.postgresql.version>9.4.12</installer.postgresql.version>
     <installer.libreoffice.version>5.2.1-alfresco</installer.libreoffice.version>
-    <installer.ghostscript.version>8.64</installer.ghostscript.version>
-    <installer.imagemagick.version>6.9.1</installer.imagemagick.version>
+    <installer.imagemagick.version>7.0.5</installer.imagemagick.version>
+    <installer.alfresco-pdf-renderer.version>1.0</installer.alfresco-pdf-renderer.version>
+
 
     <!-- Install builder version -->
     <installer.installbuilder.version>15.10.1</installer.installbuilder.version>
@@ -482,6 +489,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${dependency.mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${dependency.mariadb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -791,11 +803,11 @@
                 <serverId>alfresco-internal-staging</serverId>
                 <nexusUrl>https://artifacts.alfresco.com/nexus</nexusUrl>
                 <stagingProfileId>${release.staging.profile}</stagingProfileId>
-                <stagingDescription>Staging Platform ${project.version} (${bamboo_buildResultKey} ${bamboo_planRepository_revision})</stagingDescription>
+                <stagingDescription>Staging Platform ${project.version} (${build-key}-${build-number} ${scm-revision})</stagingDescription>
                 <tags>
-                    <build.number>${bamboo_buildNumber}</build.number>
-                    <build.key>${bamboo_buildKey}</build.key>
-                    <build.revision>${bamboo_planRepository_revision}</build.revision>
+                    <build.number>${build-number}</build.number>
+                    <build.key>${build-key}</build.key>
+                    <build.revision>${scm-revision}</build.revision>
                 </tags>
             </configuration>
         </plugin>
@@ -859,10 +871,10 @@
                             <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
-                            <Build-Name>${bamboo_planName}</Build-Name>
-                            <Build-Key>${bamboo_fullBuildKey}</Build-Key>
-                            <Build-Number>${bamboo_buildNumber}</Build-Number>
-                            <Build-Revision>${bamboo_repository_revision_number}</Build-Revision>
+                            <Build-Name>${build-name}</Build-Name>
+                            <Build-Key>${build-key}-${build-number}</Build-Key>
+                            <Build-Number>${build-number}</Build-Number>
+                            <Build-Revision>${scm-revision}</Build-Revision>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -875,19 +887,18 @@
                             <Specification-Version>${version.major}.${version.minor}.${version.revision}</Specification-Version>
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <Build-Date>${maven.build.timestamp}</Build-Date>
-                            <Build-Date>${maven.build.timestamp}</Build-Date>
-                            <Build-Name>${bamboo_planName}</Build-Name>
-                            <Build-Key>${bamboo_fullBuildKey}</Build-Key>
-                            <Build-Number>${bamboo_buildNumber}</Build-Number>
-                            <Build-Revision>${bamboo_repository_revision_number}</Build-Revision>
+                            <Build-Name>${build-name}</Build-Name>
+                            <Build-Key>${build-key}-${build-number}</Build-Key>
+                            <Build-Number>${build-number}</Build-Number>
+                            <Build-Revision>${scm-revision}</Build-Revision>
                         </manifestEntries>
                         <manifestSections>
                             <manifestSection>
                                 <name>Source-control</name>
                                 <manifestEntries>
-                                    <Last-change-Revision>${bamboo_custom_svn_lastchange_revision_number}</Last-change-Revision>
-                                    <Source-Revision>${bamboo_repository_revision_number}</Source-Revision>
-                                    <Source-Url>${bamboo_planRepository_repositoryUrl}</Source-Url>
+                                    <Last-change-Revision>${scm-revision}</Last-change-Revision>
+                                    <Source-Revision>${scm-revision}</Source-Revision>
+                                    <Source-Url>${scm-path}</Source-Url>
                                 </manifestEntries>
                             </manifestSection>
                         </manifestSections>
@@ -1376,12 +1387,61 @@
 
     <profile>
         <id>mariadb-props</id>
+
         <properties>
-            <db.master.url>jdbc:mysql://localhost/</db.master.url>
-            <db.driver>com.mysql.jdbc.Driver</db.driver>
-            <db.url>jdbc:mysql://localhost/${db.name}</db.url>
+            <db.master.url>jdbc:mariadb://localhost/</db.master.url>
+            <db.driver>org.mariadb.jdbc.Driver</db.driver>
+            <db.url>jdbc:mariadb://localhost/${db.name}</db.url>
+            <db.create.command>create database ${db.name} CHARACTER SET utf8 COLLATE utf8_bin;</db.create.command>
         </properties>
+
     </profile>
+
+    <profile>
+        <id>mariadb</id>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <configuration>
+                        <systemProperties>
+                            <db.driver>${db.driver}</db.driver>
+                            <db.url>${db.url}</db.url>
+                        </systemProperties>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.mariadb.jdbc</groupId>
+                            <artifactId>mariadb-java-client</artifactId>
+                            <version>${dependency.mariadb.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.mariadb.jdbc</groupId>
+                            <artifactId>mariadb-java-client</artifactId>
+                            <version>${dependency.mariadb.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </build>
+        <dependencies>
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>${dependency.mariadb.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </profile>
+
+
 
     <profile>
         <id>oracle-props</id>

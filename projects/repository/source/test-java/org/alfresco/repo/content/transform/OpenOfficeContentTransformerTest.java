@@ -77,9 +77,10 @@ public class OpenOfficeContentTransformerTest extends AbstractContentTransformer
     
     public void testReliability() throws Exception
     {
-        if (!worker.isAvailable())
+        if (!isOpenOfficeWorkerAvailable())
         {
             // no connection
+            System.err.println("ooWorker not available - skipping testReliability !!");
             return;
         }
         boolean reliability = transformer.isTransformable(MIMETYPE_RUBBISH, -1, MimetypeMap.MIMETYPE_TEXT_PLAIN, new TransformationOptions());
@@ -99,9 +100,10 @@ public class OpenOfficeContentTransformerTest extends AbstractContentTransformer
      */
     public void testHtmlToPdf() throws Exception
     {
-        if (!worker.isAvailable())
+        if (!isOpenOfficeWorkerAvailable())
         {
             // no connection
+            System.err.println("ooWorker not available - skipping testHtmlToPdf !!");
             return;
         }
         File htmlSourceFile = loadQuickTestFile("html");
@@ -120,9 +122,10 @@ public class OpenOfficeContentTransformerTest extends AbstractContentTransformer
      */
     public void testEmptyHtmlToEmptyPdf() throws Exception
     {
-        if (!worker.isAvailable())
+        if (!isOpenOfficeWorkerAvailable())
         {
             // no connection
+            System.err.println("ooWorker not available - skipping testEmptyHtmlToEmptyPdf !!");
             return;
         }
         URL url = this.getClass().getClassLoader().getResource("misc/empty.html");
@@ -139,47 +142,6 @@ public class OpenOfficeContentTransformerTest extends AbstractContentTransformer
         writer.setMimetype(MimetypeMap.MIMETYPE_PDF);
         
         transformer.transform(reader, writer);
-    }
-    
-    /**
-     * MNT-11279. Transform docx document that contains head with value "documentName" to pdf.
-     * 
-     */
-    public void testDocxFieldToPdf()
-    {
-        if (!worker.isAvailable())
-        {
-            // no connection
-            return;
-        }
-        URL docxUrl = this.getClass().getClassLoader().getResource("misc/Test-Header-Office-2010.docx");
-        assertNotNull("URL was unexpectedly null", docxUrl);
-
-        File docxSourceFile = new File(docxUrl.getFile());
-        assertTrue("Test file does not exist.", docxSourceFile.exists());
-        
-        File pdfTargetFile = TempFileProvider.createTempFile(getName() + "-target-", ".pdf");
-        
-        ContentReader reader = new FileContentReader(docxSourceFile);
-        reader.setMimetype(MimetypeMap.MIMETYPE_WORD);
-        ContentWriter writer = new FileContentWriter(pdfTargetFile);
-        writer.setMimetype(MimetypeMap.MIMETYPE_PDF);
-        
-        transformer.transform(reader, writer);
-        
-        //Transform to txt for checking content
-        reader = new FileContentReader(pdfTargetFile);
-        reader.setMimetype(MimetypeMap.MIMETYPE_PDF);
-        
-        File txtTargetFile = TempFileProvider.createTempFile(getName() + "-target-", ".txt");
-        
-        writer = new FileContentWriter(txtTargetFile);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        
-        transformer.transform(reader, writer);
-        
-        String txtContent = writer.getReader().getContentString();
-        assertTrue("Transformed document must contains real document name", txtContent.contains("Document File Name: Test-Header-Office-2010Test-Header-Office-2010"));    
     }
     
     /**

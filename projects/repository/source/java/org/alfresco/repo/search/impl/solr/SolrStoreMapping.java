@@ -248,5 +248,4 @@ public class SolrStoreMapping implements BeanNameAware
     {
         this.replicationFactor = replicationFactor;
     }
-
 }

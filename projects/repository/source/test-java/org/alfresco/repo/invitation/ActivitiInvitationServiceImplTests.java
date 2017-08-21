@@ -26,10 +26,8 @@
 
 package org.alfresco.repo.invitation;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.workflow.activiti.ActivitiConstants;
@@ -39,17 +37,22 @@ import org.alfresco.service.cmr.workflow.WorkflowPath;
 import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.cmr.workflow.WorkflowTask;
 import org.alfresco.service.cmr.workflow.WorkflowTaskState;
-import org.alfresco.service.namespace.QName;
+import org.alfresco.test_category.BaseSpringTestsCategory;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Nick Smith
  * @since 4.0
  *
  */
+@Category(BaseSpringTestsCategory.class)
 public class ActivitiInvitationServiceImplTests extends AbstractInvitationServiceImplTest
 {
     private WorkflowService workflowService;
     
+    /**
+     * Nominated invites workflows finish without waiting for user accept
+     */
     public void testWorkflowTaskContainsProps()
     {
         Invitation.ResourceType resourceType = Invitation.ResourceType.WEB_SITE;
@@ -60,33 +63,9 @@ public class ActivitiInvitationServiceImplTests extends AbstractInvitationServic
         String rejectUrl = "marshmallow";
         NominatedInvitation nomInvite = invitationService.inviteNominated(USER_ONE,
                 resourceType, resourceName, inviteeRole, serverPath, acceptUrl, rejectUrl);
-        
-        WorkflowTask task = getTaskForInvitation(nomInvite);
-        Map<QName, Serializable> props = task.getProperties();
-        assertEquals(inviteeRole, props.get(WorkflowModelNominatedInvitation.WF_PROP_INVITEE_ROLE));
-        assertEquals(nomInvite.getResourceDescription(), props.get(WorkflowModelNominatedInvitation.WF_PROP_RESOURCE_DESCRIPTION));
-        assertEquals(nomInvite.getResourceTitle(), props.get(WorkflowModelNominatedInvitation.WF_PROP_RESOURCE_TITLE));
-        
-        // Accept the invitation
-        invitationService.accept(nomInvite.getInviteId(), nomInvite.getTicket());
-        
-        task = workflowService.getTaskById(task.getId());
-        props = task.getProperties();
-        assertEquals(inviteeRole, props.get(WorkflowModelNominatedInvitation.WF_PROP_INVITEE_ROLE));
-        assertEquals(nomInvite.getResourceDescription(), props.get(WorkflowModelNominatedInvitation.WF_PROP_RESOURCE_DESCRIPTION));
-        assertEquals(nomInvite.getResourceTitle(), props.get(WorkflowModelNominatedInvitation.WF_PROP_RESOURCE_TITLE));
-    }
 
-    private WorkflowTask getTaskForInvitation(Invitation invite)
-    {
-        String instanceId = invite.getInviteId();
-        List<WorkflowPath> paths = workflowService.getWorkflowPaths(instanceId);
-        assertEquals(1, paths.size());
-        WorkflowPath path = paths.get(0);
-        List<WorkflowTask> tasks = workflowService.getTasksForWorkflowPath(path.getId());
-        assertEquals(1, tasks.size());
-        WorkflowTask task = tasks.get(0);
-        return task;
+        List<WorkflowPath> paths = workflowService.getWorkflowPaths(nomInvite.getInviteId());
+        assertEquals(0, paths.size());
     }
     
     /**

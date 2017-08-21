@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Repository
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -36,7 +36,7 @@ import org.alfresco.service.cmr.repository.TransformationOptions;
  */
 public class AppleIWorksContentTransformerTest extends AbstractContentTransformerTest
 {
-    private ContentTransformer transformer;
+    private AppleIWorksContentTransformer transformer;
     
     @Override
     public void setUp() throws Exception
@@ -45,9 +45,9 @@ public class AppleIWorksContentTransformerTest extends AbstractContentTransforme
         
         transformer = new AppleIWorksContentTransformer();
         
-        // Ugly cast just to set the MimetypeService
-        ((ContentTransformerHelper)transformer).setMimetypeService(mimetypeService);
-        ((ContentTransformerHelper)transformer).setTransformerConfig(transformerConfig);
+        transformer.setMimetypeService(mimetypeService);
+        transformer.setTransformerDebug(transformerDebug);
+        transformer.setTransformerConfig(transformerConfig);
     }
     
     @Override
@@ -55,17 +55,11 @@ public class AppleIWorksContentTransformerTest extends AbstractContentTransforme
     {
         return transformer;
     }
-    
+
     public void testIsTransformable() throws Exception
     {
-        // thumbnails
         assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_KEYNOTE, MimetypeMap.MIMETYPE_IMAGE_JPEG, new TransformationOptions()));
         assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_NUMBERS, MimetypeMap.MIMETYPE_IMAGE_JPEG, new TransformationOptions()));
         assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_PAGES, MimetypeMap.MIMETYPE_IMAGE_JPEG, new TransformationOptions()));
-        
-        // previews
-        assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_KEYNOTE, MimetypeMap.MIMETYPE_PDF, new TransformationOptions()));
-        assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_NUMBERS, MimetypeMap.MIMETYPE_PDF, new TransformationOptions()));
-        assertTrue(transformer.isTransformable(MimetypeMap.MIMETYPE_IWORK_PAGES, MimetypeMap.MIMETYPE_PDF, new TransformationOptions()));
     }
 }

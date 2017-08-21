@@ -1,0 +1,16 @@
+#!/bin/bash
+
+###
+# Fix properties in alfresco-global.properties
+###
+# If we run with externally mapped port other than 8080, then that should be
+# dealt with as well.
+sed -i 's:^[ \t]*alfresco.host[ \t]*=\([ \t]*.*\)$:alfresco.host='$(hostname)':' $GLOBAL_PROPS
+sed -i 's:^[ \t]*share.host[ \t]*=\([ \t]*.*\)$:share.host='$(hostname)':' $GLOBAL_PROPS
+
+# Start alfresco (exits immediately running the server as a daemon)
+$ALFRESCO_HOME/alfresco.sh start
+
+# Long running process that will keep the daemonised docker process alive
+# and may be seen with 'docker logs [-f] alfresco' where alfresco is the name of the container.
+tail -f $ALFRESCO_HOME/alfresco.log

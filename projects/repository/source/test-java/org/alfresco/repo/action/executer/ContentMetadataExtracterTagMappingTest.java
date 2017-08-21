@@ -94,7 +94,11 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
       (ConfigurableApplicationContext)ApplicationContextHelper.getApplicationContext();
    
    protected static final String TAGGING_AUDIT_APPLICATION_NAME = "Alfresco Tagging Service";
-   protected static final String QUICK_FILENAME = "quickIPTC.jpg";
+
+   protected static final String QUICK_FILENAME = "quickIPTC.jpg"; // Keywords separated with comma (,)
+   protected static final String QUICK_FILENAME2 = "quickIPTC2.jpg"; // Keywords separated with pipe (|)
+    protected static final String QUICK_FILENAME3 = "quickIPTC3.jpg"; // Keywords separated with semi-colon (;)
+
    protected static final String QUICK_KEYWORD = "fox";
    protected static final String TAG_1 = "tag one";
    protected static final String TAG_2 = "tag two";
@@ -112,8 +116,6 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
     
     private static StoreRef storeRef;
     private static NodeRef rootNode;
-    private NodeRef folder;
-    private NodeRef document;
     
     private ContentMetadataExtracter executer;
     private TagMappingMetadataExtracter extractor;
@@ -198,27 +200,23 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
         UpdateTagScopesActionExecuter updateTagsAction = 
             (UpdateTagScopesActionExecuter)ctx.getBean("update-tagscope");
         updateTagsAction.setTrackStatus(true);
-
-        // Create the folders and documents to be tagged
-        createTestDocumentsAndFolders();
     }
     
     @Override
     protected void tearDown() throws Exception
     {
-        removeTestDocumentsAndFolders();
         if (AlfrescoTransactionSupport.getTransactionReadState() != TxnReadState.TXN_NONE)
         {
             fail("Test is not transaction-safe.  Fix up transaction handling and re-test.");
         }
     }
 
-    private void createTestDocumentsAndFolders() throws Exception
+    private NodeRef[] createTestFolderAndDocument(String filename) throws Exception
     {
-        this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
+        return this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<NodeRef[]>(){
 
             @Override
-            public Void execute() throws Throwable
+            public NodeRef[] execute() throws Throwable
             {
                
                 // Authenticate as the system user
@@ -229,7 +227,7 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
                 // Create a folder
                 Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
                 folderProps.put(ContentModel.PROP_NAME, "testFolder" + guid);
-                folder = nodeService.createNode(
+                NodeRef folder = nodeService.createNode(
                         ContentMetadataExtracterTagMappingTest.rootNode, 
                         ContentModel.ASSOC_CHILDREN, 
                         QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "testFolder" + guid),
@@ -239,7 +237,7 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
                 // Create a node
                 Map<QName, Serializable> docProps = new HashMap<QName, Serializable>(1);
                 docProps.put(ContentModel.PROP_NAME, "testDocument" + guid + ".jpg");
-                document = nodeService.createNode(
+                NodeRef document = nodeService.createNode(
                         folder, 
                         ContentModel.ASSOC_CONTAINS, 
                         QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "testDocument" + guid + ".jpg"), 
@@ -250,19 +248,19 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
                 {
                     ContentWriter cw = contentService.getWriter(document, ContentModel.PROP_CONTENT, true);
                     cw.setMimetype(MimetypeMap.MIMETYPE_IMAGE_JPEG);
-                    cw.putContent(AbstractContentTransformerTest.loadNamedQuickTestFile(QUICK_FILENAME));
+                    cw.putContent(AbstractContentTransformerTest.loadNamedQuickTestFile(filename));
                 }
                 catch (Exception e)
                 {
                     fail(e.getMessage());
                 }
 
-                return null;
+                return new NodeRef[] { document, folder };
             }
         });
     }
 
-    private void removeTestDocumentsAndFolders() throws Exception
+    private void removeTestFolderAndDocument(NodeRef[] nodes) throws Exception
     {
         this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
             @Override
@@ -272,7 +270,6 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
                 authenticationComponent.setSystemUserAsCurrentUser();
                 
                 // If anything is a tag scope, stop it being
-                NodeRef[] nodes = new NodeRef[] { document, folder };
                 for(NodeRef nodeRef : nodes)
                 {
                    if(taggingService.isTagScope(nodeRef))
@@ -360,8 +357,16 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
     /**
      * Test execution of mapping strings to tags
      */
-    public void testTagMapping()
+    public void testTagMapping() throws Exception
     {
+        // explicitly set here (rather than rely on defaults) in case another test method nullified
+        this.executer = (ContentMetadataExtracter) ctx.getBean("extract-metadata");
+        executer.setStringTaggingSeparators(Arrays.asList(",", ";", "\\|"));
+        
+        // Create the folders and documents to be tagged
+        NodeRef[] nodes = createTestFolderAndDocument(QUICK_FILENAME);
+        NodeRef document = nodes[0];
+        
         this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
             
             @Override
@@ -374,28 +379,112 @@ public class ContentMetadataExtracterTagMappingTest extends TestCase
                 executer.execute(action, document);
                 
                 // Test extracted properties
+
                 assertEquals(ContentMetadataExtracterTest.QUICK_DESCRIPTION, 
                         nodeService.getProperty(document, ContentModel.PROP_DESCRIPTION));
+                
                 assertTrue("storeRef tags should contain '" + QUICK_KEYWORD + "'", 
                         taggingService.getTags(storeRef).contains(QUICK_KEYWORD));
-                assertTrue("document's tags should contain '" + QUICK_KEYWORD + "'", 
-                        taggingService.getTags(document).contains(QUICK_KEYWORD));
+                
+                List<String> tags = taggingService.getTags(document);
+                assertTrue("doc tags '"+tags+"' should contain '" + QUICK_KEYWORD + "'", 
+                        tags.contains(QUICK_KEYWORD));
                 
                 // Test manually added keyword
-                assertTrue("tags should contain '" + TAG_2 + "'", 
-                        taggingService.getTags(document).contains(TAG_2));
+                assertTrue("doc tags '"+tags+"' should contain '" + TAG_2 + "'", 
+                        tags.contains(TAG_2));
+
+                // Test manually added keyword - note: lower-case tag name
+                assertTrue("doc tags '"+tags+"' should contain '" + TAG_3.toLowerCase() + "'",
+                        tags.contains(TAG_3.toLowerCase()));
                 
                 // Test manually added nodeRef keyword
-                assertTrue("tags should contain '" + TAG_1 + "'", 
-                        taggingService.getTags(document).contains(TAG_1));
+                assertTrue("doc tags '"+tags+"' should contain '" + TAG_1 + "'", 
+                        tags.contains(TAG_1));
                 
-                // Test that there are no empty tags created by the non-existent nodeRef
-                assertEquals("tags should contain '" + TAG_1 + "'", 4,
-                        taggingService.getTags(document).size() );
-                    
+                // Test that there are no extra tags created by the non-existent nodeRef
+                assertEquals("Unexpected number of doc tags '"+tags+"'", 7,
+                        tags.size());
+                
+                return null;
+            }
+        });
+
+        removeTestFolderAndDocument(nodes);
+    }
+
+    /**
+     * Test to validate that we ignore invalid tag names when running with "enableStringTagging" option (aka "addTags")
+     * 
+     * eg. "java.lang.IllegalArgumentException: Tag name must not contain | char sequence"
+     */
+    public void testIgnoreInvalidTag() throws Exception
+    {
+        this.executer = (ContentMetadataExtracter) ctx.getBean("extract-metadata");
+        executer.setStringTaggingSeparators(null);
+
+        // Create the folders and documents to be tagged
+        NodeRef[] nodes = createTestFolderAndDocument(QUICK_FILENAME2);
+        NodeRef document = nodes[0];
+
+        this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
+
+            @Override
+            public Void execute() throws Throwable
+            {
+                ActionImpl action = new ActionImpl(document, ID, ContentMetadataExtracter.EXECUTOR_NAME, null);
+                action.setExecuteAsynchronously(false);
+
+                executer.execute(action, document);
+
+                return null;
+            }
+        });
+
+        removeTestFolderAndDocument(nodes);
+    }
+
+    public void testTagMappingSeparators() throws Exception
+    {
+        // explicitly set here (rather than rely on defaults) in case another test method nullified
+        this.executer = (ContentMetadataExtracter) ctx.getBean("extract-metadata");
+        executer.setStringTaggingSeparators(Arrays.asList(",", ";", "\\|"));
+
+        // IPTC Keywords with comma
+        NodeRef[] nodes = createTestFolderAndDocument(QUICK_FILENAME);
+        extractAndCheckTags(nodes[0], Arrays.asList("fox", "dog", "lazy", "jumping"));
+        removeTestFolderAndDocument(nodes);
+
+        // IPTC Keywords with vertical bar (pipe)
+        nodes = createTestFolderAndDocument(QUICK_FILENAME2);
+        extractAndCheckTags(nodes[0], Arrays.asList("k1", "k2", "k3"));
+        removeTestFolderAndDocument(nodes);
+
+        // IPTC Keywords with semi-colon
+        nodes = createTestFolderAndDocument(QUICK_FILENAME3);
+        extractAndCheckTags(nodes[0], Arrays.asList("keyword1", "keyword2", "keyword3", "keyword4"));
+        removeTestFolderAndDocument(nodes);
+    }
+
+    private void extractAndCheckTags(NodeRef document, List<String> expectedTags)
+    {
+        this.transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionCallback<Void>(){
+
+            @Override
+            public Void execute() throws Throwable
+            {
+                ActionImpl action = new ActionImpl(document, ID, ContentMetadataExtracter.EXECUTOR_NAME, null);
+                executer.execute(action, document);
+
+                List<String> tags = taggingService.getTags(document);
+
+                for (String expectedTag : expectedTags)
+                {
+                    assertTrue("Expected tag '"+expectedTag+"' not in "+tags, tags.contains(expectedTag));
+                }
+
                 return null;
             }
         });
     }
-
 }

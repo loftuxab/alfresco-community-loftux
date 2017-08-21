@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -1027,8 +1027,9 @@ public class NodesImpl implements Nodes
 
         return node;
     }
-    
-    protected PathInfo lookupPathInfo(NodeRef nodeRefIn, ChildAssociationRef archivedParentAssoc)
+
+    @Override
+    public PathInfo lookupPathInfo(NodeRef nodeRefIn, ChildAssociationRef archivedParentAssoc)
     {
 
         List<ElementInfo> pathElements = new ArrayList<>();
@@ -1197,6 +1198,15 @@ public class NodesImpl implements Nodes
                     {
                         value = Node.lookupUserInfo((String)value, mapUserInfo, sr.getPersonService());
                     }
+
+                    // Empty (zero length) string values are considered to be
+                    // null values, and will be represented the same as null
+                    // values (i.e. by non-existence of the property).
+                    if (value != null && value instanceof String && ((String) value).isEmpty())
+                    {
+                        continue;
+                    }
+
                     props.put(qName.toPrefixString(namespaceService), value);
                 }
             }

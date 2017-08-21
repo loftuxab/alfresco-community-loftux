@@ -51,8 +51,10 @@ import org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
 import org.alfresco.repo.model.Repository;
 import org.alfresco.repo.thumbnail.script.ScriptThumbnailService;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.repo.transaction.TransactionListenerAdapter;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionCondition;
@@ -65,6 +67,7 @@ import org.alfresco.service.cmr.repository.ContentIOException;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentServiceTransientException;
 import org.alfresco.service.cmr.repository.ContentWriter;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.PagedSourceOptions;
@@ -90,6 +93,10 @@ import org.alfresco.util.GUID;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.hibernate.dialect.DB2Dialect;
 import org.hibernate.dialect.Dialect;
 import org.junit.experimental.categories.Category;
@@ -117,6 +124,7 @@ public class ThumbnailServiceImplTest extends BaseAlfrescoSpringTest
     private Repository repositoryHelper;
     private PermissionService permissionService;
     private LockService lockService;
+    private CopyService copyService;
 
     private NodeRef folder;
     private static final String TEST_FAILING_MIME_TYPE = "application/vnd.alfresco.test.transientfailure";
@@ -146,6 +154,7 @@ public class ThumbnailServiceImplTest extends BaseAlfrescoSpringTest
         this.repositoryHelper = (Repository) this.applicationContext.getBean("repositoryHelper");
         this.permissionService = (PermissionService) applicationContext.getBean("PermissionService");
         this.lockService = (LockService) applicationContext.getBean("lockService");
+        this.copyService = (CopyService) applicationContext.getBean("CopyService");
 
         // Create a folder and some content
         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
@@ -640,6 +649,106 @@ public class ThumbnailServiceImplTest extends BaseAlfrescoSpringTest
     }
 
     /**
+     * A simple listener which will delete the given node after the transition is completed
+     */
+    private class TestNodeDeleterListener extends TransactionListenerAdapter
+    {
+        private final NodeRef nodeRef;
+        private TestNodeDeleterListener(NodeRef nodeRef)
+        {
+            this.nodeRef = nodeRef;
+        }
+
+        @Override
+        public void afterCommit()
+        {
+            transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+            {
+                public Void execute() throws Throwable
+                {
+                    secureNodeService.deleteNode(nodeRef);
+                    return null;
+                }
+            }, false, true);
+        }
+    }
+
+    /**
+     * This is a simple log error appender. You can simply add this appender to the root logger e.g.
+     * Logger.getRootLogger().addAppender(logErrorAppender);
+     *
+     * That is useful if you need to use the log output for your tests.
+     */
+    class LogErrorAppender extends AppenderSkeleton
+    {
+
+        private final List<LoggingEvent> log = new ArrayList<LoggingEvent>();
+
+        @Override
+        public boolean requiresLayout()
+        {
+            return false;
+        }
+
+        @Override
+        protected void append(final LoggingEvent loggingEvent)
+        {
+            if(loggingEvent.getLevel() == Level.ERROR)
+            {
+                log.add(loggingEvent);
+            }
+        }
+
+        @Override
+        public void close()
+        {
+        }
+
+        public List<LoggingEvent> getLog()
+        {
+            return new ArrayList<LoggingEvent>(log);
+        }
+    }
+
+    /**
+     * See REPO-2519, MNT-17113
+     *
+     * @throws IOException
+     */
+    public void testIfNodesExistsAfterCreateThumbnail() throws IOException
+    {
+        // Add the log appender to the root logger
+        LogErrorAppender logErrorAppender = new LogErrorAppender();
+        Logger.getRootLogger().addAppender(logErrorAppender);
+
+        // create content node for thumbnail node
+        NodeRef pdfOrig = createOriginalContent(folder, MimetypeMap.MIMETYPE_PDF);
+
+        QName qname = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "doclib");
+        ThumbnailDefinition details = thumbnailService.getThumbnailRegistry().getThumbnailDefinition(qname.getLocalName());
+
+        setComplete();
+        endTransaction();
+
+        // create thumbnail
+        transactionService.getRetryingTransactionHelper().doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                // Delete the content node (pdfOrig) before the afterCommit code is executed
+                TestNodeDeleterListener testNodeDeleterListener = new TestNodeDeleterListener(pdfOrig);
+                // It needs to have a higher priority as the implemented afterCommit. The priority in order are (0,1,2,3,4)
+                AlfrescoTransactionSupport.bindListener(testNodeDeleterListener, 1);
+
+                thumbnailService.createThumbnail(pdfOrig, ContentModel.PROP_CONTENT, MimetypeMap.MIMETYPE_IMAGE_JPEG, details.getTransformationOptions(), "doclib");
+                return null;
+            }
+        }, false, true);
+
+        assertEquals("There should be no error anymore", 0, logErrorAppender.getLog().size());
+    }
+
+    /**
      * See REPO-1580, MNT-17113, REPO-1644 (and related)
      */
     public void testLastThumbnailModificationDataContentUpdates() throws Exception
@@ -677,6 +786,35 @@ public class ThumbnailServiceImplTest extends BaseAlfrescoSpringTest
 
         // Check if property "Last thumbnail modification data" has changed
         assertFalse("Property 'Last thumbnail modification data' has not changed", lastThumbnailDataV1.equals(lastThumbnailDataV2));
+    }
+
+    /**
+     * See REPO-2257, MNT-17661
+     */
+    public void testLastThumbnailModificationDataContentCopy() throws Exception
+    {
+        final NodeRef pdfOrig = createOriginalContent(this.folder, MimetypeMap.MIMETYPE_PDF);
+        QName qname = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "doclib");
+
+        ThumbnailDefinition details = thumbnailService.getThumbnailRegistry().getThumbnailDefinition(qname.getLocalName());
+        NodeRef thumbnail = this.thumbnailService.createThumbnail(pdfOrig, ContentModel.PROP_CONTENT, MimetypeMap.MIMETYPE_IMAGE_JPEG,
+                details.getTransformationOptions(), "doclib");
+        assertNotNull(thumbnail);
+
+        setComplete();
+        endTransaction();
+
+        Thread.sleep(1000);
+
+        // Get initial value of property "Last thumbnail modification data"
+        List<String>lastThumbnailData = (List<String>)this.secureNodeService.getProperty(pdfOrig, ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA);
+        assertNotNull(lastThumbnailData);
+        assertEquals(1, lastThumbnailData.size());
+        assertTrue(lastThumbnailData.get(0).contains("doclib:"));
+
+        final NodeRef pdfCopy = copyService.copy(pdfOrig, this.folder, ContentModel.ASSOC_CONTAINS, QName.createQName("copyOfOriginal"));
+        List<String> lastThumbnailDataCopy = (List<String>)this.secureNodeService.getProperty(pdfCopy, ContentModel.PROP_LAST_THUMBNAIL_MODIFICATION_DATA);
+        assertNull(lastThumbnailDataCopy);
     }
 
     /**

@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -29,8 +29,10 @@ package org.alfresco.rest.api.tests.client.data;
 import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Date;
 
+import org.alfresco.rest.api.tests.util.RestApiUtil;
 import org.json.simple.JSONObject;
 
 /**
@@ -41,203 +43,242 @@ import org.json.simple.JSONObject;
  */
 public class FavouriteNode implements Serializable, ExpectedComparison
 {
-	private static final long serialVersionUID = -6881545732441221372L;
+    private static final long serialVersionUID = -6881545732441221372L;
 
-	protected String nodeId;
-	protected String guid;
-	protected String name;
-	protected String title;
-	protected String description;
-	protected Date createdAt;
-	protected Date modifiedAt;
-	protected String createdBy;
-	protected String modifiedBy;
+    protected String nodeId;
+    protected String guid;
+    protected String name;
+    protected String title;
+    protected String description;
+    protected Date createdAt;
+    protected Date modifiedAt;
+    protected String createdBy;
+    protected String modifiedBy;
+    protected PathInfo path;
 
-	public FavouriteNode()
-	{
-	}
+    public FavouriteNode()
+    {
+    }
 
-	/**
-	 * For POSTs
-	 * 
-	 * @param guid String
-	 */
-	public FavouriteNode(String guid)
-	{
-		this.guid = guid;
-	}
+    /**
+     * For POSTs
+     *
+     * @param guid String
+     */
+    public FavouriteNode(String guid)
+    {
+        this.guid = guid;
+    }
 
-	public FavouriteNode(String id, String guid)
-	{
-		this.nodeId = id;
-		this.guid = guid;
-	}
+    public FavouriteNode(String id, String guid)
+    {
+        this.nodeId = id;
+        this.guid = guid;
+    }
 
-	public void setGuid(String guid)
-	{
-		this.guid = guid;
-	}
+    public void setGuid(String guid)
+    {
+        this.guid = guid;
+    }
 
-	public String getGuid()
-	{
-		return guid;
-	}
+    public String getGuid()
+    {
+        return guid;
+    }
 
-	public String getRawNodeId()
-	{
-		return nodeId;
-	}
+    public String getRawNodeId()
+    {
+        return nodeId;
+    }
 
-	public String getNodeId()
-	{
-		return nodeId;
-	}
+    public String getNodeId()
+    {
+        return nodeId;
+    }
 
-	public boolean isFolder()
-	{
-		return false;
-	}
-	
-	public String getName()
-	{
-		return name;
-	}
+    public boolean isFolder()
+    {
+        return false;
+    }
 
-	public void setName(String name)
-	{
-		this.name = name;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public String getTitle()
-	{
-		return title;
-	}
+    public void setName(String name)
+    {
+        this.name = name;
+    }
 
-	public void setTitle(String title)
-	{
-		this.title = title;
-	}
+    public String getTitle()
+    {
+        return title;
+    }
 
-	public String getDescription()
-	{
-		return description;
-	}
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
 
-	public void setDescription(String description)
-	{
-		this.description = description;
-	}
+    public String getDescription()
+    {
+        return description;
+    }
 
-	public Date getCreatedAt()
-	{
-		return createdAt;
-	}
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
 
-	public void setCreatedAt(Date createdAt)
-	{
-		this.createdAt = createdAt;
-	}
+    public Date getCreatedAt()
+    {
+        return createdAt;
+    }
 
-	public Date getModifiedAt()
-	{
-		return modifiedAt;
-	}
+    public void setCreatedAt(Date createdAt)
+    {
+        this.createdAt = createdAt;
+    }
 
-	public void setModifiedAt(Date modifiedAt)
-	{
-		this.modifiedAt = modifiedAt;
-	}
+    public Date getModifiedAt()
+    {
+        return modifiedAt;
+    }
 
-	public String getCreatedBy()
-	{
-		return createdBy;
-	}
+    public void setModifiedAt(Date modifiedAt)
+    {
+        this.modifiedAt = modifiedAt;
+    }
 
-	public void setCreatedBy(String createdBy)
-	{
-		this.createdBy = createdBy;
-	}
+    public String getCreatedBy()
+    {
+        return createdBy;
+    }
 
-	public String getModifiedBy()
-	{
-		return modifiedBy;
-	}
+    public void setCreatedBy(String createdBy)
+    {
+        this.createdBy = createdBy;
+    }
 
-	public void setModifiedBy(String modifiedBy)
-	{
-		this.modifiedBy = modifiedBy;
-	}
+    public String getModifiedBy()
+    {
+        return modifiedBy;
+    }
 
-	public void setNodeId(String nodeId)
-	{
-		this.nodeId = nodeId;
-	}
+    public void setModifiedBy(String modifiedBy)
+    {
+        this.modifiedBy = modifiedBy;
+    }
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
-		return result;
-	}
+    public void setNodeId(String nodeId)
+    {
+        this.nodeId = nodeId;
+    }
 
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FavouriteNode other = (FavouriteNode) obj;
-		if (nodeId == null)
-		{
-			if (other.nodeId != null)
-				return false;
-		} else if (!nodeId.equals(other.nodeId))
-			return false;
-		return true;
-	}
+    public PathInfo getPath()
+    {
+        return path;
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJSON()
-	{
-		JSONObject json = new JSONObject();
-		json.put("guid", getGuid());
-		json.put("id", getNodeId());
-		return json;
-	}
+    public void setPath(PathInfo pathInfo)
+    {
+        this.path = pathInfo;
+    }
 
-	@Override
-	public void expected(Object o)
-	{
-		assertTrue(o instanceof FavouriteNode);
+    protected void parseAndSetPath(JSONObject jsonObject) throws ParseException
+    {
+        if (jsonObject.get("path") != null)
+        {
+            try
+            {
+                PathInfo pathInfo = RestApiUtil.parsePojo("path", jsonObject, PathInfo.class);
+                this.setPath(pathInfo);
+            }
+            catch (Exception e)
+            {
+                throw new ParseException(e.getMessage(), -1);
+            }
+        }
+    }
 
-		FavouriteNode other = (FavouriteNode) o;
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
+        return result;
+    }
 
-		AssertUtil.assertEquals("id", nodeId, other.getNodeId());
-		AssertUtil.assertEquals("guid", guid, other.getGuid());
-		AssertUtil.assertEquals("name", name, other.getName());
-		AssertUtil.assertEquals("title", title, other.getTitle());
-		AssertUtil.assertEquals("description", description, other.getDescription());
-		AssertUtil.assertEquals("createdAt", createdAt, other.getCreatedAt());
-		if(modifiedAt != null)
-		{
-			assertTrue(modifiedAt.before(other.getModifiedAt()) || modifiedAt.equals(other.getModifiedAt()));
-		}
-		AssertUtil.assertEquals("createdBy", createdBy, other.getCreatedBy());
-		AssertUtil.assertEquals("modifiedBy", modifiedBy, other.getModifiedBy());
-	}
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FavouriteNode other = (FavouriteNode) obj;
+        if (nodeId == null)
+        {
+            if (other.nodeId != null)
+                return false;
+        } else if (!nodeId.equals(other.nodeId))
+            return false;
+        return true;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "Node [nodeId=" + nodeId + ", guid=" + guid + ", name=" + name
-				+ ", title=" + title + ", description=" + description
-				+ ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt
-				+ ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
-				+ "]";
-	}
+    @SuppressWarnings("unchecked")
+    public JSONObject toJSON()
+    {
+        JSONObject json = new JSONObject();
+        json.put("guid", getGuid());
+        json.put("id", getNodeId());
+        return json;
+    }
+
+    @Override
+    public void expected(Object o)
+    {
+        assertTrue(o instanceof FavouriteNode);
+
+        FavouriteNode other = (FavouriteNode) o;
+
+        AssertUtil.assertEquals("id", nodeId, other.getNodeId());
+        AssertUtil.assertEquals("guid", guid, other.getGuid());
+        AssertUtil.assertEquals("name", name, other.getName());
+        AssertUtil.assertEquals("title", title, other.getTitle());
+        AssertUtil.assertEquals("description", description, other.getDescription());
+        AssertUtil.assertEquals("createdAt", createdAt, other.getCreatedAt());
+        if(modifiedAt != null)
+        {
+            assertTrue(modifiedAt.before(other.getModifiedAt()) || modifiedAt.equals(other.getModifiedAt()));
+        }
+        AssertUtil.assertEquals("createdBy", createdBy, other.getCreatedBy());
+        AssertUtil.assertEquals("modifiedBy", modifiedBy, other.getModifiedBy());
+        if(path != null)
+        {
+            path.expected(other.path);
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder(250);
+        sb.append("FavouriteNode [nodeId=").append(nodeId)
+                    .append(", guid=").append(guid)
+                    .append(", name=").append(name)
+                    .append(", title=").append(title)
+                    .append(", description=").append(description)
+                    .append(", createdAt=").append(createdAt)
+                    .append(", modifiedAt=").append(modifiedAt)
+                    .append(", createdBy=").append(createdBy)
+                    .append(", modifiedBy=").append(modifiedBy)
+                    .append(", path=").append(path)
+                    .append(']');
+        return sb.toString();
+    }
 }

@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -51,14 +51,13 @@ public class QuickShareLink
     private Date expiresAt;
 
     private String nodeId;
-
     private String name;
+    private PathInfo path;
 
     private ContentInfo content;
 
     private Date modifiedAt;
     private UserInfo modifiedByUser;
-
     private UserInfo sharedByUser;
 
     private List<String> allowableOperations;
@@ -120,6 +119,16 @@ public class QuickShareLink
         this.name = name;
     }
 
+    public PathInfo getPath()
+    {
+        return path;
+    }
+
+    public void setPath(PathInfo pathInfo)
+    {
+        this.path = pathInfo;
+    }
+
     public Date getModifiedAt()
     {
         return modifiedAt;
@@ -168,6 +177,7 @@ public class QuickShareLink
         sb.append("QuickShareLink [id=").append(getId());
         sb.append(", nodeId=").append(getNodeId());
         sb.append(", name=").append(getName());
+        sb.append(", path=").append(getPath());
         sb.append(", modifiedAt=").append(getModifiedAt());
         sb.append(", modifiedByUser=").append(getModifiedByUser());
         sb.append(", sharedByUser=").append(getSharedByUser());

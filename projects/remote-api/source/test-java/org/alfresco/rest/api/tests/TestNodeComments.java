@@ -788,10 +788,24 @@ public class TestNodeComments extends EnterpriseTestApi
 		Comments commentsProxy = publicApiClient.comments();
 
 		// locked node - cannot add/edit/delete comments (MNT-14945, MNT-16446)
+		// only the lock owner can (ALF-21907)
 
 		try
 		{
 			publicApiClient.setRequestContext(new RequestContext(network1.getId(), person11.getId()));
+
+            TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
+            {
+                @Override
+                public Void doWork() throws Exception
+                {
+                    TestSite site = sites.get(0);
+                    site.updateMember(person13.getId(), SiteRole.SiteManager);
+                    site.updateMember(person14.getId(), SiteRole.SiteManager);
+
+                    return null;
+                }
+            }, person11.getId(), network1.getId());
 
 			Comment comment = new Comment();
 			comment.setContent("my comment");
@@ -805,15 +819,15 @@ public class TestNodeComments extends EnterpriseTestApi
 					repoService.lockNode(nodeRef1);
 					return null;
 				}
-			}, person11.getId(), network1.getId());
+			}, person13.getId(), network1.getId());
 
-			publicApiClient.setRequestContext(new RequestContext(network1.getId(), person11.getId()));
+			// change to not lock owner and not node owner
+			publicApiClient.setRequestContext(new RequestContext(network1.getId(), person14.getId()));
 
 			// test GET for a locked node
-
-			int skipCount = 0;
-			int maxItems = Integer.MAX_VALUE;
-			Paging paging = getPaging(skipCount, maxItems);
+            int skipCount = 0;
+            int maxItems = Integer.MAX_VALUE;
+            Paging paging = getPaging(skipCount, maxItems);
 			commentsProxy.getNodeComments(nodeRef1.getId(), createParams(paging, null));
 
 			// test POST for a locked node
@@ -855,9 +869,72 @@ public class TestNodeComments extends EnterpriseTestApi
 			{
 				assertEquals(HttpStatus.SC_CONFLICT, e.getHttpResponse().getStatusCode());
 			}
+
+            // change to node creator
+            publicApiClient.setRequestContext(new RequestContext(network1.getId(), person11.getId()));
+
+            // test POST for a locked node
+            try
+            {
+                comment = new Comment();
+                comment.setContent("my other comment");
+                createdComment = commentsProxy.createNodeComment(nodeRef1.getId(), comment);
+
+                fail("");
+            }
+            catch (PublicApiException e)
+            {
+                assertEquals(HttpStatus.SC_CONFLICT, e.getHttpResponse().getStatusCode());
+            }
+
+            // test PUT for a locked node
+            try
+            {
+                Comment updatedComment = new Comment();
+                updatedComment.setContent("my comment");
+                commentsProxy.updateNodeComment(nodeRef1.getId(), createdComment.getId(), updatedComment);
+
+                fail("");
+            }
+            catch (PublicApiException e)
+            {
+                assertEquals(HttpStatus.SC_CONFLICT, e.getHttpResponse().getStatusCode());
+            }
+
+            // test DELETE for a locked node
+            try
+            {
+                commentsProxy.removeNodeComment(nodeRef1.getId(), createdComment.getId());
+
+                fail("");
+            }
+            catch (PublicApiException e)
+            {
+                assertEquals(HttpStatus.SC_CONFLICT, e.getHttpResponse().getStatusCode());
+            }
+
+			// change to lock owner
+			publicApiClient.setRequestContext(new RequestContext(network1.getId(), person13.getId()));
+
+			// test GET for a locked node
+            commentsProxy.getNodeComments(nodeRef1.getId(), createParams(paging, null));
+
+			// test POST for a locked node
+			comment = new Comment();
+			comment.setContent("my other comment");
+			createdComment = commentsProxy.createNodeComment(nodeRef1.getId(), comment);
+
+			// test PUT for a locked node
+			Comment updatedComment = new Comment();
+			updatedComment.setContent("my comment");
+			commentsProxy.updateNodeComment(nodeRef1.getId(), createdComment.getId(), updatedComment);
+
+			// test DELETE for a locked node
+			commentsProxy.removeNodeComment(nodeRef1.getId(), createdComment.getId());
 		}
 		finally
 		{
+		    // undo the lock
 			TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
 			{
 				@Override
@@ -866,7 +943,21 @@ public class TestNodeComments extends EnterpriseTestApi
 					repoService.unlockNode(nodeRef1);
 					return null;
 				}
-			}, person11.getId(), network1.getId());
+			}, person13.getId(), network1.getId());
+
+            // put the other members back to SiteCollaborator
+            TenantUtil.runAsUserTenant(new TenantRunAsWork<Void>()
+            {
+                @Override
+                public Void doWork() throws Exception
+                {
+                    TestSite site = sites.get(0);
+                    site.updateMember(person13.getId(), SiteRole.SiteCollaborator);
+                    site.updateMember(person14.getId(), SiteRole.SiteCollaborator);
+
+                    return null;
+                }
+            }, person11.getId(), network1.getId());
 		}
 	}
 

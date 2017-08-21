@@ -2,7 +2,7 @@
  * #%L
  * Alfresco Remote API
  * %%
- * Copyright (C) 2005 - 2016 Alfresco Software Limited
+ * Copyright (C) 2005 - 2017 Alfresco Software Limited
  * %%
  * This file is part of the Alfresco software. 
  * If the software was purchased under a paid Alfresco license, the terms of 
@@ -49,12 +49,12 @@ RelationshipResourceAction.Create<Favourite>,  RelationshipResourceAction.Delete
 
     private Favourites favourites;
 
-	public void setFavourites(Favourites favourites)
-	{
-		this.favourites = favourites;
-	}
+    public void setFavourites(Favourites favourites)
+    {
+        this.favourites = favourites;
+    }
 
-	@Override
+    @Override
     public void afterPropertiesSet()
     {
         ParameterCheck.mandatory("favourites", this.favourites);
@@ -72,34 +72,34 @@ RelationshipResourceAction.Create<Favourite>,  RelationshipResourceAction.Delete
         return favourites.getFavourites(personId, parameters);
     }
 
-	/**
+    /**
      * Adds the given site as a favourite site for the user.
      * 
      * @see org.alfresco.rest.framework.resource.actions.interfaces.RelationshipResourceAction.Create#create(String, java.util.List, org.alfresco.rest.framework.resource.parameters.Parameters)
-	 */
-	@Override
+     */
+    @Override
     @WebApiDescription(title = "Add Person Favorite", description = "Favorite something")
-	public List<Favourite> create(String personId, List<Favourite> entity, Parameters parameters)
-	{
-		List<Favourite> ret = new ArrayList<Favourite>(entity.size());
+    public List<Favourite> create(String personId, List<Favourite> entity, Parameters parameters)
+    {
+        List<Favourite> ret = new ArrayList<Favourite>(entity.size());
         for(Favourite favourite : entity)
         {
-        	ret.add(favourites.addFavourite(personId, favourite));
+            ret.add(favourites.addFavourite(personId, favourite, parameters));
         }
         return ret;
-	}
+    }
 
-	@Override
+    @Override
     @WebApiDescription(title = "Remove Person Favorite", description = "Un-favorite something")
-	public void delete(String personId, String id, Parameters parameters)
-	{
-		favourites.removeFavourite(personId, id);
-	}
+    public void delete(String personId, String id, Parameters parameters)
+    {
+        favourites.removeFavourite(personId, id);
+    }
 
-	@Override
-	public Favourite readById(String personId, String favouriteId, Parameters parameters)
-			throws RelationshipResourceNotFoundException
-	{
-		return favourites.getFavourite(personId, favouriteId);
-	}
+    @Override
+    public Favourite readById(String personId, String favouriteId, Parameters parameters)
+            throws RelationshipResourceNotFoundException
+    {
+        return favourites.getFavourite(personId, favouriteId, parameters);
+    }
 }
