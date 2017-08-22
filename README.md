@@ -38,3 +38,6 @@ Yes, we will not make modifications that will change compatiblity. Just make sur
 
 # About Loftux AB
 Loftux AB, http://loftux.se http://loftux.com is a company based in Sweden that delivers implementations and addons to Alfresco Community Edition. Please visit our website should you want seek out the opportunity to use our services.
+
+## Warranty
+The LXCommunity ECM and included extensions is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. Commercial support is available from Loftux AB.
