@@ -2,7 +2,7 @@
 
 #Set the name and build number
 versionedition="Community by Loftux AB"
-buildnumber="LX99"
+buildnumber="LX100"
 buildAlfresco="5.2-SNAPSHOT"
 
 # Add url in format id::layout::url, see http://maven.apache.org/plugins/maven-deploy-plugin/deploy-mojo.html
