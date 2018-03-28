@@ -406,8 +406,11 @@ public class TaggingServiceImpl implements TaggingService,
             // Queue all the after's for addition to the tag scopes
             for (NodeRef afterNodeRef : afterNodeRefs)
             {
-                String tagName = getTagName(afterNodeRef);
-                queueTagUpdate(nodeRef, tagName, true);
+                if (this.nodeService.exists(afterNodeRef))
+                {
+                    String tagName = getTagName(afterNodeRef);
+                    queueTagUpdate(nodeRef, tagName, true);
+                }
             }
         }
         else if (afterNodeRefs == null && beforeNodeRefs != null)
