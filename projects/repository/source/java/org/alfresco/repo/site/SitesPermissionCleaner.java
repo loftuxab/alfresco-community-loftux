@@ -133,7 +133,7 @@ public class SitesPermissionCleaner
                 String thisSiteGroupPrefix = siteServiceImpl.getSiteGroup(containingSite.getShortName(), true);
 
                 // If it's a group site permission for a site other than the current site
-                if (authority.startsWith(PermissionService.GROUP_PREFIX) &&
+                if (authority.startsWith(PermissionService.GROUP_PREFIX) && authority.startsWith(PermissionService.GROUP_PREFIX + "site") &&
                         // And it's not GROUP_EVERYONE
                         !authority.startsWith(PermissionService.ALL_AUTHORITIES) && !authority.startsWith(thisSiteGroupPrefix) &&
                         //  And if the current user has permissions to do it
