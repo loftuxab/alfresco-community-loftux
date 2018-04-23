@@ -291,9 +291,11 @@ public abstract class DeclarativeSpreadsheetWebScript extends DeclarativeWebScri
             sheet.createFreezePane(0, 1);
             
             Font fb = wb.createFont();
-            fb.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            //fb.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            fb.setBold(true);
             Font fi = wb.createFont();
-            fi.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            //fi.setBoldweight(Font.BOLDWEIGHT_BOLD);
+            fi.setBold(true);
             fi.setItalic(true);
             
             CellStyle csReq = wb.createCellStyle();

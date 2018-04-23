@@ -116,6 +116,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient-cache</artifactId>
+            <version>${dependency.httpcomponents.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -264,6 +265,11 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${dependency.httpcomponents.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
@@ -283,17 +289,23 @@
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>1.8.10-alfresco-patched</version>
+            <version>2.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>1.8.10</version>
+            <version>2.0.8</version>
+        </dependency>
+        <dependency>
+            <!-- we need this for TextToPdfContentTransformer -->
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox-tools</artifactId>
+            <version>2.0.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jempbox</artifactId>
-            <version>1.8.10</version>
+            <version>1.8.13</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -332,6 +344,10 @@
                 <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -382,27 +398,10 @@
             <version>2.4.7</version>
             <classifier>indy</classifier>
         </dependency>
-        <!-- OpenOffice -->
         <dependency>
-            <groupId>com.artofsolving</groupId>
-            <artifactId>jodconverter</artifactId>
-            <version>2.1.0-alfresco-patched</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openoffice</groupId>
-            <artifactId>unoil</artifactId>
-            <version>3.1.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>ridl</artifactId>
-                    <groupId>org.openoffice</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.openoffice</groupId>
-            <artifactId>juh</artifactId>
-            <version>3.1.0</version>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-jodconverter-core</artifactId>
+            <version>3.0.1.1</version>
         </dependency>
         <dependency>
             <groupId>net.sf.javamusictag</groupId>
@@ -445,11 +444,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
             <version>${dependency.poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>ooxml-schemas</artifactId>
-            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>org.livetribe</groupId>
