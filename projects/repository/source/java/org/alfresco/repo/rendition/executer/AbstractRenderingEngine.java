@@ -79,8 +79,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.extensions.surf.util.I18NUtil;
 
-import com.sun.star.lang.NullPointerException;
-
 /**
  * This class adds some new behaviour to the standard ActionExecuterAbstractBase
  * in order to support the RenditionService.
@@ -145,6 +143,7 @@ public abstract class AbstractRenderingEngine extends ActionExecuterAbstractBase
     protected ContentService contentService;
     protected MimetypeMap mimetypeMap;
     protected ActionTrackingService actionTrackingService;
+    protected NamespaceService namespaceService;
 
     /* Parameter names common to all Rendering Actions */
     /**
@@ -249,7 +248,12 @@ public abstract class AbstractRenderingEngine extends ActionExecuterAbstractBase
     {
         this.renditionLocationResolver = renditionLocationResolver;
     }
-    
+
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
+    }
+
     public AbstractRenderingEngine(NodeLocator temporaryParentNodeLocator, QName temporaryRenditionLinkType)
     {
         this.publicAction = false;
