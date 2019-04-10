@@ -4,21 +4,21 @@
  * %%
  * Copyright (C) 2005 - 2016 Alfresco Software Limited
  * %%
- * This file is part of the Alfresco software. 
- * If the software was purchased under a paid Alfresco license, the terms of 
- * the paid license agreement will prevail.  Otherwise, the software is 
+ * This file is part of the Alfresco software.
+ * If the software was purchased under a paid Alfresco license, the terms of
+ * the paid license agreement will prevail.  Otherwise, the software is
  * provided under the following open source license terms:
- * 
+ *
  * Alfresco is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Alfresco is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with Alfresco. If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -71,6 +71,11 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
         this.protectionEnabled = protectionEnabled;
     }
 
+    public boolean isProtectionEnabled()
+    {
+        return protectionEnabled;
+    }
+
     public void setProtectionLimit(int protectionLimit)
     {
         this.protectionLimit = protectionLimit;
@@ -92,7 +97,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
 
         this.serviceInstanceId = GUID.generate();
     }
-    
+
     public void setTicketComponent(TicketComponent ticketComponent)
     {
         this.ticketComponent = ticketComponent;
@@ -102,7 +107,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     {
         this.authenticationComponent = authenticationComponent;
     }
-   
+
     public boolean isActive()
     {
         return !(this.authenticationComponent instanceof ActivateableBean)
@@ -142,7 +147,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
                 final String protectedUserKey = getProtectedUserKey(userName);
                 if (protectedUsersCache.get(protectedUserKey) != null)
                 {
-                     protectedUsersCache.remove(protectedUserKey);
+                    protectedUsersCache.remove(protectedUserKey);
                 }
             }
         }
@@ -229,27 +234,27 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     {
         ticketComponent.invalidateTicketByUser(userName);
     }
-    
+
     public Set<String> getUsersWithTickets(boolean nonExpiredOnly)
     {
-    	return ticketComponent.getUsersWithTickets(nonExpiredOnly);
+        return ticketComponent.getUsersWithTickets(nonExpiredOnly);
     }
 
     public void invalidateTicket(String ticket) throws AuthenticationException
     {
         ticketComponent.invalidateTicketById(ticket);
     }
-    
+
     public int countTickets(boolean nonExpiredOnly)
     {
-    	return ticketComponent.countTickets(nonExpiredOnly);
+        return ticketComponent.countTickets(nonExpiredOnly);
     }
-    
+
     public int invalidateTickets(boolean expiredOnly)
     {
-    	return ticketComponent.invalidateTickets(expiredOnly);
+        return ticketComponent.invalidateTickets(expiredOnly);
     }
-    
+
 
     public void validate(String ticket) throws AuthenticationException
     {
@@ -257,12 +262,12 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
         try
         {
             String tenant = getPrevalidationTenantDomain();
-            
+
             // clear context - to avoid MT concurrency issue (causing domain mismatch) - see also 'authenticate' above
             clearCurrentSecurityContext();
             currentUser = ticketComponent.validateTicket(ticket);
             authenticationComponent.setCurrentUser(currentUser, UserNameValidationMode.NONE);
-            
+
             if (tenant == null)
             {
                 Pair<String, String> userTenant = AuthenticationUtil.getUserTenant(currentUser);
@@ -276,7 +281,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
             throw ae;
         }
     }
-    
+
     /**
      * This method is called from the {@link #validate(String)} method. If this method returns null then
      * the user's tenant will be obtained from the username. This is generally correct in the case where the user can be
@@ -292,7 +297,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     public String getCurrentTicket() throws AuthenticationException
     {
         String userName = getCurrentUserName();
-        
+
         // So that preAuthenticationCheck can constrain the creation of new tickets, we first ask for the current ticket
         // without auto-creation
         String ticket = ticketComponent.getCurrentTicket(userName, false);
@@ -308,7 +313,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     public String getNewTicket()
     {
         String userName = getCurrentUserName();
-        
+
         try
         {
             preAuthenticationCheck(userName);
@@ -320,7 +325,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
         }
         return ticketComponent.getNewTicket(userName);
     }
-    
+
     public void clearCurrentSecurityContext()
     {
         authenticationComponent.clearCurrentSecurityContext();
@@ -345,7 +350,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
         ticketComponent.clearCurrentTicket();
         ticketComponent.getCurrentTicket(guestUser, true); // to ensure new ticket is created (even if client does not explicitly call getCurrentTicket)
     }
-    
+
     public boolean guestUserAuthenticationAllowed()
     {
         return authenticationComponent.guestUserAuthenticationAllowed();
@@ -393,14 +398,14 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
 
     public Set<String> getDomains()
     {
-       return Collections.singleton(getDomain());
+        return Collections.singleton(getDomain());
     }
 
     public Set<String> getDomainsThatAllowUserCreation()
     {
         if(getAllowsUserCreation())
         {
-            return Collections.singleton(getDomain()); 
+            return Collections.singleton(getDomain());
         }
         else
         {
@@ -412,7 +417,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     {
         if(getAllowsUserDeletion())
         {
-            return Collections.singleton(getDomain()); 
+            return Collections.singleton(getDomain());
         }
         else
         {
@@ -424,7 +429,7 @@ public class AuthenticationServiceImpl extends AbstractAuthenticationService imp
     {
         if(getAllowsUserPasswordChange())
         {
-            return Collections.singleton(getDomain()); 
+            return Collections.singleton(getDomain());
         }
         else
         {
