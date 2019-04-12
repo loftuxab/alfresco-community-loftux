@@ -57,12 +57,8 @@ import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.PaneInformation;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.extensions.webscripts.DeclarativeWebScript;
 import org.springframework.extensions.webscripts.Status;
@@ -443,7 +439,7 @@ public class UserCSVUploadPost extends DeclarativeWebScript
                 for (int cn=0; cn<COLUMNS.length; cn++)
                 {
                     Cell cell = r.getCell(cn);
-                    if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK)
+                    if (cell != null && cell.getCellType() != CellType.BLANK)
                     {
                         d[cn] = df.formatCellValue(cell);
                     }
