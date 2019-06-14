@@ -159,7 +159,7 @@
     <dependency.lucene.version>2.4.1</dependency.lucene.version>
     <dependency.truezip.version>7.7.10</dependency.truezip.version>
     <dependency.jibx.version>1.2.6</dependency.jibx.version>
-    <dependency.tika.version>1.20</dependency.tika.version>
+    <dependency.tika.version>1.21</dependency.tika.version>
     <dependency.vorbisJava.version>0.4</dependency.vorbisJava.version>
     <dependency.opencmis.version>1.0.0</dependency.opencmis.version>
     <dependency.antlr.version>3.5.2</dependency.antlr.version>
@@ -168,7 +168,7 @@
     <dependency.activiti.version>5.19.0.3</dependency.activiti.version>
     <dependency.activiti-engine.version>5.19.0.3</dependency.activiti-engine.version>
     <dependency.jackson2.version>2.9.5</dependency.jackson2.version>
-    <dependency.poi.version>4.1.0</dependency.poi.version>
+    <dependency.poi.version>4.0.1</dependency.poi.version>
     <dependency.yui.version>2.9.0-alfresco-20141223</dependency.yui.version>
     <dependency.alfresco-authorised-users.version>5.2.0.4</dependency.alfresco-authorised-users.version>
     <dependency.webscripts.version>6.20</dependency.webscripts.version>
@@ -347,7 +347,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.11</version>
+            <version>1.12</version>
         </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
